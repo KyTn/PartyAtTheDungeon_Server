@@ -5,11 +5,15 @@
 #include "GameFramework/Actor.h"
 #include "ParserActor.generated.h"
 
+class PATD_MG_StaticMap;
+
 UCLASS()
 class PATD_SERVER_API AParserActor : public AActor
 {
 	GENERATED_BODY()
 	
+private :
+	PATD_MG_StaticMap* StaticMapRef;
 public:	
 	// Sets default values for this actor's properties
 	AParserActor();

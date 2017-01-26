@@ -12,6 +12,7 @@ private:
 	uint32 _y;
 
 public:
+
 	PATD_MG_LogicPosition(uint32 x, uint32 y);
 	~PATD_MG_LogicPosition();
 
@@ -24,10 +25,6 @@ public:
 		return this->GetX() == other.GetX() && this->GetY() == other.GetY();
 	}
 
-	/*
-	uint32 GetTypeHash(const PATD_MG_LogicPosition& logpos)
-	{
-		return logpos->
-	}
-	*/
+	
+	uint32 GetTypeHash(const PATD_MG_LogicPosition& logpos);
 };

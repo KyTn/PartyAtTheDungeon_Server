@@ -12,3 +12,11 @@ PATD_MG_LogicPosition::PATD_MG_LogicPosition(uint32 x, uint32 y)
 PATD_MG_LogicPosition::~PATD_MG_LogicPosition()
 {
 }
+
+
+
+uint32 PATD_MG_LogicPosition::GetTypeHash(const PATD_MG_LogicPosition& logpos)
+{
+	return 8;
+}
+

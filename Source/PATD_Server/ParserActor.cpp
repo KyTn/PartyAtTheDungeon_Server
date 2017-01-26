@@ -2,6 +2,7 @@
 
 #include "PATD_Server.h"
 #include "ParserActor.h"
+#include "PATD_MG_StaticMap.h"
 
 
 // Sets default values
@@ -16,6 +17,7 @@ AParserActor::AParserActor()
 void AParserActor::BeginPlay()
 {
 	Super::BeginPlay();
+	StaticMapRef = new PATD_MG_StaticMap();
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
 
@@ -42,21 +44,6 @@ void AParserActor::BeginPlay()
 		TArray<TArray<TCHAR>> map;
 
 		map.Empty(20);
-		/*
-		map[0][0] = 'a';
-
-
-		for (int i = 0; i < fil; i++)
-		{
-		for (int j = 0; j < col; j++)
-		{
-
-		}
-		}
-		*/
-
-		int i = 0;
-
 
 		while (B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart))
 		{
@@ -65,20 +52,28 @@ void AParserActor::BeginPlay()
 		map.Add(B.GetCharArray());
 
 
-		for (i = map.Num() - 1; i >= 0; i--)
+
+		for (int i = 0; i <= map.Num(); i++)
 		{
 			FString s;
 
 			for (int j = 0; j < map[i].Num(); j++)
 			{
 				s += map[i][j];
+
+				StaticMapRef->AddNewLogicPosition(i, j);
+				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, TEXT("CREATED LOGIC POSITION"));
 			}
 
-			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 		}
 		/**/
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, A + "----");
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, B);
+
+
+
+
 
 	}
 
