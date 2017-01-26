@@ -5,9 +5,9 @@
 /**
  * 
  */
-class PATD_SERVER_API PATD_MG_MapParser
+class PATD_SERVER_API PD_MG_MapParser
 {
 public:
-	PATD_MG_MapParser();
-	~PATD_MG_MapParser();
+	PD_MG_MapParser();
+	~PD_MG_MapParser();
 };

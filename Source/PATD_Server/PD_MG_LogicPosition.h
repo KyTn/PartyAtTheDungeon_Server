@@ -13,18 +13,18 @@ private:
 
 public:
 
-	PATD_MG_LogicPosition(uint32 x, uint32 y);
-	~PATD_MG_LogicPosition();
+	PD_MG_LogicPosition(uint32 x, uint32 y);
+	~PD_MG_LogicPosition();
 
 	uint32 GetX() { return _x; }
 	void SetX(uint32 x) { _x = x; }
 	uint32 GetY() { return _y; }
 	void SetY(uint32 y) { _y = y; }
 
-	bool operator=(PATD_MG_LogicPosition other) {
+	bool operator=(PD_MG_LogicPosition other) {
 		return this->GetX() == other.GetX() && this->GetY() == other.GetY();
 	}
 
 	
-	uint32 GetTypeHash(const PATD_MG_LogicPosition& logpos);
+	uint32 GetTypeHash(const PD_MG_LogicPosition& logpos);
 };

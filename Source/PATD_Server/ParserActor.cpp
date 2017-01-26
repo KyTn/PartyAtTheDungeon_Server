@@ -75,23 +75,12 @@ void AParserActor::BeginPlay()
 				salida.AppendInt(j);
 				salida.Append(")");
 
-
-				//salida = TEXT("adsfasdfasdf %d ", i);
-
 				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, salida);
 			}
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 			
 		}
-		/**/
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, A + "----");
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, B);
-
-	
-
-
-
 	}
 
 }
