@@ -14,6 +14,7 @@ class PATD_SERVER_API AParserActor : public AActor
 	
 private :
 	PATD_MG_StaticMap* StaticMapRef;
+
 public:	
 	// Sets default values for this actor's properties
 	AParserActor();

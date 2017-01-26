@@ -19,32 +19,36 @@ void AParserActor::BeginPlay()
 	Super::BeginPlay();
 	StaticMapRef = new PATD_MG_StaticMap();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
-
-	FString GameDir = FPaths::GameDir();
-	FString CompleteFilePath = GameDir + "Content/DungeonTestingMaps/test1.dungeon";
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
+	
+	FString CompleteFilePath = FPaths::GameDir() + "Content/DungeonTestingMaps/test1.dungeon";
 
 	FString FileData = "";
 	if (FFileHelper::LoadFileToString(FileData, *CompleteFilePath)) {
 
+		// Muesta por pantalla el contenido del fichero pasado al parser
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FileData);
 
 
+
+		// Obtenemos el numero de filas y de columnas 
 		FString A, B;
 
+		uint32 fil, col;
 
 		FileData.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
+		fil = FCString::Atoi(*A);
 
-		int32 fil = FCString::Atoi(*A);
 		B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
+		col = FCString::Atoi(*A);
+		////////////////
 
-		int32 col = FCString::Atoi(*A);
 
-
+		// Obtenemos 
 		TArray<TArray<TCHAR>> map;
 
 		map.Empty(20);
-
+		
 		while (B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart))
 		{
 			map.Add(A.GetCharArray());
@@ -52,26 +56,39 @@ void AParserActor::BeginPlay()
 		map.Add(B.GetCharArray());
 
 
+		
+		FString s;
 
-		for (int i = 0; i <= map.Num(); i++)
+		for (int i = 0; i < map.Num(); i++)
 		{
-			FString s;
-
+			s = "";
+			
 			for (int j = 0; j < map[i].Num(); j++)
 			{
 				s += map[i][j];
 
 				StaticMapRef->AddNewLogicPosition(i, j);
-				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, TEXT("CREATED LOGIC POSITION"));
+
+				FString salida = " LP : (";
+				salida.AppendInt(i);
+				salida.Append(", ");
+				salida.AppendInt(j);
+				salida.Append(")");
+
+
+				//salida = TEXT("adsfasdfasdf %d ", i);
+
+				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, salida);
 			}
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			
 		}
 		/**/
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, A + "----");
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, B);
 
-
+	
 
 
 

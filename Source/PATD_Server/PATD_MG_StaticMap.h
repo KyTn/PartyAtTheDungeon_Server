@@ -5,6 +5,8 @@
 /// CLASS REFERENCES
 class PATD_MG_Room;
 class PATD_MG_LogicPosition;
+
+
 class PATD_SERVER_API PATD_MG_StaticMap
 {
 private:
