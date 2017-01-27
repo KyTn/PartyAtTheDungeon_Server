@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "ParserActor.h"
-#include "PATD_MG_StaticMap.h"
+#include "PD_MG_StaticMap.h"
 
 
 // Sets default values
@@ -17,7 +17,7 @@ AParserActor::AParserActor()
 void AParserActor::BeginPlay()
 {
 	Super::BeginPlay();
-	StaticMapRef = new PATD_MG_StaticMap();
+	StaticMapRef = new PD_MG_StaticMap();
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
 	

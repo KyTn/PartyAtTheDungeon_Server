@@ -5,7 +5,7 @@
 /**
  * 
  */
-class PATD_SERVER_API PATD_MG_LogicPosition
+class PATD_SERVER_API PD_MG_LogicPosition
 {
 private:
 	uint32 _x;
