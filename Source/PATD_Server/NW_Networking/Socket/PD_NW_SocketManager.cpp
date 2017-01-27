@@ -6,6 +6,8 @@
 //Includes of forward declaration
 #include "PD_NW_Socket.h" 
 #include "Networking.h"
+#include "NW_NetWorking/PD_NW_ServerActor.h"
+
 
 
 PD_NW_SocketManager::PD_NW_SocketManager()
@@ -19,9 +21,20 @@ PD_NW_SocketManager::~PD_NW_SocketManager()
 }
 
 
-void PD_NW_SocketManager::socketHasReceivedData(TArray<uint8> data, int socketIndex) {
+void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("As String!!!!! ~> "));
+	SetServerActor(InmyServerActor);
+	myServerActor->IniciarTimer();
+}
 
+void PD_NW_SocketManager::SetServerActor(APD_NW_ServerActor* InmyServerActor)
+{
+	myServerActor = InmyServerActor;
+	myServerActor->SetSocketManager(this);
+}
 
+void PD_NW_SocketManager::SocketHasReceivedData(TArray<uint8> data, int socketIndex) {
 
 	//No necesitamos esto porque la funcion del timer ya tendra un bucle
 	/*//Busqueda del socket que lo envia para poder guardar la variable int socketIndex .
@@ -35,7 +48,7 @@ void PD_NW_SocketManager::socketHasReceivedData(TArray<uint8> data, int socketIn
 
 };
 
-void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
+void PD_NW_SocketManager::ListenerNewConexion(PD_NW_Socket* newSocket) {
 
 	//TO-DO Aqui habria que hacer el control de maximas conexiones, y en caso de no aceptar mas, notificarlo a la conexion con el listener, o cerrar el newSocket.
 
@@ -46,18 +59,21 @@ void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
 
 }
 
-bool PD_NW_SocketManager::initListener(int port) {
+bool PD_NW_SocketManager::InitListener(int port) {
 	
 	PD_NW_Socket ListenSocket;
 	ListenSocket.listenerSocket(port);
-	listenerNewConexion(&ListenSocket);
+	ListenerNewConexion(&ListenSocket);
 	return true;
+
 }
 
 
-void PD_NW_SocketManager::timerRefreshFunction() {
-	for (int i = 0; i < socketArray.Num(); i++) {
+void PD_NW_SocketManager::TimerRefreshFunction() {
+	/*for (int i = 0; i < socketArray.Num(); i++) {
 		//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
-		socketArray[i]->receiveData();
-	}
+		//socketArray[i]->receiveData();
+	}*/
+	UE_LOG(LogTemp, Error, TEXT("Timer Working "));
+
 }
