@@ -26,7 +26,7 @@ PD_NW_Socket::~PD_NW_Socket()
 
 
 TArray<uint8>* PD_NW_Socket::receiveData() {
-	//Aqui deberia ir la funcion que hiciese lo necesario cuando hay un envio pendiente. 
+	
 
 
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
@@ -36,6 +36,7 @@ TArray<uint8>* PD_NW_Socket::receiveData() {
 	TArray<uint8>* receivedData = nullptr;
 
 	uint32 Size;
+	//El while nos come todos los pendings pero solo se queda con el ultimo. No tiene mucho sentido
 	while (socket->HasPendingData(Size))
 	{
 		receivedData->Init(0, FMath::Min(Size, 65507u));

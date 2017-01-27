@@ -10,12 +10,12 @@
 
 PD_NW_SocketManager::PD_NW_SocketManager()
 {
-	socketArray = new TArray<PD_NW_Socket*>();
+	socketArray = TArray<PD_NW_Socket*>();
 }
 
 PD_NW_SocketManager::~PD_NW_SocketManager()
 {
-	delete socketArray;
+	//delete socketArray;
 }
 
 
@@ -41,7 +41,7 @@ void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
 	
 	//Se deberia aceptar la conexion y despues enviar el mensaje a los objetos registrados? o al reves?
 	//O separar esto en dos pasos?
-	socketArray->Add(newSocket);
+	socketArray.Add(newSocket);
 
 
 }
@@ -52,3 +52,10 @@ bool PD_NW_SocketManager::initListener(int port) {
 	return true;
 }
 
+
+void PD_NW_SocketManager::timerRefreshFunction() {
+	for (int i = 0; i < socketArray.Num(); i++) {
+		//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
+		socketArray[i]->receiveData();
+	}
+}

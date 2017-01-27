@@ -11,7 +11,7 @@ class PD_NW_Socket;
 class PATD_SERVER_API PD_NW_SocketManager
 {
 private:
-	TArray<PD_NW_Socket*>* socketArray;
+	TArray<PD_NW_Socket*> socketArray;
 
 	//Solo hay una funcion de timer, que ejecuta y guarda el SocketManager. Lo que hace es llamar a la rutina de loopPendingFunction de cada socket.
 	//Para mutear un socket?
