@@ -5,7 +5,7 @@
 
 //Includes of forward declaration
 #include "PD_NW_Socket.h" 
-
+#include "Networking.h"
 
 
 PD_NW_SocketManager::PD_NW_SocketManager()
@@ -38,7 +38,7 @@ void PD_NW_SocketManager::socketHasReceivedData(TArray<uint8> data, int socketIn
 void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
 
 	//TO-DO Aqui habria que hacer el control de maximas conexiones, y en caso de no aceptar mas, notificarlo a la conexion con el listener, o cerrar el newSocket.
-	
+
 	//Se deberia aceptar la conexion y despues enviar el mensaje a los objetos registrados? o al reves?
 	//O separar esto en dos pasos?
 	socketArray.Add(newSocket);
@@ -47,8 +47,12 @@ void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
 }
 
 bool PD_NW_SocketManager::initListener(int port) {
-
-
+	
+	//FIPv4Endpoint Endpoint(FIPv4Address(127,0,0,0), port);
+	//PD_NW_Socket* ListenSocket = FTcpSocketBuilder("prueba").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
+	PD_NW_Socket ListenSocket;
+	ListenSocket.listenerSocket(port);
+	listenerNewConexion(&ListenSocket);
 	return true;
 }
 

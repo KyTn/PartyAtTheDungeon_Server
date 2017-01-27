@@ -27,8 +27,8 @@ public:
 	//Recibir datos
 	//Deberia devolver un array de datos recibidos, pero y si hay mas de un paquete pending? Ahora mismo hay un bucle pero solo guardaria el ultimo.
 	TArray<uint8>* receiveData();
-	
-	
+
+	void listenerSocket(int port);
 };
 
 

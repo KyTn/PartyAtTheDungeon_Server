@@ -20,9 +20,9 @@ PD_NW_Socket::PD_NW_Socket(FSocket* socketIn)
 
 PD_NW_Socket::~PD_NW_Socket()
 {
+	delete this->socket; // con esto se supone que se borra la instancia de la clase (?)
+	this->socket = NULL;
 }
-
-
 
 
 TArray<uint8>* PD_NW_Socket::receiveData() {
@@ -53,8 +53,11 @@ TArray<uint8>* PD_NW_Socket::receiveData() {
 	
 	return receivedData;
 
-
-
 }
 
+
+void PD_NW_Socket::listenerSocket(int port) {
+	FIPv4Endpoint Endpoint(FIPv4Address(127, 0, 0, 0), port);
+	this->socket = FTcpSocketBuilder("prueba").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
+}
 
