@@ -85,6 +85,27 @@ void AParserActor::BeginPlay()
 
 }
 
+void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c) 
+{
+	switch (*c) {
+		// Si es una pared ...
+		case 'w':
+			break;
+
+		// Si es un tile normal y corriente ...
+		case '.':
+			break; 
+
+		// Si es una puerta ...
+		case 'd': 
+			break;
+
+		// default
+		default: 
+			break;
+	}
+}
+
 // Called every frame
 void AParserActor::Tick(float DeltaTime)
 {
