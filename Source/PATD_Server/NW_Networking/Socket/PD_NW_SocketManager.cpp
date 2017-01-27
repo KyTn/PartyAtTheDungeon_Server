@@ -48,8 +48,6 @@ void PD_NW_SocketManager::listenerNewConexion(PD_NW_Socket* newSocket) {
 
 bool PD_NW_SocketManager::initListener(int port) {
 	
-	//FIPv4Endpoint Endpoint(FIPv4Address(127,0,0,0), port);
-	//PD_NW_Socket* ListenSocket = FTcpSocketBuilder("prueba").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
 	PD_NW_Socket ListenSocket;
 	ListenSocket.listenerSocket(port);
 	listenerNewConexion(&ListenSocket);
