@@ -6,6 +6,7 @@
 #include "ParserActor.generated.h"
 
 class PD_MG_StaticMap;
+class PD_MG_LogicPosition;
 
 UCLASS()
 class PATD_SERVER_API AParserActor : public AActor
@@ -16,6 +17,15 @@ private :
 	PD_MG_StaticMap* StaticMapRef;
 	
 public:	
+
+	UPROPERTY(EditAnywhere)
+		AActor* tileActor;
+	UPROPERTY(EditAnywhere)
+		AActor* wallActor;
+	UPROPERTY(EditAnywhere)
+		AActor* doorActor;
+
+
 	// Sets default values for this actor's properties
 	AParserActor();
 
@@ -26,6 +36,6 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 
-
+	void ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c);
 	
 };
