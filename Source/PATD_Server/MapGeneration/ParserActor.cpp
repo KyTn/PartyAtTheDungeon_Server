@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-#include "ParserActor.h"
-#include "PD_MG_StaticMap.h"
-#include "PD_MG_LogicPosition.h"
+#include "PATD_Server/MapGeneration/ParserActor.h"
+#include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PATD_Server/ElementActors/PD_E_TileActor.h"
 
 
@@ -49,10 +49,10 @@ void AParserActor::BeginPlay()
 
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
-		//map.Empty();
+		map.Empty();
 
 
-		/*
+		/**/
 		for (int i = 0; i < (int)fil; i++) {
 			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
 			TArray<TCHAR> myCol = A.GetCharArray();
@@ -69,10 +69,12 @@ void AParserActor::BeginPlay()
 			map.Add(A.GetCharArray());
 			//map[i].Empty(col);
 			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, );
+			/*
 			for (i = 0; i < map[map.Num() - 1].Num(); i++) {
 				//map[map.Num() - 1][i] = A[i];
 				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, &map[map.Num() - 1][i]);
 			}
+			/**/
 		}
 		map.Add(B.GetCharArray());
 		/*
