@@ -7,6 +7,7 @@
 
 //forward declarations
 class PD_NW_SocketManager;
+class UPD_ServerGameInstance;
 
 UCLASS()
 class PATD_SERVER_API APD_NW_ServerActor : public AActor
@@ -23,6 +24,10 @@ public:
 
 
 	FTimerHandle TimerHandleActor;
+
+	FTimerHandle TimerHandleActor2;
+
+	void ChangeLevelMap();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

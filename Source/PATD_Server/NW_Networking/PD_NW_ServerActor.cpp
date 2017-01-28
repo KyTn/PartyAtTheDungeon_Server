@@ -5,6 +5,7 @@
 
 //Includes of forward declaration
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
+#include "PD_ServerGameInstance.h"
 
 // Sets default values
 APD_NW_ServerActor::APD_NW_ServerActor()
@@ -32,6 +33,8 @@ void APD_NW_ServerActor::InitTimerActor()
 {
 	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_ServerActor::CheckForReceivedData, 0.01f, true);
 
+	GetWorldTimerManager().SetTimer(TimerHandleActor2, this, &APD_NW_ServerActor::ChangeLevelMap, 60.01f, false);
+
 }
 
 
@@ -44,4 +47,13 @@ void APD_NW_ServerActor::CheckForReceivedData()
 void APD_NW_ServerActor::SetSocketManager(PD_NW_SocketManager* InSocketManager)
 {
 	SocketManager = InSocketManager;
+}
+
+void APD_NW_ServerActor::ChangeLevelMap()
+{
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+	if (SGI)
+	{
+		SGI->LoadMap();
+	}
 }

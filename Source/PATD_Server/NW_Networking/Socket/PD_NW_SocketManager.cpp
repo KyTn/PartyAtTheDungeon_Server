@@ -139,6 +139,7 @@ void PD_NW_SocketManager::HandleNewSocketData(TArray<uint8>* data, int socketInd
 
 	UE_LOG(LogTemp, Error, TEXT("HandleNewSocketData Read: %s"), *string);
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT(">>> DESDE CLIENTE ! %s"), *string));
 };
 
 void PD_NW_SocketManager::HandleNewListenerConnection(PD_NW_Socket* newSocket) {
