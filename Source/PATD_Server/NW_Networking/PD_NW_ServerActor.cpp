@@ -30,7 +30,7 @@ void APD_NW_ServerActor::Tick(float DeltaTime)
 
 void APD_NW_ServerActor::InitTimerActor()
 {
-	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_ServerActor::CheckForReceivedData, 1.0f, true);
+	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_ServerActor::CheckForReceivedData, 0.01f, true);
 
 }
 

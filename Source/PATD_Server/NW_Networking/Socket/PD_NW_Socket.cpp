@@ -17,10 +17,11 @@ PD_NW_Socket::PD_NW_Socket()
 PD_NW_Socket::~PD_NW_Socket()
 {
 	//Esto puede dar error al llamarse alguna vez sin que tenga nada?
-	if (socket) {
-		delete this->socket; // con esto se supone que se borra la instancia de la clase (?)
-	}
+	//if (socket) {
+	delete this->socket; // con esto se supone que se borra la instancia de la clase (?)
 	this->socket = NULL;
+	//}
+
 }
 
 
@@ -59,12 +60,14 @@ bool PD_NW_Socket::SendData(TArray<uint8>* sendData) {
 }
 
 TArray<uint8>* PD_NW_Socket::ReceiveData() {
-	
-
 
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
 	// ERROR!
-	if (!socket) return nullptr;
+	if (!socket)
+	{
+			UE_LOG(LogTemp, Error, TEXT(">>> No hay Socket Creado! "));
+			return nullptr;
+	}
 
 	TArray<uint8>* receivedData = nullptr;
 
@@ -73,7 +76,7 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	while (socket->HasPendingData(Size))
 	{
 		//Estamos creando los datos nuevos en el HEAP
-		receivedData = new TArray<uint8> ();
+		receivedData = new TArray<uint8>();
 		receivedData->Init(0, FMath::Min(Size, 65507u));
 
 		int32 Read = 0;
@@ -83,9 +86,14 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	// ERROR!
-	if (receivedData->Num() <= 0)return nullptr; //No Data Received
-
-	
+	if (receivedData->Num() <= 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT(">>>> No se han enviado datos ! "));
+		return nullptr; //No Data Received
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT(">>>> Se van a enviar DATOS :) ! "));
+	}
 	return receivedData;
 
 }
@@ -95,8 +103,6 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 
 PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	
-
-
 	//~~~~~~~~~~~~~
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
 	// ERROR!
@@ -121,14 +127,7 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 		newPD_NW_Socket = new PD_NW_Socket();
 		newPD_NW_Socket->SetFSocket(newFSocket);
 
-
-		
-		
 		return newPD_NW_Socket;
-	
-			
-			
-
 
 	}
 	
@@ -136,7 +135,7 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 }
 
 void PD_NW_Socket::InitAsListener(int port) {
-	FIPv4Endpoint Endpoint(FIPv4Address(127, 0, 0, 0), port);
+	FIPv4Endpoint Endpoint(FIPv4Address(127, 0, 0, 1), port);
 	this->socket = FTcpSocketBuilder("Listener Socket").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
 }
 

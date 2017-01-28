@@ -18,16 +18,17 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 		//Networking
 		PD_NW_SocketManager* socketManager;
 
-
-
 	//Functions ====
 	//Funcion para inicializar entre otros el socketManager. 
-	void initializeNetworking();
+	void InitializeNetworking();
 
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
-	void initializeAfterTravel();
+	void InitializeAfterTravel();
 
 public:
+	///CONSTANTES
+	const int32 defaultServerPort = 8890;
+
 	//Overwrites
 
 	//Funcion que llama al inicializar 

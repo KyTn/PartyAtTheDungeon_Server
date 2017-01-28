@@ -13,13 +13,10 @@ class APD_NW_ServerActor;
 class PATD_SERVER_API PD_NW_SocketManager
 {
 private:
+	///CONSTANTES
 
+	///VARIABLES
 	TArray<PD_NW_Socket*> socketArray;
-
-
-
-
-
 
 	PD_NW_Socket* listenerSocket;
 
