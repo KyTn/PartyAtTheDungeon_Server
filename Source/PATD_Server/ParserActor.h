@@ -37,5 +37,5 @@ public:
 
 
 	void ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c);
-	
+	AActor* InstantiateTile(PD_MG_LogicPosition* logpos);
 };

@@ -17,7 +17,7 @@ public:
 	PD_MG_StaticMap();
 	~PD_MG_StaticMap();
 
-	bool AddNewLogicPosition(uint32 x, uint32 y);
+	PD_MG_LogicPosition* AddNewLogicPosition(uint32 x, uint32 y);
 	bool AddLogicPosition(PD_MG_LogicPosition* ref);
 
 	bool AddNewEmptyRoom();
