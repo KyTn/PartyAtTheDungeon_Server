@@ -8,6 +8,7 @@ class APD_NW_ServerActor;
 
 /**
 *
+
 */
 class PATD_SERVER_API PD_NW_SocketManager
 {
@@ -15,18 +16,24 @@ private:
 
 	TArray<PD_NW_Socket*> socketArray;
 
-	//Solo hay una funcion de timer, que ejecuta y guarda el SocketManager. Lo que hace es llamar a la rutina de loopPendingFunction de cada socket.
-	//Para mutear un socket?
-	FTimerHandle timerHandleServer;
-	//FTimerManager timerManager;
+
+
+
+
 
 	PD_NW_Socket* listenerSocket;
 
 
 	APD_NW_ServerActor* myServerActor;
 
+	bool isServer;
 
 	//Functions ======
+
+	//Esta funcion inicia el timer. Se llamara desde el init, pero tambien individualmente al cambiar de mapa.
+	void InitTimer();
+	void DeleteTimer();
+
 
 
 	///Comunicacion con la capa superior 
@@ -54,18 +61,37 @@ private:
 
 	//Lo de la gestion de reconexiones va aqui (aunque puede llamar a otra clase)
 
-
 public:
 	///Inicializacion
 	PD_NW_SocketManager();
 	~PD_NW_SocketManager();
 
 
+	///Funciones Get y Set de los Atributos
+	void SetIsServer(bool InIsServer);
+	bool GetIsServer();
 	void SetServerActor(APD_NW_ServerActor* InmyServerActor);
 
-	//Inicializa el socketManager y lo pone a funcionar.
-	void Init(APD_NW_ServerActor* InmyServerActor, int port);
-	//Esta funcion inicia el timer. Se llamara desde el init, pero tambien individualmente al cambiar de mapa.
+
+	///FUNCIONES 
+	//Inicializa el socketManager e inicia el timer. IP se usa solo en modo cliente.
+	void Init(APD_NW_ServerActor* InmyServerActor, FString ip, int port);
+
+	///* SERVIDOR */
+	//Inicializa el SocketManager como Server
+	void InitSocketManager_ServerMode(int port);
+	//Esta es la funcion que repetira el timer. Deberia recopilar los datos recibidos en los sockets e ir llamando a las funciones de salida
+	void TimerRefreshFunction();
+
+
+	///* CLIENTE */
+	//Inicializa el SocketManager como Clinete
+	void InitSocketManager_ClientMode(FString ip, int port);
+	//void ListenerDataReceived_ClientMode();
+
+	//Funcion publica para poder añadir sockets manualmente. Devuelve la posicion donde se crea el socket.
+	int createDataSocket(FString ip, int port);
+
 
 
 	bool InitListener(int port);
@@ -75,15 +101,11 @@ public:
 	///Gestion de registro a eventos.
 	bool RegisterToSocket(int socketIndex/*,PD_NW_iSocketManagerObserver*/);
 
-	///Gestion interna
-	//Esta es la funcion que repetira el timer. Deberia recopilar los datos recibidos en los sockets e ir llamando a las funciones de salida
-	void TimerRefreshFunction();
-
 
 	///Comunicacion con la capa superior 
 
 	//Envio
-	bool SendInfoTo(int isocket, FString data);
+	bool SendInfoTo(int indexSocket, TArray<uint8>* data);
 
 
 };

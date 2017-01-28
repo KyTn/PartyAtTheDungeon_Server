@@ -115,7 +115,7 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 		FSocket* newFSocket;
 		PD_NW_Socket* newPD_NW_Socket;
 		//En principio no necesitamos guardar la direccion aqui. (Accept permite guardarla)
-		newFSocket = socket->Accept( TEXT("Socket created at Listener"));
+		newFSocket = socket->Accept( TEXT("Data Socket created at Listener"));
 		newPD_NW_Socket = new PD_NW_Socket();
 		newPD_NW_Socket->SetFSocket(newFSocket);
 
@@ -139,7 +139,7 @@ void PD_NW_Socket::InitAsListener(int port) {
 }
 
 void PD_NW_Socket::InitAsDataSocket() {
-	socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
+	socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("Data Socket created from init"), false);
 }
 
 

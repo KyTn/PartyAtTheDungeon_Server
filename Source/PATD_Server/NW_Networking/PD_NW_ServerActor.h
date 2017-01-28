@@ -13,7 +13,6 @@ class PATD_SERVER_API APD_NW_ServerActor : public AActor
 {
 	GENERATED_BODY()
 
-
 private:
 	PD_NW_SocketManager* SocketManager;
 
@@ -31,8 +30,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
-	void IniciarTimer();
-	void HacerAlgo();
+	//Setea e inicia el timer.
+	void InitTimerActor();
 
+	//Funcion a la que llama el timer
+	void CheckForReceivedData();
+
+	//Referencia al socketManager
 	void SetSocketManager(PD_NW_SocketManager* InSocketManager);
+
+
+
 };
