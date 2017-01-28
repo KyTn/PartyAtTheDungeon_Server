@@ -30,7 +30,7 @@ void AParserActor::BeginPlay()
 	if (FFileHelper::LoadFileToString(FileData, *CompleteFilePath)) {
 
 		// Muesta por pantalla el contenido del fichero pasado al parser
-		GEngine->AddOnScreenDebugMessage(-1, 500000.f, FColor::Red, FileData);
+		//GEngine->AddOnScreenDebugMessage(-1, 500000.f, FColor::Red, FileData);
 
 
 
@@ -49,8 +49,9 @@ void AParserActor::BeginPlay()
 
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
-		map.Empty(fil);
-		
+		//map.Empty();
+
+
 		/*
 		for (int i = 0; i < (int)fil; i++) {
 			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
@@ -62,19 +63,27 @@ void AParserActor::BeginPlay()
 		}
 		/**/
 		/**/
+		int i = 0;
 		while (B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart))
 		{
 			map.Add(A.GetCharArray());
+			//map[i].Empty(col);
+			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, );
+			for (i = 0; i < map[map.Num() - 1].Num(); i++) {
+				//map[map.Num() - 1][i] = A[i];
+				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, &map[map.Num() - 1][i]);
+			}
 		}
 		map.Add(B.GetCharArray());
-		/**/
+		/*
 		FString s = "F: ";
 		s.AppendInt(fil);
 		s.Append(" C: ");
 		s.AppendInt(col);
 		GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+		/**/
 
-		int i = 0;
+		//int i = 0;
 
 		for (i = 0; i < (int)fil; i++)
 		{
@@ -103,7 +112,7 @@ void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c)
 	/**/
 	if (/*logpos->GetX() == 19 &&*/ logpos->GetY() == 0 ) {
 		
-		GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, c);
+		//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, c);
 	}
 	/**/
 
@@ -127,7 +136,7 @@ void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c)
 			s.Append(", ");
 			s.AppendInt(logpos->GetY());
 
-			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 
 			break;
 
