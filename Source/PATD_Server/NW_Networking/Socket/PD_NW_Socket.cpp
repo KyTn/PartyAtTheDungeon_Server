@@ -17,9 +17,12 @@ PD_NW_Socket::PD_NW_Socket()
 
 PD_NW_Socket::~PD_NW_Socket()
 {
+	UE_LOG(LogTemp, Error, TEXT("DELETE DE LOS SOCKET "));
+
 	//Esto puede dar error al llamarse alguna vez sin que tenga nada?
 	//if (socket) {
-	delete this->socket; // con esto se supone que se borra la instancia de la clase (?)
+	socket->Close();
+	delete socket; // con esto se supone que se borra la instancia de la clase (?)
 	socket = NULL;
 	//}
 
@@ -120,6 +123,14 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	
 	bool Pending;
 	// handle incoming connections
+	if (socket == NULL) {
+		UE_LOG(LogTemp, Error, TEXT("Socket es null en Pending "));
+
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("SocketNO NULL en Pending "));
+
+	}
 	if (socket->HasPendingConnection(Pending) && Pending)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ha entrado a HasPendingConnection ! "));
