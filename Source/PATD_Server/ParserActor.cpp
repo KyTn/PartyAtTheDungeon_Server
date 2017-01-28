@@ -3,6 +3,9 @@
 #include "PATD_Server.h"
 #include "ParserActor.h"
 #include "PD_MG_StaticMap.h"
+#include "PD_MG_LogicPosition.h"
+#include "PATD_Server/ElementActors/PD_E_TileActor.h"
+
 
 
 // Sets default values
@@ -27,7 +30,7 @@ void AParserActor::BeginPlay()
 	if (FFileHelper::LoadFileToString(FileData, *CompleteFilePath)) {
 
 		// Muesta por pantalla el contenido del fichero pasado al parser
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FileData);
+		GEngine->AddOnScreenDebugMessage(-1, 500000.f, FColor::Red, FileData);
 
 
 
@@ -44,67 +47,105 @@ void AParserActor::BeginPlay()
 		////////////////
 
 
-		// Obtenemos 
+		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
-
-		map.Empty(20);
+		map.Empty(fil);
 		
+		/*
+		for (int i = 0; i < (int)fil; i++) {
+			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
+			TArray<TCHAR> myCol = A.GetCharArray();
+			map[i].Empty(col);
+			for (int j = 0; j < (int)col; j++) {
+				map[i][j] = myCol[j];
+			}
+		}
+		/**/
+		/**/
 		while (B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart))
 		{
 			map.Add(A.GetCharArray());
 		}
 		map.Add(B.GetCharArray());
+		/**/
+		FString s = "F: ";
+		s.AppendInt(fil);
+		s.Append(" C: ");
+		s.AppendInt(col);
+		GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 
+		int i = 0;
 
-		
-		FString s;
-
-		for (int i = 0; i < map.Num(); i++)
+		for (i = 0; i < (int)fil; i++)
 		{
-			s = "";
-			
-			for (int j = 0; j < map[i].Num(); j++)
+			for (int j = 0; j < (int)col; j++)
 			{
-				s += map[i][j];
-
-				StaticMapRef->AddNewLogicPosition(i, j);
-
-				FString salida = " LP : (";
-				salida.AppendInt(i);
-				salida.Append(", ");
-				salida.AppendInt(j);
-				salida.Append(")");
-
-				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, salida);
+				
+				PD_MG_LogicPosition* lp = StaticMapRef->AddNewLogicPosition(i, j);
+				ParserElementByChar(lp, &(map[i][j]));
 			}
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
-			
-		}
-	}
+			/*
+			s = "";
+			s.AppendInt(i);
 
+			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			/**/
+		}
+
+		
+	}
 }
 
 void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c) 
 {
+	FString s;
+	/**/
+	if (/*logpos->GetX() == 19 &&*/ logpos->GetY() == 0 ) {
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, c);
+	}
+	/**/
+
 	switch (*c) {
 		// Si es una pared ...
-		case 'w':
-			break;
+		case 'w':/*
+			s = "Wall at ";
+			s.AppendInt(logpos->GetX());
+			s.Append(", ");
+			s.AppendInt(logpos->GetY());
 
-		// Si es un tile normal y corriente ...
-		case '.':
-			break; 
+			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			/**/
+			break;
 
 		// Si es una puerta ...
 		case 'd': 
+
+			s = "Door at ";
+			s.AppendInt(logpos->GetX());
+			s.Append(", ");
+			s.AppendInt(logpos->GetY());
+
+			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+
 			break;
 
 		// default
+		// Si es un tile normal y corriente ...
 		default: 
+			InstantiateTile(logpos);
 			break;
 	}
 }
+/**/
+AActor* AParserActor::InstantiateTile(PD_MG_LogicPosition* logpos)
+{
+	//return GetWorld()->SpawnActor<APD_E_TileActor>(tileActor,FVector(logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+
+	return GetWorld()->SpawnActor<APD_E_TileActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+}
+/**/
 
 // Called every frame
 void AParserActor::Tick(float DeltaTime)

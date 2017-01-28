@@ -15,11 +15,11 @@ PD_MG_StaticMap::~PD_MG_StaticMap()
 }
 
 
-bool PD_MG_StaticMap::AddNewLogicPosition(uint32 x, uint32 y)
+PD_MG_LogicPosition* PD_MG_StaticMap::AddNewLogicPosition(uint32 x, uint32 y)
 {
 	PD_MG_LogicPosition* lp = new PD_MG_LogicPosition(x, y);
 	_LogicPositionsRefs->Add(lp);
 
-	return false;
+	return lp;
 }
 bool PD_MG_StaticMap::AddLogicPosition(PD_MG_LogicPosition* ref) { return false; }
