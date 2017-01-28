@@ -10,6 +10,7 @@
 
 PD_NW_Socket::PD_NW_Socket()
 {
+	socket = NULL;
 //	GetWorld()->S
 }
 
@@ -19,7 +20,7 @@ PD_NW_Socket::~PD_NW_Socket()
 	//Esto puede dar error al llamarse alguna vez sin que tenga nada?
 	//if (socket) {
 	delete this->socket; // con esto se supone que se borra la instancia de la clase (?)
-	this->socket = NULL;
+	socket = NULL;
 	//}
 
 }
@@ -86,7 +87,7 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	// ERROR!
-	if (receivedData->Num() <= 0)
+	if (receivedData==nullptr || receivedData->Num()<=0)
 	{
 		UE_LOG(LogTemp, Error, TEXT(">>>> No se han enviado datos ! "));
 		return nullptr; //No Data Received
@@ -103,6 +104,8 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 
 PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	
+
+	UE_LOG(LogTemp, Error, TEXT("Ha entrado a ReceiveNewConnection ! "));
 	//~~~~~~~~~~~~~
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
 	// ERROR!
@@ -114,18 +117,20 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	//Global cache of current Remote Address
       RemoteAddressForConnection = FIPv4Endpoint(RemoteAddress);
 	*/
-
+	
 	bool Pending;
 	// handle incoming connections
 	if (socket->HasPendingConnection(Pending) && Pending)
 	{
-		
+		UE_LOG(LogTemp, Error, TEXT("Ha entrado a HasPendingConnection ! "));
 		FSocket* newFSocket;
 		PD_NW_Socket* newPD_NW_Socket;
 		//En principio no necesitamos guardar la direccion aqui. (Accept permite guardarla)
 		newFSocket = socket->Accept( TEXT("Data Socket created at Listener"));
 		newPD_NW_Socket = new PD_NW_Socket();
 		newPD_NW_Socket->SetFSocket(newFSocket);
+
+		UE_LOG(LogTemp, Error, TEXT("Ha creado el nuevo socket ! "));
 
 		return newPD_NW_Socket;
 
