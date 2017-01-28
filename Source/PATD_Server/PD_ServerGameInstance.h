@@ -5,17 +5,16 @@
 #include "Engine/GameInstance.h"
 #include "PD_ServerGameInstance.generated.h"
 
-
+/**
+*
+*/
 //forward declarations
 class PD_NW_SocketManager;
-/**
- * 
- */
 UCLASS()
 class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
 		//Networking
 		PD_NW_SocketManager* socketManager;
 
@@ -33,11 +32,12 @@ public:
 
 	//Funcion que llama al inicializar 
 	//Existe ya UWorld aqui, y GetTimerManager()??
-	
+
 	virtual void Init();
 
 	//void Shutdown();
-	
+
 	PD_NW_SocketManager* GetSocketManager();
-	
+
+
 };
