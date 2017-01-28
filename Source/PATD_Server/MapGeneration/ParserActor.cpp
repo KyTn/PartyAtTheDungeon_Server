@@ -5,6 +5,7 @@
 #include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PATD_Server/ElementActors/PD_E_TileActor.h"
+#include "PATD_Server/ElementActors/PD_E_WallActor.h"
 
 
 
@@ -49,13 +50,14 @@ void AParserActor::BeginPlay()
 
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
-		map.Empty();
+		map.Empty(fil);
 
 
-		/**/
+		/*
 		for (int i = 0; i < (int)fil; i++) {
 			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
 			TArray<TCHAR> myCol = A.GetCharArray();
+			map.Add(myCol);
 			map[i].Empty(col);
 			for (int j = 0; j < (int)col; j++) {
 				map[i][j] = myCol[j];
@@ -128,6 +130,7 @@ void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c)
 
 			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 			/**/
+			InstantiateWall(logpos);
 			break;
 
 		// Si es una puerta ...
@@ -155,6 +158,14 @@ AActor* AParserActor::InstantiateTile(PD_MG_LogicPosition* logpos)
 	//return GetWorld()->SpawnActor<APD_E_TileActor>(tileActor,FVector(logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
 
 	return GetWorld()->SpawnActor<APD_E_TileActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+}
+
+
+AActor* AParserActor::InstantiateWall(PD_MG_LogicPosition* logpos)
+{
+	//return GetWorld()->SpawnActor<APD_E_TileActor>(tileActor,FVector(logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+
+	return GetWorld()->SpawnActor<APD_E_WallActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
 }
 /**/
 
