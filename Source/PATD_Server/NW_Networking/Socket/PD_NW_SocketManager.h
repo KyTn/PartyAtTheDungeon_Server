@@ -90,7 +90,7 @@ public:
 	//void ListenerDataReceived_ClientMode();
 
 	//Funcion publica para poder añadir sockets manualmente. Devuelve la posicion donde se crea el socket.
-	int createDataSocket(FString ip, int port);
+	int CreateDataSocket(FString ip, int port);
 
 
 

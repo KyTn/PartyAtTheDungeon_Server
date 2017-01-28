@@ -72,6 +72,8 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	//El while nos come todos los pendings pero solo se queda con el ultimo. No tiene mucho sentido
 	while (socket->HasPendingData(Size))
 	{
+		//Estamos creando los datos nuevos en el HEAP
+		receivedData = new TArray<uint8> ();
 		receivedData->Init(0, FMath::Min(Size, 65507u));
 
 		int32 Read = 0;

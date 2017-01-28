@@ -73,7 +73,7 @@ void PD_NW_SocketManager::InitSocketManager_ClientMode(FString ip, int port)
 	//2.Comprobar que hay comunicacion
 	//3.Cuando hay comunicacion, Guadar dicho socket en el Array de Socket del SocketManager
 
-	if (this->createDataSocket(ip, port) == -1) {
+	if (this->CreateDataSocket(ip, port) == -1) {
 		//ERROR!!
 	}
 	//Y si no conecta aqui porque es demasiado pronto y no esta el server up?
@@ -101,7 +101,7 @@ bool PD_NW_SocketManager::InitListener(int port) {
 }
 
 
-int PD_NW_SocketManager::createDataSocket(FString ip, int port) {
+int PD_NW_SocketManager::CreateDataSocket(FString ip, int port) {
 	PD_NW_Socket* pdSocket = new PD_NW_Socket();
 	pdSocket->InitAsDataSocket();
 	bool connected = pdSocket->ConnectTo(ip, port);
