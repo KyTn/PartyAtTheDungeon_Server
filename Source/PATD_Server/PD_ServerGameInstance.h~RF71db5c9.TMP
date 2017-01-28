@@ -34,10 +34,10 @@ public:
 	//Funcion que llama al inicializar 
 	//Existe ya UWorld aqui, y GetTimerManager()??
 	
-	virtual void Init();
+	virtual void init();
 
+	virtual void StartGameInstance();
 	//void Shutdown();
 	
-	PD_NW_SocketManager* GetSocketManager();
 	
 };
