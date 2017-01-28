@@ -14,6 +14,14 @@ void UPD_ServerGameInstance::Init()
 	InitializeNetworking();
 }
 
+void UPD_ServerGameInstance::Shutdown()
+{
+	Super::Shutdown();
+
+	if (socketManager) {
+		delete socketManager;
+	}
+}
 
 void UPD_ServerGameInstance::InitializeNetworking()
 {
@@ -38,5 +46,8 @@ void UPD_ServerGameInstance::LoadMap()
 {
 	UGameplayStatics::OpenLevel((UObject*)this, FName(TEXT("Level_Test_Travel_2")));
 
+	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
+
+	socketManager->InitServerActor(ServerActorSpawned);
 }
 

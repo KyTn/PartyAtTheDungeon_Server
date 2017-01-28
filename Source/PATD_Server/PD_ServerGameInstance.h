@@ -36,7 +36,7 @@ public:
 
 	virtual void Init();
 
-	//void Shutdown();
+	virtual void Shutdown();
 
 	PD_NW_SocketManager* GetSocketManager();
 

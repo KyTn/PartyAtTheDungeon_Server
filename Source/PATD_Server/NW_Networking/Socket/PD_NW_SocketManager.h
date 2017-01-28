@@ -68,11 +68,13 @@ public:
 	void SetIsServer(bool InIsServer);
 	bool GetIsServer();
 	void SetServerActor(APD_NW_ServerActor* InmyServerActor);
-
+	APD_NW_ServerActor* GetServerActor();
 
 	///FUNCIONES 
 	//Inicializa el socketManager e inicia el timer. IP se usa solo en modo cliente.
 	void Init(APD_NW_ServerActor* InmyServerActor, FString ip, int port);
+	//Inicializa el ServerActor para ser llamado desde cualquier Mapa
+	void InitServerActor(APD_NW_ServerActor* InmyServerActor);
 
 	///* SERVIDOR */
 	//Inicializa el SocketManager como Server

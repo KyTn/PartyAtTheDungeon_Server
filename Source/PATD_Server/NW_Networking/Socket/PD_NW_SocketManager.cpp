@@ -21,7 +21,7 @@ PD_NW_SocketManager::PD_NW_SocketManager()
 
 PD_NW_SocketManager::~PD_NW_SocketManager()
 {
-	//delete socketArray;
+	delete listenerSocket;
 }
 
 
@@ -45,6 +45,12 @@ void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, FString ip, 
 		InitSocketManager_ClientMode(ip, port);
 	}
 
+}
+
+void PD_NW_SocketManager::InitServerActor(APD_NW_ServerActor* InmyServerActor)
+{
+	SetServerActor(InmyServerActor);
+	GetServerActor()->InitTimerActor();
 }
 
 void PD_NW_SocketManager::InitSocketManager_ServerMode(int port)
@@ -197,4 +203,9 @@ void PD_NW_SocketManager::SetServerActor(APD_NW_ServerActor* InmyServerActor)
 {
 	myServerActor = InmyServerActor;
 	myServerActor->SetSocketManager(this);
+}
+
+APD_NW_ServerActor* PD_NW_SocketManager::GetServerActor()
+{
+	return myServerActor;
 }
