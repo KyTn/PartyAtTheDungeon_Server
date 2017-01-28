@@ -49,13 +49,14 @@ void AParserActor::BeginPlay()
 
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
-		map.Empty();
+		map.Empty(fil);
 
 
 		/**/
 		for (int i = 0; i < (int)fil; i++) {
 			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
 			TArray<TCHAR> myCol = A.GetCharArray();
+			map.Add(myCol);
 			map[i].Empty(col);
 			for (int j = 0; j < (int)col; j++) {
 				map[i][j] = myCol[j];

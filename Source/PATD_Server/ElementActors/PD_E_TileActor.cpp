@@ -12,7 +12,7 @@ APD_E_TileActor::APD_E_TileActor()
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = mesh;
-	const ConstructorHelpers::FObjectFinder<UStaticMesh> MeshObj(TEXT("/Game/Models/Test/TileModel.TileModel"));
+	const ConstructorHelpers::FObjectFinder<UStaticMesh> MeshObj(TEXT("/Game/Models/MapElements/Tile_Model.Tile_Model"));
 	mesh->SetStaticMesh(MeshObj.Object);
 }
 
