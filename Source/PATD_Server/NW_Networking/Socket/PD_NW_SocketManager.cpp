@@ -8,7 +8,7 @@
 #include "Networking.h"
 #include "NW_NetWorking/PD_NW_ServerActor.h"
 
-
+#include <string>
 
 PD_NW_SocketManager::PD_NW_SocketManager()
 {
@@ -20,12 +20,19 @@ PD_NW_SocketManager::~PD_NW_SocketManager()
 	//delete socketArray;
 }
 
-
-void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor)
+//Con el client mode lo que hara es no iniciar el listener
+void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, int port)
 {
-	UE_LOG(LogTemp, Warning, TEXT("As String!!!!! ~> "));
+	UE_LOG(LogTemp, Warning, TEXT("SocketManager Init() "));
+	//Inicializacion actor
+	
 	SetServerActor(InmyServerActor);
 	myServerActor->IniciarTimer();
+
+	//Inicializacion listener?
+	InitListener(port);
+
+	
 }
 
 void PD_NW_SocketManager::SetServerActor(APD_NW_ServerActor* InmyServerActor)
@@ -34,46 +41,63 @@ void PD_NW_SocketManager::SetServerActor(APD_NW_ServerActor* InmyServerActor)
 	myServerActor->SetSocketManager(this);
 }
 
-void PD_NW_SocketManager::SocketHasReceivedData(TArray<uint8> data, int socketIndex) {
+void PD_NW_SocketManager::HandleNewSocketData(TArray<uint8>* data, int socketIndex) {
 
-	//No necesitamos esto porque la funcion del timer ya tendra un bucle
-	/*//Busqueda del socket que lo envia para poder guardar la variable int socketIndex .
-	int index = socketArray->IndexOfByKey(socket) != -1; //-1 == INDEX_NONE
-	if (index != -1) {
-		receivedDataAtSocket(data, index);
-	}
-	else {
-		//ERROR!
-	}*/
+	UE_LOG(LogTemp, Error, TEXT("HandleNewSocketData (socketIndex: %d)"), socketIndex);
+
+	//Esto no va aqui, esto ya seria llamar al serializer o a los objetos suscritos
+
+	//Create a string from a byte array!
+	//
+	std::string cstr(reinterpret_cast<const char*>(data->GetData()), data->Num());
+	
+	FString string= FString(cstr.c_str());
+
+	UE_LOG(LogTemp, Error, TEXT("HandleNewSocketData Read: %s"), *string);
 
 };
 
-void PD_NW_SocketManager::ListenerNewConexion(PD_NW_Socket* newSocket) {
+void PD_NW_SocketManager::HandleNewListenerConnection(PD_NW_Socket* newSocket) {
 
-	//TO-DO Aqui habria que hacer el control de maximas conexiones, y en caso de no aceptar mas, notificarlo a la conexion con el listener, o cerrar el newSocket.
 
-	//Se deberia aceptar la conexion y despues enviar el mensaje a los objetos registrados? o al reves?
-	//O separar esto en dos pasos?
 	socketArray.Add(newSocket);
-
+	
 
 }
-
+//hay posibilidad de que esta funcion falle? quizas debe devolver void
 bool PD_NW_SocketManager::InitListener(int port) {
 	
-	PD_NW_Socket ListenSocket;
-	ListenSocket.listenerSocket(port);
-	ListenerNewConexion(&ListenSocket);
+	if (listenerSocket) { //Esto es necesario?
+		//cerrar conexion del listener
+		//deletear
+		delete listenerSocket;
+	}
+	listenerSocket = new PD_NW_Socket();
+	listenerSocket->InitAsListener(port);
+	
 	return true;
 
 }
 
 
 void PD_NW_SocketManager::TimerRefreshFunction() {
-	/*for (int i = 0; i < socketArray.Num(); i++) {
-		//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
-		//socketArray[i]->receiveData();
-	}*/
+	//if()
+	
 	UE_LOG(LogTemp, Error, TEXT("Timer Working "));
 
+	if (listenerSocket) {
+		PD_NW_Socket* newSocket = listenerSocket->ReceiveNewConnection();
+		if (newSocket) {
+			HandleNewListenerConnection(newSocket);
+		}
+	}
+
+	for (int i = 0; i < socketArray.Num(); i++) {
+	//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
+		TArray<uint8>* inData=socketArray[i]->ReceiveData();
+		if (inData) {
+			HandleNewSocketData(inData, i);
+		}
+
+	}
 }

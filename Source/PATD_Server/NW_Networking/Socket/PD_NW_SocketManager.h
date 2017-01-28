@@ -37,15 +37,22 @@ private:
 	* Deberia llamar a los objetos registrados como pendientes de ese socket (por el int).
 	O ser abstracta y que se implemente en cada implementacion del socketManager (sin usar objetos registrados)
 	*/
-	void SocketHasReceivedData(TArray<uint8> data, int socketIndex);
+	void HandleNewSocketData(TArray<uint8>* data, int socketIndex);
 
 	/*Funcion que llama la funcion del timer cuando tiene una conexion nueva.
 	//Deberia llamar a los objetos registrados como pendientes de nueva conexion.
 	O ser abstracta y que se implemente en cada implementacion del socketManager (sin usar objetos registrados)
 	*/
-	void ListenerNewConexion(PD_NW_Socket* newSocket);
+	void HandleNewListenerConnection(PD_NW_Socket* newSocket);
+	//Aqui seria donde podriamos comprobar que la ip de la nueva conexion es una que tengamos guardada, para hacer un reconnect entre los sockets (el nuevo y el viejo)
+	//Aqui el fsocket ya viene instanciado
 
+	//TO-DO Aqui habria que hacer el control de maximas conexiones, y en caso de no aceptar mas, notificarlo a la conexion con el listener, o cerrar el newSocket.
 
+	//Se deberia aceptar la conexion y despues enviar el mensaje a los objetos registrados? o al reves?
+	//O separar esto en dos pasos?
+
+	//Lo de la gestion de reconexiones va aqui (aunque puede llamar a otra clase)
 
 
 public:
@@ -57,10 +64,9 @@ public:
 	void SetServerActor(APD_NW_ServerActor* InmyServerActor);
 
 	//Inicializa el socketManager y lo pone a funcionar.
-	void Init(APD_NW_ServerActor* InmyServerActor);
+	void Init(APD_NW_ServerActor* InmyServerActor, int port);
 	//Esta funcion inicia el timer. Se llamara desde el init, pero tambien individualmente al cambiar de mapa.
-	void InitTimer();
-	void DeleteTimer();
+
 
 	bool InitListener(int port);
 	bool CloseListener();

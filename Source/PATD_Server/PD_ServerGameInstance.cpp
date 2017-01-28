@@ -20,8 +20,11 @@ void UPD_ServerGameInstance::initializeNetworking()
 	socketManager = new PD_NW_SocketManager();
 
 	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
-
-	socketManager->Init(ServerActorSpawned);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
+	
+	//Elegimos puerto 8891 ¿Donde deberia ir esto que es una variable super global?
+	socketManager->Init(ServerActorSpawned, 8891);
+	//socketManager->RestartListener()
+	//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
 	
 }
 
