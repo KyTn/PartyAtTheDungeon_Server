@@ -49,6 +49,8 @@ void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, FString ip, 
 
 void PD_NW_SocketManager::InitServerActor(APD_NW_ServerActor* InmyServerActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Spawneando el Actor e Iniciando El TimerActor Otra vez"));
+
 	SetServerActor(InmyServerActor);
 	GetServerActor()->InitTimerActor();
 }

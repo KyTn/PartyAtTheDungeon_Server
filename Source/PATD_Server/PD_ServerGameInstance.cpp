@@ -46,8 +46,12 @@ void UPD_ServerGameInstance::LoadMap()
 {
 	UGameplayStatics::OpenLevel((UObject*)this, FName(TEXT("Level_Test_Travel_2")));
 
+
+}
+
+void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
+{
 	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
 
 	socketManager->InitServerActor(ServerActorSpawned);
 }
-
