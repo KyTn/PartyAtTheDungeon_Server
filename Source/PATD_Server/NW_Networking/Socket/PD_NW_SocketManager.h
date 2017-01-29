@@ -63,6 +63,8 @@ public:
 	PD_NW_SocketManager();
 	~PD_NW_SocketManager();
 
+	///Utilidades
+	FString StateString();
 
 	///Funciones Get y Set de los Atributos
 	void SetIsServer(bool InIsServer);
@@ -86,7 +88,7 @@ public:
 	///* CLIENTE */
 	//Inicializa el SocketManager como Clinete
 	void InitSocketManager_ClientMode(FString ip, int port);
-	//void ListenerDataReceived_ClientMode();
+	
 
 	//Funcion publica para poder añadir sockets manualmente. Devuelve la posicion donde se crea el socket.
 	int CreateDataSocket(FString ip, int port);

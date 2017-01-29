@@ -3,8 +3,12 @@
 #include "PATD_Server.h"
 #include "PD_ServerGameInstance.h"
 #include "NW_NetWorking/PD_NW_ServerActor.h"
+
+//Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
 
+//Includes de prueba
+#include "NW_NetWorking/Serializer/PruebaUStruct.h"
 
 
 void UPD_ServerGameInstance::Init()
@@ -54,4 +58,6 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
 
 	socketManager->InitServerActor(ServerActorSpawned);
+
+
 }

@@ -77,7 +77,8 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 
 	uint32 Size;
 	//El while nos come todos los pendings pero solo se queda con el ultimo. No tiene mucho sentido
-	while (socket->HasPendingData(Size))
+	//Lo dejamos en un unico if, y la informacion que pueda seguir habiendo se quedara para el siguiente tick
+	if (socket->HasPendingData(Size))
 	{
 		//Estamos creando los datos nuevos en el HEAP
 		receivedData = new TArray<uint8>();
@@ -92,11 +93,11 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	// ERROR!
 	if (receivedData==nullptr || receivedData->Num()<=0)
 	{
-		UE_LOG(LogTemp, Error, TEXT(">>>> No se han enviado datos ! "));
+	//	UE_LOG(LogTemp, Error, TEXT(">>>> No se han enviado datos ! "));
 		return nullptr; //No Data Received
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT(">>>> Se van a enviar DATOS :) ! "));
+	//	UE_LOG(LogTemp, Warning, TEXT(">>>> Se van a enviar DATOS :) ! "));
 	}
 	return receivedData;
 
@@ -108,7 +109,7 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	
 
-	UE_LOG(LogTemp, Warning, TEXT("Ha entrado a ReceiveNewConnection ! "));
+//	UE_LOG(LogTemp, Warning, TEXT("Ha entrado a ReceiveNewConnection ! "));
 	//~~~~~~~~~~~~~
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
 	// ERROR!
@@ -123,14 +124,14 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	
 	bool Pending;
 	// handle incoming connections
-	if (socket == NULL) {
+	/*if (socket == NULL) {
 		UE_LOG(LogTemp, Error, TEXT("Socket es null en Pending "));
 
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("SocketNO NULL en Pending "));
 
-	}
+	}*/
 	if (socket->HasPendingConnection(Pending) && Pending)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ha entrado a HasPendingConnection ! "));

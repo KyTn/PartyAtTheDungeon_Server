@@ -5,11 +5,13 @@
 #include "Engine/GameInstance.h"
 #include "PD_ServerGameInstance.generated.h"
 
+//forward declarations
+class PD_NW_SocketManager;
+
 /**
 *
 */
-//forward declarations
-class PD_NW_SocketManager;
+
 UCLASS()
 class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 {

@@ -25,15 +25,14 @@ public:
 
 	FTimerHandle TimerHandleActor;
 
-	FTimerHandle TimerHandleActor2;
 
-	void ChangeLevelMap();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
+
 
 	//Setea e inicia el timer.
 	void InitTimerActor();
@@ -44,6 +43,16 @@ public:
 	//Referencia al socketManager
 	void SetSocketManager(PD_NW_SocketManager* InSocketManager);
 
+	//Funcion que determina si el timer esta activo.
+	bool isTimerActive();
 
+
+	//Declaraciones de prueba
+	FTimerHandle TimerHandleActor2;
+	FTimerHandle TimerHandleActor3;
+
+	void ChangeLevelMap();
+
+	void SendPruebaSockets();
 
 };
