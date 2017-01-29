@@ -8,7 +8,7 @@
 #include "PD_ServerGameInstance.h"
 
 //Includes de prueba
-#include "NW_NetWorking/Serializer/PruebaUStruct.h"
+#include "SR_Serializer/PD_SR_ListUStructs.h"
 
 
 // Sets default values
@@ -79,6 +79,21 @@ void APD_NW_ServerActor::SendPruebaSockets()
 	//PRUEBA
 
 
+	/*
+	UStruct* MyStruct = FStructMap::StaticStruct();
+	FStructMap pruebaStruct;
+	//pruebaStruct.arrayPruebaStrings
+	
+	UE_LOG(LogTemp, Warning, TEXT("Primera pos array a enviar:%s"),*pruebaStruct.arrayPruebaStrings[0]);
+
+	TArray<uint8>* Storage = new TArray<uint8>();
+	FMemoryWriter ArWriter(*Storage);
+	MyStruct->SerializeBin(ArWriter, &pruebaStruct);
+
+
+	bool successful = SocketManager->SendInfoTo(0, Storage);
+	*/
+/*
 	UStruct* MyStruct = FpruebaUStruct::StaticStruct();
 
 	FpruebaUStruct pruebaStruct;
@@ -125,4 +140,5 @@ void APD_NW_ServerActor::SendPruebaSockets()
 
 
 	 successful = SocketManager->SendInfoTo(1, Storage2);
+	 */
 }

@@ -8,7 +8,7 @@
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
 
 //Includes de prueba
-#include "NW_NetWorking/Serializer/PruebaUStruct.h"
+
 
 
 void UPD_ServerGameInstance::Init()

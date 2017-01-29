@@ -10,7 +10,7 @@
 
 //Includes de prueba
 #include <string>
-#include "NW_Networking/Serializer/PruebaUStruct.h"
+#include "SR_Serializer/PD_SR_ListUStructs.h"
 
 /******************************
 *** CONSTRUCTOR Y DESTRUCTOR DE LA CLASE **
@@ -150,6 +150,10 @@ void PD_NW_SocketManager::HandleNewSocketData(TArray<uint8>* data, int socketInd
 
 	UE_LOG(LogTemp, Error, TEXT("HandleNewSocketData (socketIndex: %d)"), socketIndex);
 
+	//Aqui llamaremos a 
+	// Ustruct = SerializerManager.DeserializeData(data,socketIndex,typeStruct);
+
+
 
 	//Esto no va aqui, esto ya seria llamar al serializer o a los objetos suscritos
 
@@ -164,17 +168,24 @@ void PD_NW_SocketManager::HandleNewSocketData(TArray<uint8>* data, int socketInd
 	*/
 
 	//Prueba con UStructs
-	FpruebaUStruct pruebaStruct;
+	FStructMap pruebaStruct;
 
-	UStruct* MyStruct = FpruebaUStruct::StaticStruct();
+	UStruct* MyStruct = FStructMap::StaticStruct();
 
 	FMemoryReader ArReader(*data);
 
 	MyStruct->SerializeBin(ArReader, &pruebaStruct);
 
-	UE_LOG(LogTemp, Error, TEXT("%s"), *(pruebaStruct.stringPrueba));
+	for (int i = 0; i < pruebaStruct.arrayPruebaStrings.Num(); i++)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s"), *(pruebaStruct.arrayPruebaStrings[i]));
+		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Green, FString::Printf(TEXT("%s"), *(pruebaStruct.arrayPruebaStrings[i])));
 
-	GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, FString::Printf(TEXT("%s"), *(pruebaStruct.stringPrueba)));
+	}
+
+	//UE_LOG(LogTemp, Error, TEXT("%s"), *(pruebaStruct.stringPrueba));
+
+	//GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Red, FString::Printf(TEXT("%s"), *(pruebaStruct.stringPrueba)));
 
 };
 
