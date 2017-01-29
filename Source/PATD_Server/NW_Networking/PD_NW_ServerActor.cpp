@@ -89,7 +89,7 @@ void APD_NW_ServerActor::SendPruebaSockets()
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *SocketManager->StateString());
 
-	pruebaStruct.stringPrueba = "Texto de prueba en server";
+	pruebaStruct.stringPrueba = "Texto de prueba en server enviado a cliente 0";
 
 
 
@@ -105,20 +105,24 @@ void APD_NW_ServerActor::SendPruebaSockets()
 
 
 
-	/*UStruct* MyStruct2 = FpruebaUStruct::StaticStruct();
+	UStruct* MyStruct2 = FpruebaUStruct::StaticStruct();
 
 	FpruebaUStruct pruebaStruct2;
 	pruebaStruct2 = FpruebaUStruct();
 
-	GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Blue, FString::Printf(TEXT("Enviando a cliente 1")));
-	pruebaStruct2.stringPrueba = "Servidor enviando a cliente 1";
+	UE_LOG(LogTemp, Warning, TEXT("Enviando a cliente 1"));
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *SocketManager->StateString());
+
+	
+	pruebaStruct2.stringPrueba = "Texto de prueba en server enviado a cliente 1";
 
 
 
 	TArray<uint8>* Storage2 = new TArray<uint8>();
-	FMemoryWriter ArWriter2(*Storage);
+	FMemoryWriter ArWriter2(*Storage2);
 	MyStruct2->SerializeBin(ArWriter2, &pruebaStruct2);
 
 
-	 successful = SocketManager->SendInfoTo(1, Storage2);*/
+	 successful = SocketManager->SendInfoTo(1, Storage2);
 }
