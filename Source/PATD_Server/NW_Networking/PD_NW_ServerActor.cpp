@@ -33,7 +33,7 @@ void APD_NW_ServerActor::InitTimerActor()
 {
 	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_ServerActor::CheckForReceivedData, 0.01f, true);
 
-	GetWorldTimerManager().SetTimer(TimerHandleActor2, this, &APD_NW_ServerActor::ChangeLevelMap, 60.01f, false);
+	GetWorldTimerManager().SetTimer(TimerHandleActor2, this, &APD_NW_ServerActor::ChangeLevelMap, 40.0f, false);
 
 }
 

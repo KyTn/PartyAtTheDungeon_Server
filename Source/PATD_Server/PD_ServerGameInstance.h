@@ -41,4 +41,7 @@ public:
 	PD_NW_SocketManager* GetSocketManager();
 
 	void LoadMap();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	void InitServerActoWhenLoadMap();
 };
