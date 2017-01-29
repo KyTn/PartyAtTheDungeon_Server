@@ -14,12 +14,11 @@ struct FpruebaUStruct
 
 		// So to simplify your life for later debugging, always use UPROPERTY()
 		UPROPERTY()
-		int32 SampleInt32;
+		FString stringPrueba;
 
-	UPROPERTY()
-		AActor* TargetActor;
 
-	//Set
+
+	/*//Set
 	void SetInt(const int NewValue)
 	{
 		SampleInt32 = NewValue;
@@ -37,13 +36,12 @@ struct FpruebaUStruct
 		if (!TargetActor) return false;
 		return TargetActor->IsValidLowLevel();
 	}
-
+	*/
 	//Constructor
 	FpruebaUStruct()
 	{
 		//Always initialize your USTRUCT variables!
 		//   exception is if you know the variable type has its own default constructor
-		SampleInt32 = 5;
-		TargetActor = NULL;
+		
 	}
 };
