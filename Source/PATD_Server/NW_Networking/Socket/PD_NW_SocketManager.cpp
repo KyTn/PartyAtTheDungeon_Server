@@ -168,20 +168,21 @@ void PD_NW_SocketManager::HandleNewSocketData(TArray<uint8>* data, int socketInd
 	*/
 
 	//Prueba con UStructs
-	FStructMap pruebaStruct;
+	/*FStructMap pruebaStruct;
 
 	UStruct* MyStruct = FStructMap::StaticStruct();
 
 	FMemoryReader ArReader(*data);
 
 	MyStruct->SerializeBin(ArReader, &pruebaStruct);
+	
 
 	for (int i = 0; i < pruebaStruct.arrayPruebaStrings.Num(); i++)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s"), *(pruebaStruct.arrayPruebaStrings[i]));
 		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Green, FString::Printf(TEXT("%s"), *(pruebaStruct.arrayPruebaStrings[i])));
 
-	}
+	}*/
 
 	//UE_LOG(LogTemp, Error, TEXT("%s"), *(pruebaStruct.stringPrueba));
 

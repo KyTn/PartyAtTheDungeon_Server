@@ -85,8 +85,8 @@ struct FStructGenericList
 
 	FStructGenericList()
 	{
-		FStructMap m;
-		list.Add(m);
+		/*FStructMap m;
+		list.Add(m);*/
 	}
 };
 
