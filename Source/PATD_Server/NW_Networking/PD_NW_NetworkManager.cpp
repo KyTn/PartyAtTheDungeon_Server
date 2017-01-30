@@ -57,18 +57,21 @@ bool PD_NW_NetworkManager::SendNow(FStructGeneric* st,int player) {
 	SendNow(player);
 	return true;
 }
-bool PD_NW_NetworkManager::SendNow(int player) {
-//	bool serializeOk;
+bool PD_NW_NetworkManager::SendNow(int player) {//serializamos y enviamos los datos de un jugador, tras esto deberian borrarse¿?
+	bool serializeOk;
 	//Para enviar todo lo pendiente con -1?
 //	FStructGenericList* sendList;
 	//FStructGenericList* = compressionManager.GetSendList(player);
-//	socketManager->SendInfoTo(player,serializerManager->SerializeData(*sendList, serializeOk));
-	
-
-	return true;
+	FStructGenericList* structPlayer = sendGenericStruct[player].GetData();
+	socketManager->SendInfoTo(player,serializerManager->SerializeData(*structPlayer, serializeOk));
+//	structPlayer->list.Empty();
+//	sendGenericStruct->Insert(*structPlayer, player); Vaciar la posicion de ese jugador en el servidor del buffer de enviar datos
+	return serializeOk;
 }
-bool PD_NW_NetworkManager::AddToSendList(FStructGeneric* st, int player) {
-
+bool PD_NW_NetworkManager::AddToSendList(FStructGeneric* st, int player) {//Actualiza los datos del buffer de salida de ese cliente
+	FStructGenericList* structPlayer = sendGenericStruct[player].GetData();
+	structPlayer->list.Add(*st);
+	sendGenericStruct->Insert(*structPlayer,player);
 	//compressionManager.AddToSendList(st, player);
 	return true;
 }

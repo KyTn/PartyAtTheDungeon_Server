@@ -19,6 +19,9 @@ private:
 	PD_NW_EventManager* eventManager;
 	PD_SR_SerializerManager* serializerManager;
 
+	TArray<FStructGenericList>* sendGenericStruct;
+	TArray<FStructGenericList>* reciveGenericStruct;
+
 	//Punto de entrada de los eventos del socketManager
 	void HandleNewSocketData(TArray<uint8>* data, int socketIndex);
 	//Por si lo necesitamos para meter en el array de compressionManager
