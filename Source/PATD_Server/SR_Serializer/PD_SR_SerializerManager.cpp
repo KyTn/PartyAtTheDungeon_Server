@@ -3,6 +3,12 @@
 #include "PATD_Server.h"
 #include "PD_SR_SerializerManager.h"
 
+PD_SR_SerializerManager::PD_SR_SerializerManager() {
+
+}
+PD_SR_SerializerManager::~PD_SR_SerializerManager() {
+
+}
 
 FStructGenericList PD_SR_SerializerManager::DeserializeData(TArray<uint8>* data, bool & correct)
 {

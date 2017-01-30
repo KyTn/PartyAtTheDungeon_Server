@@ -7,17 +7,17 @@
 #include "PD_NW_Socket.h" 
 #include "Networking.h"
 #include "NW_NetWorking/PD_NW_ServerActor.h"
-
+#include "NW_NetWorking/PD_NW_NetworkManager.h"
 //Includes de prueba
-#include <string>
-#include "SR_Serializer/PD_SR_ListUStructs.h"
+
 
 /******************************
 *** CONSTRUCTOR Y DESTRUCTOR DE LA CLASE **
 /******************************/
 PD_NW_SocketManager::PD_NW_SocketManager()
 {
-	socketArray = TArray<PD_NW_Socket*>();
+	socketArray = TArray<PD_NW_Socket*>();//Creo que no hace falta esta inicializacion.
+
 	listenerSocket = nullptr;
 }
 
@@ -256,6 +256,13 @@ APD_NW_ServerActor* PD_NW_SocketManager::GetServerActor()
 	return myServerActor;
 }
 
+
+PD_NW_NetworkManager* PD_NW_SocketManager::GetNetworkManager() {
+	return networkManager;
+}
+void PD_NW_SocketManager::SetNetworkManager(PD_NW_NetworkManager* networkManagerIn) {
+	networkManager = networkManagerIn;
+}
 
 FString PD_NW_SocketManager::StateString() {
 	FString out = "SocketManager state:";

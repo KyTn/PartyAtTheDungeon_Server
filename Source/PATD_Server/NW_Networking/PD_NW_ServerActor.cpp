@@ -8,7 +8,7 @@
 #include "PD_ServerGameInstance.h"
 
 //Includes de prueba
-#include "SR_Serializer/PD_SR_ListUStructs.h"
+
 
 
 // Sets default values
@@ -39,7 +39,7 @@ void APD_NW_ServerActor::InitTimerActor()
 	
 	//Timers de prueba
 	GetWorldTimerManager().SetTimer(TimerHandleActor2, this, &APD_NW_ServerActor::ChangeLevelMap, 40.0f, false);
-	GetWorldTimerManager().SetTimer(TimerHandleActor3, this, &APD_NW_ServerActor::SendPruebaSockets, 5.0f, true);
+	
 }
 
 

@@ -6,7 +6,8 @@
 #include "PD_ServerGameInstance.generated.h"
 
 //forward declarations
-class PD_NW_SocketManager;
+//class PD_NW_SocketManager;
+class PD_NW_NetworkManager;
 
 /**
 *
@@ -18,7 +19,8 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 		//Networking
-		PD_NW_SocketManager* socketManager;
+		//PD_NW_SocketManager* socketManager;
+		PD_NW_NetworkManager* networkManager;
 
 	//Functions ====
 	//Funcion para inicializar entre otros el socketManager. 
@@ -40,7 +42,7 @@ public:
 
 	virtual void Shutdown();
 
-	PD_NW_SocketManager* GetSocketManager();
+//	PD_NW_SocketManager* GetSocketManager();
 
 	void LoadMap();
 

@@ -5,7 +5,7 @@
 /**
  * 
  */
-#include "SR_Serializer/PD_SR_ListUStructs.h"
+#include "SR_Serializer/PD_SR_UStruct.h"
 
 class PATD_SERVER_API PD_SR_SerializerManager
 {
