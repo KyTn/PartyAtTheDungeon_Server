@@ -4,6 +4,7 @@
 #include "PATD_Server/MapGeneration/ParserActor.h"
 #include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
+#include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/ElementActors/PD_E_TileActor.h"
 #include "PATD_Server/ElementActors/PD_E_WallActor.h"
 
@@ -21,6 +22,20 @@ AParserActor::AParserActor()
 void AParserActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	//Parsear();
+
+
+	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
+	FString path = "Content/DungeonTestingMaps/test2.dungeon";
+	parseMap->StartParsingFromFile(&path);
+
+
+
+
+}
+void AParserActor::Parsear(){
 	StaticMapRef = new PD_MG_StaticMap();
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
@@ -51,8 +66,7 @@ void AParserActor::BeginPlay()
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
 		map.Empty(fil);
-
-
+		
 		/*
 		for (int i = 0; i < (int)fil; i++) {
 			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
@@ -94,8 +108,8 @@ void AParserActor::BeginPlay()
 			for (int j = 0; j < (int)col; j++)
 			{
 				
-				PD_MG_LogicPosition* lp = StaticMapRef->AddNewLogicPosition(i, j);
-				ParserElementByChar(lp, &(map[i][j]));
+				//PD_MG_LogicPosition* lp = StaticMapRef->AddNewLogicPosition(i, j);
+				//ParserElementByChar(lp, &(map[i][j]));
 			}
 
 			/*

@@ -14,9 +14,3 @@ PD_MG_LogicPosition::~PD_MG_LogicPosition()
 }
 
 
-
-uint32 PD_MG_LogicPosition::GetTypeHash(const PD_MG_LogicPosition& logpos)
-{
-	return 8;
-}
-
