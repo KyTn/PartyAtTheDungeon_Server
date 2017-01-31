@@ -2,12 +2,15 @@
 
 #include "PATD_Server.h"
 #include "PD_ServerGameInstance.h"
+
 #include "NW_NetWorking/PD_NW_ServerActor.h"
+#include "NW_NetWorking/PD_NW_NetworkManager.h"
 
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
-#include "NW_NetWorking/PD_NW_NetworkManager.h"
+
 //Includes de prueba
+#include "NW_Networking/EventLayer/PD_NW_iEventObserver.h"
 
 
 
@@ -16,6 +19,24 @@ void UPD_ServerGameInstance::Init()
 	Super::Init();
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
 	InitializeNetworking();
+
+	class ObservadorPrueba : public PD_NW_iEventObserver
+	{
+		void handleEvent(FStructGeneric* dataStruct, int inPlayer, UStructType inEventType) {
+			UE_LOG(LogTemp, Warning, TEXT("Observador dice:%s "), *((FStructMap*)dataStruct)->arrayPruebaStrings[0]);
+			if (inEventType == UStructType::FStructMap) {
+				UE_LOG(LogTemp, Warning, TEXT("Observador dice:%s "), *((FStructMap*)dataStruct)->arrayPruebaStrings[0]);
+				
+			}
+		}
+	};
+	ObservadorPrueba* obs = new ObservadorPrueba();
+	obs->setUpObserver(-1, UStructType::AllStructs);
+	networkManager->RegisterObserver(obs);
+
+
+
+
 }
 
 void UPD_ServerGameInstance::Shutdown()

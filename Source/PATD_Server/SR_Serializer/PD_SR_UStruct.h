@@ -40,12 +40,12 @@ struct FStructGeneric
 	GENERATED_BODY()
 
 		UPROPERTY()
-		int structType;
+		uint8 structType;
 
 	//Constructor
 	FStructGeneric() {
 		
-		structType = static_cast<int>(UStructType::NoDefined);
+		structType = static_cast<uint8>(UStructType::NoDefined);
 	}
 };
 
@@ -81,7 +81,7 @@ struct FStructMap : public FStructGeneric
 		FString stringPrueba;
 
 	UPROPERTY()
-		int intPrueba;
+		uint8 intPrueba;
 
 	UPROPERTY()
 		TArray<FString> arrayPruebaStrings;

@@ -99,8 +99,9 @@ public:
 	void InitSocketManager_ClientMode(FString ip, int port);
 	
 
-	//Funcion publica para poder añadir sockets manualmente. Devuelve la posicion donde se crea el socket.
-	int CreateDataSocket(FString ip, int port);
+	//Funcion publica para poder añadir sockets (conectados) manualmente. Devuelve la posicion donde se crea el socket.
+	//Solo guarda el socket en el array si se llega a conectar.
+	int ConnectDataSocket(FString ip, int port);
 
 
 

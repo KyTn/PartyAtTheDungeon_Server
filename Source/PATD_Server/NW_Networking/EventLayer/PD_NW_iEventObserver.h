@@ -24,5 +24,6 @@ public:
 	int getPlayer();
 	UStructType getType();
 
-	virtual void handleEvent(FStructGeneric* dataStruct, int player, UStructType eventType) = 0;
+	//El struct desaparecera despues de esta llamada. Si se desea guardar hay que copiarlo en la llamada.
+	virtual void handleEvent(FStructGeneric* dataStruct, int inPlayer, UStructType inEventType) = 0;
 };
