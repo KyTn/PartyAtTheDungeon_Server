@@ -31,18 +31,27 @@ bool  PD_NW_EventManager::UnregisterObserver(PD_NW_iEventObserver* observer) {
 void PD_NW_EventManager::GenerateEvent(FStructGeneric* st, int player) {
 	for (int i = 0; i < observerList.Num(); i++)
 	{
-		UStructType obsType = observerList[i]->getType();
-		int obsPlayer = observerList[i]->getPlayer();
+		if (!observerList[i]) {
+			UE_LOG(LogTemp, Warning, TEXT("ObserverNull %d"), i);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Generando evento %d "), i);
+			UStructType obsType = observerList[i]->getType();
+			int obsPlayer = observerList[i]->getPlayer();
+			UE_LOG(LogTemp, Warning, TEXT("Parada structtype %d "), st->structType);
 
-		UStructType eventType = UStructType(st->structType);
-		int eventPlayer = player;
-		
-		//Comprobamos que el observador quiere recibir eventos del jugador y el tipo del que viene.
-		if ((obsType == UStructType::AllStructs || obsType == eventType)
-			&& (obsPlayer == -1 || obsPlayer == eventPlayer)) {
-
-			//Llamar a la funcion virtual de la interfaz. Aqui cada uno pondra su codigo.
-			observerList[i]->handleEvent(st, eventPlayer, eventType);
+			
+			UStructType eventType = UStructType(st->structType);
+			int eventPlayer = player;
+			UE_LOG(LogTemp, Warning, TEXT("Parada 2 "), i);
+			//Comprobamos que el observador quiere recibir eventos del jugador y el tipo del que viene.
+			if ((obsType == UStructType::AllStructs || obsType == eventType)
+				&& (obsPlayer == -1 || obsPlayer == eventPlayer)) {
+				UE_LOG(LogTemp, Warning, TEXT("Parada 3 dentro if "), i);
+				//Llamar a la funcion virtual de la interfaz. Aqui cada uno pondra su codigo.
+				observerList[i]->handleEvent(st, eventPlayer, eventType);
+				UE_LOG(LogTemp, Warning, TEXT("Parada 4 dentro if "), i);
+			}
 		}
 	}
 }

@@ -81,7 +81,7 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	if (socket->HasPendingData(Size))
 	{
 		//Estamos creando los datos nuevos en el HEAP
-		receivedData = new TArray<uint8>();
+		receivedData = new TArray<uint8>(); //Aqui creamos reserva de memoria en heap para el array.
 		receivedData->Init(0, FMath::Min(Size, 65507u));
 
 		int32 Read = 0;
