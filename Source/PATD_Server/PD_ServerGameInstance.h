@@ -34,8 +34,8 @@ public:
 	PD_NW_NetworkManager* networkManager;
 
 	int clientMasterIndex = -1;
-
-
+	TArray<bool>* ready;
+	int numPlayers = 0;
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 

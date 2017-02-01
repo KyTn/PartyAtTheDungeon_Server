@@ -20,6 +20,7 @@ void UPD_ServerGameInstance::Init()
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
 	InitializeNetworking();
 
+
 	class ObservadorPrueba : public PD_NW_iEventObserver
 	{
 	public:
@@ -35,7 +36,7 @@ void UPD_ServerGameInstance::Init()
 				switch (dataStruct->orderType) {
 				case 0: //New connection
 
-
+					gi->numPlayers++;
 					if (gi->GetWorld()->GetMapName() != "LVL_4_GameMap") {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
@@ -65,17 +66,32 @@ void UPD_ServerGameInstance::Init()
 					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				case 3://GoToMap
+					gi->ready->Init(false,gi->numPlayers);
 					//IniciarArray de readys con el numero de jugadores actual
 					//Si uno se cae en este punto no se podra iniciar partida jamas xD
 
 					break;
 				case 4://ClientReady
-					//Setear true en array de readys
-					//Comprobar si todos son trues.
-					gi->LoadMap("LVL_4_GameMap");
-					respuesta.orderType = 9; //ChangeToMap
-					gi->networkManager->SendNow(&respuesta, -1);
-					gi->sendMap();
+					if (gi->ready[inPlayer].Contains(false)) 
+					{
+						gi->ready->Insert(true, inPlayer);
+						bool allReady = true;
+						for (size_t i = 0; i < gi->ready->Num() && allReady; i++)
+						{
+							if (gi->ready[inPlayer].Contains(false))
+								allReady = false;
+						}
+						if (allReady)
+						{
+							gi->LoadMap("LVL_4_GameMap");
+							respuesta.orderType = 9; //ChangeToMap
+							gi->networkManager->SendNow(&respuesta, -1);
+							gi->sendMap();
+						}
+					}
+					else//si ya habia pulsado reay antes se pone a falso
+						gi->ready->Insert(false,inPlayer);
+					
 					break;
 				}
 
