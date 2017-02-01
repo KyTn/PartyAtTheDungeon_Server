@@ -15,7 +15,7 @@ AParserActor::AParserActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -23,14 +23,14 @@ void AParserActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	StaticMapRef = new PD_MG_StaticMap();
 	//Parsear();
 
 
 	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
 	FString path = "Content/DungeonTestingMaps/test2.dungeon";
-	parseMap->StartParsingFromFile(&path);
-
+	parseMap->StartParsingFromFile(&path, StaticMapRef);
+	parseMap->InstantiateStaticMap(this);
 
 
 

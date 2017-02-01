@@ -16,16 +16,10 @@ class PATD_SERVER_API AParserActor : public AActor
 private :
 	PD_MG_StaticMap* StaticMapRef;
 	
+	
 public:	
-
-	UPROPERTY(EditAnywhere)
-		AActor* tileActor;
-	UPROPERTY(EditAnywhere)
-		AActor* wallActor;
-	UPROPERTY(EditAnywhere)
-		AActor* doorActor;
-
-
+	
+	
 	// Sets default values for this actor's properties
 	AParserActor();
 

@@ -22,7 +22,7 @@ PD_MG_LogicPosition* PD_MG_StaticMap::AddNewLogicPosition(uint32 x, uint32 y, TC
 	_LogicPositionsRefs.Add(lp);
 	_xymap.Add(*lp, c);
 
-
+	/*
 	FString s;
 	s.AppendInt(x);
 	s.Append(",");
@@ -30,7 +30,7 @@ PD_MG_LogicPosition* PD_MG_StaticMap::AddNewLogicPosition(uint32 x, uint32 y, TC
 	s.Append("-");
 	s.AppendChar(c);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Adding LP (" + s + ")");
-
+	/**/
 	return lp;
 }
 

@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include "GameFramework/Actor.h"
+#include "PATD_Server/MapGeneration/ParserActor.h"
+
+
 #pragma region Class_References
 
 class PD_MG_StaticMap;
@@ -21,6 +25,6 @@ public:
 
 	PD_MG_StaticMap* StartParsingFromFile(FString* filepath);
 	PD_MG_StaticMap* StartParsingFromFile(FString* filepath, PD_MG_StaticMap*  staticMapRef);
-	
 
+	void InstantiateStaticMap(AParserActor* parserActor);
 };

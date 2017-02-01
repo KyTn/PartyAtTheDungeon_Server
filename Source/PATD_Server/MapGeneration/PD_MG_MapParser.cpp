@@ -3,6 +3,7 @@
 #include "PATD_Server.h"
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
+#include "PATD_Server/MapGeneration/ParserActor.h"
 
 PD_MG_MapParser::PD_MG_MapParser()
 {
@@ -31,13 +32,16 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 	if (FFileHelper::LoadFileToString(FileData, *FilePath))
 	{
 
-		// Obtenemos el numero de filas y de columnas 
+		// Enviar a los clientes el mapa leido ... 
+
+
+		// Obtenemos la version del parser que se debe usar. 
 
 		TArray<FString> fileSplitted;
 		FileData.ParseIntoArray(fileSplitted, TEXT("\n"), true);
 
 		if (fileSplitted[0].Contains("v0.1") ) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Using parser version " + fileSplitted[0]);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Using parser version " + fileSplitted[0]);
 
 			Parsing_v_0_1(fileSplitted, staticMapRef);
 		}
@@ -80,6 +84,9 @@ PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_M
 	// Cargamos los caractares planos sin referencias de comportamiento
 	nextIndexRead = ReadRawMap(fileReaded, nextIndexRead, staticMapRef);
 	
+	//InstantiateStaticMap(staticMapRef);
+
+
 
 	return staticMapRef;
 }
@@ -119,4 +126,27 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 		
 	}
 	/**/
+}
+
+void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor) {
+	
+	for (int i = 0; i < parserActor->getMap()->GetLogicPositions().Num(); i++) {
+
+		/**/
+		switch (parserActor->getMap()->GetXYMap()[*parserActor->getMap()->GetLogicPositions()[i]]) {
+		case 'w':
+			parserActor->InstantiateWall(parserActor->getMap()->GetLogicPositions()[i]);
+			break;
+
+		case 'd':
+			break;
+
+		default: 
+
+			parserActor->InstantiateTile(parserActor->getMap()->GetLogicPositions()[i]);
+			break;
+
+		}
+		/**/
+	}
 }
