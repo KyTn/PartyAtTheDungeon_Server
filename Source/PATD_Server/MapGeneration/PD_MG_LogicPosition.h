@@ -21,10 +21,14 @@ public:
 	uint32 GetY() { return _y; }
 	void SetY(uint32 y) { _y = y; }
 
-	bool operator=(PD_MG_LogicPosition other) {
-		return this->GetX() == other.GetX() && this->GetY() == other.GetY();
+	FORCEINLINE bool operator==(const PD_MG_LogicPosition& other) const
+	{
+		return this->_x == other._x && this->_y == other._y;
 	}
 
 	
-	uint32 GetTypeHash(const PD_MG_LogicPosition& logpos);
+	friend uint32 PD_MG_LogicPosition::GetTypeHash(const PD_MG_LogicPosition& logpos)
+	{
+		return (logpos._x << 16) + logpos._y;
+	}
 };
