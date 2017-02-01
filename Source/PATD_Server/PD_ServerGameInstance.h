@@ -72,4 +72,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	TArray<bool> GetPlayersReady();
+
 };

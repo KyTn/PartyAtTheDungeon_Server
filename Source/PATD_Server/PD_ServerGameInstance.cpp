@@ -218,23 +218,26 @@ TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 {
 	TArray<FString> playersConnected = TArray<FString>();
 	FString auxNamePlayer = "";
+	
 	TArray<PD_NW_Socket*> socketArray = networkManager->GetSocketManager()->GetSocketArray();
 
-	/*for (int i = 0; i < socketArray.Num(); i++)
-	{
-		auxNamePlayer = "Player ";
-		auxNamePlayer.Append(FString::FromInt(i));
-		playersConnected.Add(auxNamePlayer);
-	}
-	*/
-	// Se queda a modo de debug para probar el ADDCHild del Widget
-	for (int i = 0; i < 4; i++) 
+	for (int i = 0; i < socketArray.Num(); i++)
 	{
 		auxNamePlayer = "Player ";
 		auxNamePlayer.Append(FString::FromInt(i));
 		playersConnected.Add(auxNamePlayer);
 	}
 	
+
+	// Se queda a modo de debug para probar el ADDCHild del Widget
+	/*for (int i = 0; i < 12; i++) 
+	{
+		auxNamePlayer = "Player ";
+		auxNamePlayer.Append(FString::FromInt(i));
+		playersConnected.Add(auxNamePlayer);
+	}
+	*/
+
 	return playersConnected;
 }
 

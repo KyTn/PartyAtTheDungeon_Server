@@ -238,7 +238,13 @@ bool PD_NW_SocketManager::SetSocketArrayIndex(int index)
 {
 	if (readyPlayersArray.Num() >= index)
 	{
-		readyPlayersArray[index] = true;
+		if (readyPlayersArray[index])
+		{
+			readyPlayersArray[index] = false;
+		} 
+		else {
+			readyPlayersArray[index] = true;
+		}
 		return true;
 	}
 	else {
