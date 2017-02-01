@@ -48,11 +48,6 @@ public:
 
 
 	//Declaraciones de prueba
-	FTimerHandle TimerHandleActor2;
-	FTimerHandle TimerHandleActor3;
 
-	void ChangeLevelMap();
-
-	void SendPruebaSockets();
 
 };

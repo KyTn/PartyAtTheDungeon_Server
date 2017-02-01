@@ -30,12 +30,55 @@ void UPD_ServerGameInstance::Init()
 		void handleEvent(FStructGenericoHito2* dataStruct, int inPlayer, UStructType inEventType) {
 			UE_LOG(LogTemp, Warning, TEXT("Recibido una MenuOrder "));
 
-			switch (dataStruct->orderType) {
-			case 0: 
+			if (dataStruct->orderType != -1) { //NullOrder
+				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
+				switch (dataStruct->orderType) {
+				case 0: //New connection
 
-				gi->sendMap();
-				gi->LoadMap();
-				break;
+
+					if (gi->GetWorld()->GetMapName() != "LVL_4_GameMap") {
+						if (gi->clientMasterIndex == -1) {//No hay clientMaster
+							gi->clientMasterIndex = inPlayer;
+							respuesta.orderType = 5;//SetClientMaster
+							respuesta.stringMap.AppendInt(inPlayer);
+						}
+						else {//Hay clientMaster
+							respuesta.orderType = 6;//Welcome
+							respuesta.stringMap.AppendInt(inPlayer);
+						}
+					}
+					else {
+						respuesta.orderType = 10;//InvalidConnection
+						//Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
+					}
+					gi->networkManager->SendNow(&respuesta, inPlayer);
+					break;
+
+				case 1://GoToMainMenu
+					gi->LoadMap("LVL_2_MainMenu");
+					respuesta.orderType = 7; //ChangeToMainMenu
+					gi->networkManager->SendNow(&respuesta, -1);
+					break;
+				case 2://GoToLobby
+					gi->LoadMap("LVL_3_SelectChars_Lobby");
+					respuesta.orderType = 8; //ChangeToLobby
+					gi->networkManager->SendNow(&respuesta, -1);
+					break;
+				case 3://GoToMap
+					//IniciarArray de readys con el numero de jugadores actual
+					//Si uno se cae en este punto no se podra iniciar partida jamas xD
+
+					break;
+				case 4://ClientReady
+					//Setear true en array de readys
+					//Comprobar si todos son trues.
+					gi->LoadMap("LVL_4_GameMap");
+					respuesta.orderType = 9; //ChangeToMap
+					gi->networkManager->SendNow(&respuesta, -1);
+					gi->sendMap();
+					break;
+				}
+
 			}
 		}
 	};
@@ -81,9 +124,9 @@ PD_NW_SocketManager* UPD_ServerGameInstance::GetSocketManager()
 }*/
 
 
-void UPD_ServerGameInstance::LoadMap()
+void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
-	UGameplayStatics::OpenLevel((UObject*)this, FName(TEXT("Level_Test_Travel_2")));
+	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
 
 
 }
@@ -100,8 +143,8 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 
 void UPD_ServerGameInstance::sendMap(){
 FStructGenericoHito2* m = new FStructGenericoHito2();
-m->orderType = 0;
+m->orderType = -1; //Indica que no es una orden
 UE_LOG(LogTemp, Warning, TEXT("Enviando Map"));
 
-networkManager->SendNow(m, 0);
+networkManager->SendNow(m,-1);
 }

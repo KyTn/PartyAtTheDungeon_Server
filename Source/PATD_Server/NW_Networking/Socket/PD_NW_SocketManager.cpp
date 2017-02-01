@@ -140,10 +140,20 @@ int PD_NW_SocketManager::ConnectDataSocket(FString ip, int port) {
 }
 
 bool PD_NW_SocketManager::SendInfoTo(int indexSocket, TArray<uint8>* data) {
-	if (socketArray.IsValidIndex(indexSocket) && socketArray[indexSocket] != nullptr) { //Comprobamos que el indice es valido
-		return socketArray[indexSocket]->SendData(data);
+	
+	if (indexSocket == -1) { //support to broadcast
+		bool ok = true;
+		for (int i = 0; i < socketArray.Num(); i++)
+		{
+			ok=ok && SendInfoTo(i, data);
+		}
+		return ok;
+	}else {
+		if (socketArray.IsValidIndex(indexSocket) && socketArray[indexSocket] != nullptr) { //Comprobamos que el indice es valido
+			return socketArray[indexSocket]->SendData(data);
+		}else return false;
 	}
-	else return false;
+	
 }
 
 

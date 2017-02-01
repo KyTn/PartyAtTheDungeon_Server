@@ -20,7 +20,7 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 
 		//Networking
 		//PD_NW_SocketManager* socketManager;
-		PD_NW_NetworkManager* networkManager;
+		
 
 	
 	//Functions ====
@@ -31,6 +31,11 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 	void InitializeAfterTravel();
 
 public:
+	PD_NW_NetworkManager* networkManager;
+
+	int clientMasterIndex = -1;
+
+
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
@@ -45,7 +50,7 @@ public:
 
 //	PD_NW_SocketManager* GetSocketManager();
 
-	void LoadMap();
+	void LoadMap(FString mapName);
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void sendMap();
