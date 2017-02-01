@@ -27,7 +27,7 @@ bool  PD_NW_EventManager::UnregisterObserver(PD_NW_iEventObserver* observer) {
 	return num>0;
 }
 
-
+/*
 void PD_NW_EventManager::GenerateEvent(FStructGeneric* st, int player) {
 	for (int i = 0; i < observerList.Num(); i++)
 	{
@@ -51,6 +51,30 @@ void PD_NW_EventManager::GenerateEvent(FStructGeneric* st, int player) {
 				//Llamar a la funcion virtual de la interfaz. Aqui cada uno pondra su codigo.
 				observerList[i]->handleEvent(st, eventPlayer, eventType);
 				UE_LOG(LogTemp, Warning, TEXT("Parada 4 dentro if "), i);
+			}
+		}
+	}
+}*/
+
+void PD_NW_EventManager::GenerateEvent(FStructGenericoHito2* st, int player) {
+	for (int i = 0; i < observerList.Num(); i++)
+	{
+		if (!observerList[i]) {
+	
+		}
+		else {
+		
+			UStructType obsType = observerList[i]->getType();
+			int obsPlayer = observerList[i]->getPlayer();
+			UStructType eventType = UStructType::FStructOrderMenu;
+			int eventPlayer = player;
+					//Comprobamos que el observador quiere recibir eventos del jugador y el tipo del que viene.
+			if ((obsType == UStructType::AllStructs || obsType == eventType)
+				&& (obsPlayer == -1 || obsPlayer == eventPlayer)) {
+
+				//Llamar a la funcion virtual de la interfaz. Aqui cada uno pondra su codigo.
+				observerList[i]->handleEvent(st, eventPlayer, eventType);
+	
 			}
 		}
 	}

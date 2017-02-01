@@ -22,6 +22,7 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 		//PD_NW_SocketManager* socketManager;
 		PD_NW_NetworkManager* networkManager;
 
+	
 	//Functions ====
 	//Funcion para inicializar entre otros el socketManager. 
 	void InitializeNetworking();
@@ -45,6 +46,9 @@ public:
 //	PD_NW_SocketManager* GetSocketManager();
 
 	void LoadMap();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	void sendMap();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void InitServerActoWhenLoadMap();

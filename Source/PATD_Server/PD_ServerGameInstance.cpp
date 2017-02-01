@@ -22,18 +22,26 @@ void UPD_ServerGameInstance::Init()
 
 	class ObservadorPrueba : public PD_NW_iEventObserver
 	{
-		void handleEvent(FStructGeneric* dataStruct, int inPlayer, UStructType inEventType) {
-			UE_LOG(LogTemp, Warning, TEXT("Observador dice:%s "), *((FStructMap*)dataStruct)->arrayPruebaStrings[0]);
-			if (inEventType == UStructType::FStructMap) {
-				UE_LOG(LogTemp, Warning, TEXT("Observador dice:%s "), *((FStructMap*)dataStruct)->arrayPruebaStrings[0]);
-				
+	public:
+		UPD_ServerGameInstance *gi;
+		ObservadorPrueba(UPD_ServerGameInstance* i) {
+			gi = i;
+		}
+		void handleEvent(FStructGenericoHito2* dataStruct, int inPlayer, UStructType inEventType) {
+			UE_LOG(LogTemp, Warning, TEXT("Recibido una MenuOrder "));
+
+			switch (dataStruct->orderType) {
+			case 0: 
+
+				gi->sendMap();
+				gi->LoadMap();
+				break;
 			}
 		}
 	};
-	ObservadorPrueba* obs = new ObservadorPrueba();
+	ObservadorPrueba* obs = new ObservadorPrueba(this);
 	obs->setUpObserver(-1, UStructType::AllStructs);
 	networkManager->RegisterObserver(obs);
-
 
 
 
@@ -88,4 +96,12 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 	networkManager->GetSocketManager()->InitServerActor(ServerActorSpawned);
 
 
+}
+
+void UPD_ServerGameInstance::sendMap(){
+FStructGenericoHito2* m = new FStructGenericoHito2();
+m->orderType = 0;
+UE_LOG(LogTemp, Warning, TEXT("Enviando Map"));
+
+networkManager->SendNow(m, 0);
 }
