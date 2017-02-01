@@ -71,6 +71,27 @@ void UPD_ServerGameInstance::Init()
 				case 4://ClientReady
 					//Setear true en array de readys
 					//Comprobar si todos son trues.
+
+					/*if (gi->ready[inPlayer].Contains(false))
+					{
+						gi->ready->Insert(true, inPlayer);
+						bool allReady = true;
+						for (size_t i = 0; i < gi->ready->Num() && allReady; i++)
+						{
+							if (gi->ready[i].Contains(false))
+								allReady = false;
+						}
+						if (allReady)
+						{
+							gi->LoadMap("LVL_4_GameMap");
+							respuesta.orderType = 9; //ChangeToMap
+							gi->networkManager->SendNow(&respuesta, -1);
+							gi->sendMap();
+						}
+					}
+					else//si ya habia pulsado reay antes se pone a falso
+						gi->ready->Insert(false, inPlayer);
+					*/
 					gi->SetClientReady(inPlayer);
 
 					if (gi->CheckForAllClientReady())
