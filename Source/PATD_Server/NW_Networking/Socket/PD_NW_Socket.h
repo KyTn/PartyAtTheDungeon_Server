@@ -27,7 +27,7 @@ public:
 	void InitAsDataSocket();
 
 	void SetFSocket(FSocket* inSocket);
-
+	FSocket* GetFSocket();
 	bool ConnectTo(FString ip , int port);
 	//Enviar datos
 	bool SendData(TArray<uint8>* sendData);

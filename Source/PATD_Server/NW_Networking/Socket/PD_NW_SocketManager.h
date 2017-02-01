@@ -18,6 +18,7 @@ private:
 
 	///VARIABLES
 	TArray<PD_NW_Socket*> socketArray;
+	TArray<bool> readyPlayersArray;
 
 	PD_NW_Socket* listenerSocket;
 
@@ -79,7 +80,10 @@ public:
 	PD_NW_NetworkManager* GetNetworkManager();
 	void SetNetworkManager(PD_NW_NetworkManager* networkManagerIn);
 
+	TArray<PD_NW_Socket*> GetSocketArray();
+	bool SetSocketArrayIndex(int index); //True si ha hecho bien el cambio / False contrario
 
+	TArray<bool> GetReadyPlayersArray();
 
 	///FUNCIONES 
 	//Inicializa el socketManager e inicia el timer. IP se usa solo en modo cliente.

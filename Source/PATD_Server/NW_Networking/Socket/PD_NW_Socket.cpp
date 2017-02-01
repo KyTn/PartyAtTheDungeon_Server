@@ -164,3 +164,7 @@ void PD_NW_Socket::InitAsDataSocket() {
 void PD_NW_Socket::SetFSocket(FSocket* inSocket) {
 	socket = inSocket;
 }
+
+FSocket* PD_NW_Socket::GetFSocket() {
+	return socket;
+}

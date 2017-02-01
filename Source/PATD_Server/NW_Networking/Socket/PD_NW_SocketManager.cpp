@@ -172,6 +172,7 @@ void PD_NW_SocketManager::HandleNewListenerConnection(PD_NW_Socket* newSocket) {
 	UE_LOG(LogTemp, Warning, TEXT("New Listener Connection"));
 
 	int socketIndex = socketArray.Add(newSocket);
+	readyPlayersArray.Add(false); //Set siempre a false el ready inicial del cliente
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *StateString());
 
@@ -221,6 +222,28 @@ bool PD_NW_SocketManager::GetIsServer()
 {
 	return isServer;
 
+}
+
+TArray<PD_NW_Socket*> PD_NW_SocketManager::GetSocketArray()
+{
+	return socketArray;
+}
+
+TArray<bool> PD_NW_SocketManager::GetReadyPlayersArray()
+{
+	return readyPlayersArray;
+}
+
+bool PD_NW_SocketManager::SetSocketArrayIndex(int index)
+{
+	if (readyPlayersArray.Num() >= index)
+	{
+		readyPlayersArray[index] = true;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 //Creo que esta funcion ya no es necesaria, se hace todo en el initServerActor y solo existe el GetServerActor

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
+#include "Networking.h"
 #include "PD_ServerGameInstance.h"
 
 #include "NW_NetWorking/PD_NW_ServerActor.h"
@@ -34,8 +35,6 @@ void UPD_ServerGameInstance::Init()
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
 				case 0: //New connection
-
-
 					if (gi->GetWorld()->GetMapName() != "LVL_4_GameMap") {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
@@ -72,10 +71,16 @@ void UPD_ServerGameInstance::Init()
 				case 4://ClientReady
 					//Setear true en array de readys
 					//Comprobar si todos son trues.
-					gi->LoadMap("LVL_4_GameMap");
-					respuesta.orderType = 9; //ChangeToMap
-					gi->networkManager->SendNow(&respuesta, -1);
-					gi->sendMap();
+					gi->SetClientReady(inPlayer);
+
+					if (gi->CheckForAllClientReady())
+					{
+						//Carga nuevo mapa + Envio de Mapa a CLIENTES
+						gi->LoadMap("LVL_4_GameMap");
+						respuesta.orderType = 9; //ChangeToMap
+						gi->networkManager->SendNow(&respuesta, -1);
+						gi->sendMap();
+					}
 					break;
 				}
 
@@ -141,10 +146,114 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 
 }
 
-void UPD_ServerGameInstance::sendMap(){
+void UPD_ServerGameInstance::sendMap()
+{
 FStructGenericoHito2* m = new FStructGenericoHito2();
 m->orderType = -1; //Indica que no es una orden
 UE_LOG(LogTemp, Warning, TEXT("Enviando Map"));
 
 networkManager->SendNow(m,-1);
+}
+
+
+
+void UPD_ServerGameInstance::SetClientReady(int indexClient)
+{
+	networkManager->GetSocketManager()->SetSocketArrayIndex(indexClient);
+}
+
+bool UPD_ServerGameInstance::CheckForAllClientReady()
+{
+	bool allReady = true;
+
+	for (int i = 0; i < networkManager->GetSocketManager()->GetReadyPlayersArray().Num(); i++)
+	{
+		allReady = allReady && networkManager->GetSocketManager()->GetReadyPlayersArray()[i];
+	}
+
+	return allReady;
+}
+
+
+/*************************************
+******* FUNCIONES UTILIDADES / BP
+*************************************/
+FString UPD_ServerGameInstance::GetServerIP()
+{
+	FString myIP = "";
+	FString auxmyIP = "";
+	TArray < TSharedPtr<FInternetAddr>> myIPAddress;
+	FString myServerName =  "";
+	FString textToPrint = "";
+
+
+	if (ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->HasNetworkDevice()) //Se puede usar funciones de red
+	{
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetHostName(myServerName); //Get Server Name HOST
+		
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(myIPAddress); //Get List of Address in Host
+		
+		for (int i = 0; i < myIPAddress.Num(); i++)
+		{
+			auxmyIP = myIPAddress[i]->ToString(false);
+			myIP.Append(auxmyIP);
+		}
+
+		textToPrint = " - The Name of the Server is: " + myServerName;
+		textToPrint.Append("\n - The List of Address hosted by this Host is: \n");
+		textToPrint.Append(myIP);
+		//textToPrint = textToPrint + "/n " + (TEXT("and the List of IP is : / n %s"), myIP);
+	}
+	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
+	{
+		textToPrint = TEXT("Device has not a Properly Configured NETWORK device to set a SERVER");
+	}
+
+
+	return textToPrint;
+}
+
+
+TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
+{
+	TArray<FString> playersConnected = TArray<FString>();
+	FString auxNamePlayer = "";
+	TArray<PD_NW_Socket*> socketArray = networkManager->GetSocketManager()->GetSocketArray();
+
+	/*for (int i = 0; i < socketArray.Num(); i++)
+	{
+		auxNamePlayer = "Player ";
+		auxNamePlayer.Append(FString::FromInt(i));
+		playersConnected.Add(auxNamePlayer);
+	}
+	*/
+	// Se queda a modo de debug para probar el ADDCHild del Widget
+	for (int i = 0; i < 4; i++) 
+	{
+		auxNamePlayer = "Player ";
+		auxNamePlayer.Append(FString::FromInt(i));
+		playersConnected.Add(auxNamePlayer);
+	}
+	
+	return playersConnected;
+}
+
+
+TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
+{
+	//TArray<bool> playersReadyArray = TArray<bool>();
+	TArray<bool> playersReadyArray = networkManager->GetSocketManager()->GetReadyPlayersArray();
+
+	// Se queda a modo de debug para probar el ADDCHild del Widget
+	/*for (int i = 0; i < 4; i++) // Se queda a modo de debug para probar el ADDCHild del Widget
+	{
+		if (i/2 == 0)
+			playersReadyArray.Add(true);
+		else
+			playersReadyArray.Add(false);
+
+	}
+	*/
+
+	return playersReadyArray;
 }

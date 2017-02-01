@@ -52,9 +52,24 @@ public:
 
 	void LoadMap(FString mapName);
 
+	void SetClientReady(int indexClient);
+
+	bool CheckForAllClientReady();
+
+
+	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void sendMap();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void InitServerActoWhenLoadMap();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	FString GetServerIP();
+	
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	TArray<FString> GetPlayersConnected();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	TArray<bool> GetPlayersReady();
 };
