@@ -151,8 +151,11 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 	return nullptr;
 }
 
-void PD_NW_Socket::InitAsListener(int port) {
-	FIPv4Endpoint Endpoint(FIPv4Address(127, 0, 0, 1), port);
+void PD_NW_Socket::InitAsListener(TArray<uint8>ip, int port) {
+
+
+
+	FIPv4Endpoint Endpoint(FIPv4Address(ip[0], ip[1], ip[2], ip[3]), port);
 	this->socket = FTcpSocketBuilder("Listener Socket").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
 }
 

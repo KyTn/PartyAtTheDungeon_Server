@@ -139,7 +139,7 @@ void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor) {
 			break;
 
 		case 'd':
-			break;
+			
 
 		default: 
 

@@ -27,6 +27,8 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 	//Funcion para inicializar entre otros el socketManager. 
 	void InitializeNetworking();
 
+	void castIP(const FString &myIP);
+
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
 	void InitializeAfterTravel();
 
@@ -38,6 +40,7 @@ public:
 	int numPlayers = 0;
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
+	TArray <uint8> ip = TArray<uint8>();
 
 	//Overwrites
 

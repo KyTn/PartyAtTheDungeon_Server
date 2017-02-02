@@ -33,7 +33,7 @@ PD_NW_SocketManager::~PD_NW_SocketManager()
 *** FUNCIONES **
 /******************************/
 //
-void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, FString ip, int port)
+void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, TArray<uint8> ip, int port)
 {
 	UE_LOG(LogTemp, Warning, TEXT("INICIANDO SOCKET MANAGER! "));
 	//Inicializacion actor
@@ -41,23 +41,23 @@ void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, FString ip, 
 
 	if (isServer)
 	{
-		InitSocketManager_ServerMode(port);
+		InitSocketManager_ServerMode(ip,port);
 	}
 	else
 	{
-		InitSocketManager_ClientMode(ip, port);
+		InitSocketManager_ClientMode("", port);
 	}
 
 }
 
 
 
-void PD_NW_SocketManager::InitSocketManager_ServerMode(int port)
+void PD_NW_SocketManager::InitSocketManager_ServerMode(TArray<uint8>ip, int port)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Socket MANAGER como SERVIDOR!! "));
 
 	//Inicializacion listener
-	if (InitListener(port))
+	if (InitListener(ip,port))
 	{
 		//Cuando se ha creado el Socket Listener, puedes llamar al Actor para que empiece el Timer de Escuchar.
 		// Se llama en el init para todos.
@@ -97,7 +97,7 @@ void PD_NW_SocketManager::InitSocketManager_ClientMode(FString ip, int port)
 
 //hay posibilidad de que esta funcion falle? quizas debe devolver void 
 ///R: Asi sabemos si se ha creado, antes de proceder a que el ServerActor empiece a escuhcar por ese puerto y genere errores
-bool PD_NW_SocketManager::InitListener(int port) {
+bool PD_NW_SocketManager::InitListener(TArray<uint8> ip, int port) {
 
 	/*if (listenerSocket) { //Esto es necesario?
 	//cerrar conexion del listener
@@ -105,7 +105,7 @@ bool PD_NW_SocketManager::InitListener(int port) {
 	delete listenerSocket;
 	}*/
 	listenerSocket = new PD_NW_Socket();
-	listenerSocket->InitAsListener(port);
+	listenerSocket->InitAsListener(ip,port);
 
 	return true;
 

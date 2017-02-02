@@ -87,13 +87,13 @@ public:
 
 	///FUNCIONES 
 	//Inicializa el socketManager e inicia el timer. IP se usa solo en modo cliente.
-	void Init(APD_NW_ServerActor* InmyServerActor, FString ip, int port);
+	void Init(APD_NW_ServerActor* InmyServerActor, TArray<uint8> ip, int port);
 	//Inicializa el ServerActor para ser llamado desde cualquier Mapa
 	void InitServerActor(APD_NW_ServerActor* InmyServerActor);
 
 	///* SERVIDOR */
 	//Inicializa el SocketManager como Server
-	void InitSocketManager_ServerMode(int port);
+	void InitSocketManager_ServerMode(TArray <uint8>ip, int port);
 	//Esta es la funcion que repetira el timer. Deberia recopilar los datos recibidos en los sockets e ir llamando a las funciones de salida
 	void TimerRefreshFunction();
 
@@ -109,7 +109,7 @@ public:
 
 
 
-	bool InitListener(int port);
+	bool InitListener(TArray<uint8> ip, int port);
 	bool CloseListener();
 
 

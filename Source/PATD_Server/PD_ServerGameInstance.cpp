@@ -129,8 +129,9 @@ void UPD_ServerGameInstance::Shutdown()
 }
 
 void UPD_ServerGameInstance::InitializeNetworking()
-{
-
+{	
+	//FString myip;
+	GetServerIP();
 	networkManager= new PD_NW_NetworkManager();
 	PD_NW_SocketManager* socketManager = networkManager->GetSocketManager();
 	//socketManager = new PD_NW_SocketManager();
@@ -139,10 +140,35 @@ void UPD_ServerGameInstance::InitializeNetworking()
 	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
 	socketManager->SetNetworkManager(networkManager);
 	//Donde se pone el puerto que es como una constante global?
-	socketManager->Init(ServerActorSpawned, "", defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
+	socketManager->Init(ServerActorSpawned, ip, defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
 	
 	
 }
+
+
+
+//Format IP String as Number Parts
+void UPD_ServerGameInstance::castIP(const FString& TheIP)
+{
+	//IP Formatting
+	TheIP.Replace(TEXT(" "), TEXT(""));
+
+	//String Parts
+	TArray<FString> Parts;
+	TheIP.ParseIntoArray(Parts, TEXT("."), true);
+
+	//String to Number Parts
+	for (int32 i = 0; i < 4; ++i)
+	{
+		ip.Add(FCString::Atoi(*Parts[i]));
+	}
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[1]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[2]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);
+}
+
+
 /*
 PD_NW_SocketManager* UPD_ServerGameInstance::GetSocketManager()
 {
@@ -218,7 +244,11 @@ FString UPD_ServerGameInstance::GetServerIP()
 		{
 			auxmyIP = myIPAddress[i]->ToString(false);
 			myIP.Append(auxmyIP);
+			UE_LOG(LogTemp, Warning, TEXT("My ip %s"), *myIP);
 		}
+		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+		castIP(myIP);
+
 
 		textToPrint = " - The Name of the Server is: " + myServerName;
 		textToPrint.Append("\n - The List of Address hosted by this Host is: \n");
