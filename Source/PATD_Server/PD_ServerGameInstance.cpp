@@ -51,6 +51,12 @@ void UPD_ServerGameInstance::Init()
 						//Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
 					}
 					gi->networkManager->SendNow(&respuesta, inPlayer);
+					if (gi->GetWorld()->GetMapName() == "LVL_2_MainMenu")
+						respuesta.orderType = 7;//Welcome
+					gi->networkManager->SendNow(&respuesta, inPlayer);
+					if (gi->GetWorld()->GetMapName() == "LVL_3_SelectChars_Lobby")
+						respuesta.orderType = 8;//Welcome
+					gi->networkManager->SendNow(&respuesta, inPlayer);
 					break;
 
 				case 1://GoToMainMenu
@@ -162,10 +168,10 @@ void UPD_ServerGameInstance::castIP(const FString& TheIP)
 	{
 		ip.Add(FCString::Atoi(*Parts[i]));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
+	/*UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[1]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[2]);
-	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);*/
 }
 
 
@@ -240,13 +246,12 @@ FString UPD_ServerGameInstance::GetServerIP()
 		
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(myIPAddress); //Get List of Address in Host
 		
-		for (int i = 0; i < myIPAddress.Num(); i++)
+		for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
 		{
 			auxmyIP = myIPAddress[i]->ToString(false);
 			myIP.Append(auxmyIP);
-			UE_LOG(LogTemp, Warning, TEXT("My ip %s"), *myIP);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
 		castIP(myIP);
 
 
@@ -258,6 +263,7 @@ FString UPD_ServerGameInstance::GetServerIP()
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
 	{
 		textToPrint = TEXT("Device has not a Properly Configured NETWORK device to set a SERVER");
+		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
 	}
 
 
