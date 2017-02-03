@@ -21,8 +21,10 @@ AParserActor::AParserActor()
 // Called when the game starts or when spawned
 void AParserActor::BeginPlay()
 {
-	Super::BeginPlay();
 
+	
+	Super::BeginPlay();
+	/*
 	StaticMapRef = new PD_MG_StaticMap();
 	//Parsear();
 
@@ -32,9 +34,25 @@ void AParserActor::BeginPlay()
 	parseMap->StartParsingFromFile(&path, StaticMapRef);
 	parseMap->InstantiateStaticMap(this);
 
+	*/
+
 
 
 }
+
+//Agregado para el hito2 MCG
+void AParserActor::InitGameMap() {
+	StaticMapRef = new PD_MG_StaticMap();
+	//Parsear();
+
+
+	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
+	FString path = FPaths::GameDir() + "Content/DungeonTestingMaps/test2.dungeon";
+	parseMap->StartParsingFromFile(&path, StaticMapRef);
+	parseMap->InstantiateStaticMap(this);
+}
+
+
 void AParserActor::Parsear(){
 	StaticMapRef = new PD_MG_StaticMap();
 
@@ -189,3 +207,4 @@ void AParserActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+

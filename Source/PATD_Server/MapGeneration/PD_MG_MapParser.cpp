@@ -31,6 +31,8 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 
 	if (FFileHelper::LoadFileToString(FileData, *FilePath))
 	{
+		//Agregado para el hito2 MCG
+		staticMapRef->SetMapString(FileData);
 
 		// Enviar a los clientes el mapa leido ... 
 

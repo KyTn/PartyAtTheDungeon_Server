@@ -35,3 +35,12 @@ PD_MG_LogicPosition* PD_MG_StaticMap::AddNewLogicPosition(uint32 x, uint32 y, TC
 }
 
 bool PD_MG_StaticMap::Clear() { return false; }
+
+
+//Agregado para el hito2 MCG
+FString PD_MG_StaticMap::GetMapString() {
+	return mapString;
+}
+void PD_MG_StaticMap::SetMapString(FString mapStrinIn) {
+	mapString = mapStrinIn;
+}

@@ -9,10 +9,11 @@
 
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
+#include "MapGeneration/ParserActor.h"
 
 //Includes de prueba
 #include "NW_Networking/EventLayer/PD_NW_iEventObserver.h"
-
+#include "MapGeneration/PD_MG_StaticMap.h"
 
 
 void UPD_ServerGameInstance::Init()
@@ -35,7 +36,7 @@ void UPD_ServerGameInstance::Init()
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
 				case 0: //New connection
-					if (gi->GetWorld()->GetMapName() != "LVL_4_GameMap") {
+					if (gi->GetWorld()->GetMapName() != "UEDPIE_0_LVL_4_GameMap") {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
 							respuesta.orderType = 5;//SetClientMaster
@@ -104,9 +105,11 @@ void UPD_ServerGameInstance::Init()
 					{
 						//Carga nuevo mapa + Envio de Mapa a CLIENTES
 						gi->LoadMap("LVL_4_GameMap");
-						respuesta.orderType = 9; //ChangeToMap
-						gi->networkManager->SendNow(&respuesta, -1);
-						gi->sendMap();
+						//gi->InitGameMap();
+
+					//Llamamos a enviar el mensaje de respuesta cuando ya este cargado nuestro mapa en InitGameMap();
+						
+						
 					}
 					break;
 				}
@@ -185,7 +188,7 @@ PD_NW_SocketManager* UPD_ServerGameInstance::GetSocketManager()
 void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
 	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
-
+	
 
 }
 
@@ -203,7 +206,10 @@ void UPD_ServerGameInstance::sendMap()
 {
 FStructGenericoHito2* m = new FStructGenericoHito2();
 m->orderType = -1; //Indica que no es una orden
-UE_LOG(LogTemp, Warning, TEXT("Enviando Map"));
+
+m->stringMap=parserActor->GetStaticMap()->GetMapString();
+
+UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
 
 networkManager->SendNow(m,-1);
 }
@@ -316,4 +322,25 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 	*/
 
 	return playersReadyArray;
+}
+
+//Esta funcion la llama el actor del server map (ya colocado) para inicializar
+void UPD_ServerGameInstance::InitGameMap() {
+	
+	UE_LOG(LogTemp, Warning, TEXT("Iniciando actor de parser"));
+
+	AParserActor* ServerActorSpawned = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
+	//en el begin play del actor es donde se parsea el mapa desde un fichero.
+	parserActor = ServerActorSpawned;
+
+	parserActor->InitGameMap();
+
+
+	
+	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa
+	FStructGenericoHito2 respuesta = FStructGenericoHito2();
+	respuesta.orderType = 9; //ChangeToMap
+	networkManager->SendNow(&respuesta, -1);
+	//LLamamos al send map cuando nosotros ya lo hemos parseado para poder tener el string.
+	sendMap();
 }

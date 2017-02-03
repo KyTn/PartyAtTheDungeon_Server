@@ -8,7 +8,7 @@
 //forward declarations
 //class PD_NW_SocketManager;
 class PD_NW_NetworkManager;
-
+class AParserActor;
 /**
 *
 */
@@ -31,8 +31,13 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
 	void InitializeAfterTravel();
+	
+
+	
 
 public:
+
+	AParserActor*  parserActor;
 	PD_NW_NetworkManager* networkManager;
 
 	int clientMasterIndex = -1;
@@ -66,6 +71,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void InitServerActoWhenLoadMap();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	void InitGameMap();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	FString GetServerIP();

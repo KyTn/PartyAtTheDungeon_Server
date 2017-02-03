@@ -35,4 +35,14 @@ public:
 	void ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c);
 	AActor* InstantiateTile(PD_MG_LogicPosition* logpos);
 	AActor* InstantiateWall(PD_MG_LogicPosition* logpos);
+
+
+	//Agregado para el hito2 MCG
+	PD_MG_StaticMap* GetStaticMap() {
+		return StaticMapRef;
+	};
+
+	void InitGameMap();
+
+
 };
