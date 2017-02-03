@@ -28,7 +28,7 @@ void AParserActor::BeginPlay()
 
 
 	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
-	FString path = "Content/DungeonTestingMaps/test2.dungeon";
+	FString path = FPaths::GameDir() + "Content/DungeonTestingMaps/test2.dungeon";
 	parseMap->StartParsingFromFile(&path, StaticMapRef);
 	parseMap->InstantiateStaticMap(this);
 
