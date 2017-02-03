@@ -32,7 +32,7 @@ void UPD_ServerGameInstance::Init()
 		void handleEvent(FStructGenericoHito2* dataStruct, int inPlayer, UStructType inEventType) {
 			UE_LOG(LogTemp, Warning, TEXT("Recibido una MenuOrder "));
 
-			if (dataStruct->orderType != -1) { //NullOrder
+			if (dataStruct->orderType != 255) { //NullOrder
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
 				case 0: //New connection
@@ -111,6 +111,10 @@ void UPD_ServerGameInstance::Init()
 						
 						
 					}
+					break;
+				case 11:
+					respuesta.orderType = 9; //ChangeToLobby
+					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				}
 
@@ -205,7 +209,7 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 void UPD_ServerGameInstance::sendMap()
 {
 FStructGenericoHito2* m = new FStructGenericoHito2();
-m->orderType = -1; //Indica que no es una orden
+m->orderType = 255; //Indica que no es una orden
 
 m->stringMap=parserActor->GetStaticMap()->GetMapString();
 
@@ -335,12 +339,14 @@ void UPD_ServerGameInstance::InitGameMap() {
 
 	parserActor->InitGameMap();
 
+	sendMap();
+
 
 	
 	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa
-	FStructGenericoHito2 respuesta = FStructGenericoHito2();
-	respuesta.orderType = 9; //ChangeToMap
-	networkManager->SendNow(&respuesta, -1);
+	//FStructGenericoHito2 respuesta = FStructGenericoHito2();
+	//respuesta.orderType = 9; //ChangeToMap
+	//networkManager->SendNow(&respuesta, -1);
 	//LLamamos al send map cuando nosotros ya lo hemos parseado para poder tener el string.
-	sendMap();
+	
 }
