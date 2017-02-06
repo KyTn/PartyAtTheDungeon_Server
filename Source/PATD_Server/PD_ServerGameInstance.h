@@ -27,12 +27,13 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 	//Funcion para inicializar entre otros el socketManager. 
 	void InitializeNetworking();
 
-	void castIP(const FString &myIP);
+	//void castIP(const FString &myIP);
 
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
 	void InitializeAfterTravel();
 	
-
+	FString serverIP;
+	FString serverName;
 	
 
 public:
@@ -45,7 +46,7 @@ public:
 	int numPlayers = 0;
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
-	TArray <uint8> ip = TArray<uint8>();
+	//TArray <uint8> ip = TArray<uint8>();
 
 	//Overwrites
 
@@ -64,6 +65,9 @@ public:
 
 	bool CheckForAllClientReady();
 
+	//Inicializa la variable privada ip y el serverName
+	void InitializeServerAddress();
+
 
 	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
@@ -76,12 +80,15 @@ public:
 	void InitGameMap();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
-	FString GetServerIP();
+		FString GetServerIP();
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		FString GetServerName();
 	
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	TArray<FString> GetPlayersConnected();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	TArray<bool> GetPlayersReady();
+
 
 };

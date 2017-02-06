@@ -23,7 +23,7 @@ public:
 	PD_NW_Socket();
 	~PD_NW_Socket();
 
-	void InitAsListener(TArray <uint8> ip, int port);
+	void InitAsListener(FString ip, int port);
 	void InitAsDataSocket();
 
 	void SetFSocket(FSocket* inSocket);

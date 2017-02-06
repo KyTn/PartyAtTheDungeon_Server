@@ -3,14 +3,14 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "PD_NW_ServerActor.generated.h"
+#include "PD_NW_TimerActor.generated.h"
 
 //forward declarations
 class PD_NW_SocketManager;
-class UPD_ServerGameInstance;
+
 
 UCLASS()
-class PATD_SERVER_API APD_NW_ServerActor : public AActor
+class PATD_SERVER_API APD_NW_TimerActor : public AActor
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ private:
 
 public:
 	// Sets default values for this actor's properties
-	APD_NW_ServerActor();
+	APD_NW_TimerActor();
 
 
 	FTimerHandle TimerHandleActor;

@@ -6,7 +6,7 @@
 //Includes of forward declaration
 #include "PD_NW_Socket.h" 
 #include "Networking.h"
-#include "NW_NetWorking/PD_NW_ServerActor.h"
+#include "NW_NetWorking/PD_NW_TimerActor.h"
 #include "NW_NetWorking/PD_NW_NetworkManager.h"
 //Includes de prueba
 
@@ -33,11 +33,11 @@ PD_NW_SocketManager::~PD_NW_SocketManager()
 *** FUNCIONES **
 /******************************/
 //
-void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, TArray<uint8> ip, int port)
+void PD_NW_SocketManager::Init(APD_NW_TimerActor* InmyTimerActor, FString ip, int port)
 {
 	UE_LOG(LogTemp, Warning, TEXT("INICIANDO SOCKET MANAGER! "));
 	//Inicializacion actor
-	InitServerActor(InmyServerActor);
+	InitTimerActor(InmyTimerActor);
 
 	if (isServer)
 	{
@@ -52,7 +52,7 @@ void PD_NW_SocketManager::Init(APD_NW_ServerActor* InmyServerActor, TArray<uint8
 
 
 
-void PD_NW_SocketManager::InitSocketManager_ServerMode(TArray<uint8>ip, int port)
+void PD_NW_SocketManager::InitSocketManager_ServerMode(FString ip, int port)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Socket MANAGER como SERVIDOR!! "));
 
@@ -97,13 +97,14 @@ void PD_NW_SocketManager::InitSocketManager_ClientMode(FString ip, int port)
 
 //hay posibilidad de que esta funcion falle? quizas debe devolver void 
 ///R: Asi sabemos si se ha creado, antes de proceder a que el ServerActor empiece a escuhcar por ese puerto y genere errores
-bool PD_NW_SocketManager::InitListener(TArray<uint8> ip, int port) {
+bool PD_NW_SocketManager::InitListener(FString ip, int port) {
 
 	/*if (listenerSocket) { //Esto es necesario?
 	//cerrar conexion del listener
 	//deletear
 	delete listenerSocket;
 	}*/
+	
 	listenerSocket = new PD_NW_Socket();
 	listenerSocket->InitAsListener(ip,port);
 
@@ -111,14 +112,14 @@ bool PD_NW_SocketManager::InitListener(TArray<uint8> ip, int port) {
 
 }
 
-void PD_NW_SocketManager::InitServerActor(APD_NW_ServerActor* InmyServerActor)
+void PD_NW_SocketManager::InitTimerActor(APD_NW_TimerActor* InmyTimerActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("InitServerActor"));
+	UE_LOG(LogTemp, Warning, TEXT("InitTimerActor"));
 
-	myServerActor = InmyServerActor;
-	myServerActor->SetSocketManager(this);
+	myTimerActor = InmyTimerActor;
+	myTimerActor->SetSocketManager(this);
 
-	GetServerActor()->InitTimerActor();
+	GetTimerActor()->InitTimerActor();
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *StateString());
 }
 
@@ -261,9 +262,9 @@ myServerActor = InmyServerActor;
 myServerActor->SetSocketManager(this);
 }*/
 
-APD_NW_ServerActor* PD_NW_SocketManager::GetServerActor()
+APD_NW_TimerActor* PD_NW_SocketManager::GetTimerActor()
 {
-	return myServerActor;
+	return myTimerActor;
 }
 
 
@@ -276,11 +277,11 @@ void PD_NW_SocketManager::SetNetworkManager(PD_NW_NetworkManager* networkManager
 
 FString PD_NW_SocketManager::StateString() {
 	FString out = "SocketManager state:";
-	if (GetServerActor()->isTimerActive()) {
+	if (GetTimerActor()->isTimerActive()) {
 
-		out += "=[ServerActor OK]=";
+		out += "=[TimerActor OK]=";
 
-		if (GetServerActor()->isTimerActive()) {
+		if (GetTimerActor()->isTimerActive()) {
 			out += "=[Timer running]=";
 		}
 		else {
@@ -288,7 +289,7 @@ FString PD_NW_SocketManager::StateString() {
 		}
 	}
 	else {
-		out += "=[ServerActor missing!]=";
+		out += "=[TimerActor missing!]=";
 	}
 
 	if (listenerSocket) {

@@ -4,7 +4,7 @@
 #include "Networking.h"
 #include "PD_ServerGameInstance.h"
 
-#include "NW_NetWorking/PD_NW_ServerActor.h"
+#include "NW_NetWorking/PD_NW_TimerActor.h"
 #include "NW_NetWorking/PD_NW_NetworkManager.h"
 
 //Includes of forward declaration
@@ -144,22 +144,23 @@ void UPD_ServerGameInstance::Shutdown()
 void UPD_ServerGameInstance::InitializeNetworking()
 {	
 	//FString myip;
-	GetServerIP();
+	InitializeServerAddress();
+
 	networkManager= new PD_NW_NetworkManager();
 	PD_NW_SocketManager* socketManager = networkManager->GetSocketManager();
 	//socketManager = new PD_NW_SocketManager();
 	socketManager->SetIsServer(true);
 
-	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
+	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	socketManager->SetNetworkManager(networkManager);
 	//Donde se pone el puerto que es como una constante global?
-	socketManager->Init(ServerActorSpawned, ip, defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
+	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
 	
 	
 }
 
 
-
+/*
 //Format IP String as Number Parts
 void UPD_ServerGameInstance::castIP(const FString& TheIP)
 {
@@ -175,11 +176,11 @@ void UPD_ServerGameInstance::castIP(const FString& TheIP)
 	{
 		ip.Add(FCString::Atoi(*Parts[i]));
 	}
-	/*UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[1]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[2]);
-	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);*/
-}
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);
+}*/
 
 
 /*
@@ -198,10 +199,10 @@ void UPD_ServerGameInstance::LoadMap(FString mapName)
 
 void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 {
-	APD_NW_ServerActor* ServerActorSpawned = (APD_NW_ServerActor*)GetWorld()->SpawnActor(APD_NW_ServerActor::StaticClass());
+	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 
 	//socketManager->InitServerActor(ServerActorSpawned);
-	networkManager->GetSocketManager()->InitServerActor(ServerActorSpawned);
+	networkManager->GetSocketManager()->InitTimerActor(ServerActorSpawned);
 
 
 }
@@ -241,7 +242,7 @@ bool UPD_ServerGameInstance::CheckForAllClientReady()
 /*************************************
 ******* FUNCIONES UTILIDADES / BP
 *************************************/
-FString UPD_ServerGameInstance::GetServerIP()
+void UPD_ServerGameInstance::InitializeServerAddress()
 {
 	FString myIP = "";
 	FString auxmyIP = "";
@@ -262,22 +263,38 @@ FString UPD_ServerGameInstance::GetServerIP()
 			myIP.Append(auxmyIP);
 		}
 		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
-		castIP(myIP);
+		serverIP = myIP;
+		serverName = myServerName;
 
 
+
+		//castIP(myIP);
+
+/*
 		textToPrint = " - The Name of the Server is: " + myServerName;
 		textToPrint.Append("\n - The List of Address hosted by this Host is: \n");
 		textToPrint.Append(myIP);
 		//textToPrint = textToPrint + "/n " + (TEXT("and the List of IP is : / n %s"), myIP);
+		*/
 	}
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
-	{
+	{/*
 		textToPrint = TEXT("Device has not a Properly Configured NETWORK device to set a SERVER");
-		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+		*/
+		UE_LOG(LogTemp, Warning, TEXT("ERROR : GetServerIP:Device has not a Properly Configured NETWORK device to set a SERVER: My ip %d"), myIP.Len());
+		
 	}
 
 
-	return textToPrint;
+	
+	
+}
+
+FString UPD_ServerGameInstance::GetServerIP() {
+	return serverIP;
+}
+FString UPD_ServerGameInstance::GetServerName() {
+	return serverName;
 }
 
 

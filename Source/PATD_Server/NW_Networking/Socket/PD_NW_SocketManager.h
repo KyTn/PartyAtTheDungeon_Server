@@ -4,7 +4,7 @@
 
 //forward declarations
 class PD_NW_Socket;
-class APD_NW_ServerActor;
+class APD_NW_TimerActor;
 
 class PD_NW_NetworkManager;
 /**
@@ -23,7 +23,7 @@ private:
 	PD_NW_Socket* listenerSocket;
 
 
-	APD_NW_ServerActor* myServerActor;
+	APD_NW_TimerActor* myTimerActor;
 
 	bool isServer;
 
@@ -75,8 +75,11 @@ public:
 	///Funciones Get y Set de los Atributos
 	void SetIsServer(bool InIsServer);
 	bool GetIsServer();
-	void SetServerActor(APD_NW_ServerActor* InmyServerActor);
-	APD_NW_ServerActor* GetServerActor();
+
+	void SetTimerActor(APD_NW_TimerActor* InmyServerActor);
+	APD_NW_TimerActor* GetTimerActor();
+
+
 	PD_NW_NetworkManager* GetNetworkManager();
 	void SetNetworkManager(PD_NW_NetworkManager* networkManagerIn);
 
@@ -87,13 +90,13 @@ public:
 
 	///FUNCIONES 
 	//Inicializa el socketManager e inicia el timer. IP se usa solo en modo cliente.
-	void Init(APD_NW_ServerActor* InmyServerActor, TArray<uint8> ip, int port);
+	void Init(APD_NW_TimerActor* InmyServerActor, FString ip, int port);
 	//Inicializa el ServerActor para ser llamado desde cualquier Mapa
-	void InitServerActor(APD_NW_ServerActor* InmyServerActor);
+	void InitTimerActor(APD_NW_TimerActor* InmyServerActor);
 
 	///* SERVIDOR */
 	//Inicializa el SocketManager como Server
-	void InitSocketManager_ServerMode(TArray <uint8>ip, int port);
+	void InitSocketManager_ServerMode(FString ip, int port);
 	//Esta es la funcion que repetira el timer. Deberia recopilar los datos recibidos en los sockets e ir llamando a las funciones de salida
 	void TimerRefreshFunction();
 
@@ -109,7 +112,7 @@ public:
 
 
 
-	bool InitListener(TArray<uint8> ip, int port);
+	bool InitListener(FString ip, int port);
 	bool CloseListener();
 
 
