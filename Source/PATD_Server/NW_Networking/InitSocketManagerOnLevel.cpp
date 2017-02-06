@@ -23,7 +23,18 @@ void AInitSocketManagerOnLevel::BeginPlay()
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
 	if (SGI)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Actor de spawneo  %s"), *GetWorld()->GetMapName());
+
 		SGI->InitServerActoWhenLoadMap();
+		if (GetWorld()->GetMapName() == "UEDPIE_0_LVL_4_GameMap") {
+			UE_LOG(LogTemp, Warning, TEXT("If del LVL_4_Gamemap"));
+			SGI->InitGameMap();
+		}
+		/*Esto lo que hace es como el open level carga en un hilo diferente o algo asi, y las 
+		siguientes instrucciones que haya tras llamarlo, no tienen que ejecutarse con el mapa 
+		ya cargado, tenemos este actor para inicializar cosas, que se instancia junto al mapa. (esta en el)
+		El cuando se le llame a su begin play, va a llamar a InitGameMap que spawnea el actor de parser.
+		*/
 	}
 
 }

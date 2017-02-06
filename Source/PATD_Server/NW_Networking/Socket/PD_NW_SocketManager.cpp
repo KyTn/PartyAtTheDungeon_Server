@@ -11,9 +11,9 @@
 //Includes de prueba
 
 
-/******************************
-*** CONSTRUCTOR Y DESTRUCTOR DE LA CLASE **
-/******************************/
+//============================================
+//*** CONSTRUCTOR Y DESTRUCTOR DE LA CLASE **
+//============================================
 PD_NW_SocketManager::PD_NW_SocketManager()
 {
 	socketArray = TArray<PD_NW_Socket*>();//Creo que no hace falta esta inicializacion.

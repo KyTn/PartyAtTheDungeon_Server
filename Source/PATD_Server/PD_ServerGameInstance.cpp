@@ -9,10 +9,11 @@
 
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
+#include "MapGeneration/ParserActor.h"
 
 //Includes de prueba
 #include "NW_Networking/EventLayer/PD_NW_iEventObserver.h"
-
+#include "MapGeneration/PD_MG_StaticMap.h"
 
 
 void UPD_ServerGameInstance::Init()
@@ -31,11 +32,11 @@ void UPD_ServerGameInstance::Init()
 		void handleEvent(FStructGenericoHito2* dataStruct, int inPlayer, UStructType inEventType) {
 			UE_LOG(LogTemp, Warning, TEXT("Recibido una MenuOrder "));
 
-			if (dataStruct->orderType != -1) { //NullOrder
+			if (dataStruct->orderType != 255) { //NullOrder
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
 				case 0: //New connection
-					if (gi->GetWorld()->GetMapName() != "LVL_4_GameMap") {
+					if (gi->GetWorld()->GetMapName() != "UEDPIE_0_LVL_4_GameMap") {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
 							respuesta.orderType = 5;//SetClientMaster
@@ -50,6 +51,12 @@ void UPD_ServerGameInstance::Init()
 						respuesta.orderType = 10;//InvalidConnection
 						//Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
 					}
+					gi->networkManager->SendNow(&respuesta, inPlayer);
+					if (gi->GetWorld()->GetMapName() == "LVL_2_MainMenu")
+						respuesta.orderType = 7;//Welcome
+					gi->networkManager->SendNow(&respuesta, inPlayer);
+					if (gi->GetWorld()->GetMapName() == "LVL_3_SelectChars_Lobby")
+						respuesta.orderType = 8;//Welcome
 					gi->networkManager->SendNow(&respuesta, inPlayer);
 					break;
 
@@ -98,10 +105,16 @@ void UPD_ServerGameInstance::Init()
 					{
 						//Carga nuevo mapa + Envio de Mapa a CLIENTES
 						gi->LoadMap("LVL_4_GameMap");
-						respuesta.orderType = 9; //ChangeToMap
-						gi->networkManager->SendNow(&respuesta, -1);
-						gi->sendMap();
+						//gi->InitGameMap();
+
+					//Llamamos a enviar el mensaje de respuesta cuando ya este cargado nuestro mapa en InitGameMap();
+						
+						
 					}
+					break;
+				case 11:
+					respuesta.orderType = 9; //ChangeToLobby
+					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				}
 
@@ -162,10 +175,10 @@ void UPD_ServerGameInstance::castIP(const FString& TheIP)
 	{
 		ip.Add(FCString::Atoi(*Parts[i]));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
+	/*UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[0]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[1]);
 	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[2]);
-	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);
+	UE_LOG(LogTemp, Warning, TEXT("My ip %d"), ip[3]);*/
 }
 
 
@@ -179,7 +192,7 @@ PD_NW_SocketManager* UPD_ServerGameInstance::GetSocketManager()
 void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
 	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
-
+	
 
 }
 
@@ -196,8 +209,11 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 void UPD_ServerGameInstance::sendMap()
 {
 FStructGenericoHito2* m = new FStructGenericoHito2();
-m->orderType = -1; //Indica que no es una orden
-UE_LOG(LogTemp, Warning, TEXT("Enviando Map"));
+m->orderType = 255; //Indica que no es una orden
+
+m->stringMap=parserActor->GetStaticMap()->GetMapString();
+
+UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
 
 networkManager->SendNow(m,-1);
 }
@@ -240,13 +256,12 @@ FString UPD_ServerGameInstance::GetServerIP()
 		
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(myIPAddress); //Get List of Address in Host
 		
-		for (int i = 0; i < myIPAddress.Num(); i++)
+		for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
 		{
 			auxmyIP = myIPAddress[i]->ToString(false);
 			myIP.Append(auxmyIP);
-			UE_LOG(LogTemp, Warning, TEXT("My ip %s"), *myIP);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
 		castIP(myIP);
 
 
@@ -258,6 +273,7 @@ FString UPD_ServerGameInstance::GetServerIP()
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
 	{
 		textToPrint = TEXT("Device has not a Properly Configured NETWORK device to set a SERVER");
+		UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
 	}
 
 
@@ -310,4 +326,27 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 	*/
 
 	return playersReadyArray;
+}
+
+//Esta funcion la llama el actor del server map (ya colocado) para inicializar
+void UPD_ServerGameInstance::InitGameMap() {
+	
+	UE_LOG(LogTemp, Warning, TEXT("Iniciando actor de parser"));
+
+	AParserActor* ServerActorSpawned = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
+	//en el begin play del actor es donde se parsea el mapa desde un fichero.
+	parserActor = ServerActorSpawned;
+
+	parserActor->InitGameMap();
+
+	sendMap();
+
+
+	
+	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa
+	//FStructGenericoHito2 respuesta = FStructGenericoHito2();
+	//respuesta.orderType = 9; //ChangeToMap
+	//networkManager->SendNow(&respuesta, -1);
+	//LLamamos al send map cuando nosotros ya lo hemos parseado para poder tener el string.
+	
 }

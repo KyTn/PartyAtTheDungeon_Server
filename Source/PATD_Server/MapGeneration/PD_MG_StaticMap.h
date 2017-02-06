@@ -31,6 +31,9 @@ private:
 
 	PD_MG_LogicPosition* _StartPointLP;
 
+	//Agregado para el hito2 MCG
+	FString mapString;
+
 public:
 	PD_MG_StaticMap();
 	~PD_MG_StaticMap();
@@ -48,6 +51,10 @@ public:
 
 	TMap<PD_MG_LogicPosition, TCHAR> GetXYMap() { return _xymap; }
 	TArray<PD_MG_LogicPosition*> GetLogicPositions() { return _LogicPositionsRefs; }
+
+	//Agregado para el hito2 MCG
+	FString GetMapString();
+	void SetMapString(FString mapStringIn);
 
 #pragma endregion
 
