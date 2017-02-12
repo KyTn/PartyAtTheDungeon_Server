@@ -9,7 +9,7 @@
 
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
-#include "MapGeneration/ParserActor.h"
+#include "MapGeneration/PD_MG_Map.h"
 
 //Includes de prueba
 #include "NW_Networking/EventLayer/PD_NW_iEventObserver.h"
@@ -209,14 +209,14 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 
 void UPD_ServerGameInstance::sendMap()
 {
-FStructGenericoHito2* m = new FStructGenericoHito2();
-m->orderType = 255; //Indica que no es una orden
+	FStructGenericoHito2* m = new FStructGenericoHito2();
+	m->orderType = 255; //Indica que no es una orden
 
-m->stringMap=parserActor->GetStaticMap()->GetMapString();
+	//m->stringMap=parserActor->GetStaticMap()->GetMapString(); // TODO ANGEL
 
-UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
+	UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
 
-networkManager->SendNow(m,-1);
+	networkManager->SendNow(m, -1);
 }
 
 
@@ -350,6 +350,8 @@ void UPD_ServerGameInstance::InitGameMap() {
 	
 	UE_LOG(LogTemp, Warning, TEXT("Iniciando actor de parser"));
 
+	// TODO ANGEL
+	/* 
 	AParserActor* ServerActorSpawned = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
 	//en el begin play del actor es donde se parsea el mapa desde un fichero.
 	parserActor = ServerActorSpawned;
@@ -357,7 +359,7 @@ void UPD_ServerGameInstance::InitGameMap() {
 	parserActor->InitGameMap();
 
 	sendMap();
-
+	/**/
 
 	
 	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa

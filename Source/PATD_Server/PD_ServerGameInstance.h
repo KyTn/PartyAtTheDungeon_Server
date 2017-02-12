@@ -8,7 +8,7 @@
 //forward declarations
 //class PD_NW_SocketManager;
 class PD_NW_NetworkManager;
-class AParserActor;
+class PD_MG_Map;
 /**
 *
 */
@@ -38,7 +38,8 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 
 public:
 
-	AParserActor*  parserActor;
+
+	PD_MG_Map*  LOGIC_MAP;
 	PD_NW_NetworkManager* networkManager;
 
 	int clientMasterIndex = -1;

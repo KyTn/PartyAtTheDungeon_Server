@@ -1,0 +1,119 @@
+START_ROOM
+Name: simple_Cuadrada
+id: sala_1
+tags:
+size_x: 8
+size_y: 8
+W W w w w w W W  
+W . . . . . . W
+w . . . . . . w
+w . . . . . . w
+w . . . . . . w
+W . . . . . . W
+W W w w w w W W
+START_ROOM
+Name: Cuadrada_1
+id: sala_2
+tags:
+size_x: 9
+size_y: 9
+W W W W W W w W W  
+W . . W W . . . W
+w . . W W . . . w
+w . . . . . . . w
+w . . . . . . . w
+W . . . . . . . W
+W W w w w w w W W
+START_ROOM
+Name: Cuadrada_2
+id: sala_3
+tags:
+size_x: 10
+size_y: 10 
+W W w w w w w W W  
+W . . . . . . . W
+w . . . , . . . w
+w . . O O O . . w
+w . , O O O , . w
+w . . O O O . . w
+W . . . , . . . W
+W W w w w w w W W
+START_ROOM
+Name: Boss_simple_Cuadrada_2
+id: sala_6
+tags:
+size_X: 16
+size_Y: 16
+W W w w w w w w w w w w w w W W
+W . . . . . . . . . . . . . . W
+w . . . . . . . . . . . . . . w
+w . . . . . . . . . . . . . . w
+w . . . . . , , , . . . . . . w
+w . . . . . , , , . . . . . . w
+w . . . . , , , , , . . . . . w
+w . . . , , , , , , , . . . . w
+w . . . , , , , , , , . . . . w
+w . . . . , , , , , . . . . . w
+w . . . . . , , , . . . . . . w
+w . . . . . , , , . . . . . . w
+w . . . . . . . . . . . . . . w
+w . . . . . . . . . . . . . . w
+w . . . . . . . . . . . . . . w
+W . . . . . . . . . . . . . . W
+W W w w w w w w w w w w w w W W
+START_ROOM
+Name: Rectangular_1
+id: sala_8
+tags:
+size_X: 20
+size_Y: 10
+W W w w w w w W W W W w w w w w w w W W
+W . . . . . . . W W . . . . . . . . . W
+w . . . . . . . W W . . . . . . . . . w
+w . . . . . . . O O . . . . . . . . . w
+w . . . . . . . W W . . . . . . . . . w
+w . . . . . . . W W . . . . . . . . . w
+w . . . . . . . . . . . . . . . . . . w
+w . . . . . . . W W . . . . . . . . . w
+W . . . . . . . W W . . . . . . . . . W
+W W w w w w w W W W W w w w w w w w W W
+START_ROOM
+Name: forma_L_Cuadrada
+id: sala_9
+tags:
+size_X: 10
+size_Y: 10
+W W w w w w w w w w W W
+W . . . . . . . . . . W
+w . . . . . . . . . . w
+w . . . . . . . . . . w
+W . . . . . . . . . . w
+W W w w w W W . . . . w
+            W . . . . w
+            w . . . . w
+            w . . . . w
+            W . . . . W
+            W W w w W W
+START_ROOM
+Name: forma_Cruz
+id: sala_9
+tags:
+size_X: 16
+size_Y: 16
+         W w w w w W 
+         W . . . . W       
+         W . . . . W
+         W . . . . W 
+         W . . . . W 
+W W W W W W . . . . W W W W W W
+w . . . . . . . . . . . . . . w 
+w . . . . . . . . . . . . . . w 
+w . . . . . . . . . . . . . . w 
+w . . . . . . . . . . . . . . w 
+W W W W W W . . . . W W W W W W
+          W . . . . W 
+          W . . . . W 
+          W . . . . W 
+          W . . . . W 
+          W . . . . W 
+          W w w w w W

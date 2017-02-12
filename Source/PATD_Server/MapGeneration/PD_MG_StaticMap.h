@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
+#include "PD_MG_LogicPosition.h"
 
 /// CLASS REFERENCES
 class PD_MG_Room;
