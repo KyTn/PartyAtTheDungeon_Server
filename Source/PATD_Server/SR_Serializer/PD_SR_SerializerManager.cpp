@@ -100,8 +100,38 @@ T* PD_SR_SerializerManager::Des(T* data) {
 //const std::type_info r= typeid(*genericstruct);
 //	Des(FMyStruct);
 
+/*
+template<typename T>
+TArray<uint8>* PD_SR_SerializerManager::SerializeData(T* genericstruct) {
+	TArray<uint8>* data = new TArray<uint8>();
+	UStruct* FMyStruct = T::StaticStruct();
+	FMemoryWriter ArWriter(*data);
+	FMyStruct->SerializeBin(ArWriter, genericstruct);
 
 
+	return data;
+}*/
+/*
+template<typename T>
+T* PD_SR_SerializerManager::DeserializeData(TArray<uint8>* data)
+{
+
+	T* generyStructs = new T();
+
+
+	UStruct* FMyStruct = T::StaticStruct();
+
+
+	FMemoryReader ArReader(*data);
+	FMyStruct->SerializeBin(ArReader, generyStructs);
+
+
+	return generyStructs;
+
+}
+*/
+
+/*
 TArray<uint8>* PD_SR_SerializerManager::SerializeData(FStructGenericoHito2* genericstruct) {
 	TArray<uint8>* data = new TArray<uint8>();
 	UStruct* FMyStruct = FStructGenericoHito2::StaticStruct();
@@ -112,7 +142,8 @@ TArray<uint8>* PD_SR_SerializerManager::SerializeData(FStructGenericoHito2* gene
 	return data;
 }
 
-
+*/
+/*
 FStructGenericoHito2* PD_SR_SerializerManager::DeserializeData(TArray<uint8>* data)
 {
 
@@ -128,4 +159,6 @@ FStructGenericoHito2* PD_SR_SerializerManager::DeserializeData(TArray<uint8>* da
 	
 		return generyStructs;
 	
-}
+}*/
+
+

@@ -31,7 +31,7 @@ void AInitSocketManagerOnLevel::BeginPlay()
 			SGI->InitGameMap();
 		}
 		/*Esto lo que hace es como el open level carga en un hilo diferente o algo asi, y las 
-		siguientes instrucciones que haya tras llamarlo, no tienen que ejecutarse con el mapa 
+		siguientes instrucciones que haya tras llamarlo, no se ejecutan con el mapa 
 		ya cargado, tenemos este actor para inicializar cosas, que se instancia junto al mapa. (esta en el)
 		El cuando se le llame a su begin play, va a llamar a InitGameMap que spawnea el actor de parser.
 		*/

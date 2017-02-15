@@ -29,9 +29,15 @@ void UPD_ServerGameInstance::Init()
 		ObservadorPrueba(UPD_ServerGameInstance* i) {
 			gi = i;
 		}
-		void handleEvent(FStructGenericoHito2* dataStruct, int inPlayer, UStructType inEventType) {
-			UE_LOG(LogTemp, Warning, TEXT("Recibido una MenuOrder "));
+		void handleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+			UE_LOG(LogTemp, Warning, TEXT("Recibido evento"));
 
+
+			FStructGenericoHito2* dataStruct = (FStructGenericoHito2*)inDataStruct;
+
+
+
+			
 			if (dataStruct->orderType != 255) { //NullOrder
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
@@ -39,35 +45,52 @@ void UPD_ServerGameInstance::Init()
 					if (gi->GetWorld()->GetMapName() != "UEDPIE_0_LVL_4_GameMap") {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
+							UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 5 - SetClientMaster"));
+
 							respuesta.orderType = 5;//SetClientMaster
 							respuesta.stringMap.AppendInt(inPlayer);
 						}
 						else {//Hay clientMaster
+							UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 6 - Welcome"));
 							respuesta.orderType = 6;//Welcome
 							respuesta.stringMap.AppendInt(inPlayer);
 						}
 					}
 					else {
+						UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 10 - Invalidconnection"));
 						respuesta.orderType = 10;//InvalidConnection
 						//Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
 					}
+					
+					//Esto esta para controlar el bug del flujo no?
+					
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 4 - ClientReady"));
 					gi->networkManager->SendNow(&respuesta, inPlayer);
+					
 					if (gi->GetWorld()->GetMapName() == "LVL_2_MainMenu")
-						respuesta.orderType = 7;//Welcome
+						respuesta.orderType = 7;
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (0)"));
+
 					gi->networkManager->SendNow(&respuesta, inPlayer);
 					if (gi->GetWorld()->GetMapName() == "LVL_3_SelectChars_Lobby")
-						respuesta.orderType = 8;//Welcome
+						respuesta.orderType = 8;
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (0)"));
+					
 					gi->networkManager->SendNow(&respuesta, inPlayer);
 					break;
-
+					
 				case 1://GoToMainMenu
 					gi->LoadMap("LVL_2_MainMenu");
 					respuesta.orderType = 7; //ChangeToMainMenu
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (1)"));
+
 					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				case 2://GoToLobby
 					gi->LoadMap("LVL_3_SelectChars_Lobby");
 					respuesta.orderType = 8; //ChangeToLobby
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (1)"));
+
 					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				case 3://GoToMap
@@ -78,7 +101,7 @@ void UPD_ServerGameInstance::Init()
 				case 4://ClientReady
 					//Setear true en array de readys
 					//Comprobar si todos son trues.
-
+					
 					/*if (gi->ready[inPlayer].Contains(false))
 					{
 						gi->ready->Insert(true, inPlayer);
@@ -99,6 +122,7 @@ void UPD_ServerGameInstance::Init()
 					else//si ya habia pulsado reay antes se pone a falso
 						gi->ready->Insert(false, inPlayer);
 					*/
+					
 					gi->SetClientReady(inPlayer);
 
 					if (gi->CheckForAllClientReady())
@@ -114,6 +138,8 @@ void UPD_ServerGameInstance::Init()
 					break;
 				case 11:
 					respuesta.orderType = 9; //ChangeToLobby
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 9 - ChangeToMap"));
+
 					gi->networkManager->SendNow(&respuesta, -1);
 					break;
 				}

@@ -29,10 +29,24 @@ PD_NW_NetworkManager::~PD_NW_NetworkManager()
 
 void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIndex){
 	
+	//Necesitamos otro metodo, que con el numero nos diga que tipo esta recibiendo, y de esa manera poder instanciar ese tipo??
+	//Para poder darle a la funcion de plantilal ese tipo, tendriamos que tener algo dinamico.
 	
-	FStructGenericoHito2* structEventGenericHito2 = serializerManager->DeserializeData(data);
-	eventManager->GenerateEvent(structEventGenericHito2, socketIndex);
+//	FStructGenericoHito2* structEventGenericHito2 = serializerManager->DeserializeData(data);
+	//eventManager->GenerateEvent(serializerManager->DeserializeData(data), socketIndex);
+	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: socketIndex %d"), socketIndex);
 
+	FStructData dataStruct = *(serializerManager->DeserializeDataTemplate<FStructData>(data)); // Esto tambien es una copia?? ver bien que devolver en cada punto, si puntero referencia o tipo directo!
+
+	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: structType %d"), dataStruct.structType);
+
+	FStructGeneric* genericStruct = serializerManager->DeserializeData(&dataStruct.data, UStructType(dataStruct.structType)); //Otra copia?
+
+	eventManager->GenerateEvent(genericStruct, socketIndex);
+	
+	
+	
+	//serializerManager->DeserializeData(data,
 
 	/*
 	FStructGeneric* structEvent = serializerManager->DeserializeData(data);
@@ -75,6 +89,7 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 void PD_NW_NetworkManager::HandleNewConnectionSocketListener(int socketIndex) {
 	//Con compresor
 	//sendGenericStruct.Insert(new FStructGenericList(),socketIndex);
+	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewConnectionSocketListener:: socketIndex %d"), socketIndex);
 
 	//Generar el evento de nuevo jugador.
 	FStructGenericoHito2* structNewConnection = new FStructGenericoHito2(); //alaaaa otro new
@@ -93,10 +108,35 @@ PD_NW_EventManager* PD_NW_NetworkManager::GetEventManager() {
 PD_SR_SerializerManager* PD_NW_NetworkManager::GetSerializerManager() {
 	return serializerManager;
 }
-
+/*
 bool PD_NW_NetworkManager::SendNow(FStructGenericoHito2* st, int player) {
 
-	return socketManager->SendInfoTo(player, serializerManager->SerializeData(st));
+	//return socketManager->SendInfoTo(player, serializerManager->SerializeData(st));
+	return false;
+}*/
+
+bool PD_NW_NetworkManager::SendNow(FStructGeneric* structGeneric, int player) {
+
+	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: Enviando data a player %d. Struct de tipo %d"),player, structGeneric->structType);
+
+	TArray<uint8>* dataIn = serializerManager->SerializeData(structGeneric, UStructType(structGeneric->structType));
+	if (dataIn) {
+		
+
+		//Construyendo el dataStruct
+		FStructData dataStruct;
+		dataStruct.data = *dataIn; //Hace una copia o simplemente se asigna??
+		dataStruct.structType = structGeneric->structType;
+
+		TArray<uint8>* dataSend = serializerManager->SerializeDataTemplate<FStructData>(&dataStruct);
+		//Enviar dataStruct, en realidad deberiamos meter este dataStruct en el struct de lista y enviar ese.
+		return socketManager->SendInfoTo(player, dataSend);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: data recibida del serializador null"));
+
+		return false;
+	}
 	
 }
 
@@ -171,7 +211,7 @@ int  PD_NW_NetworkManager::ConnectTo(FString ip, int port) {
 	}
 	else {
 		//Insertamos el buffer igual que para un nuevo jugador que venga del listener.
-		sendGenericStruct.Insert(new FStructGenericList(), player);
+		sendGenericStruct.Insert(new FStructDataList(), player);
 
 	}
 	return player;
