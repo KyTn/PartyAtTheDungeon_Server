@@ -26,7 +26,9 @@ void AInitSocketManagerOnLevel::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Actor de spawneo  %s"), *GetWorld()->GetMapName());
 
 		SGI->InitServerActoWhenLoadMap();
-		if (GetWorld()->GetMapName() == "UEDPIE_0_LVL_4_GameMap") {
+
+		FString currentMapName = SGI->levelsNameDictionary.GetMapName(4, SGI->GetWorld()->IsPlayInEditor());
+		if (GetWorld()->GetMapName() == currentMapName) {
 			UE_LOG(LogTemp, Warning, TEXT("If del LVL_4_Gamemap"));
 			SGI->InitGameMap();
 		}

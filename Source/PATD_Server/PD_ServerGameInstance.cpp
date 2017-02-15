@@ -10,7 +10,7 @@
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
 #include "MapGeneration/PD_MG_Map.h"
-
+#include "MapGeneration/ParserActor.h"
 //Includes de prueba
 #include "NW_Networking/EventLayer/PD_NW_iEventObserver.h"
 #include "MapGeneration/PD_MG_StaticMap.h"
@@ -20,6 +20,7 @@ void UPD_ServerGameInstance::Init()
 {
 	Super::Init();
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
+	levelsNameDictionary = LevelsNameDictionary();
 	InitializeNetworking();
 
 	class ObservadorPrueba : public PD_NW_iEventObserver
@@ -35,14 +36,12 @@ void UPD_ServerGameInstance::Init()
 
 			FStructGenericoHito2* dataStruct = (FStructGenericoHito2*)inDataStruct;
 
-
-
 			
 			if (dataStruct->orderType != 255) { //NullOrder
 				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
 				switch (dataStruct->orderType) {
 				case 0: //New connection
-					if (gi->GetWorld()->GetMapName() != "UEDPIE_0_LVL_4_GameMap") {
+					if (gi->GetWorld()->GetMapName() != gi->levelsNameDictionary.GetMapName(4, gi->GetWorld()->IsPlayInEditor()) ) {
 						if (gi->clientMasterIndex == -1) {//No hay clientMaster
 							gi->clientMasterIndex = inPlayer;
 							UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 5 - SetClientMaster"));
@@ -67,12 +66,12 @@ void UPD_ServerGameInstance::Init()
 					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 4 - ClientReady"));
 					gi->networkManager->SendNow(&respuesta, inPlayer);
 					
-					if (gi->GetWorld()->GetMapName() == "LVL_2_MainMenu")
+					if (gi->GetWorld()->GetMapName() == gi->levelsNameDictionary.GetMapName(2, gi->GetWorld()->IsPlayInEditor()))
 						respuesta.orderType = 7;
 					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (0)"));
 
 					gi->networkManager->SendNow(&respuesta, inPlayer);
-					if (gi->GetWorld()->GetMapName() == "LVL_3_SelectChars_Lobby")
+					if (gi->GetWorld()->GetMapName() == gi->levelsNameDictionary.GetMapName(3, gi->GetWorld()->IsPlayInEditor()))
 						respuesta.orderType = 8;
 					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (0)"));
 					
@@ -238,7 +237,7 @@ void UPD_ServerGameInstance::sendMap()
 	FStructGenericoHito2* m = new FStructGenericoHito2();
 	m->orderType = 255; //Indica que no es una orden
 
-	//m->stringMap=parserActor->GetStaticMap()->GetMapString(); // TODO ANGEL
+	m->stringMap= parserActor->GetStaticMap()->GetMapString(); // TODO ANGEL
 
 	UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
 
@@ -377,21 +376,19 @@ void UPD_ServerGameInstance::InitGameMap() {
 	UE_LOG(LogTemp, Warning, TEXT("Iniciando actor de parser"));
 
 	// TODO ANGEL
-	/* 
-	AParserActor* ServerActorSpawned = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
+	
+	parserActor = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
 	//en el begin play del actor es donde se parsea el mapa desde un fichero.
-	parserActor = ServerActorSpawned;
-
 	parserActor->InitGameMap();
 
 	sendMap();
-	/**/
+	
 
 	
 	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa
-	//FStructGenericoHito2 respuesta = FStructGenericoHito2();
-	//respuesta.orderType = 9; //ChangeToMap
-	//networkManager->SendNow(&respuesta, -1);
+	FStructGenericoHito2 respuesta = FStructGenericoHito2();
+	respuesta.orderType = 9; //ChangeToMap
+	networkManager->SendNow(&respuesta, -1);
 	//LLamamos al send map cuando nosotros ya lo hemos parseado para poder tener el string.
 	
 }

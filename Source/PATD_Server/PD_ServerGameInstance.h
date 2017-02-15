@@ -3,12 +3,15 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "LevelsNameDictionary.h"
 #include "PD_ServerGameInstance.generated.h"
 
 //forward declarations
 //class PD_NW_SocketManager;
 class PD_NW_NetworkManager;
 class PD_MG_Map;
+class AParserActor;
+
 /**
 *
 */
@@ -38,8 +41,11 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance
 
 public:
 
+	//Para tener los nombres de los niveles - diferenciar ejecución en editor o en ejecutable
+	LevelsNameDictionary levelsNameDictionary;
 
 	PD_MG_Map*  LOGIC_MAP;
+	AParserActor* parserActor;
 	PD_NW_NetworkManager* networkManager;
 
 	int clientMasterIndex = -1;
