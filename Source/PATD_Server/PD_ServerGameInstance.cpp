@@ -16,141 +16,139 @@
 #include "MapGeneration/PD_MG_StaticMap.h"
 
 
+void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+	UE_LOG(LogTemp, Warning, TEXT("Recibido evento"));
+
+
+	FStructGenericoHito2* dataStruct = (FStructGenericoHito2*)inDataStruct;
+
+
+	if (dataStruct->orderType != 255) { //NullOrder
+		FStructGenericoHito2 respuesta = FStructGenericoHito2();
+		switch (dataStruct->orderType) {
+		case 0: //New connection
+			if (!this->GetWorld()->GetMapName().Contains(this->levelsNameDictionary.GetMapName(4))) {
+				if (this->clientMasterIndex == -1) {//No hay clientMaster
+					this->clientMasterIndex = inPlayer;
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 5 - SetClientMaster"));
+
+					respuesta.orderType = 5;//SetClientMaster
+					respuesta.stringMap.AppendInt(inPlayer);
+				}
+				else {//Hay clientMaster
+					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 6 - Welcome"));
+					respuesta.orderType = 6;//Welcome
+					respuesta.stringMap.AppendInt(inPlayer);
+				}
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 10 - Invalidconnection"));
+				respuesta.orderType = 10;//InvalidConnection
+										 //Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
+			}
+
+			//Esto esta para controlar el bug del flujo no?
+
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 4 - ClientReady"));
+			this->networkManager->SendNow(&respuesta, inPlayer);
+
+			if (this->GetWorld()->GetMapName().Contains( this->levelsNameDictionary.GetMapName(2)))
+				respuesta.orderType = 7;
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (0)"));
+
+			this->networkManager->SendNow(&respuesta, inPlayer);
+			if (this->GetWorld()->GetMapName().Contains(this->levelsNameDictionary.GetMapName(3)))
+				respuesta.orderType = 8;
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (0)"));
+
+			this->networkManager->SendNow(&respuesta, inPlayer);
+			break;
+
+		case 1://GoToMainMenu
+			this->LoadMap("LVL_2_MainMenu");
+			respuesta.orderType = 7; //ChangeToMainMenu
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (1)"));
+
+			this->networkManager->SendNow(&respuesta, -1);
+			break;
+		case 2://GoToLobby
+			this->LoadMap("LVL_3_SelectChars_Lobby");
+			respuesta.orderType = 8; //ChangeToLobby
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (1)"));
+
+			this->networkManager->SendNow(&respuesta, -1);
+			break;
+		case 3://GoToMap
+			   //IniciarArray de readys con el numero de jugadores actual
+			   //Si uno se cae en este punto no se podra iniciar partida jamas xD
+
+			break;
+		case 4://ClientReady
+			   //Setear true en array de readys
+			   //Comprobar si todos son trues.
+
+			   /*if (gi->ready[inPlayer].Contains(false))
+			   {
+			   gi->ready->Insert(true, inPlayer);
+			   bool allReady = true;
+			   for (size_t i = 0; i < gi->ready->Num() && allReady; i++)
+			   {
+			   if (gi->ready[i].Contains(false))
+			   allReady = false;
+			   }
+			   if (allReady)
+			   {
+			   gi->LoadMap("LVL_4_GameMap");
+			   respuesta.orderType = 9; //ChangeToMap
+			   gi->networkManager->SendNow(&respuesta, -1);
+			   gi->sendMap();
+			   }
+			   }
+			   else//si ya habia pulsado reay antes se pone a falso
+			   gi->ready->Insert(false, inPlayer);
+			   */
+
+			this->SetClientReady(inPlayer);
+
+			if (this->CheckForAllClientReady())
+			{
+				//Carga nuevo mapa + Envio de Mapa a CLIENTES
+				this->LoadMap("LVL_4_GameMap");
+				//gi->InitGameMap();
+
+				//Llamamos a enviar el mensaje de respuesta cuando ya este cargado nuestro mapa en InitGameMap();
+
+
+			}
+			break;
+		case 11:
+			respuesta.orderType = 9; //ChangeToMap
+			UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 9 - ChangeToMap"));
+
+			this->networkManager->SendNow(&respuesta, -1);
+			break;
+		}
+
+	}
+}
+
+bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) {
+	
+	return true; //de momento recibe todos, siempre es cierto.
+}
+
+
+
+
+
 void UPD_ServerGameInstance::Init()
 {
 	Super::Init();
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
 	levelsNameDictionary = LevelsNameDictionary();
+
+	//en el inicialize networking seteamos el gameinstance como observador.
 	InitializeNetworking();
-
-	class ObservadorPrueba : public PD_NW_iEventObserver
-	{
-	public:
-		UPD_ServerGameInstance *gi;
-		ObservadorPrueba(UPD_ServerGameInstance* i) {
-			gi = i;
-		}
-		void handleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
-			UE_LOG(LogTemp, Warning, TEXT("Recibido evento"));
-
-
-			FStructGenericoHito2* dataStruct = (FStructGenericoHito2*)inDataStruct;
-
-			
-			if (dataStruct->orderType != 255) { //NullOrder
-				FStructGenericoHito2 respuesta =  FStructGenericoHito2();
-				switch (dataStruct->orderType) {
-				case 0: //New connection
-					if (gi->GetWorld()->GetMapName() != gi->levelsNameDictionary.GetMapName(4, gi->GetWorld()->IsPlayInEditor()) ) {
-						if (gi->clientMasterIndex == -1) {//No hay clientMaster
-							gi->clientMasterIndex = inPlayer;
-							UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 5 - SetClientMaster"));
-
-							respuesta.orderType = 5;//SetClientMaster
-							respuesta.stringMap.AppendInt(inPlayer);
-						}
-						else {//Hay clientMaster
-							UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 6 - Welcome"));
-							respuesta.orderType = 6;//Welcome
-							respuesta.stringMap.AppendInt(inPlayer);
-						}
-					}
-					else {
-						UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 10 - Invalidconnection"));
-						respuesta.orderType = 10;//InvalidConnection
-						//Deberiamos quitar la conexion del manager o ver como gestionar esto mas adelante.
-					}
-					
-					//Esto esta para controlar el bug del flujo no?
-					
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 4 - ClientReady"));
-					gi->networkManager->SendNow(&respuesta, inPlayer);
-					
-					if (gi->GetWorld()->GetMapName() == gi->levelsNameDictionary.GetMapName(2, gi->GetWorld()->IsPlayInEditor()))
-						respuesta.orderType = 7;
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (0)"));
-
-					gi->networkManager->SendNow(&respuesta, inPlayer);
-					if (gi->GetWorld()->GetMapName() == gi->levelsNameDictionary.GetMapName(3, gi->GetWorld()->IsPlayInEditor()))
-						respuesta.orderType = 8;
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (0)"));
-					
-					gi->networkManager->SendNow(&respuesta, inPlayer);
-					break;
-					
-				case 1://GoToMainMenu
-					gi->LoadMap("LVL_2_MainMenu");
-					respuesta.orderType = 7; //ChangeToMainMenu
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 7 - ChangeToMainMenu (1)"));
-
-					gi->networkManager->SendNow(&respuesta, -1);
-					break;
-				case 2://GoToLobby
-					gi->LoadMap("LVL_3_SelectChars_Lobby");
-					respuesta.orderType = 8; //ChangeToLobby
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 8 - ChangeToLobby (1)"));
-
-					gi->networkManager->SendNow(&respuesta, -1);
-					break;
-				case 3://GoToMap
-					//IniciarArray de readys con el numero de jugadores actual
-					//Si uno se cae en este punto no se podra iniciar partida jamas xD
-
-					break;
-				case 4://ClientReady
-					//Setear true en array de readys
-					//Comprobar si todos son trues.
-					
-					/*if (gi->ready[inPlayer].Contains(false))
-					{
-						gi->ready->Insert(true, inPlayer);
-						bool allReady = true;
-						for (size_t i = 0; i < gi->ready->Num() && allReady; i++)
-						{
-							if (gi->ready[i].Contains(false))
-								allReady = false;
-						}
-						if (allReady)
-						{
-							gi->LoadMap("LVL_4_GameMap");
-							respuesta.orderType = 9; //ChangeToMap
-							gi->networkManager->SendNow(&respuesta, -1);
-							gi->sendMap();
-						}
-					}
-					else//si ya habia pulsado reay antes se pone a falso
-						gi->ready->Insert(false, inPlayer);
-					*/
-					
-					gi->SetClientReady(inPlayer);
-
-					if (gi->CheckForAllClientReady())
-					{
-						//Carga nuevo mapa + Envio de Mapa a CLIENTES
-						gi->LoadMap("LVL_4_GameMap");
-						//gi->InitGameMap();
-
-					//Llamamos a enviar el mensaje de respuesta cuando ya este cargado nuestro mapa en InitGameMap();
-						
-						
-					}
-					break;
-				case 11:
-					respuesta.orderType = 9; //ChangeToLobby
-					UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance:: Enviando: 9 - ChangeToMap"));
-
-					gi->networkManager->SendNow(&respuesta, -1);
-					break;
-				}
-
-			}
-		}
-	};
-	ObservadorPrueba* obs = new ObservadorPrueba(this);
-	obs->setUpObserver(-1, UStructType::AllStructs);
-	networkManager->RegisterObserver(obs);
-
-
 
 }
 
@@ -181,7 +179,10 @@ void UPD_ServerGameInstance::InitializeNetworking()
 	//Donde se pone el puerto que es como una constante global?
 	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
 	
-	
+
+	//Seteamos este gameinstance como observador de eventos en el networkmanager.
+	networkManager->RegisterObserver(this);
+
 }
 
 

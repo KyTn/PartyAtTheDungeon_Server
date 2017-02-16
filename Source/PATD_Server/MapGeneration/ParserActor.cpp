@@ -47,7 +47,10 @@ void AParserActor::InitGameMap() {
 
 
 	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
-	FString path = FPaths::GameDir() + "Content/DungeonTestingMaps/test2.dungeon";
+	//Estamos metiendo el FPaths::GameDir() aqui y en el parserActor, asi que solo hay que ponerlo en uno de los sitios
+	FString path = /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test2.dungeon";
+
+	UE_LOG(LogTemp, Warning, TEXT("ParseActor::  Llamando a StartParsingFromFile. Path:%s"), *path);
 	parseMap->StartParsingFromFile(&path, StaticMapRef);
 	parseMap->InstantiateStaticMap(this);
 }

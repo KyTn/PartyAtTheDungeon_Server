@@ -26,12 +26,14 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 	staticMapRef->Clear();
 
 	// Leamos el fichero
+	//Estamos metiendo el FPaths::GameDir() aqui y en el parserActor, asi que solo hay que ponerlo en uno de los sitios
 	FString FilePath = FPaths::GameDir() + *filepath;
 	FString FileData = "";
 
 	if (FFileHelper::LoadFileToString(FileData, *FilePath))
 	{
 		//Agregado para el hito2 MCG
+		UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapParser::StartParsingFromFile::  Llamando a SetMapString . Path :%s  Mapa: %s" ), *FilePath, *FileData);
 		staticMapRef->SetMapString(FileData);
 
 		// Enviar a los clientes el mapa leido ... 
@@ -51,6 +53,10 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No parser version registered! Searching for " + fileSplitted[0]);
 		}
+
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("PD_MG_MapParser::StartParsingFromFile::  Error loading map! Failed to load file!. Path :%s "), *FilePath);
 
 	}
 
