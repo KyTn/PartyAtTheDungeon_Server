@@ -159,25 +159,23 @@ void UPD_ServerGameInstance::Shutdown()
 	if (networkManager) {
 	delete networkManager;
 	}
-	/*if (socketManager) {
-		delete socketManager;
-	}*/
+	
 }
 
 void UPD_ServerGameInstance::InitializeNetworking()
 {	
-	//FString myip;
+	
 	InitializeServerAddress();
 
 	networkManager= new PD_NW_NetworkManager();
 	PD_NW_SocketManager* socketManager = networkManager->GetSocketManager();
-	//socketManager = new PD_NW_SocketManager();
+	
 	socketManager->SetIsServer(true);
 
 	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	socketManager->SetNetworkManager(networkManager);
-	//Donde se pone el puerto que es como una constante global?
-	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer, quizas no lo queremos llamar aqui o queremos separarlo entre init y start
+	
+	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
 	
 
 	//Seteamos este gameinstance como observador de eventos en el networkmanager.
@@ -227,7 +225,6 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 {
 	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 
-	//socketManager->InitServerActor(ServerActorSpawned);
 	networkManager->GetSocketManager()->InitTimerActor(ServerActorSpawned);
 
 
@@ -291,17 +288,6 @@ void UPD_ServerGameInstance::InitializeServerAddress()
 		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
 		serverIP = myIP;
 		serverName = myServerName;
-
-
-
-		//castIP(myIP);
-
-/*
-		textToPrint = " - The Name of the Server is: " + myServerName;
-		textToPrint.Append("\n - The List of Address hosted by this Host is: \n");
-		textToPrint.Append(myIP);
-		//textToPrint = textToPrint + "/n " + (TEXT("and the List of IP is : / n %s"), myIP);
-		*/
 	}
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
 	{/*
@@ -311,9 +297,6 @@ void UPD_ServerGameInstance::InitializeServerAddress()
 		
 	}
 
-
-	
-	
 }
 
 FString UPD_ServerGameInstance::GetServerIP() {
@@ -326,6 +309,8 @@ FString UPD_ServerGameInstance::GetServerName() {
 
 TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 {
+	//Esto ahora se conseguiria del ServerManager
+
 	TArray<FString> playersConnected = TArray<FString>();
 	FString auxNamePlayer = "";
 	
@@ -351,7 +336,7 @@ TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 	return playersConnected;
 }
 
-
+// LO DE READY NO CREO QUE VAYA EN EL SOCKET MANAGER!
 TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 {
 	//TArray<bool> playersReadyArray = TArray<bool>();

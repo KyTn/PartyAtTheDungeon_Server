@@ -28,6 +28,15 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_N
 
 
 {
+
+	//Aqui deberiamos dejar solo las funciones de inicializacion de managers y de comunicacion con interfaz
+	//El gameinstance sera una especie de gestor de interfaces de menu.
+	//Tendria el ServerManager que seria el encargado de todo el switch gigante, el estado del servidor y la gestion de conexiones.
+	
+	//Ademas convendria hacer ya una limpieza para poder tener en cuenta los nuevos comentarios y no los viejos.
+
+	
+
 	GENERATED_BODY()
 
 		//Networking

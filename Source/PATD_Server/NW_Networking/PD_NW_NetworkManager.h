@@ -18,13 +18,13 @@ class PD_SR_SerializerManager;
 class PATD_SERVER_API PD_NW_NetworkManager
 {
 private:
-	//PD_NW_CompressionManager* compressionManager;
+
 	PD_NW_SocketManager* socketManager;
 	PD_NW_EventManager* eventManager;
 	PD_SR_SerializerManager* serializerManager;
 
 	TArray<FStructDataList*> sendGenericStruct;
-//	TArray<FStructGenericList>* reciveGenericStruct;
+
 
 
 
@@ -57,6 +57,7 @@ public:
 	/*bool SendNow(FStructGeneric* st,int player=-1);
 	bool SendNow(int player=-1);
 	bool AddToSendList(FStructGeneric* st, int player=-1);*/
+
 	//Funcion para conectar (se usa en el cliente) Devuelve el "player" que seria el servidor
 	//que deberia ser 0 si solo tenemos un servidor. Es el que usaremos en las funciones de enviar y recibir.
 	//-1 para error. Encapsula una llamada al socketmanager y crea el buffer para esta conexion.

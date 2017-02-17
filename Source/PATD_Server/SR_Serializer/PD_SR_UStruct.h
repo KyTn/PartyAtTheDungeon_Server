@@ -148,3 +148,10 @@ struct FStructOrderMenu : public FStructGeneric
 	}
 
 };
+
+
+//Necesitamos structs para ordenes (acciones) y un struct que lleve un array de estas para cada fase (consumibles, movimiento y acciones)
+//Si lo hacemos asi, las ordenes tienen que ser un struct comun, para no volver a tener problemas de herencia.
+
+//Necesitamos struct para las estadisticas de un character que se envian desde el cliente al servidor
+

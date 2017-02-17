@@ -253,14 +253,6 @@ bool PD_NW_SocketManager::SetSocketArrayIndex(int index)
 	}
 }
 
-//Creo que esta funcion ya no es necesaria, se hace todo en el initServerActor y solo existe el GetServerActor
-//Nunca vamos a querer setearlo sin iniciar el timer... o si?
-/*
-void PD_NW_SocketManager::SetServerActor(APD_NW_ServerActor* InmyServerActor)
-{
-myServerActor = InmyServerActor;
-myServerActor->SetSocketManager(this);
-}*/
 
 APD_NW_TimerActor* PD_NW_SocketManager::GetTimerActor()
 {

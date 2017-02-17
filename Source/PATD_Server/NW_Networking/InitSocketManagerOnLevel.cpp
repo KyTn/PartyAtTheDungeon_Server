@@ -18,8 +18,13 @@ AInitSocketManagerOnLevel::AInitSocketManagerOnLevel()
 // Called when the game starts or when spawned
 void AInitSocketManagerOnLevel::BeginPlay()
 {
+
+	
 	Super::BeginPlay();
 	
+
+	//Esto deberia desaparecer y ser llamado desde el gameState que sera el encargado de llamar a una unica funcion en el GameInstance(UIManager)
+	//que indicara que se ha cargado el mapa
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
 	if (SGI)
 	{

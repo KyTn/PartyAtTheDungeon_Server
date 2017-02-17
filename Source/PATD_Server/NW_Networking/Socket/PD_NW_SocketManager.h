@@ -83,9 +83,9 @@ public:
 	PD_NW_NetworkManager* GetNetworkManager();
 	void SetNetworkManager(PD_NW_NetworkManager* networkManagerIn);
 
+	// LO DE READY NO CREO QUE VAYA AQUI!
 	TArray<PD_NW_Socket*> GetSocketArray();
 	bool SetSocketArrayIndex(int index); //True si ha hecho bien el cambio / False contrario
-
 	TArray<bool> GetReadyPlayersArray();
 
 	///FUNCIONES 
