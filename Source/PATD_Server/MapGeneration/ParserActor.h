@@ -6,6 +6,7 @@
 #include "ParserActor.generated.h"
 
 class PD_MG_StaticMap;
+class PD_MG_DynamicMap;
 class PD_MG_LogicPosition;
 
 UCLASS()
@@ -15,7 +16,7 @@ class PATD_SERVER_API AParserActor : public AActor
 	
 private :
 	PD_MG_StaticMap* StaticMapRef;
-	
+	PD_MG_DynamicMap* DynamicMapRef;
 	
 public:	
 	
@@ -36,10 +37,16 @@ public:
 	AActor* InstantiateTile(PD_MG_LogicPosition* logpos);
 	AActor* InstantiateWall(PD_MG_LogicPosition* logpos);
 
+	AActor* InstantiateArcher(PD_MG_LogicPosition* logpos);
+
 
 	//Agregado para el hito2 MCG
 	PD_MG_StaticMap* GetStaticMap() {
 		return StaticMapRef;
+	};
+
+	PD_MG_DynamicMap* GetDynamicMap() {
+		return DynamicMapRef;
 	};
 
 	void InitGameMap();

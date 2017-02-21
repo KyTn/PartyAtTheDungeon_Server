@@ -7,7 +7,8 @@
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/ElementActors/PD_E_TileActor.h"
 #include "PATD_Server/ElementActors/PD_E_WallActor.h"
-
+#include "PATD_Server/MapGeneration/PD_MG_DynamicMap.h"
+#include "PATD_Server/Actors/Enemies/PD_E_Archer.h"
 
 
 // Sets default values
@@ -43,6 +44,7 @@ void AParserActor::BeginPlay()
 //Agregado para el hito2 MCG
 void AParserActor::InitGameMap() {
 	StaticMapRef = new PD_MG_StaticMap();
+	DynamicMapRef = new PD_MG_DynamicMap();
 	//Parsear();
 
 
@@ -51,8 +53,9 @@ void AParserActor::InitGameMap() {
 	FString path = /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test2.dungeon";
 
 	UE_LOG(LogTemp, Warning, TEXT("ParseActor::  Llamando a StartParsingFromFile. Path:%s"), *path);
-	parseMap->StartParsingFromFile(&path, StaticMapRef);
+	parseMap->StartParsingFromFile(&path, StaticMapRef, DynamicMapRef);
 	parseMap->InstantiateStaticMap(this);
+	parseMap->InstantiateDynamicMap(this);
 }
 
 
@@ -203,6 +206,16 @@ AActor* AParserActor::InstantiateWall(PD_MG_LogicPosition* logpos)
 	return GetWorld()->SpawnActor<APD_E_WallActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
 }
 /**/
+
+AActor* AParserActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
+
+
+	return GetWorld()->SpawnActor<APD_E_Archer>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+}
+
+
+
+
 
 // Called every frame
 void AParserActor::Tick(float DeltaTime)
