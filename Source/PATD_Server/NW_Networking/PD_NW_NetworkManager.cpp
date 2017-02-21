@@ -87,8 +87,8 @@ void PD_NW_NetworkManager::HandleNewConnectionSocketListener(int socketIndex) {
 
 	//Generar el evento de nuevo jugador. 
 	//TODO Transformar a struct de nueva conexion
-	FStructGenericoHito2* structNewConnection = new FStructGenericoHito2(); //alaaaa otro new
-	structNewConnection->orderType = 0;
+	FStructNewConnection* structNewConnection = new FStructNewConnection(); //alaaaa otro new
+	
 	eventManager->GenerateEvent(structNewConnection, socketIndex);
 }
 

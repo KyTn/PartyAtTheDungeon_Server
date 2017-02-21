@@ -13,4 +13,8 @@ public:
 
 	//tiene que guardar la lista de acciones o recibirla por parametro
 	//DoLogicTurn();
+
+
+	//Funciones para procesar cada orden individual
+
 };

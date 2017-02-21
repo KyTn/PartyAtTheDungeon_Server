@@ -17,6 +17,7 @@
 
 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+	/*
 	UE_LOG(LogTemp, Warning, TEXT("Recibido evento"));
 
 
@@ -108,6 +109,8 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 			   gi->ready->Insert(false, inPlayer);
 			   */
 
+	/*
+
 			this->SetClientReady(inPlayer);
 
 			if (this->CheckForAllClientReady())
@@ -129,7 +132,7 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 			break;
 		}
 
-	}
+	}*/
 }
 
 bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) {
@@ -232,9 +235,8 @@ void UPD_ServerGameInstance::InitServerActoWhenLoadMap()
 
 void UPD_ServerGameInstance::sendMap()
 {
-	FStructGenericoHito2* m = new FStructGenericoHito2();
-	m->orderType = 255; //Indica que no es una orden
-
+	FStructMap* m = new FStructMap();
+	
 	m->stringMap= parserActor->GetStaticMap()->GetMapString(); // TODO ANGEL
 
 	UE_LOG(LogTemp, Warning, TEXT("Enviando Map %s"), *m->stringMap);
@@ -372,7 +374,7 @@ void UPD_ServerGameInstance::InitGameMap() {
 
 	
 	//llamamos a la respuesta al cliente, el cliente carga el nivel del mapa
-	FStructGenericoHito2 respuesta = FStructGenericoHito2();
+	FStructOrderMenu respuesta = FStructOrderMenu();
 	respuesta.orderType = 9; //ChangeToMap
 	networkManager->SendNow(&respuesta, -1);
 	//LLamamos al send map cuando nosotros ya lo hemos parseado para poder tener el string.

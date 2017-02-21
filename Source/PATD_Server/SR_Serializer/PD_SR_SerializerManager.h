@@ -5,7 +5,7 @@
 /**
  * 
  */
-#include "SR_Serializer/PD_SR_UStruct.h"
+#include "Structs/PD_NetStructs.h"
 
 
 
@@ -28,13 +28,19 @@ TArray<uint8>* SerializeData(FStructGeneric* structGeneric, UStructType type) {
 		
 		 }break;
 
-		case UStructType::FStructGenericoHito2: {
-			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructGenericoHito2"));
-			FStructGenericoHito2* structSpecialization = (FStructGenericoHito2*)structGeneric;
-			return SerializeDataTemplate<FStructGenericoHito2>(structSpecialization);
+		case UStructType::FStructOrderMenu: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructOrderMenu"));
+			FStructOrderMenu* structSpecialization = (FStructOrderMenu*)structGeneric;
+			return SerializeDataTemplate<FStructOrderMenu>(structSpecialization);
 		
 		 }break;
 
+		case UStructType::FStructTurnOrders: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructTurnOrders"));
+			FStructTurnOrders* structSpecialization = (FStructTurnOrders*)structGeneric;
+			return SerializeDataTemplate<FStructTurnOrders>(structSpecialization);
+
+		}break;
 
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Tipo de ustruct no reconocido"));
@@ -56,12 +62,17 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 
 	}break;
 
-	case UStructType::FStructGenericoHito2: {
-		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructGenericoHito2"));
-		return DeserializeDataTemplate<FStructGenericoHito2>(data);
+	case UStructType::FStructOrderMenu: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructOrderMenu"));
+		return DeserializeDataTemplate<FStructOrderMenu>(data);
 
 	}break;
 
+	case UStructType::FStructTurnOrders: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructTurnOrders"));
+		return DeserializeDataTemplate<FStructTurnOrders>(data);
+
+	}break;
 
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Tipo de ustruct no reconocido"));

@@ -8,7 +8,7 @@
 #include "PD_NW_iEventObserver.h"
 
 //Includes prueba
-#include "SR_Serializer/PD_SR_UStruct.h"
+#include "Structs/PD_NetStructs.h"
 
 /**
  * 

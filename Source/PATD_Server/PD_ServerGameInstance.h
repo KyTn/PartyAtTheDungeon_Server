@@ -17,7 +17,7 @@
 class PD_NW_NetworkManager;
 class PD_MG_Map;
 class AParserActor;
-
+class PD_PlayersManager;
 /**
 *
 */
@@ -50,6 +50,8 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_N
 
 	//void castIP(const FString &myIP);
 
+
+
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
 	void InitializeAfterTravel();
 	
@@ -72,6 +74,8 @@ public:
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 	//TArray <uint8> ip = TArray<uint8>();
+
+	PD_PlayersManager* playersManager;
 
 	//Overwrites
 
