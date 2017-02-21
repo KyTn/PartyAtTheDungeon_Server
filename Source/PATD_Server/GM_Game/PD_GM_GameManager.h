@@ -32,10 +32,14 @@ public:
 	StructGameState* structGameState;
 	
 	//Funciones de gestion del estado (maquina de estados)
+
+	//Funciones de configuracion de la maquina
 	//Transiciones
 	void UpdateState();
 	//Acciones al empezar el estado
 	void OnBeginState();
+
+	//Funciones auxiliares
 	//Control directo del estado, llama a OnBeginState
 	void ChangeState(EGameState newState);
 

@@ -71,14 +71,7 @@ FStructNewConnection=2 struct que crea el networkmanager (no necesita serializac
 
 enum class UStructType { NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructMap = 10, FStructOrderMenu = 20, FStructTurnOrders = 30 };
 
-//Ordenes. NullOrder significa que el paquete recibido no es de una orden
-enum class MenuOrderType {
-	NullOrder = -1,
-	//Ordenes que recibe el servidor. 
-	NewConnection = 0, GoToMainMenu = 1, GoToLobby = 2, GoToMap = 3, ClientReady = 4,
-	//Ordenes que recibe el cliente. La 5 cuenta como 6 pero ademas setea ClientMaster.
-	SetClientMaster = 5, Welcome = 6, ChangeToMainMenu = 7, ChangeToLobby = 8, ChangeToMap = 9, InvalidConnection = 10
-};
+
 
 
 //=================================
@@ -118,6 +111,15 @@ struct FStructMap : public FStructGeneric
 
 };
 
+
+//Ordenes. NullOrder significa que el paquete recibido no es de una orden
+enum class MenuOrderType {
+	NullOrder = -1,
+	//Ordenes que recibe el servidor. 
+	NewConnection = 0, GoToMainMenu = 1, GoToLobby = 2, GoToMap = 3, ClientReady = 4,
+	//Ordenes que recibe el cliente. La 5 cuenta como 6 pero ademas setea ClientMaster.
+	SetClientMaster = 5, Welcome = 6, ChangeToMainMenu = 7, ChangeToLobby = 8, ChangeToMap = 9, InvalidConnection = 10
+};
 USTRUCT()
 struct FStructOrderMenu : public FStructGeneric
 {

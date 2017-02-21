@@ -47,8 +47,6 @@ bool PD_PlayersManager::AllPlayersSendOrders() {
 void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection){
 	StructPlayer* structPlayer = new StructPlayer();
 	dataPlayers.Add(structPlayer);
-	
-	
 }
 
 

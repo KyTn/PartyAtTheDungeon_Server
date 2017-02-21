@@ -5,10 +5,14 @@
 //Include de herencia (interfaz)
 #include "NW_NetWorking/EventLayer/PD_NW_iEventObserver.h"
 
+//Include de structs
+#include "Structs/PD_ServerStructs.h"
+
 //Includes de unreal
 #include "Engine/GameInstance.h"
 #include "LevelsNameDictionary.h"
 #include "PD_ServerGameInstance.generated.h"
+
 
 
 
@@ -47,11 +51,7 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_N
 	//Functions ====
 	//Funcion para inicializar entre otros el socketManager. 
 	void InitializeNetworking();
-
-	//void castIP(const FString &myIP);
-
-
-
+		
 	//Funcion para volver a poner todo adecuadamente despues de un travel.
 	void InitializeAfterTravel();
 	
@@ -63,7 +63,6 @@ public:
 
 	//Para tener los nombres de los niveles - diferenciar ejecución en editor o en ejecutable
 	LevelsNameDictionary levelsNameDictionary;
-
 	PD_MG_Map*  LOGIC_MAP;
 	AParserActor* parserActor;
 	PD_NW_NetworkManager* networkManager;
@@ -102,9 +101,29 @@ public:
 	virtual	bool SuscribeToEvents(int inPlayer, UStructType inType);
 	virtual void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
 
+	//=========
+	//Funciones de gestion del estado (maquina de estados)
+	//=========
+
+	//Struct con el estado para la maquina de estados del gameManager
+	StructServerState* structGameState;
+
+	//Funciones de configuracion de la maquina
+	//Transiciones
+	void UpdateState();
+	//Acciones al empezar el estado
+	void OnBeginState();
+
+	//Funciones auxiliares
+	//Control directo del estado, llama a OnBeginState
+	void ChangeState(EServerState newState);
+
+	void InitState();
 
 
+	//=========
 	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
+	//=========
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void sendMap();
 
