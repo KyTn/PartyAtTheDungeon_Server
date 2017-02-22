@@ -1,31 +1,41 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-#include "PD_GM_InterectionManager.h"
+#include "PD_GM_InteractionsManager.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
 
-PD_GM_InterectionManager::PD_GM_InterectionManager()
+PD_GM_InteractionsManager::PD_GM_InteractionsManager()
 {
 }
 
-PD_GM_InterectionManager::~PD_GM_InterectionManager()
+PD_GM_InteractionsManager::~PD_GM_InteractionsManager()
 {
 }
 
+void PD_GM_InteractionsManager::IntitializeTurnStates() {
+	ItemTurnInformation->CurrentState = InteractionStates::Ready;
+	MoveTurnInformation->CurrentState = InteractionStates::Ready;
+	AttackTurnInformation->CurrentState = InteractionStates::Ready;
+}
 
+//Control de los turnos
 
-void PD_GM_InterectionManager::PlayersLogicTurn() {
+void PD_GM_InteractionsManager::PlayersLogicTurn() {
 
+	LogicTurnItemPhase();
 	LogicTurnMovePhase();
 	LogicTurnAttackPhase();
-
-
 }
 
-void PD_GM_InterectionManager::LogicTurnMovePhase() {
-	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?-
+void PD_GM_InteractionsManager::LogicTurnItemPhase() {
+	ItemTurnInformation->CurrentState = InteractionStates::Working;
+}
+
+void PD_GM_InteractionsManager::LogicTurnMovePhase() {
+	MoveTurnInformation->CurrentState = InteractionStates::Working;
+	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?- Yo creo que mejor en el playerManager
 	int numTicks = 0;
 	for (int i = 0; playerManager->GetNumPlayers(); i++) {
 		if (numTicks < (playerManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
@@ -38,22 +48,28 @@ void PD_GM_InterectionManager::LogicTurnMovePhase() {
 	}
 }
 
-void PD_GM_InterectionManager::LogicTurnAttackPhase() {
-	
+void PD_GM_InteractionsManager::LogicTurnAttackPhase() {
+	AttackTurnInformation->CurrentState = InteractionStates::Working;
 }
 
-void PD_GM_InterectionManager::TickMovePhase(int tick) {
+
+//Control de los Ticks
+
+void PD_GM_InteractionsManager::TickItemPhase(int tick) {
+
+}
+
+void PD_GM_InteractionsManager::TickMovePhase(int tick) {
 	for (int i = 0; playerManager->GetNumPlayers(); i++) {
 		 
-		 //Resolucion de conflictos? choques etc.
+		//Resolucion de conflictos? choques etc.
 		FStructOrderAction order=playerManager->getDataStructPlayer(i)->turnOrders->listMove[tick];
-		 playerManager->getDataStructPlayer(i)->logicCharacter->ProcessMoveOrder(order);
-		 //Llamada a moverse actor provisional
-		 //Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
-		 //al moverse los siguientes personajes.
+		playerManager->getDataStructPlayer(i)->logicCharacter->ProcessMoveOrder(order);
+		//Llamada a moverse actor provisional
+		//Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
+		//al moverse los siguientes personajes.
 		 		
 	}
-
 }
 //Ejemplo conflicto con choques
 /*
@@ -77,6 +93,6 @@ pared, le devolveria a su casilla y seria él, el que tendria que detectar un cho
 Hacer sistema de conflictos para resolver todo a posteriori? Entre movimiento y resolucion de conflictos, el mapa se queda en una situacion que permite la
 existencia de mas de un personaje por casilla.
 */
-void PD_GM_InterectionManager::TickAttackPhase(int tick) {
+void PD_GM_InteractionsManager::TickAttackPhase(int tick) {
 
 }

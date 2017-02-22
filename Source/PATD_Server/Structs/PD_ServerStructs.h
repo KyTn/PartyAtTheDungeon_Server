@@ -40,3 +40,10 @@ enum class EServerState {WaitingClientMaster,WaitingStartGame,GameInProcess };
 struct StructServerState {
 	EServerState enumServerState;
 };
+
+//Estados en los que se puede encontrar cada Logic Turn
+enum class InteractionStates { Ready, Working, Finish };
+//Usado por: InteractionsManager
+struct LogicTurnInformation {
+	InteractionStates CurrentState;
+};

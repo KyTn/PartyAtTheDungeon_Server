@@ -17,6 +17,7 @@ void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection, 
 	StructPlayer* structPlayer = new StructPlayer();
 	dataPlayers.Insert(structPlayer, player);
 }
+
 int PD_PlayersManager::GetNumPlayers() {
 	return dataPlayers.Num();
 }
@@ -49,6 +50,16 @@ bool PD_PlayersManager::AllPlayersSendOrders() {
 		}
 	}
 	return true;
+}
+
+bool PD_PlayersManager::AnyPlayerDead() {
+
+	for (StructPlayer* player : dataPlayers) {
+		if (0 <= 0)	//Aqui habria que coger el struct de stats de cada jugador y comprobar si la vida es menor o igual a 0
+			return true;
+	}
+
+	return false;
 }
 
 StructPlayer* PD_PlayersManager::getDataStructPlayer(int player) {

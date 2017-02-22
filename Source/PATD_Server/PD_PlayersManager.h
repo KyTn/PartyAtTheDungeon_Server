@@ -36,6 +36,10 @@ public:
 	//Funciones de consulta de datos de players
 	bool AllPlayersReady();
 	bool AllPlayersSendOrders();
+	bool AnyPlayerDead();
+
+	//Funciones de consulta de mision y objetivos de la partida
+	
 	//FStructTurnOrders* getTurnOrders(int player);
 	StructPlayer* getDataStructPlayer(int player);
 
