@@ -104,7 +104,15 @@ public:
 	//=========
 	//Funciones de gestion del estado (maquina de estados)
 	//=========
-
+	//Esquema
+	/*
+	el clientMaster se conecta al servidor
+		Los clientes se meten ahora.
+		el clientMaster configura y da ok.
+		les sale a todos para elegir su personaje.
+		Aqui no se puede conectar nadie mas.
+		Lo crean y le dan a ready.
+		*/
 	//Struct con el estado para la maquina de estados del gameManager
 	StructServerState* structGameState;
 

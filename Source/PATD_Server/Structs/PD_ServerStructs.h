@@ -3,8 +3,10 @@
 #include "PD_NetStructs.h"
 //Incluyendo este archivo en cualquier otro #include "Structs/PD_ServerStructs.h" tenemos todos los structs (porque hace include de los demas)
 
+//#include "GM_Game/LogicCharacter/PD_GM_iLogicCharacter.h"
+//#include "GM_Game/LogicCharacter/PD_GM_PlayerLogicCharacter.h"
 
-
+class PD_GM_PlayerLogicCharacter;
 
 
 
@@ -17,6 +19,10 @@ struct StructPlayer {
 
 	//Ingame data
 	FStructTurnOrders* turnOrders;
+
+	//Puntero a Struct de caracteristicas del jugador.
+	PD_GM_PlayerLogicCharacter* logicCharacter;
+	//Puntero a su fisicCharacter (actor de unreal)
 
 
 };

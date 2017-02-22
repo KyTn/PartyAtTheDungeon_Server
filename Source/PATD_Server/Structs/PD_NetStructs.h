@@ -8,7 +8,7 @@
 
 
 //=================================
-///Structs NO serializables -- (No se envian)
+///Structs NO serializables -- (No se envian ellos mismos)
 //=================================
 
 enum class EDirections { Up = 1, Down = 2, Left = 3, Right = 4 };

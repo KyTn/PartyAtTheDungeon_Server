@@ -21,7 +21,7 @@ PD_GM_GameManager::~PD_GM_GameManager()
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
-		playerManager->setTurnOrders(turnStruct,inPlayer);
+		playerManager->getDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
 	}
 	

@@ -11,13 +11,22 @@ PD_PlayersManager::~PD_PlayersManager()
 {
 }
 
+//Funciones de gestion de conexion
+
+void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection, int player) {
+	StructPlayer* structPlayer = new StructPlayer();
+	dataPlayers.Insert(structPlayer, player);
+}
+int PD_PlayersManager::GetNumPlayers() {
+	return dataPlayers.Num();
+}
 
 //Funciones de modificacion de datos de players
-
+/*
 void PD_PlayersManager::setTurnOrders(FStructTurnOrders* turnOrders, int player) {
 	CheckPlayerIndex(player);
 	dataPlayers[player]->turnOrders = turnOrders;
-}
+}*/
 
 
 //Funciones de consulta de datos de players
@@ -42,11 +51,9 @@ bool PD_PlayersManager::AllPlayersSendOrders() {
 	return true;
 }
 
-//Funciones de gestion de conexion
-
-void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection){
-	StructPlayer* structPlayer = new StructPlayer();
-	dataPlayers.Add(structPlayer);
+StructPlayer* PD_PlayersManager::getDataStructPlayer(int player) {
+	CheckPlayerIndex(player);
+	return dataPlayers[player];
 }
 
 

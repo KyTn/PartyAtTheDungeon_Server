@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+#include "Structs/PD_ServerStructs.h"
 /**
  * 
  */
@@ -20,6 +20,15 @@ public:
 	//pues los enemigos y los personajes lo calculan de diferente manera (unos llevan armas y dependera de esta y otros no, es fijo)
 
 	//Tambien guardaremos punteros a las cosas que nos interesen, como el actor fisico que lo represente.
+
+	void ProcessMoveOrder(FStructOrderAction order) {
+		if (EOrderAction(order.orderType) == EOrderAction::Move) {
+			//Actualizar logicPosition.
+			//Pero para saber si invadimos la casilla de otro objeto, necesitamos una referencia al mapa, y que en el mapa se guarde
+			//por posiciones logicas, que characters hay (solo uno en principio, pero puede que necesitemos varios).
+			//Siendo asi, al moverse tendria que actualizar las referencias en el mapa aparte de su propia logicPosition.
+		}
+	};
 
 	//CheckAndChangeLogicPosition() {
 
