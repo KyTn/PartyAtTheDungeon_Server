@@ -1,15 +1,8 @@
 #pragma once
-
+//Hacemos (#include "Structs/PD_ServerStructs.h") en el .cpp de las clases para usar los structs.
+//Si los necesitamos en el .h los hacemos con forward declaration.
 #include "PD_NetStructs.h"
-//Incluyendo este archivo en cualquier otro #include "Structs/PD_ServerStructs.h" tenemos todos los structs (porque hace include de los demas)
-
-//#include "GM_Game/LogicCharacter/PD_GM_iLogicCharacter.h"
-//#include "GM_Game/LogicCharacter/PD_GM_PlayerLogicCharacter.h"
-
-class PD_GM_PlayerLogicCharacter;
-
-
-
+#include "PD_ServerEnums.h"
 
 //Usado por: PlayersManager
 struct StructPlayer {
@@ -17,32 +10,39 @@ struct StructPlayer {
 	//Menu options and configuration
 	bool readyMenu;
 
+	bool clientMaster;
 	//Ingame data
 	FStructTurnOrders* turnOrders;
 
+	//PD_MG_LogicPosition* logicPosition;
+//	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
+	
 	PD_GM_PlayerLogicCharacter* logicCharacter;
+	APD_PLY_Controller* actorController;
+	APD_PLY_GenericCharacter* actor;
 	//Puntero a su fisicCharacter (actor de unreal)
 
 
 };
 
 
-enum class EGameState {  WaitingPlayerOrders, ExecutingActionOrders };
+
 
 //Usado por: GameManager
 struct StructGameState {
 	EGameState enumGameState;
 };
 
-enum class EServerState {WaitingClientMaster,WaitingStartGame,GameInProcess };
+
 //Usado por: GameInstance -ServerManager-
 struct StructServerState {
 	EServerState enumServerState;
+	bool gameConfigurationDone;
 };
 
 //Estados en los que se puede encontrar cada Logic Turn
-enum class InteractionStates { Ready, Working, Finish };
+
 //Usado por: InteractionsManager
 struct LogicTurnInformation {
 	InteractionStates CurrentState;

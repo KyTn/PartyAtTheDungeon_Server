@@ -225,33 +225,9 @@ bool PD_NW_SocketManager::GetIsServer()
 
 }
 
-TArray<PD_NW_Socket*> PD_NW_SocketManager::GetSocketArray()
-{
-	return socketArray;
-}
 
-TArray<bool> PD_NW_SocketManager::GetReadyPlayersArray()
-{
-	return readyPlayersArray;
-}
 
-bool PD_NW_SocketManager::SetSocketArrayIndex(int index)
-{
-	if (readyPlayersArray.Num() >= index)
-	{
-		if (readyPlayersArray[index])
-		{
-			readyPlayersArray[index] = false;
-		} 
-		else {
-			readyPlayersArray[index] = true;
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
-}
+
 
 
 APD_NW_TimerActor* PD_NW_SocketManager::GetTimerActor()

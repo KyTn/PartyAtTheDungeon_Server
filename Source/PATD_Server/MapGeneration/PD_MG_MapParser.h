@@ -31,7 +31,7 @@ public:
 	PD_MG_StaticMap* StartParsingFromFile(FString* filepath);
 	PD_MG_StaticMap* StartParsingFromFile(FString* filepath, PD_MG_StaticMap*  staticMapRef, PD_MG_DynamicMap* DynamicMapRef);
 
-	void InstantiateStaticMap(AParserActor* parserActor);
+	void InstantiateStaticMap(AParserActor* parserActor, PD_MG_StaticMap* staticMap);
 
-	void InstantiateDynamicMap(AParserActor* parserActor);
+	void InstantiateDynamicMap(AParserActor* parserActor, PD_MG_DynamicMap* dynamicMap);
 };

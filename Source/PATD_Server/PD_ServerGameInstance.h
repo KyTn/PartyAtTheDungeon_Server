@@ -5,8 +5,18 @@
 //Include de herencia (interfaz)
 #include "NW_NetWorking/EventLayer/PD_NW_iEventObserver.h"
 
-//Include de structs
-#include "Structs/PD_ServerStructs.h"
+
+
+//forward declarations
+//Include de enums (no se pueden hacer forward declaration)
+#include "Structs/PD_ServerEnums.h"
+struct StructServerState;
+class PD_NW_NetworkManager;
+class AParserActor;
+class PD_PlayersManager;
+class PD_MG_MapParser;
+class PD_GM_MapManager;
+class PD_GM_GameManager;
 
 //Includes de unreal
 #include "Engine/GameInstance.h"
@@ -16,12 +26,6 @@
 
 
 
-//forward declarations
-//class PD_NW_SocketManager;
-class PD_NW_NetworkManager;
-class PD_MG_Map;
-class AParserActor;
-class PD_PlayersManager;
 /**
 *
 */
@@ -32,29 +36,9 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_N
 
 
 {
-
-	//Aqui deberiamos dejar solo las funciones de inicializacion de managers y de comunicacion con interfaz
-	//El gameinstance sera una especie de gestor de interfaces de menu.
-	//Tendria el ServerManager que seria el encargado de todo el switch gigante, el estado del servidor y la gestion de conexiones.
-	
-	//Ademas convendria hacer ya una limpieza para poder tener en cuenta los nuevos comentarios y no los viejos.
-
-	
-
 	GENERATED_BODY()
-
-		//Networking
-		//PD_NW_SocketManager* socketManager;
-		
-
-	
-	//Functions ====
-	//Funcion para inicializar entre otros el socketManager. 
 	void InitializeNetworking();
 		
-	//Funcion para volver a poner todo adecuadamente despues de un travel.
-	void InitializeAfterTravel();
-	
 	FString serverIP;
 	FString serverName;
 	
@@ -63,83 +47,60 @@ public:
 
 	//Para tener los nombres de los niveles - diferenciar ejecución en editor o en ejecutable
 	LevelsNameDictionary levelsNameDictionary;
-	PD_MG_Map*  LOGIC_MAP;
+	//PD_MG_Map*  LOGIC_MAP;
 	AParserActor* parserActor;
-	PD_NW_NetworkManager* networkManager;
 
-	int clientMasterIndex = -1;
-	TArray<bool>* ready;
-	int numPlayers = 0;
+	PD_NW_NetworkManager* networkManager;
+	PD_PlayersManager* playersManager;
+	PD_MG_MapParser* mapParser;
+	PD_GM_MapManager* mapManager;
+	PD_GM_GameManager* gameManager;
+
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
-	//TArray <uint8> ip = TArray<uint8>();
 
-	PD_PlayersManager* playersManager;
+	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test2.dungeon";
 
-	//Overwrites
 
-	//Funcion que llama al inicializar 
-	//Existe ya UWorld aqui, y GetTimerManager()??
 
+	//Overwrites - GameInstance
 	virtual void Init();
-
 	virtual void Shutdown();
+	//Overwrites - iEventObserver
+	virtual	bool SuscribeToEvents(int inPlayer, UStructType inType);
+	virtual void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType); //Aqui controlamos la mayoria de entradas.
 
-//	PD_NW_SocketManager* GetSocketManager();
-
+	//Carga de mapa
 	void LoadMap(FString mapName);
-
-	void SetClientReady(int indexClient);
-
-	bool CheckForAllClientReady();
+	//Callback cuando el mapa este cargado (Lo llama el estado GameStateInitializer en su beginPlay)
+	void OnMapFinishLoad();
 
 	//Inicializa la variable privada ip y el serverName
 	void InitializeServerAddress();
 
-	//Funciones del eventObserver, para determinar que eventos recibimos y para procesarlos
 
-	virtual	bool SuscribeToEvents(int inPlayer, UStructType inType);
-	virtual void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
 
 	//=========
 	//Funciones de gestion del estado (maquina de estados)
 	//=========
-	//Esquema
-	/*
-	el clientMaster se conecta al servidor
-		Los clientes se meten ahora.
-		el clientMaster configura y da ok.
-		les sale a todos para elegir su personaje.
-		Aqui no se puede conectar nadie mas.
-		Lo crean y le dan a ready.
-		*/
-	//Struct con el estado para la maquina de estados del gameManager
-	StructServerState* structGameState;
+
+	//Struct con el estado del server
+	StructServerState* structServerState;
 
 	//Funciones de configuracion de la maquina
 	//Transiciones
 	void UpdateState();
 	//Acciones al empezar el estado
 	void OnBeginState();
-
 	//Funciones auxiliares
 	//Control directo del estado, llama a OnBeginState
 	void ChangeState(EServerState newState);
-
-	void InitState();
+	//void InitState();
 
 
 	//=========
 	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
 	//=========
-	UFUNCTION(BlueprintCallable, Category = "GameInstance")
-	void sendMap();
-
-	UFUNCTION(BlueprintCallable, Category = "GameInstance")
-	void InitServerActoWhenLoadMap();
-
-	UFUNCTION(BlueprintCallable, Category = "GameInstance")
-	void InitGameMap();
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 		FString GetServerIP();

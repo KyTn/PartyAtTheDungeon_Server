@@ -183,13 +183,13 @@ void PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstInd
 }
 
 
-void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor) {
-	for (int i = 0; i < parserActor->getMap()->GetLogicPositions().Num(); i++) {
+void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor,PD_MG_StaticMap* staticMap) {
+	for (int i = 0; i < staticMap->GetLogicPositions().Num(); i++) {
 
 		/**/
-		switch (parserActor->getMap()->GetXYMap()[*parserActor->getMap()->GetLogicPositions()[i]]) {
+		switch (staticMap->GetXYMap()[*staticMap->GetLogicPositions()[i]]) {
 		case 'w':
-			parserActor->InstantiateWall(parserActor->getMap()->GetLogicPositions()[i]);
+			parserActor->InstantiateWall(staticMap->GetLogicPositions()[i]);
 			break;
 
 		case 'd':
@@ -197,7 +197,7 @@ void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor) {
 
 		default: 
 
-			parserActor->InstantiateTile(parserActor->getMap()->GetLogicPositions()[i]);
+			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
 			break;
 
 		}
@@ -206,13 +206,13 @@ void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor) {
 }
 
 
-void PD_MG_MapParser::InstantiateDynamicMap(AParserActor* parserActor) {
+void PD_MG_MapParser::InstantiateDynamicMap(AParserActor* parserActor, PD_MG_DynamicMap* dynamicMap) {
 	FString enemyId,enemyId2="id_zombie";
-	for (int i = 0; i < parserActor->GetDynamicMap()->GetLogicPositions().Num(); i++) {
+	for (int i = 0; i < dynamicMap->GetLogicPositions().Num(); i++) {
 		enemyId.Reset();
-		enemyId = parserActor->GetDynamicMap()->GetEnemy(parserActor->GetDynamicMap()->GetXYMap()[*parserActor->GetDynamicMap()->GetLogicPositions()[i]]);
-		if (parserActor->GetDynamicMap()->GetEnemy(parserActor->GetDynamicMap()->GetXYMap()[*parserActor->GetDynamicMap()->GetLogicPositions()[i]])=="id_zombie") {
-			parserActor->InstantiateArcher(parserActor->GetDynamicMap()->GetLogicPositions()[i]);
+		enemyId = dynamicMap->GetEnemy(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]]);
+		if (dynamicMap->GetEnemy(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
+			parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]);
 			UE_LOG(LogTemp, Error, TEXT("Entra :%s !!!!"), *enemyId);
 		}
 		/*if (parserActor->GetDynamicMap()->GetXYMap()[*parserActor->GetDynamicMap()->GetLogicPositions()[i]] = 'z') {

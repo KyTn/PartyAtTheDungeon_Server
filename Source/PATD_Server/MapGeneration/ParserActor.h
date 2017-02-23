@@ -16,8 +16,8 @@ class PATD_SERVER_API AParserActor : public AActor
 	GENERATED_BODY()
 
 private:
-	PD_MG_StaticMap* StaticMapRef;
-	PD_MG_DynamicMap* DynamicMapRef;
+	//PD_MG_StaticMap* StaticMapRef;
+	//PD_MG_DynamicMap* DynamicMapRef;
 	//APD_E_Archer* characterP;
 public:
 
@@ -38,7 +38,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
-	PD_MG_StaticMap* getMap() { return StaticMapRef; }
+//	PD_MG_StaticMap* getMap() { return StaticMapRef; }
 
 	void Parsear();
 	void ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c);
@@ -50,15 +50,15 @@ public:
 
 
 	//Agregado para el hito2 MCG
-	PD_MG_StaticMap* GetStaticMap() {
+	/*PD_MG_StaticMap* GetStaticMap() {
 		return StaticMapRef;
 	};
 
 	PD_MG_DynamicMap* GetDynamicMap() {
 		return DynamicMapRef;
 	};
-
-	void InitGameMap();
+	
+	void InitGameMap();*/
 
 
 };

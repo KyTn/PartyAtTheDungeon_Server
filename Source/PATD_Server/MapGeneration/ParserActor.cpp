@@ -49,113 +49,25 @@ void AParserActor::BeginPlay()
 
 
 }
+/*StaticMapRef = new PD_MG_StaticMap();
 
 //Agregado para el hito2 MCG
 void AParserActor::InitGameMap() {
-	StaticMapRef = new PD_MG_StaticMap();
 	DynamicMapRef = new PD_MG_DynamicMap();
 	//Parsear();
 
 
 	PD_MG_MapParser* parseMap = new PD_MG_MapParser();
 	//Estamos metiendo el FPaths::GameDir() aqui y en el parserActor, asi que solo hay que ponerlo en uno de los sitios
-	FString path = /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test2.dungeon";
+	FString path =  "Content/DungeonTestingMaps/test2.dungeon";
 
 	UE_LOG(LogTemp, Warning, TEXT("ParseActor::  Llamando a StartParsingFromFile. Path:%s"), *path);
 	parseMap->StartParsingFromFile(&path, StaticMapRef, DynamicMapRef);
 	parseMap->InstantiateStaticMap(this);
 	parseMap->InstantiateDynamicMap(this);
-}
+}*/
 
 
-void AParserActor::Parsear() {
-	StaticMapRef = new PD_MG_StaticMap();
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
-
-	FString CompleteFilePath = FPaths::GameDir() + "Content/DungeonTestingMaps/test1.dungeon";
-
-	FString FileData = "";
-	if (FFileHelper::LoadFileToString(FileData, *CompleteFilePath)) {
-
-		// Muesta por pantalla el contenido del fichero pasado al parser
-		//GEngine->AddOnScreenDebugMessage(-1, 500000.f, FColor::Red, FileData);
-
-
-
-		// Obtenemos el numero de filas y de columnas 
-		FString A, B;
-
-		uint32 fil, col;
-
-		FileData.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
-		fil = FCString::Atoi(*A);
-
-		B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
-		col = FCString::Atoi(*A);
-		////////////////
-
-
-		// Obtenemos los chars del fichero de texto (los estáticos)
-		TArray<TArray<TCHAR>> map;
-		map.Empty(fil);
-
-		/*
-		for (int i = 0; i < (int)fil; i++) {
-		B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
-		TArray<TCHAR> myCol = A.GetCharArray();
-		map.Add(myCol);
-		map[i].Empty(col);
-		for (int j = 0; j < (int)col; j++) {
-		map[i][j] = myCol[j];
-		}
-		}
-		/**/
-		/**/
-		int i = 0;
-		while (B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart))
-		{
-			map.Add(A.GetCharArray());
-			//map[i].Empty(col);
-			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, );
-			/*
-			for (i = 0; i < map[map.Num() - 1].Num(); i++) {
-			//map[map.Num() - 1][i] = A[i];
-			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, &map[map.Num() - 1][i]);
-			}
-			/**/
-		}
-		map.Add(B.GetCharArray());
-		/*
-		FString s = "F: ";
-		s.AppendInt(fil);
-		s.Append(" C: ");
-		s.AppendInt(col);
-		GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
-		/**/
-
-		//int i = 0;
-
-		for (i = 0; i < (int)fil; i++)
-		{
-			for (int j = 0; j < (int)col; j++)
-			{
-
-				//PD_MG_LogicPosition* lp = StaticMapRef->AddNewLogicPosition(i, j);
-				//ParserElementByChar(lp, &(map[i][j]));
-			}
-
-			/*
-			s = "";
-			s.AppendInt(i);
-
-			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
-			/**/
-		}
-
-
-	}
-}
 
 void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c)
 {

@@ -11,6 +11,7 @@
 UCLASS()
 class PATD_SERVER_API APD_PLY_Controller : public AAIController
 {
+public:
 	GENERATED_BODY()
 	
 	virtual void BeginPlay() override;

@@ -3,6 +3,10 @@
 #include "PATD_Server.h"
 #include "PD_PlayersManager.h"
 
+//Include of forward declaration
+#include "Structs/PD_ServerStructs.h"//Para todos los structs
+
+
 PD_PlayersManager::PD_PlayersManager()
 {
 }
@@ -60,6 +64,14 @@ bool PD_PlayersManager::AnyPlayerDead() {
 	}
 
 	return false;
+}
+
+int PD_PlayersManager::getIndexClientMaster() {
+	for (int i = 0; i < dataPlayers.Num();i++) {
+		StructPlayer* player = dataPlayers[i];
+		if (player->clientMaster) return i;
+	}
+	return -1;
 }
 
 StructPlayer* PD_PlayersManager::getDataStructPlayer(int player) {

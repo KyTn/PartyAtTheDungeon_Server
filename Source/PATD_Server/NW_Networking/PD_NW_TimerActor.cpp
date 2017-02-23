@@ -35,10 +35,10 @@ void APD_NW_TimerActor::Tick(float DeltaTime)
 void APD_NW_TimerActor::InitTimerActor()
 {
 	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_TimerActor::CheckForReceivedData, 0.01f, true);
-	
+
 	//Timers de prueba
-	
-	
+
+
 }
 
 

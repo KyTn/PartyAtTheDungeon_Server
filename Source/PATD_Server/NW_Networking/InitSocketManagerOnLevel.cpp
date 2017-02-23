@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+/*
 #include "PATD_Server.h"
 #include "InitSocketManagerOnLevel.h"
 
-//Includes of forward declaration
+
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
-#include "PD_ServerGameInstance.h"
+
 
 // Sets default values
 AInitSocketManagerOnLevel::AInitSocketManagerOnLevel()
@@ -22,7 +22,7 @@ void AInitSocketManagerOnLevel::BeginPlay()
 	
 	Super::BeginPlay();
 	
-
+	
 	//Esto deberia desaparecer y ser llamado desde el gameState que sera el encargado de llamar a una unica funcion en el GameInstance(UIManager)
 	//que indicara que se ha cargado el mapa
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
@@ -37,11 +37,12 @@ void AInitSocketManagerOnLevel::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("If del LVL_4_Gamemap"));
 			SGI->InitGameMap();
 		}
+		*/
 		/*Esto lo que hace es como el open level carga en un hilo diferente o algo asi, y las 
 		siguientes instrucciones que haya tras llamarlo, no se ejecutan con el mapa 
 		ya cargado, tenemos este actor para inicializar cosas, que se instancia junto al mapa. (esta en el)
 		El cuando se le llame a su begin play, va a llamar a InitGameMap que spawnea el actor de parser.
-		*/
+		
 	}
 
 }
@@ -53,3 +54,4 @@ void AInitSocketManagerOnLevel::Tick( float DeltaTime )
 
 }
 
+*/

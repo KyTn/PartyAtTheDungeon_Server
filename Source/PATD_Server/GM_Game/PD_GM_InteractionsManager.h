@@ -6,9 +6,13 @@
  * 
  */
 
-#include "Structs/PD_ServerStructs.h"
+
+
+
+
  //forward declarations
 class PD_PlayersManager;
+class PD_GM_MapManager;
 
 class PATD_SERVER_API PD_GM_InteractionsManager
 {
@@ -18,10 +22,11 @@ private:
 	LogicTurnInformation* AttackTurnInformation;
 
 public:
-	PD_GM_InteractionsManager();
+	PD_GM_InteractionsManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager);
 	~PD_GM_InteractionsManager();
 
-	PD_PlayersManager* playerManager;
+	PD_PlayersManager* playersManager;
+	PD_GM_MapManager* mapManager;
 
 	void IntitializeTurnStates();
 	

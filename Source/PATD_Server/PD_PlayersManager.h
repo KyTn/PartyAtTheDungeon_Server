@@ -2,11 +2,13 @@
 
 #pragma once
 
-//Incluyendo #include "Structs/PD_ServerStructs.h" tenemos todos los structs (porque hace include de los demas)
-#include "Structs/PD_ServerStructs.h"
 
-//Include de forward declaration en  "Structs/PD_ServerStructs.h"
-#include "GM_Game/LogicCharacter/PD_GM_PlayerLogicCharacter.h"
+
+
+//forward declaration
+struct FStructNewConnection;
+struct StructPlayer;
+
 /**
  * 
  */
@@ -37,6 +39,7 @@ public:
 	bool AllPlayersReady();
 	bool AllPlayersSendOrders();
 	bool AnyPlayerDead();
+	int getIndexClientMaster();
 
 	//Funciones de consulta de mision y objetivos de la partida
 	

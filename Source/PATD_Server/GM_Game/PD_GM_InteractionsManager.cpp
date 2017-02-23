@@ -3,11 +3,21 @@
 #include "PATD_Server.h"
 #include "PD_GM_InteractionsManager.h"
 
+//includes de uso
+#include "MapGeneration/PD_MG_LogicPosition.h"
+#include "LogicCharacter/PD_GM_PlayerLogicCharacter.h"
+#include "Actors/Players/PD_PLY_Controller.h"
+
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
+#include "PD_GM_MapManager.h"
+#include "Structs/PD_ServerStructs.h"//Para todos los structs
 
-PD_GM_InteractionsManager::PD_GM_InteractionsManager()
+
+PD_GM_InteractionsManager::PD_GM_InteractionsManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
 {
+	playersManager = inPlayersManager;
+	mapManager = inMapManager;
 }
 
 PD_GM_InteractionsManager::~PD_GM_InteractionsManager()
@@ -37,9 +47,9 @@ void PD_GM_InteractionsManager::LogicTurnMovePhase() {
 	MoveTurnInformation->CurrentState = InteractionStates::Working;
 	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?- Yo creo que mejor en el playerManager
 	int numTicks = 0;
-	for (int i = 0; playerManager->GetNumPlayers(); i++) {
-		if (numTicks < (playerManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
-			numTicks = playerManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
+	for (int i = 0; playersManager->GetNumPlayers(); i++) {
+		if (numTicks < (playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
+			numTicks = playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
 		};
 	}
 	//Ejecutar los ticks
@@ -60,15 +70,20 @@ void PD_GM_InteractionsManager::TickItemPhase(int tick) {
 }
 
 void PD_GM_InteractionsManager::TickMovePhase(int tick) {
-	for (int i = 0; playerManager->GetNumPlayers(); i++) {
-		 
+	for (int i = 0; playersManager->GetNumPlayers(); i++) {
+
 		//Resolucion de conflictos? choques etc.
-		FStructOrderAction order=playerManager->getDataStructPlayer(i)->turnOrders->listMove[tick];
-		playerManager->getDataStructPlayer(i)->logicCharacter->ProcessMoveOrder(order);
+		StructPlayer* structPlayer = playersManager->getDataStructPlayer(i);
+		FStructOrderAction order = structPlayer->turnOrders->listMove[tick];
+
+		structPlayer->logicCharacter->ProcessMoveOrder(order);
 		//Llamada a moverse actor provisional
 		//Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
 		//al moverse los siguientes personajes.
-		 		
+		PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
+		PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition();
+		FVector realPosition= mapManager->getUWorldPosition(logicPosition);
+		playersManager->getDataStructPlayer(i)->actorController->Move(realPosition.X, realPosition.Y);
 	}
 }
 //Ejemplo conflicto con choques

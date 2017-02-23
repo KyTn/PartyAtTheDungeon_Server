@@ -3,14 +3,22 @@
 #include "PATD_Server.h"
 #include "PD_GM_GameManager.h"
 
+//Includes de uso de objetos
+#include "Structs/PD_ServerStructs.h"
+
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
+#include "PD_GM_MapManager.h"
+#include "PD_GM_InteractionsManager.h"
+#include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 
 
 
-PD_GM_GameManager::PD_GM_GameManager()
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
 {
 	InitState();
+	playersManager = inPlayersManager; 
+	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 
 PD_GM_GameManager::~PD_GM_GameManager()
@@ -21,7 +29,7 @@ PD_GM_GameManager::~PD_GM_GameManager()
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
-		playerManager->getDataStructPlayer(inPlayer)->turnOrders=turnStruct;
+		playersManager->getDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
 	}
 	
@@ -42,7 +50,7 @@ void PD_GM_GameManager::UpdateState() {
 	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 
 		//Transiciones de estados
-		if (playerManager->AllPlayersSendOrders()) {
+		if (playersManager->AllPlayersSendOrders()) {
 			this->ChangeState(EGameState::ExecutingActionOrders);
 		}
 
