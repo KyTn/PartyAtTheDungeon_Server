@@ -9,6 +9,7 @@
 #include "PATD_Server/ElementActors/PD_E_WallActor.h"
 #include "PATD_Server/MapGeneration/PD_MG_DynamicMap.h"
 #include "PATD_Server/Actors/Enemies/PD_E_Archer.h"
+#include "PATD_Server/Actors/Enemies/PD_E_Zombie.h"
 
 
 // Sets default values
@@ -16,14 +17,22 @@ AParserActor::AParserActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> TileBlueprint(TEXT("Blueprint'/Game/BluePrints/MapElements/BP_ME_TileActor.BP_ME_TileActor'"));
+	if (TileBlueprint.Object) {
+		TileClass = (UClass*)TileBlueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ArcherBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Archer.Archer'"));
+	if (ArcherBlueprint.Object) {
+		ArcherClass = (UClass*)ArcherBlueprint.Object->GeneratedClass;
+	}
 }
 
 // Called when the game starts or when spawned
 void AParserActor::BeginPlay()
 {
 
-	
+
 	Super::BeginPlay();
 	/*
 	StaticMapRef = new PD_MG_StaticMap();
@@ -59,11 +68,11 @@ void AParserActor::InitGameMap() {
 }
 
 
-void AParserActor::Parsear(){
+void AParserActor::Parsear() {
 	StaticMapRef = new PD_MG_StaticMap();
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Starting Dungeon Parser v0.1");
-	
+
 	FString CompleteFilePath = FPaths::GameDir() + "Content/DungeonTestingMaps/test1.dungeon";
 
 	FString FileData = "";
@@ -90,16 +99,16 @@ void AParserActor::Parsear(){
 		// Obtenemos los chars del fichero de texto (los estáticos)
 		TArray<TArray<TCHAR>> map;
 		map.Empty(fil);
-		
+
 		/*
 		for (int i = 0; i < (int)fil; i++) {
-			B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
-			TArray<TCHAR> myCol = A.GetCharArray();
-			map.Add(myCol);
-			map[i].Empty(col);
-			for (int j = 0; j < (int)col; j++) {
-				map[i][j] = myCol[j];
-			}
+		B.Split("\n", &A, &B, ESearchCase::CaseSensitive, ESearchDir::FromStart);
+		TArray<TCHAR> myCol = A.GetCharArray();
+		map.Add(myCol);
+		map[i].Empty(col);
+		for (int j = 0; j < (int)col; j++) {
+		map[i][j] = myCol[j];
+		}
 		}
 		/**/
 		/**/
@@ -111,8 +120,8 @@ void AParserActor::Parsear(){
 			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, );
 			/*
 			for (i = 0; i < map[map.Num() - 1].Num(); i++) {
-				//map[map.Num() - 1][i] = A[i];
-				GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, &map[map.Num() - 1][i]);
+			//map[map.Num() - 1][i] = A[i];
+			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, &map[map.Num() - 1][i]);
 			}
 			/**/
 		}
@@ -131,7 +140,7 @@ void AParserActor::Parsear(){
 		{
 			for (int j = 0; j < (int)col; j++)
 			{
-				
+
 				//PD_MG_LogicPosition* lp = StaticMapRef->AddNewLogicPosition(i, j);
 				//ParserElementByChar(lp, &(map[i][j]));
 			}
@@ -144,50 +153,50 @@ void AParserActor::Parsear(){
 			/**/
 		}
 
-		
+
 	}
 }
 
-void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c) 
+void AParserActor::ParserElementByChar(PD_MG_LogicPosition* logpos, TCHAR* c)
 {
 	FString s;
 	/**/
-	if (/*logpos->GetX() == 19 &&*/ logpos->GetY() == 0 ) {
-		
+	if (/*logpos->GetX() == 19 &&*/ logpos->GetY() == 0) {
+
 		//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, c);
 	}
 	/**/
 
 	switch (*c) {
 		// Si es una pared ...
-		case 'w':/*
-			s = "Wall at ";
-			s.AppendInt(logpos->GetX());
-			s.Append(", ");
-			s.AppendInt(logpos->GetY());
+	case 'w':/*
+			 s = "Wall at ";
+			 s.AppendInt(logpos->GetX());
+			 s.Append(", ");
+			 s.AppendInt(logpos->GetY());
 
-			GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
-			/**/
-			InstantiateWall(logpos);
-			break;
+			 GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+			 /**/
+		InstantiateWall(logpos);
+		break;
 
 		// Si es una puerta ...
-		case 'd': 
+	case 'd':
 
-			s = "Door at ";
-			s.AppendInt(logpos->GetX());
-			s.Append(", ");
-			s.AppendInt(logpos->GetY());
+		s = "Door at ";
+		s.AppendInt(logpos->GetX());
+		s.Append(", ");
+		s.AppendInt(logpos->GetY());
 
-			//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
+		//GEngine->AddOnScreenDebugMessage(-1, 5000000.f, FColor::Red, s);
 
-			break;
+		break;
 
 		// default
 		// Si es un tile normal y corriente ...
-		default: 
-			InstantiateTile(logpos);
-			break;
+	default:
+		InstantiateTile(logpos);
+		break;
 	}
 }
 /**/
@@ -195,7 +204,14 @@ AActor* AParserActor::InstantiateTile(PD_MG_LogicPosition* logpos)
 {
 	//return GetWorld()->SpawnActor<APD_E_TileActor>(tileActor,FVector(logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
 
-	return GetWorld()->SpawnActor<APD_E_TileActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	//return GetWorld()->SpawnActor<APD_E_TileActor>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	/*UWorld* const World = GetWorld();
+	if (World) {
+	characterT = GetWorld()->SpawnActor<APD_E_TileActor>(TileClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f));
+	}
+	characterPs.Add(characterT);*/
+	return GetWorld()->SpawnActor<APD_E_TileActor>(TileClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f));
+	//	return new AActor();
 }
 
 
@@ -207,11 +223,46 @@ AActor* AParserActor::InstantiateWall(PD_MG_LogicPosition* logpos)
 }
 /**/
 
-AActor* AParserActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
+ACharacter* AParserActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
+	/*TSubclassOf<class APD_E_Zombie> zombieClass;
+	AActor*	characterP = NewObject<APD_E_Archer>();
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Zombie.Zombie'"));
+	if (ItemBlueprint.Object) {
+	zombieClass = (UClass*)ItemBlueprint.Object->GeneratedClass;
+	}
+	UWorld* const World = GetWorld();
+	if (World) {
+	characterP = GetWorld()->SpawnActor<AMyCharacterParent>(zombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	}
+	return characterP;*/
+	//characterP = GetWorld()->SpawnActor<APD_E_Archer>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	///characterP->Placement(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	//characterP->getCharacter(0)->SetActorLocationAndRotation(FVector(-1.0f *1600.0f, 700.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	//return characterP;
 
-
-	return GetWorld()->SpawnActor<APD_E_Archer>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	//return GetWorld()->SpawnActor<APD_E_Zombie>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	return GetWorld()->SpawnActor<APD_E_Archer>(ArcherClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
 }
+
+/*void AParserActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
+	/*TSubclassOf<class APD_E_Zombie> zombieClass;
+	AActor*	characterP = NewObject<APD_E_Archer>();
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Zombie.Zombie'"));
+	if (ItemBlueprint.Object) {
+	zombieClass = (UClass*)ItemBlueprint.Object->GeneratedClass;
+	}
+	UWorld* const World = GetWorld();
+	if (World) {
+	characterP = GetWorld()->SpawnActor<AMyCharacterParent>(zombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	}
+	return characterP;
+	//APD_E_Archer* characterP = GetWorld()->SpawnActor<APD_E_Archer>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+	///characterP->Placement(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	//characterP->getCharacter()->SetActorLocationAndRotation(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	//return characterP;
+
+	//return GetWorld()->SpawnActor<APD_E_Zombie>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
+}*/
 
 
 
