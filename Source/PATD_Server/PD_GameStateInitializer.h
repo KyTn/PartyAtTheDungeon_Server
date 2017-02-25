@@ -5,7 +5,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "PD_GameStateInitializer.generated.h"
 
-class UPD_ServerGameInstance;
+
 /**
  * 
  */

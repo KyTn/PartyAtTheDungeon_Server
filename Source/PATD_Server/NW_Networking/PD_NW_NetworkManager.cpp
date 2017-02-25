@@ -26,11 +26,11 @@ PD_NW_NetworkManager::~PD_NW_NetworkManager()
 
 void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIndex){
 
-	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: socketIndex %d"), socketIndex);
+	//UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: socketIndex %d"), socketIndex);
 
 	FStructData dataStruct = *(serializerManager->DeserializeDataTemplate<FStructData>(data)); // Esto tambien es una copia?? ver bien que devolver en cada punto, si puntero referencia o tipo directo!
 
-	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: structType %d"), dataStruct.structType);
+	//UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: structType %d"), dataStruct.structType);
 
 	FStructGeneric* genericStruct = serializerManager->DeserializeData(&dataStruct.data, UStructType(dataStruct.structType)); //Otra copia?
 

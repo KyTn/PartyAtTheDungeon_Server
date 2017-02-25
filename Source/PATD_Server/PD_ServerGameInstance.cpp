@@ -9,13 +9,14 @@
 //Includes de uso
 #include "MapGeneration/PD_MG_StaticMap.h"
 #include "MapGeneration/PD_MG_DynamicMap.h"
+#include "NW_Networking/Socket/PD_NW_SocketManager.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
-#include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
-#include "MapGeneration/ParserActor.h"
+#include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_PlayersManager.h"
 #include "MapGeneration/PD_MG_MapParser.h"
+#include "MapGeneration/ParserActor.h"
 #include "GM_Game/PD_GM_MapManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
 
@@ -33,7 +34,14 @@ Aqui no se puede conectar nadie mas.
 Lo crean y le dan a ready.
 */
 
+bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) {
+
+	return true; //de momento recibe todos, siempre es cierto.
+}
+
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent:: Evento recibido:%d Estado del servidor: %d"), static_cast<uint8>(inEventType), static_cast<uint8>(structServerState->enumServerState));
+
 	if (structServerState->enumServerState == EServerState::WaitingClientMaster) {
 		//Evento NewConnection
 		if (inEventType == UStructType::FStructNewConnection) {
@@ -153,11 +161,6 @@ void UPD_ServerGameInstance::ChangeState(EServerState newState) {
 	OnBeginState();
 }
 	
-
-bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) {
-	
-	return true; //de momento recibe todos, siempre es cierto.
-}
 
 
 void UPD_ServerGameInstance::LoadMap(FString mapName)
@@ -324,10 +327,18 @@ FString UPD_ServerGameInstance::GetServerName() {
 
 TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 {
-	//Esto ahora se conseguiria del ServerManager
+	//Esto ahora se conseguiria del playersManager
 
 	TArray<FString> playersConnected = TArray<FString>();
 	FString auxNamePlayer = "";
+
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		auxNamePlayer = "Player ";
+		auxNamePlayer.Append(FString::FromInt(i));
+		playersConnected.Add(auxNamePlayer);
+	}
 	/*
 	TArray<PD_NW_Socket*> socketArray = networkManager->GetSocketManager()->GetSocketArray();
 
@@ -355,6 +366,11 @@ TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 {
 	TArray<bool> playersReadyArray = TArray<bool>();
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		playersReadyArray.Add(playersManager->getDataStructPlayer(i)->readyMenu);
+	}
 	//TArray<bool> playersReadyArray = networkManager->GetSocketManager()->GetReadyPlayersArray();
 
 	// Se queda a modo de debug para probar el ADDCHild del Widget

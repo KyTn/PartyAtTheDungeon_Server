@@ -12,9 +12,9 @@
 #include "Structs/PD_ServerEnums.h"
 struct StructServerState;
 class PD_NW_NetworkManager;
-class AParserActor;
 class PD_PlayersManager;
 class PD_MG_MapParser;
+class AParserActor;
 class PD_GM_MapManager;
 class PD_GM_GameManager;
 
@@ -48,11 +48,11 @@ public:
 	//Para tener los nombres de los niveles - diferenciar ejecución en editor o en ejecutable
 	LevelsNameDictionary levelsNameDictionary;
 	//PD_MG_Map*  LOGIC_MAP;
-	AParserActor* parserActor;
-
+	
 	PD_NW_NetworkManager* networkManager;
 	PD_PlayersManager* playersManager;
 	PD_MG_MapParser* mapParser;
+	AParserActor* parserActor;
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
 
