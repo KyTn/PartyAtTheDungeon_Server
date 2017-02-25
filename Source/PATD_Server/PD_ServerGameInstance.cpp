@@ -130,7 +130,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 	}
 	else if (structServerState->enumServerState == EServerState::GameInProcess){
 
-		mapParser = new PD_MG_MapParser();
+		/*mapParser = new PD_MG_MapParser();
 
 		PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
@@ -145,7 +145,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 		//Enviar mapa al cliente
 		FStructMap structMap;
 		structMap.stringMap = mapString;
-		networkManager->SendNow(&structMap, -1);
+		networkManager->SendNow(&structMap, -1);*/
 
 		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
@@ -174,13 +174,13 @@ void UPD_ServerGameInstance::LoadMap(FString mapName)
 //Callback cuando el mapa este cargado
 void UPD_ServerGameInstance::OnMapFinishLoad() {
 	//Sin importar el estado hacemos:
-	APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
+	/*APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	networkManager->GetSocketManager()->InitTimerActor(TimerActorSpawned);
 
-	if (structServerState->enumServerState == EServerState::GameInProcess) {
+	if (structServerState->enumServerState == EServerState::GameInProcess) {*/
 		//Quizas esto es tarea del gameManager.
 	///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
-	/*mapParser = new PD_MG_MapParser();
+	mapParser = new PD_MG_MapParser();
 
 	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
@@ -188,7 +188,7 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 	mapManager = new PD_GM_MapManager();
 	mapManager->StaticMapRef = staticMapRef;
-	mapManager->DynamicMapRef = dynamicMapRef;*/
+	mapManager->DynamicMapRef = dynamicMapRef;
 		parserActor = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
 		mapParser->InstantiateStaticMap(parserActor,mapManager->StaticMapRef);
 		mapParser->InstantiateDynamicMap(parserActor, mapManager->DynamicMapRef);
@@ -196,7 +196,7 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 		gameManager = new PD_GM_GameManager(playersManager,mapManager);
 		networkManager->RegisterObserver(gameManager);
 
-	}
+	//}
 }
 
 

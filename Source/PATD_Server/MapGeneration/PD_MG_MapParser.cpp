@@ -240,16 +240,18 @@ void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor,PD_MG_Stati
 			parserActor->InstantiateWall(staticMap->GetLogicPositions()[i]);
 			break;
 
+		case '.':
+			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
+			break;
 		case 'd':
-			
-
-		default: 
+			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
+			break;
+		/*default: 
 
 			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
 			break;
-
+			*/
 		}
-		/**/
 	}
 }
 
@@ -263,6 +265,10 @@ void PD_MG_MapParser::InstantiateDynamicMap(AParserActor* parserActor, PD_MG_Dyn
 		switch (enemyId) {
 		case EEnemiesType::Archer:
 			dynamicMap->UpdateActor(parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]), dynamicMap->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+			break;
+		
+		case EEnemiesType::Zombie:
+			dynamicMap->UpdateActor(parserActor->InstantiateZombie(dynamicMap->GetLogicPositions()[i]), dynamicMap->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
 			break;
 		}
 		//if (dynamicMap->GetEnemyId(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
