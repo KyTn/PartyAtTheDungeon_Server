@@ -126,11 +126,12 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 		PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
+		///Haria falta una clase Enemy manager, con los enemigos para organizar sus acciones, y llamar a las AI correspondientes
 		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 		mapManager = new PD_GM_MapManager();
 		mapManager->StaticMapRef = staticMapRef;
 		mapManager->DynamicMapRef = dynamicMapRef;
-
+		
 		//Esto quiza no deberia guardar el string ya ahi.
 		FString mapString = mapManager->StaticMapRef->GetMapString();
 		//Enviar mapa al cliente
@@ -175,6 +176,16 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 
 	if (structServerState->enumServerState == EServerState::GameInProcess) {
 		//Quizas esto es tarea del gameManager.
+	///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
+	/*mapParser = new PD_MG_MapParser();
+
+	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
+	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
+	///Haria falta una clase Enemy manager, con los enemigos para organizar sus acciones, y llamar a las AI correspondientes
+	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
+	mapManager = new PD_GM_MapManager();
+	mapManager->StaticMapRef = staticMapRef;
+	mapManager->DynamicMapRef = dynamicMapRef;*/
 		parserActor = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
 		mapParser->InstantiateStaticMap(parserActor,mapManager->StaticMapRef);
 		mapParser->InstantiateDynamicMap(parserActor, mapManager->DynamicMapRef);
