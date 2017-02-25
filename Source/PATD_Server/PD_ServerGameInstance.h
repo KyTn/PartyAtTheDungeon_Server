@@ -59,7 +59,7 @@ public:
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
-	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test2.dungeon";
+	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test3.dungeon";
 
 
 

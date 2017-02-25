@@ -3,6 +3,9 @@
 #include "PATD_Server.h"
 #include "PD_MG_DynamicMap.h"
 #include "PD_MG_LogicPosition.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
+#include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
+
 PD_MG_DynamicMap::PD_MG_DynamicMap()
 {
 	//_rooms = new TArray<PD_MG_Room*>();
@@ -13,29 +16,24 @@ PD_MG_DynamicMap::~PD_MG_DynamicMap()
 {
 }
 
+void PD_MG_DynamicMap::AddNewEnemy(uint32 x, uint32 y, PD_GM_IALogicCharacter* ch, EEnemiesType type) {
 
-PD_MG_LogicPosition* PD_MG_DynamicMap::AddNewLogicPosition(uint32 x, uint32 y, TCHAR c)
-{
 	PD_MG_LogicPosition* lp = new PD_MG_LogicPosition(x, y);
-
 	_LogicPositionsRefs.Add(lp);
-	_xymap.Add(*lp, c);
-
-	return lp;
+	_xymap.Add(*lp, type);
+	TArray<	PD_GM_IALogicCharacter*> chs;
+	chs.Add(ch);
+	enemies.Add(*lp,chs);
 }
 
-void PD_MG_DynamicMap::AddEnemyDictionary(TCHAR key, FString value) {
-	enemies.Add(key,value);
-}
+void PD_MG_DynamicMap::UpdateActor(AActor* actor, PD_MG_LogicPosition* lp) {
 
-FString PD_MG_DynamicMap::GetEnemy(TCHAR key) {
-	FString idEnemy = enemies[key];
-	return idEnemy;
+	TArray<	PD_GM_IALogicCharacter*> chs = enemies[*lp];
+	PD_GM_IALogicCharacter* ch = chs[0];
+	ch->UpdateCharacter(actor);
+	chs.Reset();
+	chs.Add(ch);
+	enemies.Emplace(*lp,chs);
 }
-
-bool PD_MG_DynamicMap::IsEnemy(TCHAR key) {
-	return enemies.Contains(key);
-}
-
 
 bool PD_MG_DynamicMap::Clear() { return false; }

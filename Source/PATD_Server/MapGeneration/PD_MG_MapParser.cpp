@@ -5,6 +5,8 @@
 #include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/PD_MG_DynamicMap.h"
 #include "PATD_Server/MapGeneration/ParserActor.h"
+#include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
 
 PD_MG_MapParser::PD_MG_MapParser()
 {
@@ -100,7 +102,7 @@ PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_M
 	nextIndexRead = ReadTypesEnemies(fileReaded, nextIndexRead, dynamicMapRef);
 
 	//Cargamos la posición de los enemigos
-	ReadEnemiesMap(fileReaded, mapIndex, dynamicMapRef);
+	//ReadEnemiesMap(fileReaded, mapIndex, dynamicMapRef);
 
 	return staticMapRef;
 }
@@ -144,13 +146,55 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 }
 
 uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
-	FString enemyKey = "", enemyValue, bufferLine="";
+	TArray <TCHAR> enemyLine;
+	FString f;
 	uint32 Enemynum = (uint32)FCString::Atoi(*(fileReaded[firstIndex]));
+	uint32 intType,x, y;
+	int32 num,j;
 	firstIndex++;
+	EEnemiesType type;
 	for (uint32 i = firstIndex; i < Enemynum + firstIndex;i++) {
-		enemyValue = fileReaded[i].RightChop(2);
+		/*enemyValue = fileReaded[i].RightChop(2);
 		enemyValue.RemoveAt(enemyValue.Len()-1);//Hay que hacer esto, dado que guardaba basura, un "\n", o un "\0" que se comportaba al hacer el cout como "\n"
-		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], enemyValue);
+		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], enemyValue);*/
+		enemyLine = fileReaded[i].GetCharArray();
+		enemyLine.RemoveAt(enemyLine.Num() - 1);
+		enemyLine.RemoveAt(enemyLine.Num() - 1);
+	
+		j = 0; num = 1; intType=0; x = 0; y = 0;
+		while (enemyLine[j]!=':')
+		{
+			intType = enemyLine[j]-'0' + (intType*num);
+			j++;
+			num = num * 10;
+		}
+		type = EEnemiesType(intType);
+		num = 1; j++;
+		while (enemyLine[j] != ',')
+		{
+			x = enemyLine[j] - '0' + (x*num);
+			j++;
+			num = num * 10;
+		}
+		num = 1; j++;
+		while (j<enemyLine.Num())
+		{
+			y = enemyLine[j] - '0' + (y*num);
+			j++;
+			num = num * 10;
+		}
+		switch (type) {///En este switch metemos la IA lógica de cada uno
+			case EEnemiesType::Archer: {
+				PD_GM_IALogicCharacter* ch = new PD_GM_IALogicCharacter();
+				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				break;
+		}
+			case EEnemiesType::Zombie: {
+				PD_GM_IALogicCharacter* ch = new PD_GM_IALogicCharacter();
+				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				break;
+			}
+		}
 
 //		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], fileReaded[i].RightChop(2).RemoveAt(fileReaded[i].Len()));
 
@@ -172,15 +216,19 @@ uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firs
 }
 
 
-void PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
+/*void PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
 	for (uint32 i = firstIndex; i < dynamicMapRef->GetHeight() + firstIndex; i++) {
 		TArray<TCHAR> ta = fileReaded[i].GetCharArray();
 		for (uint32 j = 0; j < dynamicMapRef->GetWidth(); j++) {
-			if (dynamicMapRef->IsEnemy(ta[j])) 
+			if (dynamicMapRef->IsEnemy(ta[j])) {
 				dynamicMapRef->AddNewLogicPosition(i - firstIndex, j, ta[j]);
+				/*Deberiamos tener distintas clases de IALogicCharacter, y pasar en función del caracter la clase correspondiente, haciendo aqui
+				un swaitch. A la hora de instanciar, nos quitariamos el switch.
+				dynamicMapRef->AddNewEnemy(i - firstIndex, j);
+			}
 		}
 	}
-}
+}*/
 
 
 void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor,PD_MG_StaticMap* staticMap) {
@@ -207,19 +255,22 @@ void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor,PD_MG_Stati
 
 
 void PD_MG_MapParser::InstantiateDynamicMap(AParserActor* parserActor, PD_MG_DynamicMap* dynamicMap) {
-	FString enemyId,enemyId2="id_zombie";
+	EEnemiesType enemyId;
 	for (int i = 0; i < dynamicMap->GetLogicPositions().Num(); i++) {
-		enemyId.Reset();
-		enemyId = dynamicMap->GetEnemy(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]]);
-		if (dynamicMap->GetEnemy(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
-			parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]);
-			UE_LOG(LogTemp, Error, TEXT("Entra :%s !!!!"), *enemyId);
+	
+		enemyId = dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]];
+
+		switch (enemyId) {
+		case EEnemiesType::Archer:
+			dynamicMap->UpdateActor(parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]), dynamicMap->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+			break;
 		}
-		/*if (parserActor->GetDynamicMap()->GetXYMap()[*parserActor->GetDynamicMap()->GetLogicPositions()[i]] = 'z') {
-			parserActor->InstantiateArcher(parserActor->GetDynamicMap()->GetLogicPositions()[i]);
-			UE_LOG(LogTemp, Error, TEXT("Entra2 :%s !!!!"), *enemyId);
-		}*/
-		//UE_LOG(LogTemp, Warning, TEXT("%s,%s"), *enemyId, *enemyId2);
+		//if (dynamicMap->GetEnemyId(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
+			//parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]);
+			//UE_LOG(LogTemp, Error, TEXT("Entra :%s !!!!"), *enemyId);
+		//}
+		//dynamicMap->GetLogicPositions
+
 	}
 }
 
