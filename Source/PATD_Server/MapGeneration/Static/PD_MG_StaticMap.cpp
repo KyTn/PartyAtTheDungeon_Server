@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_MG_StaticMap.h"
-#include "PD_MG_LogicPosition.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 PD_MG_StaticMap::PD_MG_StaticMap()
 {
 	//_rooms = new TArray<PD_MG_Room*>();

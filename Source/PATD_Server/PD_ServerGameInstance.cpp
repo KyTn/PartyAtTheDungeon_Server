@@ -7,8 +7,8 @@
 #include "NW_NetWorking/PD_NW_TimerActor.h"
 #include "NW_NetWorking/PD_NW_NetworkManager.h"
 //Includes de uso
-#include "MapGeneration/PD_MG_StaticMap.h"
-#include "MapGeneration/PD_MG_DynamicMap.h"
+#include "MapGeneration/Static/PD_MG_StaticMap.h"
+#include "MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
 
 //Includes of forward declaration
@@ -16,7 +16,7 @@
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_PlayersManager.h"
 #include "MapGeneration/PD_MG_MapParser.h"
-#include "MapGeneration/ParserActor.h"
+#include "MapGeneration/Instantiation/ParserActor.h"
 #include "GM_Game/PD_GM_MapManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
 

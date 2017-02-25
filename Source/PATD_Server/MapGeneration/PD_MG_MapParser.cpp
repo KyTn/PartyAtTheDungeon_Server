@@ -2,9 +2,9 @@
 
 #include "PATD_Server.h"
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
-#include "PATD_Server/MapGeneration/PD_MG_StaticMap.h"
-#include "PATD_Server/MapGeneration/PD_MG_DynamicMap.h"
-#include "PATD_Server/MapGeneration/ParserActor.h"
+#include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
+#include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
+#include "PATD_Server/MapGeneration/Instantiation/ParserActor.h"
 #include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
 
