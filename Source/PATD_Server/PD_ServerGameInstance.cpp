@@ -16,7 +16,7 @@
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_PlayersManager.h"
 #include "MapGeneration/PD_MG_MapParser.h"
-#include "MapGeneration/Instantiation/ParserActor.h"
+#include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "GM_Game/PD_GM_MapManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
 
