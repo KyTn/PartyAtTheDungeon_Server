@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+#include "PATD_Server.h"
 /**
  * 
  */
@@ -31,4 +31,14 @@ public:
 	{
 		return (logpos._x << 16) + logpos._y;
 	}
+
+
+	static FVector* LogicToWorldPosition(PD_MG_LogicPosition* pos) {
+		return new FVector(-1.0f * pos->GetX()*100.0f, pos->GetY() * 100.0f, 0.f);
+	}
+
+	FVector* ToWorldPosition() {
+		return LogicToWorldPosition(this);
+	}
+
 };

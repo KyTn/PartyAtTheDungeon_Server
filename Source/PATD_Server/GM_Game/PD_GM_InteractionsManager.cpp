@@ -82,8 +82,8 @@ void PD_GM_InteractionsManager::TickMovePhase(int tick) {
 		//al moverse los siguientes personajes.
 		PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
 		PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition();
-		FVector realPosition= mapManager->getUWorldPosition(logicPosition);
-		playersManager->getDataStructPlayer(i)->actorController->Move(realPosition.X, realPosition.Y);
+		FVector* realPosition= mapManager->LogicToWorldPosition(logicPosition);
+		playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
 	}
 	//Comprobar que choques.
 }
