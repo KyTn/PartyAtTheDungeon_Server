@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "PD_MG_LogicPosition.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 
 /// CLASS REFERENCES
-class PD_MG_Room;
 class PD_MG_LogicPosition;
 
 UENUM(BlueprintType)        //"BlueprintType" is essential to include
@@ -26,7 +25,6 @@ private:
 	TMap<PD_MG_LogicPosition, TCHAR> _xymap;
 
 
-	TArray<PD_MG_Room*> _rooms;
 	TArray<PD_MG_LogicPosition*> _LogicPositionsRefs;
 
 	PD_MG_LogicPosition* _StartPointLP;
@@ -60,9 +58,6 @@ public:
 
 
 	PD_MG_LogicPosition* AddNewLogicPosition(uint32 x, uint32 y, TCHAR c);
-
-	bool AddNewEmptyRoom();
-	bool AddRoom(PD_MG_Room* newRoom);
 
 	bool Clear();
 };

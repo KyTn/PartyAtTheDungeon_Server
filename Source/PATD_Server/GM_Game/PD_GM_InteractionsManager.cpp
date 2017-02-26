@@ -85,6 +85,7 @@ void PD_GM_InteractionsManager::TickMovePhase(int tick) {
 		FVector realPosition= mapManager->getUWorldPosition(logicPosition);
 		playersManager->getDataStructPlayer(i)->actorController->Move(realPosition.X, realPosition.Y);
 	}
+	//Comprobar que choques.
 }
 //Ejemplo conflicto con choques
 /*

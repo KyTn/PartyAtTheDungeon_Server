@@ -17,7 +17,7 @@ class PD_MG_MapParser;
 class AParserActor;
 class PD_GM_MapManager;
 class PD_GM_GameManager;
-
+class PD_GM_EnemyManager;
 //Includes de unreal
 #include "Engine/GameInstance.h"
 #include "LevelsNameDictionary.h"
@@ -55,7 +55,7 @@ public:
 	AParserActor* parserActor;
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
-
+	PD_GM_EnemyManager* enemyManager;
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 

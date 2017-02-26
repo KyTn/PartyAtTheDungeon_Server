@@ -9,8 +9,8 @@ PD_GM_IALogicCharacter::PD_GM_IALogicCharacter()
 {
 }
 
-void PD_GM_IALogicCharacter::UpdateCharacter(AActor* character) {
-	this->character = character;
+void PD_GM_IALogicCharacter::UpdateCharacter(AActor* charact) {
+	this->character = charact;
 }
 
 PD_GM_IALogicCharacter::~PD_GM_IALogicCharacter()

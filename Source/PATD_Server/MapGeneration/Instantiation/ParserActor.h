@@ -9,7 +9,7 @@ class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_MG_LogicPosition;
 class APD_E_Archer;
-class APD_E_TileActor;
+class APD_E_ElementActor;
 UCLASS()
 class PATD_SERVER_API AParserActor : public AActor
 {
@@ -20,15 +20,15 @@ private:
 	//PD_MG_DynamicMap* DynamicMapRef;
 	//APD_E_Archer* characterP;
 public:
-
-	TArray<APD_E_TileActor*> characterTs;
-	APD_E_TileActor* characterT;
-	TSubclassOf<class APD_E_TileActor> TileClass;
-
-
-	TArray<APD_E_Archer*> characterArs;
-	APD_E_Archer* characterAr;
+	//Static
+	TSubclassOf<class APD_E_ElementActor> TileClass;
+	TSubclassOf<class APD_E_ElementActor> WallClass;
+	//Enemies
+	/// seria la class generica
 	TSubclassOf<class APD_E_Archer> ArcherClass;
+	TSubclassOf<class APD_E_Archer> ZombieClass;
+
+
 	// Sets default values for this actor's properties
 	AParserActor();
 
@@ -45,20 +45,6 @@ public:
 	AActor* InstantiateTile(PD_MG_LogicPosition* logpos);
 	AActor* InstantiateWall(PD_MG_LogicPosition* logpos);
 
-	//void InstantiateArcherFirstTime(PD_MG_LogicPosition* logpos);
 	ACharacter* InstantiateArcher(PD_MG_LogicPosition* logpos);
-
-
-	//Agregado para el hito2 MCG
-	/*PD_MG_StaticMap* GetStaticMap() {
-		return StaticMapRef;
-	};
-
-	PD_MG_DynamicMap* GetDynamicMap() {
-		return DynamicMapRef;
-	};
-	
-	void InitGameMap();*/
-
-
+	ACharacter* InstantiateZombie(PD_MG_LogicPosition* logpos);
 };

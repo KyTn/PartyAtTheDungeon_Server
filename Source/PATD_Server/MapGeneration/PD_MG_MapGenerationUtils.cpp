@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_MG_MapGenerationUtils.h"
-#include "PD_MG_StaticMap.h"
+#include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 
 PD_MG_MapGenerationUtils::PD_MG_MapGenerationUtils()
 {

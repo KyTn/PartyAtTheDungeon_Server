@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "PATD_Server/MapGeneration/ParserActor.h"
+#include "PATD_Server/MapGeneration/Instantiation/ParserActor.h"
 
 
 #pragma region Class_References

@@ -3,16 +3,16 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "PD_E_WallActor.generated.h"
+#include "PD_E_ElementActor.generated.h"
 
 UCLASS()
-class PATD_SERVER_API APD_E_WallActor : public AActor
+class PATD_SERVER_API APD_E_ElementActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APD_E_WallActor();
+	APD_E_ElementActor();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -20,8 +20,6 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-
-	UPROPERTY(EditAnywhere)
-		UStaticMeshComponent* mesh;
+	
 	
 };

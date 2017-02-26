@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_MG_DynamicMap.h"
-#include "PD_MG_LogicPosition.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
 #include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
 
