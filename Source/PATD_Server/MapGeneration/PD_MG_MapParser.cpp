@@ -111,7 +111,7 @@ PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_M
 
 #pragma endregion 
 
-///Rellena el diccionario interno del staticMapRef con la info en crudo del mapa, sin referencias de comportamiento. 
+//Rellena el diccionario interno del staticMapRef con la info en crudo del mapa, sin referencias de comportamiento. 
 uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_StaticMap* staticMapRef)
 {
 
@@ -124,6 +124,7 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 	return staticMapRef->GetHeight() + firstIndex;
 }
 
+//Rellena la parte de los enemigos del DynamicMap pasado por parametros
 uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
 	TArray <TCHAR> enemyLine;
 	FString f;
