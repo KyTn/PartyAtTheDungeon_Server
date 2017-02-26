@@ -17,7 +17,7 @@ PD_MG_MapParser::~PD_MG_MapParser()
 }
 
 
-
+#pragma region Parse From File
 
 PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath)
 {
@@ -67,7 +67,10 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 	return staticMapRef;
 }
 
+#pragma endregion
 
+
+#pragma region VERSION OF PARSERS
 
 PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* dynamicMapRef)
 {
@@ -107,6 +110,8 @@ PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_M
 	return staticMapRef;
 }
 
+#pragma endregion 
+
 ///Rellena el diccionario interno del staticMapRef con la info en crudo del mapa, sin referencias de comportamiento. 
 uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_StaticMap* staticMapRef)
 {
@@ -115,34 +120,9 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 		TArray<TCHAR> ta = fileReaded[i].GetCharArray();
 		for (uint32 j = 0; j < staticMapRef->GetWidth(); j++) {
 			staticMapRef->AddNewLogicPosition(i- firstIndex, j, ta[j]);
-			//if (ta[j] == 'z' || ta[j] == 'x' || ta[j] == 'c') //esto es lo que define el mapa estático
-				//dynamicMapRef->AddNewLogicPosition(i - firstIndex, j, ta[j]);
 		}
 	}
 	return staticMapRef->GetHeight() + firstIndex;
-	// Test
-	/*
-	FString s;
-	s = "";
-	s.AppendInt(staticMapRef->GetLogicPositions().Num());
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Testing " + s);
-	for (int i = firstIndex; i < staticMapRef->GetLogicPositions().Num(); i++) {
-	
-		
-		FString s;
-		TMap<PD_MG_LogicPosition, TCHAR> m = staticMapRef->GetXYMap();
-		TArray<PD_MG_LogicPosition*> lps = staticMapRef->GetLogicPositions();
-		PD_MG_LogicPosition* lp = lps[i];
-		s.AppendInt(lp->GetX());
-		s.Append(",");
-		s.AppendInt(lp->GetY());
-		s.Append("-");
-		s.AppendChar(m[*lp]);
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, s);
-		
-	}
-	/**/
 }
 
 uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
@@ -215,20 +195,6 @@ uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firs
 	return firstIndex + Enemynum + 1;
 }
 
-
-/*void PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
-	for (uint32 i = firstIndex; i < dynamicMapRef->GetHeight() + firstIndex; i++) {
-		TArray<TCHAR> ta = fileReaded[i].GetCharArray();
-		for (uint32 j = 0; j < dynamicMapRef->GetWidth(); j++) {
-			if (dynamicMapRef->IsEnemy(ta[j])) {
-				dynamicMapRef->AddNewLogicPosition(i - firstIndex, j, ta[j]);
-				/*Deberiamos tener distintas clases de IALogicCharacter, y pasar en función del caracter la clase correspondiente, haciendo aqui
-				un swaitch. A la hora de instanciar, nos quitariamos el switch.
-				dynamicMapRef->AddNewEnemy(i - firstIndex, j);
-			}
-		}
-	}
-}*/
 
 
 void PD_MG_MapParser::InstantiateStaticMap(AParserActor* parserActor,PD_MG_StaticMap* staticMap) {

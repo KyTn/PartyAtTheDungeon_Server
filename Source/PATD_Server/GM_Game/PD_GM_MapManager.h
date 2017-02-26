@@ -5,6 +5,7 @@
 
 // FORWARD DECLARATIONS
 class PD_MG_LogicPosition;
+class PD_MM_MapInfo;
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
@@ -24,7 +25,7 @@ private:
 public:
 	PD_GM_MapManager();
 	~PD_GM_MapManager();
-
+	PD_MM_MapInfo* MapInfo;
 	PD_MG_StaticMap* StaticMapRef;
 	PD_MG_DynamicMap* DynamicMapRef;
 
