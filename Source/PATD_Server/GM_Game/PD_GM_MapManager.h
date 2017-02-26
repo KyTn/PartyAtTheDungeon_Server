@@ -2,19 +2,24 @@
 
 #pragma once
 
+
+// FORWARD DECLARATIONS
 class PD_MG_LogicPosition;
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
-class PD_GM_iLogicCharacter;
 class PD_GM_GameManager;
-/**
- * 
- */
+class APD_PLY_GenericCharacter;
+
+
+
+
+
 class PATD_SERVER_API PD_GM_MapManager
 {
 private:
 	PD_GM_GameManager* _GAMEMANAGER;
-
+	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, 0 si no hay ninguno. 
+	bool getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 
 public:
 	PD_GM_MapManager();
@@ -23,18 +28,14 @@ public:
 	PD_MG_StaticMap* StaticMapRef;
 	PD_MG_DynamicMap* DynamicMapRef;
 
-	//PD_GM_iLogicCharacter* getLogicCharacterAt(PD_MG_LogicPosition* pos);
-	
-	//Esto iria aqui, o si hacemos otra clase para la visualizacion, en esa clase.
-	//FVector getUWorldPosition(PD_MG_LogicPosition* pos);
-
 
 #pragma region GET INFO OF THE MAP
 
 
-	// Estas funciones devolverán un GenericCharacter 
-	AActor* getPlayerAt(PD_MG_LogicPosition* logpos);
-	AActor* getEnemyAt(PD_MG_LogicPosition* logpos);
+	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Player. 0 si no hay ninguno. 
+	bool getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
+	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
+	bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 
 	// Esta funcion devolverá un Interactuable
 	AActor* getInteractuableAt(PD_MG_LogicPosition* logpos);
