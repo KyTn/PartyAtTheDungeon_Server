@@ -70,6 +70,12 @@ public:
 	virtual	bool SuscribeToEvents(int inPlayer, UStructType inType);
 	virtual void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType); //Aqui controlamos la mayoria de entradas.
 
+	// --- Handlers --- //
+	void HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient);
+	void HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
+	void HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
+
+
 	//Carga de mapa
 	void LoadMap(FString mapName);
 	//Callback cuando el mapa este cargado (Lo llama el estado GameStateInitializer en su beginPlay)

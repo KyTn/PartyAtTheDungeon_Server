@@ -34,10 +34,17 @@ Aqui no se puede conectar nadie mas.
 Lo crean y le dan a ready.
 */
 
+#pragma region Suscribe to events
+
 bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) {
 
 	return true; //de momento recibe todos, siempre es cierto.
 }
+
+#pragma endregion 
+
+
+#pragma region HandleEvent Functions 
 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent:: Evento recibido:%d Estado del servidor: %d"), static_cast<uint8>(inEventType), static_cast<uint8>(structServerState->enumServerState));
@@ -45,54 +52,119 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 	if (structServerState->enumServerState == EServerState::WaitingClientMaster) {
 		//Evento NewConnection
 		if (inEventType == UStructType::FStructNewConnection) {
-			//Registrar en playersManager
-			playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
-			StructPlayer* structPlayer = playersManager->getDataStructPlayer(inPlayer);
-			structPlayer->clientMaster = true; //Es el ClientMaster
-			//Contestar al cliente
-			FStructOrderMenu clientResponse;
-			clientResponse.orderType = static_cast<uint8>(MenuOrderType::Welcome);
-			clientResponse.playerIndex = inPlayer;
-			clientResponse.isClientMaster = true;
-			networkManager->SendNow(&clientResponse, inPlayer);
 
-			this->UpdateState();//Cambio de estado
+			// registra un jugador entrante como jugador MASTER
+			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, true);
 		}
 	}else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
+
 		//Evento NewConnection
 		if (inEventType == UStructType::FStructNewConnection) {
-			//Registrar en playersManager
-			playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
-			//Contestar al cliente
-			FStructOrderMenu clientResponse;
-			clientResponse.orderType = static_cast<uint8>(MenuOrderType::Welcome);
-			clientResponse.playerIndex = inPlayer;
-			networkManager->SendNow(&clientResponse, inPlayer);
+
+			// registra un jugador entrante como jugador normal
+			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, false);
+
 		//Evento OrderMenu
 		}else if (inEventType == UStructType::FStructOrderMenu) {
-			FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
-			if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
-				//Solo si lo envia el clientMaster
-				if (inPlayer == playersManager->getIndexClientMaster()) {
-					structServerState->gameConfigurationDone = true;
-					this->UpdateState();//Cambio de estado
-				}
-			}
+
+			// Cuando el client Master envía la congif de la partida ... 
+			HandleEvent_ConfigMatch(inDataStruct, inPlayer, inEventType);
+
+
+			//FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
+			//if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
+			//	//Solo si lo envia el clientMaster
+			//	if (inPlayer == playersManager->getIndexClientMaster()) {
+			//		structServerState->gameConfigurationDone = true;
+			//		this->UpdateState();//Cambio de estado
+			//	}
+			//}
+
+
+
 		}
 	}else if (structServerState->enumServerState == EServerState::WaitingReady) {
 		//Evento OrderMenu
 		if (inEventType == UStructType::FStructOrderMenu) {
-			FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
-			if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
-				playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
-				this->UpdateState();//Cambio de estado
-			}
+
+			// Cuando un jugador envía READY, marcarlo como preparado. 
+
+			HandleEvent_PlayerReady(inDataStruct, inPlayer, inEventType);
+
+
+			//FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
+			//if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
+
+			//	playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
+			//	this->UpdateState();//Cambio de estado
+			//}
+
+
+
 		//Evento PlayerData
 		}else if (inEventType == UStructType::FStructOrderMenu) {
 
 		}
 	}
 }
+
+
+
+// Registra un jugador entrante. 
+// PARAMS: 
+//		FStructGeneric* inDataStruct	Estructura que recibe del NetManager
+//		int inPlayer					Index del jugador que envía
+//		UStructType inEventType			Tipo de estructura
+//		bool isMasterClient				registra como masterclient o no. Default: false.
+//
+void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient = false) {
+
+	//Registrar en playersManager
+	playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
+
+	if (isMasterClient) {
+		StructPlayer* structPlayer = playersManager->getDataStructPlayer(inPlayer);
+		structPlayer->clientMaster = true; //Es el ClientMaster
+										   //Contestar al cliente
+	}
+
+	//Enviamos al cliente el success 
+	FStructOrderMenu clientResponse;
+	clientResponse.orderType = static_cast<uint8>(MenuOrderType::Welcome);
+	clientResponse.playerIndex = inPlayer;
+	clientResponse.isClientMaster = isMasterClient;
+	networkManager->SendNow(&clientResponse, inPlayer);
+
+	if(isMasterClient) this->UpdateState(); //Cambio de estado al WaitingGameConfiguration
+
+}
+
+void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+
+	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
+	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
+		//Solo si lo envia el clientMaster
+		if (inPlayer == playersManager->getIndexClientMaster()) {
+			structServerState->gameConfigurationDone = true;
+			this->UpdateState();//Cambio de estado
+		}
+	}
+
+}
+
+void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+
+	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
+	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
+		playersManager->getDataStructPlayer(inPlayer)->readyMenu = menuOrder->orderType != 0;
+		//playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
+		this->UpdateState();//Cambio de estado a GameInProcess
+	}
+}
+
+#pragma endregion
+
+#pragma region ONBEGIN & UPDATE STATES
 
 void UPD_ServerGameInstance::UpdateState() {
 	if (structServerState->enumServerState == EServerState::WaitingClientMaster){
@@ -111,6 +183,11 @@ void UPD_ServerGameInstance::UpdateState() {
 		}
 	}
 
+}
+
+void UPD_ServerGameInstance::ChangeState(EServerState newState) {
+	structServerState->enumServerState = newState;
+	OnBeginState();
 }
 
 void UPD_ServerGameInstance::OnBeginState() {
@@ -156,14 +233,10 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 }
 
-
-void UPD_ServerGameInstance::ChangeState(EServerState newState) {
-	structServerState->enumServerState = newState;
-	OnBeginState();
-}
-	
+#pragma endregion 
 
 
+#pragma region MAPS 
 void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
 	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
@@ -185,10 +258,14 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
 	///Haria falta una clase Enemy manager, con los enemigos para organizar sus acciones, y llamar a las AI correspondientes
+	
+	// Parsea el chorizo
 	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 	mapManager = new PD_GM_MapManager();
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
+
+	// Instanciacion del Map
 		parserActor = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
 		mapParser->InstantiateStaticMap(parserActor,mapManager->StaticMapRef);
 		mapParser->InstantiateDynamicMap(parserActor, mapManager->DynamicMapRef);
@@ -199,8 +276,11 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 	//}
 }
 
+#pragma endregion
 
+#pragma region INITS
 
+// Inicializa el GameInstance
 void UPD_ServerGameInstance::Init()
 {
 	Super::Init();
@@ -217,6 +297,35 @@ void UPD_ServerGameInstance::Init()
 
 }
 
+// Inicializa los servicios de red, el NetworkManager. 
+void UPD_ServerGameInstance::InitializeNetworking()
+{
+
+	InitializeServerAddress();
+
+	networkManager = new PD_NW_NetworkManager();
+	PD_NW_SocketManager* socketManager = networkManager->GetSocketManager();
+
+	socketManager->SetIsServer(true);
+
+	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
+	socketManager->SetNetworkManager(networkManager);
+
+	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
+
+
+																		 //Seteamos este gameinstance como observador de eventos en el networkmanager.
+	networkManager->RegisterObserver(this);
+
+}
+
+
+
+#pragma endregion
+
+
+#pragma region SHUTDOWNS
+
 void UPD_ServerGameInstance::Shutdown()
 {
 	Super::Shutdown();
@@ -228,27 +337,11 @@ void UPD_ServerGameInstance::Shutdown()
 	
 }
 
-void UPD_ServerGameInstance::InitializeNetworking()
-{	
-	
-	InitializeServerAddress();
 
-	networkManager= new PD_NW_NetworkManager();
-	PD_NW_SocketManager* socketManager = networkManager->GetSocketManager();
-	
-	socketManager->SetIsServer(true);
+#pragma endregion
 
-	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
-	socketManager->SetNetworkManager(networkManager);
-	
-	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
-	
 
-	//Seteamos este gameinstance como observador de eventos en el networkmanager.
-	networkManager->RegisterObserver(this);
-
-}
-
+#pragma region Comments
 
 /*
 //Format IP String as Number Parts
@@ -280,20 +373,16 @@ PD_NW_SocketManager* UPD_ServerGameInstance::GetSocketManager()
 }*/
 
 
-
-
-
-
-
-
-
-
-
+#pragma endregion
 
 
 /*************************************
 ******* FUNCIONES UTILIDADES / BP
 *************************************/
+
+#pragma region Blueprint_Functions 
+
+
 void UPD_ServerGameInstance::InitializeServerAddress()
 {
 	FString myIP = "";
@@ -397,4 +486,14 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 
 	return playersReadyArray;
 }
+
+
+
+#pragma endregion
+
+
+
+
+
+
 
