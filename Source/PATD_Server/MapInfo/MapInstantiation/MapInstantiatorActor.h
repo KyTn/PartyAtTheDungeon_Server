@@ -11,7 +11,7 @@
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_MG_LogicPosition;
-class APD_E_Archer;
+class APD_E_EnemyCharacter;
 class APD_E_ElementActor;
 
 //////////////////////////
@@ -36,8 +36,8 @@ public:
 	TSubclassOf<class APD_E_ElementActor> WallClass;
 	//Enemies
 	/// seria la class generica
-	TSubclassOf<class APD_E_Archer> ArcherClass;
-	TSubclassOf<class APD_E_Archer> ZombieClass;
+	TSubclassOf<class APD_E_EnemyCharacter> ArcherClass;
+	TSubclassOf<class APD_E_EnemyCharacter> ZombieClass;
 
 #pragma endregion 
 
