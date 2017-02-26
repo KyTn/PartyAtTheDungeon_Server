@@ -14,7 +14,7 @@ struct StructServerState;
 class PD_NW_NetworkManager;
 class PD_PlayersManager;
 class PD_MG_MapParser;
-class AParserActor;
+class AMapInstantiatorActor;
 class PD_GM_MapManager;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
@@ -52,7 +52,6 @@ public:
 	PD_NW_NetworkManager* networkManager;
 	PD_PlayersManager* playersManager;
 	PD_MG_MapParser* mapParser;
-	AParserActor* parserActor;
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
 	PD_GM_EnemyManager* enemyManager;

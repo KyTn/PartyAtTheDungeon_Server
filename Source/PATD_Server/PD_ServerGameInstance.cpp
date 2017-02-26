@@ -265,10 +265,16 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
 
-	// Instanciacion del Map
-		parserActor = (AParserActor*)GetWorld()->SpawnActor(AParserActor::StaticClass());
-		mapParser->InstantiateStaticMap(parserActor,mapManager->StaticMapRef);
-		mapParser->InstantiateDynamicMap(parserActor, mapManager->DynamicMapRef);
+		// Instanciacion del Map
+
+		// le pasamos al mapManager un instanciador
+		AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
+		mapManager->instantiator = InstantiatorActor;
+
+		// le decimos al mapManager que instancia las cosicas en el mundo
+		mapManager->InstantiateStaticMap();
+		mapManager->InstantiateDynamicMap();
+
 		//Aqui cedemos el control al GameManager.
 		gameManager = new PD_GM_GameManager(playersManager,mapManager);
 		networkManager->RegisterObserver(gameManager);

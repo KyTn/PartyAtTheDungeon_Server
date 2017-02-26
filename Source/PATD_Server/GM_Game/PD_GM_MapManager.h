@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
 
 // FORWARD DECLARATIONS
 class PD_MG_LogicPosition;
@@ -18,6 +19,9 @@ class APD_PLY_GenericCharacter;
 class PATD_SERVER_API PD_GM_MapManager
 {
 private:
+
+	
+
 	PD_GM_GameManager* _GAMEMANAGER;
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, 0 si no hay ninguno. 
 	bool getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
@@ -25,6 +29,9 @@ private:
 public:
 	PD_GM_MapManager();
 	~PD_GM_MapManager();
+
+	AMapInstantiatorActor* instantiator;
+
 	PD_MM_MapInfo* MapInfo;
 	PD_MG_StaticMap* StaticMapRef;
 	PD_MG_DynamicMap* DynamicMapRef;
@@ -51,6 +58,12 @@ public:
 #pragma endregion
 
 
+#pragma region INSTANTIATE MAP
 
+	void InstantiateStaticMap();
+	void InstantiateDynamicMap();
+
+
+#pragma endregion
 
 };

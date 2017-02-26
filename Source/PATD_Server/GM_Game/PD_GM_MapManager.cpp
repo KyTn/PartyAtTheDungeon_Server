@@ -2,7 +2,9 @@
 
 #include "PATD_Server.h"
 #include "PD_GM_MapManager.h"
-
+#include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
+#include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
+#include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
 
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
@@ -39,3 +41,61 @@ PD_MG_LogicPosition* PD_GM_MapManager::WorldToLogicPosition(FVector* pos) {
 }
 
 #pragma endregion 
+
+
+
+
+#pragma region INSTANTIATE MAP
+
+void PD_GM_MapManager::InstantiateStaticMap() {
+
+	for (int i = 0; i < StaticMapRef->GetLogicPositions().Num(); i++) {
+
+		/**/
+		switch (StaticMapRef->GetXYMap()[*StaticMapRef->GetLogicPositions()[i]]) {
+		case 'w':
+			instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]);
+			break;
+
+		case '.':
+			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			break;
+		case 'd':
+
+			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			break;
+			/*default:
+
+			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
+			break;
+			*/
+		}
+	}
+}
+
+
+void PD_GM_MapManager::InstantiateDynamicMap() {
+	EEnemiesType enemyId;
+	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
+
+		enemyId = DynamicMapRef->GetXYMap()[*DynamicMapRef->GetLogicPositions()[i]];
+
+		switch (enemyId) {
+		case EEnemiesType::Archer:
+			DynamicMapRef->UpdateActor(instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]), DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+			break;
+
+		case EEnemiesType::Zombie:
+			DynamicMapRef->UpdateActor(instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]), DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+			break;
+		}
+		//if (dynamicMap->GetEnemyId(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
+		//parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]);
+		//UE_LOG(LogTemp, Error, TEXT("Entra :%s !!!!"), *enemyId);
+		//}
+		//dynamicMap->GetLogicPositions
+
+	}
+}
+
+#pragma endregion
