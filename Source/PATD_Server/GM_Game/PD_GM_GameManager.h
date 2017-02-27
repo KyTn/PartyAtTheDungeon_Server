@@ -71,6 +71,8 @@ public:
 	void TickAttackPhase(int tick);
 
 
+	void VisualTurnMovePhase();
+
 	//Funciones de gestion de visualizacion (visualization manager)
 	//Esto lo llamara la parte visual (controller o actor) cuando finalize su animacion, para cambiar de estado o hacer lo que coresponda
 	void OnAnimationEnd();

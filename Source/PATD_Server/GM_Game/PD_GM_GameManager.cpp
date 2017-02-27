@@ -6,7 +6,7 @@
 //Includes de uso de objetos
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "LogicCharacter/PD_GM_PlayerLogicCharacter.h"
-#include "Actors/Players/PD_PLY_Controller.h"
+//#include "Actors/Players/PD_PLY_Controller.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -145,16 +145,19 @@ void PD_GM_GameManager::LogicTurnItemPhase() {
 }
 
 void PD_GM_GameManager::LogicTurnMovePhase() {
+	
+	int _numTicks = 0;
+
 	MoveTurnInformation->CurrentState = InteractionStates::Working;
 	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?- Yo creo que mejor en el playerManager
-	int numTicks = 0;
+	
 	for (int i = 0; playersManager->GetNumPlayers(); i++) {
-		if (numTicks < (playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
-			numTicks = playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
+		if (_numTicks < (playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
+			_numTicks = playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
 		};
 	}
 	//Ejecutar los ticks
-	for (int i = 0; i < numTicks; i++) {
+	for (int i = 0; i < _numTicks; i++) {
 		TickMovePhase(i);
 	}
 }
@@ -176,16 +179,24 @@ void PD_GM_GameManager::TickMovePhase(int tick) {
 		//Resolucion de conflictos? choques etc.
 		StructPlayer* structPlayer = playersManager->getDataStructPlayer(i);
 		FStructOrderAction order = structPlayer->turnOrders->listMove[tick];
-		structPlayer->logicCharacter->ProcessMoveOrder(order);
-		structPlayer->turnOrders->listMove.Remove(order); //O marcar como consumida
+		
+		
+		///TODO ALVARO
+		//structPlayer->logicCharacter->ProcessMoveOrder(order);
+
+		//structPlayer->turnOrders->listMove.Remove(order); //O marcar como consumida
 
 		//Llamada a moverse actor provisional
 		//Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
 		//al moverse los siguientes personajes.
-		PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
-		PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition(); 
-		FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
-		playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
+		
+		///TODO ALVARO
+		//PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
+		//PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition(); 
+		//FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
+		
+		///TODO ALVARO
+		//playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
 	}
 	//Comprobar que choques.
 }
@@ -198,15 +209,18 @@ void PD_GM_GameManager::TickAttackPhase(int tick) {
 
 
 void PD_GM_GameManager::VisualTurnMovePhase() {
+	/*
 	if (structGameState->enumActionPhase == EActionPhase::Move) {
 	
 	}
-	)
+	*/
 }
 
 
 void PD_GM_GameManager::OnAnimationEnd() {
+	/*
 	if (structGameState->enumGameState == EGameState::ExecutingActionOrders) {
 
 	}
+	*/
 }

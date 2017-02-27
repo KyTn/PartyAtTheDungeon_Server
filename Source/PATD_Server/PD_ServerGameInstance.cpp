@@ -475,7 +475,7 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
-		playersReadyArray.Add(playersManager->getDataStructPlayer(i)->readyMenu);
+		//playersReadyArray.Add(playersManager->getDataStructPlayer(i)->readyMenu);
 	}
 	//TArray<bool> playersReadyArray = networkManager->GetSocketManager()->GetReadyPlayersArray();
 

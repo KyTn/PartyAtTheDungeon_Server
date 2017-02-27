@@ -19,7 +19,8 @@ PD_PlayersManager::~PD_PlayersManager()
 
 void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection, int player) {
 	StructPlayer* structPlayer = new StructPlayer();
-	dataPlayers.Insert(structPlayer, player);
+	structPlayer->ID_PLAYER = player;
+	dataPlayers.Add(structPlayer);
 }
 
 int PD_PlayersManager::GetNumPlayers() {
@@ -35,6 +36,11 @@ void PD_PlayersManager::setTurnOrders(FStructTurnOrders* turnOrders, int player)
 
 
 //Funciones de consulta de datos de players
+
+
+
+
+
 
 bool PD_PlayersManager::AllPlayersReady() {
 	

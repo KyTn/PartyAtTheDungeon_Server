@@ -7,6 +7,9 @@
 //Usado por: PlayersManager
 struct StructPlayer {
 
+	// indica el player que es
+	int ID_PLAYER;
+
 	//Menu options and configuration
 	bool readyMenu;
 
@@ -18,9 +21,13 @@ struct StructPlayer {
 //	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
 	
-	PD_GM_PlayerLogicCharacter* logicCharacter;
-	APD_PLY_Controller* actorController;
-	APD_PLY_GenericCharacter* actor;
+
+	///TODO ALVARO
+	//PD_GM_PlayerLogicCharacter* logicCharacter;
+	//APD_PLY_Controller* actorController;
+	//APD_PLY_GenericCharacter* actor;
+	
+	
 	//Puntero a su fisicCharacter (actor de unreal)
 
 

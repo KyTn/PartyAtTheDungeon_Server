@@ -102,7 +102,6 @@ public:
 	void ChangeState(EServerState newState);
 	//void InitState();
 
-
 	//=========
 	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
 	//=========

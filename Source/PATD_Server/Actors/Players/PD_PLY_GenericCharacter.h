@@ -4,7 +4,8 @@
 
 #include "GameFramework/Actor.h"
 #include "../MyCharacterParent.h"
-#include "PD_PLY_Controller.h"
+///TODO ALVARO
+//#include "PD_PLY_Controller.h"
 #include "GM_Game/LogicCharacter/PD_GM_PlayerLogicCharacter.h"
 #include "PD_PLY_GenericCharacter.generated.h"
 
@@ -32,7 +33,8 @@ public:
 	TSubclassOf<class AMyCharacterParent> character_Player_BP; //BP donde esta el PROP del Character
 
 	//Controller para el personaje
-	APD_PLY_Controller* playerController;
+	///TODO ALVARO
+	//APD_PLY_Controller* playerController;
 
 	//Character Stats and Logic
 	PD_GM_PlayerLogicCharacter* LogicCharacter;
