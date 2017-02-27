@@ -39,12 +39,15 @@ public:
 	bool AllPlayersReady();
 	bool AllPlayersSendOrders();
 	bool AnyPlayerDead();
-	int getIndexClientMaster();
+	int GetIndexClientMaster();
 
+	int GetMaxLenghtActions(EActionPhase phase);
+	int GetPlayerMaxLenghtActions(EActionPhase phase);
 	//Funciones de consulta de mision y objetivos de la partida
 	
 	//FStructTurnOrders* getTurnOrders(int player);
-	StructPlayer* getDataStructPlayer(int player);
+	//Funcion de acceso directo al struct 
+	StructPlayer* GetDataStructPlayer(int player);
 
 	
 

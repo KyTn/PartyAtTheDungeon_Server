@@ -39,8 +39,7 @@ public:
 
 	//Struct con el estado para la maquina de estados del gameManager
 	StructGameState* structGameState;
-	int numTicks;
-	
+		
 	//Funciones de gestion del estado (maquina de estados)
 
 	//Funciones de configuracion de la maquina
@@ -66,12 +65,16 @@ public:
 	void LogicTurnAttackPhase();
 
 	//Funciones para procesar cada accion individual
-	void TickItemPhase(int tick);
-	void TickMovePhase(int tick);
-	void TickAttackPhase(int tick);
+	void LogicMoveTick(int tick);
+	void LogicAttackTick(int tick);
+	void LogicItemTick(int tick);
 
 
 	//Funciones de gestion de visualizacion (visualization manager)
 	//Esto lo llamara la parte visual (controller o actor) cuando finalize su animacion, para cambiar de estado o hacer lo que coresponda
 	void OnAnimationEnd();
+
+	void VisualTickControl();
+	void VisualMoveTick();
+	void VisualAttackTick();
 };

@@ -123,7 +123,7 @@ void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStr
 	playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
 
 	if (isMasterClient) {
-		StructPlayer* structPlayer = playersManager->getDataStructPlayer(inPlayer);
+		StructPlayer* structPlayer = playersManager->GetDataStructPlayer(inPlayer);
 		structPlayer->clientMaster = true; //Es el ClientMaster
 										   //Contestar al cliente
 	}
@@ -144,7 +144,7 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
 		//Solo si lo envia el clientMaster
-		if (inPlayer == playersManager->getIndexClientMaster()) {
+		if (inPlayer == playersManager->GetIndexClientMaster()) {
 			structServerState->gameConfigurationDone = true;
 			this->UpdateState();//Cambio de estado
 		}
@@ -156,7 +156,7 @@ void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruc
 
 	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
-		playersManager->getDataStructPlayer(inPlayer)->readyMenu = menuOrder->orderType != 0;
+		playersManager->GetDataStructPlayer(inPlayer)->readyMenu = menuOrder->orderType != 0;
 		//playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
 		this->UpdateState();//Cambio de estado a GameInProcess
 	}
@@ -169,7 +169,7 @@ void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruc
 void UPD_ServerGameInstance::UpdateState() {
 	if (structServerState->enumServerState == EServerState::WaitingClientMaster){
 		//Transiciones de estados
-		if (playersManager->getIndexClientMaster() != -1) {
+		if (playersManager->GetIndexClientMaster() != -1) {
 			this->ChangeState(EServerState::WaitingGameConfiguration);
 		}
 	}else  if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
@@ -475,7 +475,7 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
-		playersReadyArray.Add(playersManager->getDataStructPlayer(i)->readyMenu);
+		playersReadyArray.Add(playersManager->GetDataStructPlayer(i)->readyMenu);
 	}
 	//TArray<bool> playersReadyArray = networkManager->GetSocketManager()->GetReadyPlayersArray();
 

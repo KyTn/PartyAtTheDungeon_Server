@@ -33,7 +33,7 @@ struct StructPlayer {
 struct StructGameState {
 	EGameState enumGameState;
 	EActionPhase enumActionPhase;
-	int visualTick;
+	
 };
 
 

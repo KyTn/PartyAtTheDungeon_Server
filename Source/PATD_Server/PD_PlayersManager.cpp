@@ -66,7 +66,7 @@ bool PD_PlayersManager::AnyPlayerDead() {
 	return false;
 }
 
-int PD_PlayersManager::getIndexClientMaster() {
+int PD_PlayersManager::GetIndexClientMaster() {
 	for (int i = 0; i < dataPlayers.Num();i++) {
 		StructPlayer* player = dataPlayers[i];
 		if (player->clientMaster) return i;
@@ -74,7 +74,46 @@ int PD_PlayersManager::getIndexClientMaster() {
 	return -1;
 }
 
-StructPlayer* PD_PlayersManager::getDataStructPlayer(int player) {
+//Devuelve el numero de acciones de la lista mas larga
+int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {
+	int indexplayer = this->GetPlayerMaxLenghtActions(phase);
+	if (indexplayer != -1) {
+		if (phase == EActionPhase::Move) {
+			return this->GetDataStructPlayer(indexplayer)->turnOrders->listMove.Num();
+		}
+		else if (phase == EActionPhase::Attack) {
+			return this->GetDataStructPlayer(indexplayer)->turnOrders->listAttack.Num();
+		}
+	}
+	return 0;
+
+
+}
+//Devuelve el index del jugador con la lista de acciones mas larga
+int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
+	int numTicks = 0;
+	int indexPlayer=-1;
+
+	for (int i = 0; this->GetNumPlayers(); i++) {
+		TArray<FStructOrderAction> listActions;
+		if (phase == EActionPhase::Move) {
+			listActions = this->GetDataStructPlayer(i)->turnOrders->listMove;
+		}
+		else if (phase == EActionPhase::Attack) {
+			listActions = this->GetDataStructPlayer(i)->turnOrders->listAttack;
+		}
+
+
+		if (numTicks < (listActions.Num())) {
+			numTicks = listActions.Num();
+			indexPlayer = i;
+		};
+	}
+	return numTicks;
+}
+
+//Funcion de acceso directo al struct
+StructPlayer* PD_PlayersManager::GetDataStructPlayer(int player) {
 	CheckPlayerIndex(player);
 	return dataPlayers[player];
 }
@@ -92,3 +131,4 @@ bool PD_PlayersManager::CheckPlayerIndex(int player) {
 		return false;
 	}
 }
+
