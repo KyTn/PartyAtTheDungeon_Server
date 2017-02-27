@@ -12,6 +12,7 @@
 #include "Structs/PD_ServerEnums.h"
 class PD_PlayersManager;
 class PD_GM_MapManager;
+class PD_GM_EnemyManager;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
 struct LogicTurnInformation;
@@ -28,11 +29,12 @@ private:
 	LogicTurnInformation* MoveTurnInformation;
 	LogicTurnInformation* AttackTurnInformation;
 public:
-	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager);
+	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_GM_EnemyManager* inEnemyMan);
 	~PD_GM_GameManager();
 
 	PD_PlayersManager* playersManager;
 	PD_GM_MapManager* mapManager;
+	PD_GM_EnemyManager* enemyManager;
 	//Tiene que heredar de observer y suscribirse a paquetes de juegos (ordenes).
 	//Tiene un MapManager y un InteractionManager
 	void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);

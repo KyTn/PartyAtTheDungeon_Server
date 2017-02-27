@@ -6,6 +6,7 @@
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "PATD_Server/Structs/PD_ServerEnums.h"
+#include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 
@@ -74,8 +75,9 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 }
 
 
-void PD_GM_MapManager::InstantiateDynamicMap() {
+void PD_GM_MapManager::InstantiateDynamicMap(PD_GM_EnemyManager* enemyMan) {
 	EEnemiesType enemyId;
+	///necesitamos comprobar ya el ID
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
 		enemyId = DynamicMapRef->GetXYMap()[*DynamicMapRef->GetLogicPositions()[i]];

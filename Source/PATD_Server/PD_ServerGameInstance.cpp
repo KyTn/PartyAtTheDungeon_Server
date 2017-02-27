@@ -273,10 +273,10 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
 		mapManager->InstantiateStaticMap();
-		mapManager->InstantiateDynamicMap();
+		mapManager->InstantiateDynamicMap(enemyManager);
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager);
+		gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
 		networkManager->RegisterObserver(gameManager);
 
 	//}
