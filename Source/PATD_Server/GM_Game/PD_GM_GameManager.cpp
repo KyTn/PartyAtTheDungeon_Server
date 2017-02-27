@@ -11,7 +11,6 @@
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
 #include "PD_GM_MapManager.h"
-#include "PD_GM_InteractionsManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 
 

@@ -10,7 +10,6 @@ class PD_MM_MapInfo;
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
-class APD_PLY_GenericCharacter;
 
 
 
@@ -24,7 +23,7 @@ private:
 
 	PD_GM_GameManager* _GAMEMANAGER;
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, 0 si no hay ninguno. 
-	bool getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
+	//bool getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 
 public:
 	PD_GM_MapManager();
@@ -41,9 +40,9 @@ public:
 
 
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Player. 0 si no hay ninguno. 
-	bool getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
+	//bool getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
-	bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
+	//bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 
 	// Esta funcion devolverá un Interactuable
 	AActor* getInteractuableAt(PD_MG_LogicPosition* logpos);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 
 
 // FORWARD DECLARATIONS
@@ -36,11 +36,12 @@ public:
 	PD_MM_Room();
 	~PD_MM_Room();
 
+	
 	TArray<PD_MG_LogicPosition> LogicPosInRoom;
+	
 	TMap<PD_MG_LogicPosition, uint32> tiles;
 	TMap<PD_MG_LogicPosition, uint32> walls;
 	TMap<PD_MG_LogicPosition, uint32> interactuables;
 	TMap<PD_MG_LogicPosition, uint32> players;
 	TMap<PD_MG_LogicPosition, uint32> enemies;
-
 };

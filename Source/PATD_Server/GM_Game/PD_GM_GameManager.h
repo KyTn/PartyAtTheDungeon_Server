@@ -12,8 +12,11 @@
 #include "Structs/PD_ServerEnums.h"
 class PD_PlayersManager;
 class PD_GM_MapManager;
-class PD_GM_InteractionsManager;
+//class PD_GM_InteractionsManager;
 struct StructGameState;
+struct LogicTurnInformation;
+
+
 /**
  * 
  */
