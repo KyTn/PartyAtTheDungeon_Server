@@ -8,7 +8,6 @@
 
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
-#include "PATD_Server/Actors/Players/PD_PLY_GenericCharacter.h"
 
 PD_GM_MapManager::PD_GM_MapManager()
 {
@@ -20,10 +19,11 @@ PD_GM_MapManager::~PD_GM_MapManager()
 
 #pragma region GET INFO OF THE MAP
 
+/*
 bool PD_GM_MapManager::getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 bool PD_GM_MapManager::getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
-
+*/
 AActor* PD_GM_MapManager::getInteractuableAt(PD_MG_LogicPosition* logpos) { return 0; }
 
 

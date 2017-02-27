@@ -41,6 +41,183 @@ struct FStructOrderAction {
 
 };
 
+USTRUCT()
+struct FStructLogicPosition {
+
+	GENERATED_BODY()
+
+		UPROPERTY()
+		uint32 positionX;
+	UPROPERTY()
+		uint32 positionY;
+
+	FStructLogicPosition() {
+
+	}
+
+};
+
+
+/*
+STRUCTS PARA EL CHARACTER LOGIC
+- Stats básicos - Los que elige el jugador
+- Stats base - Stats base del personaje - unas constantes
+- Weapons
+- Skills
+- Skin
+- Stats Totales
+*/
+
+//Stats Basicos - Poder, Agilidad, Destreza, ...
+USTRUCT()
+struct FStructBasicStats
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		uint8 POD;
+	UPROPERTY()
+		uint8 AGI;
+	UPROPERTY()
+		uint8 DES;
+	UPROPERTY()
+		uint8 CON;
+	UPROPERTY()
+		uint8 PER;
+	UPROPERTY()
+		uint8 MAL;
+	//Constructor
+	FStructBasicStats()
+	{
+	}
+};
+
+//Stats BASE - Vida - Damage
+USTRUCT()
+struct FStructInitBaseStats
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		uint8 HPBase;
+	UPROPERTY()
+		uint8 DMGBase;
+	UPROPERTY()
+		uint8 APBase;
+
+	//Constructor
+	FStructInitBaseStats()
+	{
+	}
+};
+
+//Habilidades - Activas y Pasivas
+USTRUCT()
+struct FStructSkills
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		TArray<uint8> listActiveSkills;
+
+	UPROPERTY()
+		TArray<uint8> listPasiveSkills;
+	//Constructor
+	FStructSkills()
+	{
+
+	}
+};
+
+
+//Weapons - Compuesto por Damage - Range - BP(skin)
+USTRUCT()
+struct FStructWeapon
+{
+	GENERATED_BODY()
+		UPROPERTY()
+		uint8 ID_Weapon;
+	UPROPERTY()
+		uint8 TypeWeapon;
+	UPROPERTY()
+		uint8 DMWeapon;
+	UPROPERTY()
+		uint8 RangeWeapon;
+	//UPROPERTY()
+	//TSubclassOf<class WeaponParent> SkinWeapon;
+
+	//Constructor
+	FStructWeapon()
+	{
+	}
+};
+
+//Weapons - Compuesto por Damage - Range - BP(skin)
+USTRUCT()
+struct FStructSkin
+{
+	GENERATED_BODY()
+
+		//UPROPERTY()
+		//enum indicando el cabezon
+		//UPROPERTY()
+		//enum indicando el cuerpo
+
+		/* !!NOTA: Estos datos se tienen que pasar al GenericCharacter.h  para que elija en el Character_BP elija el mesh adecuado en base a estos datos.
+		*/
+		//Constructor
+		FStructSkin()
+	{
+	}
+};
+
+//STATS totales del Jugador - Vida - Daño Total - Rango Total
+USTRUCT()
+struct FStructTotalStats
+{
+	GENERATED_BODY()
+
+		//stats generales del jugador
+		UPROPERTY()
+		uint8 HPTotal;
+	UPROPERTY()
+		uint8 APTotal;
+	UPROPERTY()
+		uint8 HPCurrent;
+	UPROPERTY()
+		uint8 RangeTotal;
+	UPROPERTY()
+		uint8 DMGTotal;
+
+	//stats principales - siendo el valor de estas el BONUS que da cada stat (no los puntos dados - diferencia respecto al FStructBasicStats
+	UPROPERTY()
+		float PODBonus;
+	UPROPERTY()
+		int8 AGIBonus;
+	UPROPERTY()
+		int8 DESBonus;
+	UPROPERTY()
+		float CONBonus;
+	UPROPERTY()
+		float PERBonus;
+	UPROPERTY()
+		float MALBonus;
+
+	//stats secundarios - AP - SAL - CH (dependen de los BONUS de los stats principales
+	UPROPERTY()
+		int8 AP;
+	UPROPERTY()
+		int8 CH;
+	UPROPERTY()
+		int8 SA;
+
+
+	//Constructor
+	FStructTotalStats()
+	{
+	}
+};
+
 
 /*
 Procedimiento para agregar un struct:
@@ -69,8 +246,10 @@ AllStructs=1 para suscribirse a eventos para todos.
 FStructNewConnection=2 struct que crea el networkmanager (no necesita serializacion)
 */
 
-enum class UStructType { NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructMap = 10, FStructOrderMenu = 20, FStructTurnOrders = 30 };
-
+enum class UStructType {
+	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructMap = 10, FStructOrderMenu = 20, FStructTurnOrders = 30,
+	FStructCharacter = 40, FStructUpdateCharacter = 41
+};
 
 
 
@@ -78,6 +257,52 @@ enum class UStructType { NotDefined = 0, AllStructs = 1, FStructNewConnection = 
 ///Structs SERIALIZABLES (heredan de FStructGeneric) (Se envian)
 //=================================
 
+USTRUCT()
+struct FStructCharacter : public  FStructGeneric
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		FStructTotalStats totalStats;
+	UPROPERTY()
+		FStructBasicStats basicStats;
+	UPROPERTY()
+		FStructInitBaseStats initBaseStats;
+	UPROPERTY()
+		FStructSkills skils;
+	UPROPERTY()
+		FStructWeapon weapon;
+	UPROPERTY()
+		FStructSkin skin;
+
+	//Constructor
+	FStructCharacter()
+	{
+		structType = static_cast<uint8>(UStructType::FStructCharacter);
+	}
+};
+
+//Sirve para actualizar el estado de un character cuando se ha iniciado la partida
+//Solo se van a enviar los atributos del character que sean necesarios
+USTRUCT()
+struct FStructUpdateCharacter : public  FStructGeneric
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		uint8 HPCurrent;
+	UPROPERTY()
+		uint8 ID_character; //Identifica al Jugador que realiza la modificacion
+	UPROPERTY()
+		FStructLogicPosition currentCharacterPosition;
+
+
+	//Constructor
+	FStructUpdateCharacter()
+	{
+		structType = static_cast<uint8>(UStructType::FStructUpdateCharacter);
+	}
+};
 
 USTRUCT()
 struct FStructNewConnection : public FStructGeneric

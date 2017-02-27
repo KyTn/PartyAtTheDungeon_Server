@@ -5,13 +5,12 @@
 
 //Includes de uso de objetos
 #include "MapGeneration/PD_MG_LogicPosition.h"
-#include "LogicCharacter/PD_GM_PlayerLogicCharacter.h"
-#include "Actors/Players/PD_PLY_Controller.h"
+#include "LogicCharacter/PD_GM_LogicCharacter.h"
+//#include "Actors/Players/PD_PLY_Controller.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
 #include "PD_GM_MapManager.h"
-#include "PD_GM_InteractionsManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 
 
@@ -141,12 +140,27 @@ void PD_GM_GameManager::LogicTurnItemPhase() {
 }
 
 void PD_GM_GameManager::LogicTurnMovePhase() {
+	
+	int _numTicks = 0;
+
 	MoveTurnInformation->CurrentState = InteractionStates::Working;
 	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?- Yo creo que mejor en el playerManager
+<<<<<<< HEAD
 	int numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Move);
 	//Ejecutar los ticks
 	for (int i = 0; i < numTicks; i++) {
 		LogicMoveTick(i);
+=======
+	
+	for (int i = 0; playersManager->GetNumPlayers(); i++) {
+		if (_numTicks < (playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
+			_numTicks = playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
+		};
+	}
+	//Ejecutar los ticks
+	for (int i = 0; i < _numTicks; i++) {
+		TickMovePhase(i);
+>>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 	}
 }
 
@@ -172,8 +186,29 @@ void PD_GM_GameManager::LogicMoveTick(int tick) {
 		StructPlayer* structPlayer = playersManager->GetDataStructPlayer(i);
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = structPlayer->turnOrders->listMove[tick];
+<<<<<<< HEAD
 		//structPlayer->logicCharacter->MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove);
 
+=======
+		
+		
+		///TODO ALVARO
+		//structPlayer->logicCharacter->ProcessMoveOrder(order);
+
+		//structPlayer->turnOrders->listMove.Remove(order); //O marcar como consumida
+
+		//Llamada a moverse actor provisional
+		//Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
+		//al moverse los siguientes personajes.
+		
+		///TODO ALVARO
+		//PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
+		//PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition(); 
+		//FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
+		
+		///TODO ALVARO
+		//playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
+>>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 	}
 	//Comprobar que choques.//Resolucion de conflictos
 }
@@ -190,8 +225,13 @@ void PD_GM_GameManager::LogicAttackTick(int tick) {
 
 	}
 
+<<<<<<< HEAD
 }
 void PD_GM_GameManager::VisualTickControl() {
+=======
+void PD_GM_GameManager::VisualTurnMovePhase() {
+	/*
+>>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 	if (structGameState->enumActionPhase == EActionPhase::Move) {
 		if (playersManager->GetMaxLenghtActions(structGameState->enumActionPhase) == 0) { //No hay mas acciones de mover
 			structGameState->enumActionPhase = EActionPhase::Attack;
@@ -233,7 +273,11 @@ void PD_GM_GameManager::VisualMoveTick(){
 			//playersManager->GetDataStructPlayer(i)->actorController->MoveTo(realPosition->X, realPosition->Y);
 
 	}
+<<<<<<< HEAD
 
+=======
+	*/
+>>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 }
 
 void PD_GM_GameManager::VisualAttackTick() {
@@ -247,6 +291,12 @@ void PD_GM_GameManager::VisualAttackTick() {
 
 
 
+<<<<<<< HEAD
+=======
+void PD_GM_GameManager::OnAnimationEnd() {
+	/*
+	if (structGameState->enumGameState == EGameState::ExecutingActionOrders) {
+>>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 
 
 
@@ -257,4 +307,5 @@ void PD_GM_GameManager::OnAnimationEnd() {
 		}*/ 
 		//Mañana hacer el sistema del callback cuando este el controller subido.
 	}
+	*/
 }

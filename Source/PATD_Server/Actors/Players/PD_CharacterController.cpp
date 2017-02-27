@@ -1,21 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-#include "PD_PLY_Controller.h"
+#include "PD_CharacterController.h"
 
-void APD_PLY_Controller::BeginPlay()
-{
-	Super::BeginPlay();
-}
 
-// Called every frame
-void APD_PLY_Controller::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
-
-void APD_PLY_Controller::Move(float x, float y)
+bool APD_CharacterController::MoveTo(float x, float y)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Init GameMap"));
 
@@ -27,11 +17,19 @@ void APD_PLY_Controller::Move(float x, float y)
 	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's new Location is %s"), *newPosition.ToString());
 
 	MoveToLocation(newPosition, -1.0f, true, false, false, true, 0, true);
+	return true;
 }
 
-void APD_PLY_Controller::Attack()
+bool APD_CharacterController::ActionTo(float x, float y, uint8 id_action)
 {
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "AL ATAQUERRRRRR !!!!!");
+	return true;
 
 }
+
+bool APD_CharacterController::Animate(uint8 typeAnimation)
+{
+	return true;
+}
+

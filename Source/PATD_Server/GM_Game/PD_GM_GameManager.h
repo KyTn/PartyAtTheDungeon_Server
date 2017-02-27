@@ -12,8 +12,11 @@
 #include "Structs/PD_ServerEnums.h"
 class PD_PlayersManager;
 class PD_GM_MapManager;
-class PD_GM_InteractionsManager;
+//class PD_GM_InteractionsManager;
 struct StructGameState;
+struct LogicTurnInformation;
+
+
 /**
  * 
  */
@@ -69,6 +72,8 @@ public:
 	void LogicAttackTick(int tick);
 	void LogicItemTick(int tick);
 
+
+	void VisualTurnMovePhase();
 
 	//Funciones de gestion de visualizacion (visualization manager)
 	//Esto lo llamara la parte visual (controller o actor) cuando finalize su animacion, para cambiar de estado o hacer lo que coresponda

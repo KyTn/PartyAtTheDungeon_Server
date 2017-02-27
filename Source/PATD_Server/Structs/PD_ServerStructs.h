@@ -4,8 +4,13 @@
 #include "PD_NetStructs.h"
 #include "PD_ServerEnums.h"
 
+class PD_GM_LogicCharacter;
+
 //Usado por: PlayersManager
 struct StructPlayer {
+
+	// indica el player que es
+	int ID_PLAYER;
 
 	//Menu options and configuration
 	bool readyMenu;
@@ -18,11 +23,18 @@ struct StructPlayer {
 //	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
 	
-	PD_GM_PlayerLogicCharacter* logicCharacter;
-	APD_PLY_Controller* actorController;
-	APD_PLY_GenericCharacter* actor;
-	//Puntero a su fisicCharacter (actor de unreal)
 
+	FStructCharacter* player_character; //Envio de la informacion LOGICA del personaje
+	FStructUpdateCharacter* update_character;
+	PD_GM_LogicCharacter* logic_Character;
+
+	StructPlayer() {
+		clientMaster = false;
+		readyMenu = false; //¿que es esto?
+		turnOrders = new FStructTurnOrders();
+		player_character = new FStructCharacter();
+		update_character = new FStructUpdateCharacter();
+	}
 
 };
 
