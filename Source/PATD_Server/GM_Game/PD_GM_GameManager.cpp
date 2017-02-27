@@ -145,22 +145,12 @@ void PD_GM_GameManager::LogicTurnMovePhase() {
 
 	MoveTurnInformation->CurrentState = InteractionStates::Working;
 	//Calcular el numero de ticks a realizar (el de la lista mas larga) -Aqui o en el playerManager?- Yo creo que mejor en el playerManager
-<<<<<<< HEAD
+
 	int numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Move);
 	//Ejecutar los ticks
 	for (int i = 0; i < numTicks; i++) {
 		LogicMoveTick(i);
-=======
-	
-	for (int i = 0; playersManager->GetNumPlayers(); i++) {
-		if (_numTicks < (playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num())) {
-			_numTicks = playersManager->getDataStructPlayer(i)->turnOrders->listMove.Num();
-		};
-	}
-	//Ejecutar los ticks
-	for (int i = 0; i < _numTicks; i++) {
-		TickMovePhase(i);
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
+
 	}
 }
 
@@ -186,10 +176,10 @@ void PD_GM_GameManager::LogicMoveTick(int tick) {
 		StructPlayer* structPlayer = playersManager->GetDataStructPlayer(i);
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = structPlayer->turnOrders->listMove[tick];
-<<<<<<< HEAD
+
 		//structPlayer->logicCharacter->MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove);
 
-=======
+
 		
 		
 		///TODO ALVARO
@@ -208,7 +198,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick) {
 		
 		///TODO ALVARO
 		//playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
+
 	}
 	//Comprobar que choques.//Resolucion de conflictos
 }
@@ -225,13 +215,10 @@ void PD_GM_GameManager::LogicAttackTick(int tick) {
 
 	}
 
-<<<<<<< HEAD
+
 }
 void PD_GM_GameManager::VisualTickControl() {
-=======
-void PD_GM_GameManager::VisualTurnMovePhase() {
-	/*
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
+
 	if (structGameState->enumActionPhase == EActionPhase::Move) {
 		if (playersManager->GetMaxLenghtActions(structGameState->enumActionPhase) == 0) { //No hay mas acciones de mover
 			structGameState->enumActionPhase = EActionPhase::Attack;
@@ -253,59 +240,46 @@ void PD_GM_GameManager::VisualTurnMovePhase() {
 	}
 }
 
-void PD_GM_GameManager::VisualMoveTick(){ 
-	
+void PD_GM_GameManager::VisualMoveTick() {
+
 	//Todos a la vez
 	for (int i = 0; playersManager->GetNumPlayers(); i++) {
-			FStructOrderAction visualAction = playersManager->GetDataStructPlayer(i)->turnOrders->listMove.Pop();
+		FStructOrderAction visualAction = playersManager->GetDataStructPlayer(i)->turnOrders->listMove.Pop();
 
-			StructPlayer* structPlayer = playersManager->GetDataStructPlayer(i);
-			PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
-			PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition();
-			//Esto solo esta para pruebas, pues luego la visualizacion no tendra que lidiar con ordenesLogicas (sino con sus propias ordenes preferiblemente)
-			if (visualAction.targetDirection == 1)logicPosition->SetY(logicPosition->GetY() + 1);
-			else if (visualAction.targetDirection == 2)logicPosition->SetY(logicPosition->GetY() - 1);
-			else if (visualAction.targetDirection == 3)logicPosition->SetX(logicPosition->GetX() + 1);
-			else if (visualAction.targetDirection == 4)logicPosition->SetX(logicPosition->GetX() - 1);
+		StructPlayer* structPlayer = playersManager->GetDataStructPlayer(i);
+		PD_GM_LogicCharacter* logicCharacter = structPlayer->logic_Character;
+		PD_MG_LogicPosition* logicPosition = logicCharacter->GetCurrentLogicalPosition();
+		//Esto solo esta para pruebas, pues luego la visualizacion no tendra que lidiar con ordenesLogicas (sino con sus propias ordenes preferiblemente)
+		if (visualAction.targetDirection == 1)logicPosition->SetY(logicPosition->GetY() + 1);
+		else if (visualAction.targetDirection == 2)logicPosition->SetY(logicPosition->GetY() - 1);
+		else if (visualAction.targetDirection == 3)logicPosition->SetX(logicPosition->GetX() + 1);
+		else if (visualAction.targetDirection == 4)logicPosition->SetX(logicPosition->GetX() - 1);
 
 
-			FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
-			//playersManager->GetDataStructPlayer(i)->actorController->MoveTo(realPosition->X, realPosition->Y);
+		FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
+		//playersManager->GetDataStructPlayer(i)->actorController->MoveTo(realPosition->X, realPosition->Y);
 
 	}
-<<<<<<< HEAD
-
-=======
-	*/
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 }
 
 void PD_GM_GameManager::VisualAttackTick() {
 	//Uno a uno
-	int indexPlayer=playersManager->GetPlayerMaxLenghtActions(structGameState->enumActionPhase);
-	FStructOrderAction visualAction= playersManager->GetDataStructPlayer(indexPlayer)->turnOrders->listAttack.Pop();
+	int indexPlayer = playersManager->GetPlayerMaxLenghtActions(structGameState->enumActionPhase);
+	FStructOrderAction visualAction = playersManager->GetDataStructPlayer(indexPlayer)->turnOrders->listAttack.Pop();
 	//playersManager->GetDataStructPlayer(indexPlayer)->actorController->ActionTo();
-		
-	
+
+
 }
 
-
-
-<<<<<<< HEAD
-=======
-void PD_GM_GameManager::OnAnimationEnd() {
-	/*
-	if (structGameState->enumGameState == EGameState::ExecutingActionOrders) {
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
 
 
 
 void PD_GM_GameManager::OnAnimationEnd() {
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 		/*if (playersManager->AllAnimationEnd()) {
-			VisualTickControl();
-		}*/ 
+		VisualTickControl();
+		}*/
 		//Mañana hacer el sistema del callback cuando este el controller subido.
 	}
-	*/
+
 }

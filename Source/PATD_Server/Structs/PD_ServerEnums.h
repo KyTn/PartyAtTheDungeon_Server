@@ -1,9 +1,9 @@
 #pragma once
-<<<<<<< HEAD
+
 enum class EGameState { WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization,EndOfTurn };
-=======
-enum class EGameState { WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingActionOrders};
->>>>>>> a96fa556403e4c379908d71d066954f01c37f669
+
+//enum class EGameState { WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingActionOrders};
+
 enum class EServerState { WaitingClientMaster, WaitingGameConfiguration, WaitingReady,GameInProcess };
 enum class InteractionStates { Ready, Working, Finish };
 enum class EActionPhase { Move=0, Attack=1, EndTurn=2 };

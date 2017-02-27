@@ -6,6 +6,7 @@
 
 
 //forward declaration
+#include "Structs/PD_ServerEnums.h"
 struct FStructNewConnection;
 struct StructPlayer;
 
