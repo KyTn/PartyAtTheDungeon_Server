@@ -3,7 +3,7 @@
 #include "PATD_Server.h"
 #include "PD_MG_DynamicMap.h"
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
-#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
 
 PD_MG_DynamicMap::PD_MG_DynamicMap()
@@ -28,12 +28,13 @@ void PD_MG_DynamicMap::AddNewEnemy(uint32 x, uint32 y, PD_GM_IALogicCharacter* c
 
 void PD_MG_DynamicMap::UpdateActor(AActor* actor, PD_MG_LogicPosition* lp) {
 
-	TArray<	PD_GM_IALogicCharacter*> chs = enemies[*lp];
+/*	TArray<	PD_GM_LogicCharacter*> chs = enemies[*lp];
 	PD_GM_IALogicCharacter* ch = chs[0];
 	ch->UpdateCharacter(actor);
 	chs.Reset();
 	chs.Add(ch);
 	enemies.Emplace(*lp,chs);
+	*/
 }
 
 bool PD_MG_DynamicMap::Clear() { return false; }

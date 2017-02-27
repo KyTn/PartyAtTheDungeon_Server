@@ -5,7 +5,7 @@
 
 //Includes de uso de objetos
 #include "MapGeneration/PD_MG_LogicPosition.h"
-#include "LogicCharacter/PD_GM_PlayerLogicCharacter.h"
+#include "LogicCharacter/PD_GM_LogicCharacter.h"
 //#include "Actors/Players/PD_PLY_Controller.h"
 
 //Includes of forward declaration

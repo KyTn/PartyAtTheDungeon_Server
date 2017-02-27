@@ -5,7 +5,7 @@
 #include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
-#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_IALogicCharacter.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 PD_MG_MapParser::PD_MG_MapParser()
 {
@@ -165,13 +165,13 @@ uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firs
 		}
 		switch (type) {///En este switch metemos la IA lógica de cada uno
 			case EEnemiesType::Archer: {
-				PD_GM_IALogicCharacter* ch = new PD_GM_IALogicCharacter();
-				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
+				//dynamicMapRef->AddNewEnemy(x, y, ch, type);
 				break;
 		}
 			case EEnemiesType::Zombie: {
-				PD_GM_IALogicCharacter* ch = new PD_GM_IALogicCharacter();
-				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
+				//dynamicMapRef->AddNewEnemy(x, y, ch, type);
 				break;
 			}
 		}
