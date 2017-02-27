@@ -5,7 +5,7 @@
 #include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
-
+#include "PATD_Server/Structs/PD_ServerEnums.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 
@@ -89,12 +89,6 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 			DynamicMapRef->UpdateActor(instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]), DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
 			break;
 		}
-		//if (dynamicMap->GetEnemyId(dynamicMap->GetXYMap()[*dynamicMap->GetLogicPositions()[i]])=="id_zombie") {
-		//parserActor->InstantiateArcher(dynamicMap->GetLogicPositions()[i]);
-		//UE_LOG(LogTemp, Error, TEXT("Entra :%s !!!!"), *enemyId);
-		//}
-		//dynamicMap->GetLogicPositions
-
 	}
 }
 

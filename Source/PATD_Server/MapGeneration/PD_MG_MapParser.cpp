@@ -4,8 +4,9 @@
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
-#include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
+#include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
 
 PD_MG_MapParser::PD_MG_MapParser()
 {
@@ -20,10 +21,10 @@ PD_MG_MapParser::~PD_MG_MapParser()
 
 PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath)
 {
-	return StartParsingFromFile(filepath, new PD_MG_StaticMap(), new PD_MG_DynamicMap());
+	return StartParsingFromFile(filepath, new PD_MG_StaticMap(), new PD_MG_DynamicMap(), new PD_GM_EnemyManager());
 }
 
-PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* dynamicMapRef)
+PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* dynamicMapRef, PD_GM_EnemyManager* enemyMan)
 {
 	staticMapRef->Clear();
 	dynamicMapRef->Clear();
@@ -49,7 +50,7 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 		if (fileSplitted[0].Contains("v0.1") ) {
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Using parser version " + fileSplitted[0]);
 
-			Parsing_v_0_1(fileSplitted, staticMapRef, dynamicMapRef);
+			Parsing_v_0_1(fileSplitted, staticMapRef, dynamicMapRef,enemyMan);
 		}
 		else 
 		{
@@ -71,7 +72,7 @@ PD_MG_StaticMap* PD_MG_MapParser::StartParsingFromFile(FString* filepath, PD_MG_
 
 #pragma region VERSION OF PARSERS
 
-PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* dynamicMapRef)
+PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* dynamicMapRef, PD_GM_EnemyManager* enemyMan)
 {
 	//if (!fileReaded[0].Equals("v0.1")) { return staticMapRef; }
 
@@ -99,12 +100,12 @@ PD_MG_StaticMap* PD_MG_MapParser::Parsing_v_0_1(TArray<FString> fileReaded, PD_M
 	// Cargamos los caractares planos sin referencias de comportamiento
 	nextIndexRead = ReadRawMap(fileReaded, nextIndexRead, staticMapRef);
 	
-	//InstantiateStaticMap(staticMapRef);
-	//Creamos el TMAP con los tipos de enemigos que hay
-	nextIndexRead = ReadTypesEnemies(fileReaded, nextIndexRead, dynamicMapRef);
+	//Cargamos los enemigos que hay en el map, y los instanciamos en el enemyManager
+	nextIndexRead = ReadEnemiesMap(fileReaded, nextIndexRead, dynamicMapRef, enemyMan);
 
-	//Cargamos la posición de los enemigos
-	//ReadEnemiesMap(fileReaded, mapIndex, dynamicMapRef);
+	//Cargamos los objetos interactuables en el mapa
+	//nextIndexRead = ReadInteractiveObjectMap(fileReaded, nextIndexRead, dynamicMapRef);
+
 
 	return staticMapRef;
 }
@@ -125,7 +126,7 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 }
 
 //Rellena la parte de los enemigos del DynamicMap pasado por parametros
-uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
+uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef, PD_GM_EnemyManager* enemyMan) {
 	TArray <TCHAR> enemyLine;
 	FString f;
 	uint32 Enemynum = (uint32)FCString::Atoi(*(fileReaded[firstIndex]));
@@ -166,33 +167,42 @@ uint32 PD_MG_MapParser::ReadTypesEnemies(TArray<FString> fileReaded, uint32 firs
 		switch (type) {///En este switch metemos la IA lógica de cada uno
 			case EEnemiesType::Archer: {
 				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
-				//dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				//Hay que hacer el set ID ch->SetIDCharacter();
+				//Hay que hacer el set logicalLocation
+				enemyMan->AddEnemie(ch);
+				dynamicMapRef->AddNewEnemy(x, y, ch, type);
 				break;
 		}
 			case EEnemiesType::Zombie: {
 				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
-				//dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				//Hay que hacer el set ID ch->SetIDCharacter();
+				//Hay que hacer el set logicalLocation
+				enemyMan->AddEnemie(ch);
+				dynamicMapRef->AddNewEnemy(x, y, ch, type);
 				break;
 			}
 		}
-
-//		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], fileReaded[i].RightChop(2).RemoveAt(fileReaded[i].Len()));
-
-		///Comprobación de que se escribe bien el TMAP de los enemigos
-		/*enemyValue.Reset();
-		enemyValue=dynamicMapRef->GetEnemy(fileReaded[i].GetCharArray()[0]);
-		//enemyValue.InsertAt(0, bufferLine.RightChop(2));
-		UE_LOG(LogTemp, Error, TEXT("Prueba :%s !!!!"), *enemyValue);
-		*/
-		///Forma más simple y con mas pasos de hacerlo
-		/*
-		bufferLine = fileReaded[i];
-		enemyValue.Reset();
-		enemyValue.InsertAt(0,bufferLine.RightChop(2));
-		UE_LOG(LogTemp, Error, TEXT("Prueba :%s !!!!"), *enemyValue);
-		*/
 	}
 	return firstIndex + Enemynum + 1;
 }
 
 
+/*uint32 PD_MG_MapParser::ReadInteraciveObjectMap(TArray<FString> fileReaded, uint32 firstIndex, PD_MG_DynamicMap* dynamicMapRef) {
+	TArray <TCHAR> intObjLine;
+	FString f;
+	uint32 intObjNum = (uint32)FCString::Atoi(*(fileReaded[firstIndex]));
+	uint32 intType, x, y;
+	int32 num, j;
+	firstIndex++;
+	for (uint32 i = firstIndex; i < intObjNum + firstIndex; i++) {
+		/*enemyValue = fileReaded[i].RightChop(2);
+		enemyValue.RemoveAt(enemyValue.Len()-1);//Hay que hacer esto, dado que guardaba basura, un "\n", o un "\0" que se comportaba al hacer el cout como "\n"
+		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], enemyValue);
+		intObjLine = fileReaded[i].GetCharArray();
+		intObjLine.RemoveAt(intObjLine.Num() - 1);
+		intObjLine.RemoveAt(intObjLine.Num() - 1);
+
+		///Falta decidir como se va a definir en el fichero, el parseo y guardarlo en el mapa dinámico
+	}
+	return firstIndex + intObjNum + 1;
+}*/

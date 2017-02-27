@@ -14,7 +14,6 @@ class PD_GM_GameManager;
 
 
 
-
 class PATD_SERVER_API PD_GM_MapManager
 {
 private:
