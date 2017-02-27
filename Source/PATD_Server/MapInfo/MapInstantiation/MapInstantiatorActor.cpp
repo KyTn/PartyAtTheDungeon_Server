@@ -6,7 +6,7 @@
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
-#include "PATD_Server/Actors/Enemies/PD_E_Archer.h"
+#include "PATD_Server/Actors/Enemies/PD_E_EnemyCharacter.h"
 #include "PATD_Server/Actors/PD_E_ElementActor.h"
 
 
@@ -101,11 +101,11 @@ ACharacter* AMapInstantiatorActor::InstantiateArcher(PD_MG_LogicPosition* logpos
 	//return characterP;
 
 	//return GetWorld()->SpawnActor<APD_E_Zombie>(FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f), FActorSpawnParameters());
-	return GetWorld()->SpawnActor<APD_E_Archer>(ArcherClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	return GetWorld()->SpawnActor<APD_E_EnemyCharacter>(ArcherClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
 }
 
 ACharacter* AMapInstantiatorActor::InstantiateZombie(PD_MG_LogicPosition* logpos) {
-	return GetWorld()->SpawnActor<APD_E_Archer>(ZombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+	return GetWorld()->SpawnActor<APD_E_EnemyCharacter>(ZombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
 }
 
 #pragma endregion

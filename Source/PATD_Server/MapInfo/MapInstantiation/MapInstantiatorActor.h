@@ -11,7 +11,7 @@
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_MG_LogicPosition;
-class APD_E_Archer;
+class APD_E_EnemyCharacter;
 class APD_E_ElementActor;
 
 //////////////////////////
@@ -21,26 +21,7 @@ class PATD_SERVER_API AMapInstantiatorActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-
-
-private:
-	//PD_MG_StaticMap* StaticMapRef;
-	//PD_MG_DynamicMap* DynamicMapRef;
-	//APD_E_Archer* characterP;
 public:
-#pragma region TSUBCLASSOF Static & Dynamic
-
-	//Static
-	TSubclassOf<class APD_E_ElementActor> TileClass;
-	TSubclassOf<class APD_E_ElementActor> WallClass;
-	//Enemies
-	/// seria la class generica
-	TSubclassOf<class APD_E_Archer> ArcherClass;
-	TSubclassOf<class APD_E_Archer> ZombieClass;
-
-#pragma endregion 
-
 
 #pragma region BUILT IN FUNCTIONS
 
@@ -53,6 +34,20 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 #pragma endregion
+
+
+#pragma region TSUBCLASSOF Static & Dynamic
+
+	//Static
+	TSubclassOf<class APD_E_ElementActor> TileClass;
+	TSubclassOf<class APD_E_ElementActor> WallClass;
+	//Enemies
+	/// seria la class generica
+	TSubclassOf<class APD_E_EnemyCharacter> ArcherClass;
+	TSubclassOf<class APD_E_EnemyCharacter> ZombieClass;
+
+#pragma endregion 
+
 
 	AActor* InstantiateTile(PD_MG_LogicPosition* logpos);
 	AActor* InstantiateWall(PD_MG_LogicPosition* logpos);

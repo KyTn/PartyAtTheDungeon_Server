@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+/*
 #include "PATD_Server.h"
 #include "PD_GM_InteractionsManager.h"
 
@@ -87,6 +87,7 @@ void PD_GM_InteractionsManager::TickMovePhase(int tick) {
 	}
 	//Comprobar que choques.
 }
+*/
 //Ejemplo conflicto con choques
 /*
 Mapa:
@@ -109,6 +110,3 @@ pared, le devolveria a su casilla y seria él, el que tendria que detectar un cho
 Hacer sistema de conflictos para resolver todo a posteriori? Entre movimiento y resolucion de conflictos, el mapa se queda en una situacion que permite la
 existencia de mas de un personaje por casilla.
 */
-void PD_GM_InteractionsManager::TickAttackPhase(int tick) {
-
-}

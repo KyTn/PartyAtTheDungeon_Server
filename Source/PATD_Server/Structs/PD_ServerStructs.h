@@ -32,6 +32,8 @@ struct StructPlayer {
 //Usado por: GameManager
 struct StructGameState {
 	EGameState enumGameState;
+	EActionPhase enumActionPhase;
+	int visualTick;
 };
 
 
