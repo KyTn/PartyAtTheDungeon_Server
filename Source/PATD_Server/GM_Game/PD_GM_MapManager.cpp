@@ -7,6 +7,8 @@
 #include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "PATD_Server/Actors/Enemies/PD_E_EnemyCharacter.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 
@@ -36,7 +38,7 @@ PD_MG_LogicPosition* PD_GM_MapManager::WorldToLogicPosition(FVector* pos) {
 	float x, y;
 
 	x = -1.0f * pos->X / 100.f;
-	y = pos->X / 100.f;
+	y = pos->Y / 100.f;
 
 	return new PD_MG_LogicPosition((int)roundf(x), (int)roundf(y));
 }
@@ -76,20 +78,31 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 
 
 void PD_GM_MapManager::InstantiateDynamicMap(PD_GM_EnemyManager* enemyMan) {
-	EEnemiesType enemyId;
+	ECharacterType enemyType;
 	///necesitamos comprobar ya el ID
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
-		enemyId = DynamicMapRef->GetXYMap()[*DynamicMapRef->GetLogicPositions()[i]];
+		
+		enemyType = DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]][0]->GetTypeCharacter();///Cogemos el tipo
+		
+		for (int j = 0; j < enemyMan->GetEnemies().Num(); j++) {
+			if (enemyMan->GetEnemies()[j]->GetIDCharacter() == DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]][0]->GetIDCharacter()) {///Comprobamos el ID, para asignar el Character correctamente
 
-		switch (enemyId) {
-		case EEnemiesType::Archer:
-			DynamicMapRef->UpdateActor(instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]), DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
-			break;
-
-		case EEnemiesType::Zombie:
-			DynamicMapRef->UpdateActor(instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]), DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
-			break;
+				switch (enemyType) {
+					case ECharacterType::Archer: {
+						APD_E_EnemyCharacter* charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
+						//DynamicMapRef->UpdateActor(charac, DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+						enemyMan->GetEnemies()[j]->SetCharacterBP(charac);
+						break;
+					}
+					case ECharacterType::Zombie: {
+						APD_E_EnemyCharacter* charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
+						//DynamicMapRef->UpdateActor(charac, DynamicMapRef->GetLogicPositions()[i]);///instancia el objeto fisico en el lógico
+						enemyMan->GetEnemies()[j]->SetCharacterBP(charac);
+						break;
+					}
+				}
+			}
 		}
 	}
 }

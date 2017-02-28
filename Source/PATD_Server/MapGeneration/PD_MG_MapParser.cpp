@@ -133,7 +133,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 	uint32 intType,x, y;
 	int32 num,j;
 	firstIndex++;
-	EEnemiesType type;
+	ECharacterType type;
 	for (uint32 i = firstIndex; i < Enemynum + firstIndex;i++) {
 		/*enemyValue = fileReaded[i].RightChop(2);
 		enemyValue.RemoveAt(enemyValue.Len()-1);//Hay que hacer esto, dado que guardaba basura, un "\n", o un "\0" que se comportaba al hacer el cout como "\n"
@@ -149,7 +149,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 			j++;
 			num = num * 10;
 		}
-		type = EEnemiesType(intType);
+		type = ECharacterType(intType);
 		num = 1; j++;
 		while (enemyLine[j] != ',')
 		{
@@ -164,21 +164,24 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 			j++;
 			num = num * 10;
 		}
+		PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
+		PD_MG_LogicPosition* lp = new PD_MG_LogicPosition(x, y);
+		ch->SetCurrentLogicalPosition(lp);
 		switch (type) {///En este switch metemos la IA lógica de cada uno
-			case EEnemiesType::Archer: {
-				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
-				//Hay que hacer el set ID ch->SetIDCharacter();
-				//Hay que hacer el set logicalLocation
+			case ECharacterType::Archer: {
+				FString id = "Arch" + i;
+				ch->SetIDCharacter(id);
+				ch->SetTypeCharacter(type);				
 				enemyMan->AddEnemie(ch);
-				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				dynamicMapRef->AddNewEnemy(lp, ch, type);
 				break;
 		}
-			case EEnemiesType::Zombie: {
-				PD_GM_LogicCharacter* ch = new PD_GM_LogicCharacter();
-				//Hay que hacer el set ID ch->SetIDCharacter();
-				//Hay que hacer el set logicalLocation
+			case ECharacterType::Zombie: {
+				FString id = "Zomb" + i;
+				ch->SetIDCharacter(id);
+				ch->SetTypeCharacter(type);
 				enemyMan->AddEnemie(ch);
-				dynamicMapRef->AddNewEnemy(x, y, ch, type);
+				dynamicMapRef->AddNewEnemy(lp, ch, type);
 				break;
 			}
 		}

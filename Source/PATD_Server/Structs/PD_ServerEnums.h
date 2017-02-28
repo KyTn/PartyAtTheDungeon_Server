@@ -14,4 +14,4 @@ enum class ActiveSkills { Punch = 1, Fireball = 2, JustInTheEye = 3, ForTheKing 
 enum class PasiveSkills { NotInMyGuard = 1, TheGoodBier = 2, KingInTheNorth = 3, HelloWorld = 4, YouShallNotPass = 5 };
 
 
-enum class EEnemiesType { Archer, Zombie };
+enum class ECharacterType { Player, Archer, Zombie };
