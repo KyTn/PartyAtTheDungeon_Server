@@ -10,6 +10,7 @@
 #include "MapGeneration/Static/PD_MG_StaticMap.h"
 #include "MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -102,8 +103,10 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 
 
 		//Evento PlayerData
-		}else if (inEventType == UStructType::FStructOrderMenu) {
-
+		}
+		else if (inEventType == UStructType::FStructCharacter) {
+			//Se reciben los datos del jugador y se procesan
+			HandleEvent_LoadPlayerInfo(inDataStruct, inPlayer);
 		}
 	}
 }
@@ -150,6 +153,19 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 		}
 	}
 
+}
+
+void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataStruct, int inPlayer) {
+	FStructCharacter* playerStats = (FStructCharacter*)inDataStruct;
+
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character = new PD_GM_LogicCharacter();
+
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->totalStats = &playerStats->totalStats;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->basicStats = &playerStats->basicStats;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->initBaseStats = &playerStats->initBaseStats;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skills = &playerStats->skills;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->weapon = &playerStats->weapon;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skin = &playerStats->skin;
 }
 
 void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
