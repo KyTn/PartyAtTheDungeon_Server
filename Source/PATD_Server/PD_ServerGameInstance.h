@@ -73,6 +73,7 @@ public:
 	void HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient);
 	void HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
 	void HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
+	void HandleEvent_LoadPlayerInfo(FStructGeneric* inDataStruct, int inPlayer);
 
 
 	//Carga de mapa

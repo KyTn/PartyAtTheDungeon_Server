@@ -44,14 +44,6 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	PD_MG_LogicPosition currentLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion actual del personaje
 	PD_MG_LogicPosition movingLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion del personaje en cada tick (Todo Logico, el personaje NO SE MUEVE)
 
-												//Variables - Stats del personaje , arma y habilidades
-	FStructBasicStats* basicStats;
-	FStructInitBaseStats* initBaseStats;
-	FStructSkills* skills;
-	FStructWeapon* weapon;
-	FStructSkin* skin;
-	FStructTotalStats* totalStats;
-
 	//Referencia al Mapa de la partida para que se pueda Mover-atacar-interactuar con los elementos del mismo
 	PD_GM_MapManager* mapMng;
 	//PlayerManager* playerMng;
@@ -62,6 +54,13 @@ public:
 	PD_GM_LogicCharacter();
 	~PD_GM_LogicCharacter();
 
+	//Variables - Stats del personaje , arma y habilidades
+	FStructBasicStats* basicStats;
+	FStructInitBaseStats* initBaseStats;
+	FStructSkills* skills;
+	FStructWeapon* weapon;
+	FStructSkin* skin;
+	FStructTotalStats* totalStats;
 
 	/*
 	//Metodo para encontrar el camino adecuado para ir a la posicion deseada
