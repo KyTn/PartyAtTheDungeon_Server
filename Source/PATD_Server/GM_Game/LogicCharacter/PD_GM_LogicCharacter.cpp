@@ -57,8 +57,8 @@ TArray<FStructOrderAction>* PD_GM_LogicCharacter::FindPathToMove(PD_MG_LogicPosi
 }
 
 
-
-PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove)
+//PD_MG_LogicPosition* MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove);
+PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderAction* order)
 {
 	/*
 	- OBJETIVO: Simula el movimiento del personaje siguiendo una lista de movimientos dada (el camino calculado hasta una
@@ -75,9 +75,14 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(uint8 tick, TArra
 	que se mueven y actue en consecuencia.
 	- Tras el choque habría que cambiar esa movingLogicalPosition
 	*/
+	
 	PD_MG_LogicPosition* targetPosition;
 	targetPosition = movingLogicalPosition;
-
+	
+	/*
+	currentLogicalPosition = order->targetLogicPosition;
+	movingLogicalPosition = order->targetLogicPosition;
+	*/
 	return targetPosition;
 }
 
@@ -95,7 +100,9 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 	Devuelve true si todo ha ido bien, si algo ha fallado, devuelve false (normalmente a raiz de que la funcion move del controlador
 	devuelva tambien false
 	*/
-
+	/*
+	currentLogicalPosition = &targetPosition;
+	controller*/
 	return true;
 }
 

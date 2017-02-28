@@ -11,35 +11,6 @@
 ///Structs NO serializables -- (No se envian ellos mismos)
 //=================================
 
-enum class EDirections { Up = 1, Down = 2, Left = 3, Right = 4 };
-
-enum class EOrderAction { Move = 1, Attack = 2 };
-//Los struct tienen que ser USTRUCT para poder meterlos en un array de otro USTRUCT.
-USTRUCT()
-struct FStructOrderAction {
-
-
-	GENERATED_BODY()
-
-		//EOrderAction
-		UPROPERTY()
-		uint8 orderType;
-
-	//EDirections
-	UPROPERTY()
-		uint8 targetDirection;
-
-	/*
-	LogicPosition targetTile;
-	CharacterId targetCharacter;
-	etc.
-	int subtipo; para numero de consumible, numero de habilidad, etc.
-	*/
-	FStructOrderAction() {
-
-	}
-
-};
 
 USTRUCT()
 struct FStructLogicPosition {
@@ -56,6 +27,38 @@ struct FStructLogicPosition {
 	}
 
 };
+
+enum class EDirections { Up = 1, Down = 2, Left = 3, Right = 4 };
+enum class EOrderAction { Move = 1, Attack = 2 };
+//Los struct tienen que ser USTRUCT para poder meterlos en un array de otro USTRUCT.
+USTRUCT()
+struct FStructOrderAction {
+
+
+	GENERATED_BODY()
+
+		//EOrderAction
+		UPROPERTY()
+		uint8 orderType;
+
+	//EDirections
+	UPROPERTY()
+	uint8 targetDirection;
+	UPROPERTY()
+	FStructLogicPosition targetLogicPosition;
+	/*
+	LogicPosition targetTile;
+	CharacterId targetCharacter;
+	etc.
+	int subtipo; para numero de consumible, numero de habilidad, etc.
+	*/
+	FStructOrderAction() {
+
+	}
+
+};
+
+
 
 
 /*

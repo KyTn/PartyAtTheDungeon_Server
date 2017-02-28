@@ -64,12 +64,12 @@ public:
 	void PlayersLogicTurn();
 
 	void LogicTurnItemPhase();
-	void LogicTurnMovePhase();
-	void LogicTurnAttackPhase();
+	void LogicTurnMovePhase(int numCharacters);
+	void LogicTurnAttackPhase(int numCharacters);
 
 	//Funciones para procesar cada accion individual
-	void LogicMoveTick(int tick);
-	void LogicAttackTick(int tick);
+	void LogicMoveTick(int tick, int numCharacters);
+	void LogicAttackTick(int tick, int numCharacters);
 	void LogicItemTick(int tick);
 
 

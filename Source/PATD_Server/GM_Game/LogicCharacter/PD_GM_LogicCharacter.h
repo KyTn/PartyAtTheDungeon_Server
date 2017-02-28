@@ -76,8 +76,8 @@ public:
 	Devuelve:
 	- Un posicion logica, indicando la casilla destino del movimiento despues de la simulacion
 	*/
-	PD_MG_LogicPosition* MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove);
-
+	//PD_MG_LogicPosition* MoveToLogicPosition(uint8 tick, TArray<FStructOrderAction> listMove);
+	PD_MG_LogicPosition* MoveToLogicPosition(FStructOrderAction* order);
 	/*
 	//Metodo para moverse visualmente por el mapa
 	Recibe:
