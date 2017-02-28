@@ -103,7 +103,8 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition* targetPos
 	*/
 	
 	FVector* realPosition = mapMng->LogicToWorldPosition(targetPosition);
-	
+	controller->MoveTo(realPosition->X,realPosition->Y);
+
 	return true;
 }
 

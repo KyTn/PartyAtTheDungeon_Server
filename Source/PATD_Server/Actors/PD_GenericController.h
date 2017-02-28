@@ -2,6 +2,11 @@
 
 #pragma once
 
+
+//forward declarations
+#include "Structs/PD_ServerEnums.h"
+
+//include de unreal
 #include "AIController.h"
 #include "PD_GenericController.generated.h"
 
@@ -11,8 +16,22 @@
 UCLASS()
 class PATD_SERVER_API APD_GenericController : public AAIController
 {
+
+
+	EAnimationType animationOn;
+	int maxLengthAnimation = 30;
+	int currentTimeAnimation;
+	FVector moveTargetPosition;
+	float toleranceMove = 2.0;
+
 public:
 	GENERATED_BODY()
+
+	APD_GenericController();
+
+	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
+	void Tick(float DeltaTime)override;
+	void OnAnimationEnd();
 		/*
 		//Para mover al personaje de forma visual por el mapa
 		Recibe:
@@ -50,6 +69,7 @@ public:
 	8. State N
 	etc.
 	*/
+	
 	
 	
 };
