@@ -272,7 +272,7 @@ struct FStructCharacter : public  FStructGeneric
 	UPROPERTY()
 		FStructInitBaseStats initBaseStats;
 	UPROPERTY()
-		FStructSkills skils;
+		FStructSkills skills;
 	UPROPERTY()
 		FStructWeapon weapon;
 	UPROPERTY()
