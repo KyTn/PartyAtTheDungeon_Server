@@ -11,6 +11,7 @@
 UCLASS()
 class PATD_SERVER_API APD_GenericController : public AAIController
 {
+public:
 	GENERATED_BODY()
 		/*
 		//Para mover al personaje de forma visual por el mapa

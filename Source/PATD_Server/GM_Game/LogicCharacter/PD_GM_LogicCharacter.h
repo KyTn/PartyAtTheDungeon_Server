@@ -5,6 +5,7 @@
 
 #include "Structs/PD_ServerStructs.h"
 
+#include "MapGeneration/PD_MG_LogicPosition.h"
 
 //forward declarations
 #include "Structs/PD_ServerEnums.h"
@@ -19,6 +20,7 @@ struct FStructTotalStats;
 class PD_MG_LogicPosition;
 class AMyCharacterParent;
 class APD_GenericController;
+class PD_GM_MapManager;
 
 class PATD_SERVER_API PD_GM_LogicCharacter
 {
@@ -39,8 +41,8 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	AActor* character_Player_BP; //BP donde esta el PROP del Character
 
 
-	PD_MG_LogicPosition* currentLogicalPosition; //Posicion actual del personaje
-	PD_MG_LogicPosition* movingLogicalPosition; //Posicion del personaje en cada tick (Todo Logico, el personaje NO SE MUEVE)
+	PD_MG_LogicPosition currentLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion actual del personaje
+	PD_MG_LogicPosition movingLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion del personaje en cada tick (Todo Logico, el personaje NO SE MUEVE)
 
 												//Variables - Stats del personaje , arma y habilidades
 	FStructBasicStats* basicStats;
@@ -51,7 +53,7 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	FStructTotalStats* totalStats;
 
 	//Referencia al Mapa de la partida para que se pueda Mover-atacar-interactuar con los elementos del mismo
-	//MapManager* mapMng;
+	PD_GM_MapManager* mapMng;
 	//PlayerManager* playerMng;
 	//EnemiesManager* EnemiesMng;
 
@@ -85,7 +87,7 @@ public:
 	Devuelve:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
-	bool MoveToPhysicalPosition(PD_MG_LogicPosition targetPosition);
+	bool MoveToPhysicalPosition(PD_MG_LogicPosition* targetPosition);
 
 
 	/*
@@ -191,6 +193,6 @@ public:
 	void SetCharacterBP(AActor* ncharacter_Player_BP); //BP donde esta el PROP del Character
 	void SetCurrentLogicalPosition(PD_MG_LogicPosition* ncurrentLogicalPosition);
 	void SetMovingLogicalPosition(PD_MG_LogicPosition* nmovingLogicalPosition);
-
+	void SetMapManager(PD_GM_MapManager* nmapManager);
 
 };

@@ -11,6 +11,7 @@
 UCLASS()
 class PATD_SERVER_API APD_CharacterController : public APD_GenericController
 {
+public:
 	GENERATED_BODY()
 	
 	virtual bool MoveTo(float x, float y) override;

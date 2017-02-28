@@ -2,17 +2,26 @@
 
 #pragma once
 
+//forward declaration
+#include "Structs/PD_ServerEnums.h"
+struct FStructTurnOrders;
 class PD_GM_LogicCharacter;
+
+
 class PATD_SERVER_API PD_GM_EnemyManager
 {
 
 private:
+	//Quizas podriamos hacer un StructEnemy para guardar informacion asociada que podamos querer de un enemigo. (Las ordenes por ejemplo)
 	TArray<PD_GM_LogicCharacter*> enemies;
-
+	TArray<FStructTurnOrders*> listTurnOrders;
 public:
 	PD_GM_EnemyManager();
 	~PD_GM_EnemyManager();
 
 	void AddEnemie(PD_GM_LogicCharacter* enemy);
 	TArray<PD_GM_LogicCharacter*> GetEnemies();
+	FStructTurnOrders* GetTurnOrders(int indexEnemy);
+	int GetEnemyMaxLenghtActions(EActionPhase phase);
+	int GetMaxLenghtActions(EActionPhase phase);
 };
