@@ -19,7 +19,7 @@
 #include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "GM_Game/PD_GM_MapManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
-
+#include "GM_Game/PD_GM_EnemyManager.h"
 //Includes de prueba
 
 
@@ -257,10 +257,10 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 
 	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
-	///Haria falta una clase Enemy manager, con los enemigos para organizar sus acciones, y llamar a las AI correspondientes
+	enemyManager = new PD_GM_EnemyManager();
 	
 	// Parsea el chorizo
-	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
+	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef, enemyManager);
 	mapManager = new PD_GM_MapManager();
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
@@ -273,10 +273,10 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
 		mapManager->InstantiateStaticMap();
-		mapManager->InstantiateDynamicMap();
+		mapManager->InstantiateDynamicMap(enemyManager);
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager);
+		gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
 		networkManager->RegisterObserver(gameManager);
 
 	//}

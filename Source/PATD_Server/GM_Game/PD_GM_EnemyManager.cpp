@@ -2,13 +2,22 @@
 
 #include "PATD_Server.h"
 #include "PD_GM_EnemyManager.h"
+#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 PD_GM_EnemyManager::PD_GM_EnemyManager()
 {
-	/*Esta Clase va a ser la encargada de tener una lista con los enemigos, de cara a realizar las acciones y llamar a la IA correspondiente.	
-	*/
+
 }
 
 PD_GM_EnemyManager::~PD_GM_EnemyManager()
 {
+}
+
+
+void PD_GM_EnemyManager::AddEnemie(PD_GM_LogicCharacter* enemy) {
+	enemies.Add(enemy);
+}
+
+TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
+	return enemies;
 }

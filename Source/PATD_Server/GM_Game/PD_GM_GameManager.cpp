@@ -11,15 +11,17 @@
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
 #include "PD_GM_MapManager.h"
+#include "PD_GM_EnemyManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 
 
 
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_GM_EnemyManager* inEnemyMan)
 {
 	InitState();
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
+	enemyManager = inEnemyMan;
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 

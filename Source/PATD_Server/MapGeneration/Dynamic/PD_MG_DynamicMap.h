@@ -3,21 +3,18 @@
 
 #pragma once
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
-#include "PATD_Server/Actors/Enemies/PD_E_EnemiesEnum.h"
+#include "PATD_Server/Structs/PD_ServerEnums.h"
 
 /// CLASS REFERENCES
 class PD_MG_LogicPosition;
-class PD_GM_IALogicCharacter;
-class PD_E_EnemiesEnum;
+class PD_GM_LogicCharacter;
 
 class PATD_SERVER_API PD_MG_DynamicMap
 {
 private:
 	
 	uint32 _Height, _Width;
-	//TMap< PD_MG_LogicPosition, EEnemiesType> posEnemies;
-	TMap<PD_MG_LogicPosition, EEnemiesType> _xymap;
-	TMap<PD_MG_LogicPosition, TArray<PD_GM_IALogicCharacter*>> enemies;
+	TMap<PD_MG_LogicPosition, TArray<PD_GM_LogicCharacter*>> enemies;
 	TArray<PD_MG_LogicPosition*> _LogicPositionsRefs;
 
 public:
@@ -32,15 +29,14 @@ public:
 	void SetHeight(uint32 val) { _Height = val; }
 	void SetWidth(uint32 val) { _Width = val; }
 
-	TMap<PD_MG_LogicPosition, TArray<PD_GM_IALogicCharacter*>> getEnemies() { return enemies; }
-	TMap<PD_MG_LogicPosition, EEnemiesType> GetXYMap() { return _xymap; }
+	TMap<PD_MG_LogicPosition, TArray<PD_GM_LogicCharacter*>> getEnemies() { return enemies; }
 	TArray<PD_MG_LogicPosition*> GetLogicPositions() { return _LogicPositionsRefs; }
 
 #pragma endregion
 
 	//PD_MG_LogicPosition* AddNewLogicPosition(uint32 x, uint32 y, TCHAR c);
 
-	void AddNewEnemy(uint32 x, uint32 y, PD_GM_IALogicCharacter* ch, EEnemiesType type);
+	void AddNewEnemy(PD_MG_LogicPosition* lp, PD_GM_LogicCharacter* ch, ECharacterType type);
 
 	void UpdateActor(AActor* actor, PD_MG_LogicPosition* lp);
 

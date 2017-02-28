@@ -10,8 +10,7 @@ class PD_MM_MapInfo;
 class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
-
-
+class PD_GM_EnemyManager;
 
 
 
@@ -60,7 +59,7 @@ public:
 #pragma region INSTANTIATE MAP
 
 	void InstantiateStaticMap();
-	void InstantiateDynamicMap();
+	void InstantiateDynamicMap(PD_GM_EnemyManager* enemyMan);
 
 
 #pragma endregion
