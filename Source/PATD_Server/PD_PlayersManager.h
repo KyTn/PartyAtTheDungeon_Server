@@ -51,7 +51,7 @@ public:
 	//Funcion de acceso directo al struct 
 	StructPlayer* GetDataStructPlayer(int player);
 
-	
+	TArray<StructPlayer*> GetDataPlayers() { return dataPlayers;}
 
 
 };

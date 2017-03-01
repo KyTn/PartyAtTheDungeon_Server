@@ -279,6 +279,7 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	structMap.stringMap = mapString;
 	networkManager->SendNow(&structMap, -1);
 
+
 	// le pasamos al mapManager un instanciador
 	AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
 	mapManager->instantiator = InstantiatorActor;

@@ -3,16 +3,16 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-#include "PD_E_EnemyCharacter.generated.h"
+#include "PD_E_Character.generated.h"
 
 UCLASS()
-class PATD_SERVER_API APD_E_EnemyCharacter : public ACharacter
+class PATD_SERVER_API APD_E_Character : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	APD_E_EnemyCharacter();
+	APD_E_Character();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

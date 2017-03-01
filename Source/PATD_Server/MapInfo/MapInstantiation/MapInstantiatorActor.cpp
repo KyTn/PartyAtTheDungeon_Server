@@ -6,7 +6,7 @@
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PATD_Server/MapGeneration/PD_MG_MapParser.h"
 #include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
-#include "PATD_Server/Actors/Enemies/PD_E_EnemyCharacter.h"
+#include "PATD_Server/Actors/PD_E_Character.h"
 #include "PATD_Server/Actors/PD_E_ElementActor.h"
 
 
@@ -54,6 +54,8 @@ void AMapInstantiatorActor::Tick(float DeltaTime)
 
 #pragma region INSTANTIATORS
 
+
+
 AActor* AMapInstantiatorActor::InstantiateTile(PD_MG_LogicPosition* logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(TileClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f));
@@ -64,12 +66,16 @@ AActor* AMapInstantiatorActor::InstantiateWall(PD_MG_LogicPosition* logpos)
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(WallClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 0.f), FRotator(0.0f, 0.f, 0.f));
 }
 
-APD_E_EnemyCharacter* AMapInstantiatorActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
-	return GetWorld()->SpawnActor<APD_E_EnemyCharacter>(ArcherClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+APD_E_Character* AMapInstantiatorActor::InstantiateArcher(PD_MG_LogicPosition* logpos) {
+	return GetWorld()->SpawnActor<APD_E_Character>(ArcherClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
 }
 
-APD_E_EnemyCharacter* AMapInstantiatorActor::InstantiateZombie(PD_MG_LogicPosition* logpos) {
-	return GetWorld()->SpawnActor<APD_E_EnemyCharacter>(ZombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+APD_E_Character* AMapInstantiatorActor::InstantiateZombie(PD_MG_LogicPosition* logpos) {
+	return GetWorld()->SpawnActor<APD_E_Character>(ZombieClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_Character* AMapInstantiatorActor::InstantiatePlayer(PD_MG_LogicPosition* logpos) {
+	return GetWorld()->SpawnActor<APD_E_Character>(PlayerClass, FVector(-1.0f * logpos->GetX()*100.0f, logpos->GetY() * 100.0f, 100.f), FRotator(0.0f, 0.f, 0.f));
 }
 
 #pragma endregion

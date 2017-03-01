@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-#include "PD_E_EnemyCharacter.h"
+#include "PD_E_Character.h"
 
 
 // Sets default values
-APD_E_EnemyCharacter::APD_E_EnemyCharacter()
+APD_E_Character::APD_E_Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -13,21 +13,21 @@ APD_E_EnemyCharacter::APD_E_EnemyCharacter()
 }
 
 // Called when the game starts or when spawned
-void APD_E_EnemyCharacter::BeginPlay()
+void APD_E_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void APD_E_EnemyCharacter::Tick( float DeltaTime )
+void APD_E_Character::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
 }
 
 // Called to bind functionality to input
-void APD_E_EnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APD_E_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 

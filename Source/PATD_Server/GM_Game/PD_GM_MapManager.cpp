@@ -9,7 +9,7 @@
 #include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
 #include "PATD_Server/GM_Game/PD_GM_GameManager.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
-#include "PATD_Server/Actors/Enemies/PD_E_EnemyCharacter.h"
+#include "PATD_Server/Actors/PD_E_Character.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
@@ -94,8 +94,13 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	ECharacterType enemyType;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->enemyManager->GetEnemies().Num());
+	/*TArray<PD_MG_LogicPosition*> spawn = MapInfo->GetSpawnPoint();
+	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
+	{
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCurrentLogicalPosition(spawn[i]);
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(spawn[i]));///actualizamos la referencia del BP
 
-	///necesitamos comprobar ya el ID
+	}*/
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
 		enemyType = DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
@@ -104,7 +109,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		{
 			case ECharacterType::Archer: 
 			{
-				APD_E_EnemyCharacter* charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
+				APD_E_Character* charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
 				PD_GM_LogicCharacter* logicCha = new PD_GM_LogicCharacter();
 				logicCha->SetIsPlayer(false);
 				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]].type_Character);
@@ -119,7 +124,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 			}
 			case ECharacterType::Zombie: 
 			{
-				APD_E_EnemyCharacter* charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
+				APD_E_Character* charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
 				PD_GM_LogicCharacter* logicCha = new PD_GM_LogicCharacter();
 				logicCha->SetIsPlayer(false);
 				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]].type_Character);
