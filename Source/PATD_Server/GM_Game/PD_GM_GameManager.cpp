@@ -21,6 +21,7 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	InitState();
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
+	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }

@@ -20,7 +20,7 @@ private:
 
 	
 
-	PD_GM_GameManager* _GAMEMANAGER;
+	
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, 0 si no hay ninguno. 
 	//bool getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 
@@ -29,6 +29,7 @@ public:
 	~PD_GM_MapManager();
 
 	AMapInstantiatorActor* instantiator;
+	PD_GM_GameManager* _GAMEMANAGER;
 
 	PD_MM_MapInfo* MapInfo;
 	PD_MG_StaticMap* StaticMapRef;
