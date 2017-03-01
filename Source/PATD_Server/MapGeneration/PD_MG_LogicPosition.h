@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "PATD_Server.h"
+#include "math.h"
+
 /**
  * 
  */
@@ -40,17 +41,16 @@ public:
 		return LogicToWorldPosition(this);
 	}
 
-	TArray<PD_MG_LogicPosition> GetAdjacents(TArray<PD_MG_LogicPosition> list) {
-		
-		TArray<PD_MG_LogicPosition> res;
-		
+
+	TArray<PD_MG_LogicPosition*> GetAdjacents(TArray<PD_MG_LogicPosition*> list) {
+
+		TArray<PD_MG_LogicPosition*> res = TArray<PD_MG_LogicPosition*>();
+
 		for (int i = 0; i < list.Num(); i++) {
-			if ((list[i].GetX() - this->GetX()) <= 1 || (list[i].GetY() - this->GetY()) <= 1) {
+			if ( abs((int)(list[i]->GetX()) - (int)(this->GetX())) <= 1 || abs((int)(list[i]->GetY()) - (int)(this->GetY())) <= 1) {
 				res.Add(list[i]);
 			}
-
 		}
-		
 		return res;
 	}
 };

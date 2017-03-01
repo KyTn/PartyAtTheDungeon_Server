@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
+#include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
 
 // FORWARD DECLARATIONS
 class PD_MG_LogicPosition;
@@ -54,6 +54,7 @@ public:
 	//Dada la posición en el mundo, te devuelve la posición lógica que estaría asignada a posición en el mundo, exista o no en el mapa. 
 	PD_MG_LogicPosition* WorldToLogicPosition(FVector* pos);
 
+	TArray<PD_MG_LogicPosition*> Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition * logPos);
 
 #pragma endregion
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
+#include "MapGeneration/PD_MG_LogicPosition.h"
 
 
 // FORWARD DECLARATIONS
@@ -12,19 +12,23 @@ class PD_MM_Room;
 
 class PATD_SERVER_API PD_MM_MapInfo
 {
+
 public:
 	PD_MM_MapInfo();
 	~PD_MM_MapInfo();
+
+	PD_GM_MapManager* mapManager;
+
 
 	TArray<PD_MG_LogicPosition> allLogicPos;
 	TArray<PD_MM_Room> rooms;
 
 
 	// Devuelve un puntero al Room que tenga ese logPos. True si existe. 
-	bool RoomOf(PD_MG_LogicPosition logpos, PD_MM_Room* room);
+	bool RoomOf(PD_MG_LogicPosition* logpos, PD_MM_Room* room);
 
 	// Inicializa el vector de rooms dado un staticMap
-	void CalculateRooms( PD_MG_StaticMap* sm );
+	void CalculateRooms(PD_MG_StaticMap* sm);
 
 };
 
@@ -36,12 +40,11 @@ public:
 	PD_MM_Room();
 	~PD_MM_Room();
 
-	
+	bool IsSpawnRoom = false;
+
 	TArray<PD_MG_LogicPosition> LogicPosInRoom;
-	
-	TMap<PD_MG_LogicPosition, uint32> tiles;
-	TMap<PD_MG_LogicPosition, uint32> walls;
-	TMap<PD_MG_LogicPosition, uint32> interactuables;
-	TMap<PD_MG_LogicPosition, uint32> players;
-	TMap<PD_MG_LogicPosition, uint32> enemies;
+
+	TMap<PD_MG_LogicPosition, AActor*> tiles;
+	TMap<PD_MG_LogicPosition, AActor*> walls;
+	TMap<PD_MG_LogicPosition, AActor*> interactuables;
 };
