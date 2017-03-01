@@ -8,11 +8,13 @@
 #include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
 #include "PATD_Server/GM_Game/PD_GM_GameManager.h"
+#include "PD_PlayersManager.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PATD_Server/Actors/PD_E_Character.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
+#include "MapInfo/PD_MM_MapInfo.h"
 
 PD_GM_MapManager::PD_GM_MapManager()
 {
@@ -22,6 +24,17 @@ PD_GM_MapManager::~PD_GM_MapManager()
 {
 }
 
+
+
+void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
+
+	StaticMapRef = sm;
+	DynamicMapRef = dm;
+
+	// Ya tengo la info del mapa cargada por el Struct o por las refs del estatico y dinamico
+	MapInfo = new PD_MM_MapInfo(this);
+}
+
 #pragma region GET INFO OF THE MAP
 
 /*
@@ -29,6 +42,17 @@ bool PD_GM_MapManager::getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PL
 bool PD_GM_MapManager::getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 */
+
+TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
+	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
+		if (MapInfo->rooms[i].IsSpawnRoom) {
+			return MapInfo->rooms[i].LogicPosInRoom;
+		}
+	}
+
+	return TArray<PD_MG_LogicPosition>();
+}
+
 AActor* PD_GM_MapManager::getInteractuableAt(PD_MG_LogicPosition* logpos) { return 0; }
 
 
@@ -45,14 +69,14 @@ PD_MG_LogicPosition* PD_GM_MapManager::WorldToLogicPosition(FVector* pos) {
 	return new PD_MG_LogicPosition((int)roundf(x), (int)roundf(y));
 }
 
-TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoint()
-{
 
-	TArray<PD_MG_LogicPosition> spawnPoints;
-	return  spawnPoints;
+
+TArray<PD_MG_LogicPosition*> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition* logPos) {
+
+	return logPos->GetAdjacents(StaticMapRef->GetLogicPositions());
 }
 
-#pragma endregion 
+#pragma endregion
 
 
 
@@ -77,15 +101,17 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 		/**/
 		switch (StaticMapRef->GetXYMap()[*StaticMapRef->GetLogicPositions()[i]]) {
 		case 'w':
-			instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]);
+			
+			MapInfo->AddWall(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]));
 			break;
 
 		case '.':
-			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			
+			MapInfo->AddTile(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]));
 			break;
 		case 'd':
 
-			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			MapInfo->AddTile(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]));
 			break;
 			/*default:
 
@@ -101,13 +127,15 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	ECharacterType enemyType;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->enemyManager->GetEnemies().Num());
-	/*TArray<PD_MG_LogicPosition*> spawn = MapInfo->GetSpawnPoint();
+	TArray<PD_MG_LogicPosition> spawn = GetSpawnPoints();
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCurrentLogicalPosition(spawn[i]);
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(spawn[i]));///actualizamos la referencia del BP
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(&spawn[i]);
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(&spawn[i]));
+		///actualizamos la referencia del BP
 
-	}*/
+	}
+
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
 		enemyType = DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo

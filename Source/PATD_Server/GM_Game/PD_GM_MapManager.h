@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
+#include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
 
 // FORWARD DECLARATIONS
 class PD_MG_LogicPosition;
@@ -11,6 +11,7 @@ class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
+class PD_PlayersManager;
 class APD_GenericController;
 
 
@@ -28,6 +29,9 @@ public:
 	PD_GM_MapManager();
 	~PD_GM_MapManager();
 
+
+	void Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm);
+
 	AMapInstantiatorActor* instantiator;
 	PD_GM_GameManager* _GAMEMANAGER;
 
@@ -43,7 +47,7 @@ public:
 	//bool getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
 	//bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
-	TArray<PD_MG_LogicPosition> GetSpawnPoint();
+	TArray<PD_MG_LogicPosition> GetSpawnPoints();
 
 	// Esta funcion devolverá un Interactuable
 	AActor* getInteractuableAt(PD_MG_LogicPosition* logpos);
@@ -54,6 +58,7 @@ public:
 	//Dada la posición en el mundo, te devuelve la posición lógica que estaría asignada a posición en el mundo, exista o no en el mapa. 
 	PD_MG_LogicPosition* WorldToLogicPosition(FVector* pos);
 
+	TArray<PD_MG_LogicPosition*> Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition * logPos);
 
 #pragma endregion
 
