@@ -9,7 +9,6 @@
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "MapGeneration/PD_MG_LogicPosition.h"
-#include "Actors/MyCharacterParent.h"
 #include "Actors/PD_GenericController.h"
 #include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "GM_Game/PD_GM_MapManager.h"
@@ -265,7 +264,6 @@ bool PD_GM_LogicCharacter::GetIsDead() { return isDead; }
 FString PD_GM_LogicCharacter::GetIDCharacter() { return ID_character; }
 ECharacterType PD_GM_LogicCharacter::GetTypeCharacter() { return type_character; }
 APD_GenericController* PD_GM_LogicCharacter::GetController() { return controller; }
-AMyCharacterParent* PD_GM_LogicCharacter::GetCharacterParent() { return characterParent; }
 ACharacter* PD_GM_LogicCharacter::GetCharacterBP() { return character_Player_BP; }
 PD_MG_LogicPosition* PD_GM_LogicCharacter::GetCurrentLogicalPosition() { return &currentLogicalPosition; }
 PD_MG_LogicPosition* PD_GM_LogicCharacter::GetMovingLogicalPosition() { return &movingLogicalPosition; }
@@ -377,7 +375,6 @@ void PD_GM_LogicCharacter::SetIsDead(bool nIsDead) { isDead = nIsDead; }
 void PD_GM_LogicCharacter::SetIDCharacter(FString nID_character) { ID_character = nID_character; }
 void PD_GM_LogicCharacter::SetTypeCharacter(ECharacterType nID_character) { type_character = nID_character; }
 void PD_GM_LogicCharacter::SetController(APD_GenericController* ncontroller) { controller = ncontroller; }
-void PD_GM_LogicCharacter::SetCharacterParent(AMyCharacterParent* ncharacterParent) { characterParent = ncharacterParent; }
 void PD_GM_LogicCharacter::SetCharacterBP(ACharacter* ncharacter_Player_BP) { character_Player_BP = ncharacter_Player_BP; }
 void PD_GM_LogicCharacter::SetCurrentLogicalPosition(PD_MG_LogicPosition* ncurrentLogicalPosition) { currentLogicalPosition = *ncurrentLogicalPosition; }
 void PD_GM_LogicCharacter::SetMovingLogicalPosition(PD_MG_LogicPosition* nmovingLogicalPosition) { movingLogicalPosition = *nmovingLogicalPosition; }
