@@ -25,15 +25,10 @@
 
 
 
-//Esquema
-/*
-el clientMaster se conecta al servidor
-Los clientes se meten ahora.
-el clientMaster configura y da ok.
-les sale a todos para elegir su personaje.
-Aqui no se puede conectar nadie mas.
-Lo crean y le dan a ready.
-*/
+#pragma region Get Managers
+//Funciones para obtener managers
+PD_GM_GameManager* UPD_ServerGameInstance::getGameManager() { return gameManager; }
+#pragma endregion 
 
 #pragma region Suscribe to events
 

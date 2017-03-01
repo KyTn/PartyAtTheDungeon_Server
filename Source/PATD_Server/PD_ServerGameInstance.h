@@ -60,6 +60,8 @@ public:
 
 	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test3.dungeon";
 
+	//Funciones para obtener managers
+	PD_GM_GameManager* getGameManager();
 
 
 	//Overwrites - GameInstance
