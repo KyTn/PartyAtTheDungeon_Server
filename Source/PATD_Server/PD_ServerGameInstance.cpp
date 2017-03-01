@@ -231,14 +231,9 @@ void UPD_ServerGameInstance::OnBeginState() {
 		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 		mapManager = new PD_GM_MapManager();
 		mapManager->StaticMapRef = staticMapRef;
-		mapManager->DynamicMapRef = dynamicMapRef;
+		mapManager->DynamicMapRef = dynamicMapRef;*/
 		
-		//Esto quiza no deberia guardar el string ya ahi.
-		FString mapString = mapManager->StaticMapRef->GetMapString();
-		//Enviar mapa al cliente
-		FStructMap structMap;
-		structMap.stringMap = mapString;
-		networkManager->SendNow(&structMap, -1);*/
+		
 
 		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
@@ -261,12 +256,12 @@ void UPD_ServerGameInstance::LoadMap(FString mapName)
 }
 
 //Callback cuando el mapa este cargado
-void UPD_ServerGameInstance::OnMapFinishLoad() {
+void UPD_ServerGameInstance::OnLoadedLevel() {
 	//Sin importar el estado hacemos:
-	/*APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
+	APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	networkManager->GetSocketManager()->InitTimerActor(TimerActorSpawned);
 
-	if (structServerState->enumServerState == EServerState::GameInProcess) {*/
+	if (structServerState->enumServerState == EServerState::GameInProcess) {
 		//Quizas esto es tarea del gameManager.
 	///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
 	mapParser = new PD_MG_MapParser();
@@ -281,21 +276,26 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
 
-		// Instanciacion del Map
 
-		// le pasamos al mapManager un instanciador
-		AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
-		mapManager->instantiator = InstantiatorActor;
+	FString mapString = mapManager->StaticMapRef->GetMapString();
+	//Enviar mapa al cliente
+	FStructMap structMap;
+	structMap.stringMap = mapString;
+	networkManager->SendNow(&structMap, -1);
 
-		// le decimos al mapManager que instancia las cosicas en el mundo
-		mapManager->InstantiateStaticMap();
-		mapManager->InstantiateDynamicMap(enemyManager);
+	// le pasamos al mapManager un instanciador
+	AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
+	mapManager->instantiator = InstantiatorActor;
 
-		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
-		networkManager->RegisterObserver(gameManager);
+	// le decimos al mapManager que instancia las cosicas en el mundo
+	mapManager->InstantiateStaticMap();
+	mapManager->InstantiateDynamicMap(enemyManager);
 
-	//}
+	//Aqui cedemos el control al GameManager.
+	gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
+	networkManager->RegisterObserver(gameManager);
+
+	}
 }
 
 #pragma endregion

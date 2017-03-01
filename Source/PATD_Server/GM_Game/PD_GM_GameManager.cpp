@@ -96,7 +96,6 @@ void PD_GM_GameManager::UpdateState() {
 
 void PD_GM_GameManager::OnBeginState() {
 
-
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata

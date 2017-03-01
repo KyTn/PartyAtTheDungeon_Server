@@ -11,7 +11,7 @@ void APD_GameStateInitializer:: BeginPlay() {
 
 
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-	SGI->OnMapFinishLoad();
+	SGI->OnLoadedLevel();
 }
 
 
