@@ -114,8 +114,9 @@ int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {
 int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 	int numTicks = 0;
 	int indexPlayer=-1;
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions"));
 
-	for (int i = 0; this->GetNumPlayers(); i++) {
+	for (int i = 0; i < this->GetNumPlayers(); i++) {
 		TArray<FStructOrderAction> listActions;
 		if (phase == EActionPhase::Move) {
 			listActions = this->GetDataStructPlayer(i)->turnOrders->listMove;
@@ -128,9 +129,11 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 		if (numTicks < (listActions.Num())) {
 			numTicks = listActions.Num();
 			indexPlayer = i;
-		};
+		}
 	}
-	return numTicks;
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Health is %d"), indexPlayer);
+
+	return indexPlayer;
 }
 
 //Funcion de acceso directo al struct
