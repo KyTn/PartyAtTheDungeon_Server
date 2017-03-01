@@ -87,7 +87,7 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderActio
 }
 
 
-bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition* targetPosition)
+bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosition)
 {
 	/*
 	- OBJETIVO: Mueve al personaje hasta la posicion fisica establecida anteriormente en simulacion
@@ -101,8 +101,8 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition* targetPos
 	devuelva tambien false
 	*/
 	
-	FVector* realPosition = mapMng->LogicToWorldPosition(targetPosition);
-	controller->MoveTo(realPosition->X,realPosition->Y);
+	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
+	controller->MoveTo(realPosition.X,realPosition.Y);
 
 	return true;
 }
@@ -265,8 +265,8 @@ FString PD_GM_LogicCharacter::GetIDCharacter() { return ID_character; }
 ECharacterType PD_GM_LogicCharacter::GetTypeCharacter() { return type_character; }
 APD_GenericController* PD_GM_LogicCharacter::GetController() { return controller; }
 ACharacter* PD_GM_LogicCharacter::GetCharacterBP() { return character_Player_BP; }
-PD_MG_LogicPosition* PD_GM_LogicCharacter::GetCurrentLogicalPosition() { return &currentLogicalPosition; }
-PD_MG_LogicPosition* PD_GM_LogicCharacter::GetMovingLogicalPosition() { return &movingLogicalPosition; }
+PD_MG_LogicPosition PD_GM_LogicCharacter::GetCurrentLogicalPosition() { return currentLogicalPosition; }
+PD_MG_LogicPosition PD_GM_LogicCharacter::GetMovingLogicalPosition() { return movingLogicalPosition; }
 
 //SET
 void PD_GM_LogicCharacter::SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL)
@@ -376,6 +376,6 @@ void PD_GM_LogicCharacter::SetIDCharacter(FString nID_character) { ID_character 
 void PD_GM_LogicCharacter::SetTypeCharacter(ECharacterType nID_character) { type_character = nID_character; }
 void PD_GM_LogicCharacter::SetController(APD_GenericController* ncontroller) { controller = ncontroller; }
 void PD_GM_LogicCharacter::SetCharacterBP(ACharacter* ncharacter_Player_BP) { character_Player_BP = ncharacter_Player_BP; }
-void PD_GM_LogicCharacter::SetCurrentLogicalPosition(PD_MG_LogicPosition* ncurrentLogicalPosition) { currentLogicalPosition = *ncurrentLogicalPosition; }
-void PD_GM_LogicCharacter::SetMovingLogicalPosition(PD_MG_LogicPosition* nmovingLogicalPosition) { movingLogicalPosition = *nmovingLogicalPosition; }
+void PD_GM_LogicCharacter::SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition) { currentLogicalPosition = ncurrentLogicalPosition; }
+void PD_GM_LogicCharacter::SetMovingLogicalPosition(PD_MG_LogicPosition nmovingLogicalPosition) { movingLogicalPosition = nmovingLogicalPosition; }
 void PD_GM_LogicCharacter::SetMapManager(PD_GM_MapManager* nmapManager) { mapMng = nmapManager; }

@@ -85,7 +85,7 @@ public:
 	Devuelve:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
-	bool MoveToPhysicalPosition(PD_MG_LogicPosition* targetPosition);
+	bool MoveToPhysicalPosition(PD_MG_LogicPosition targetPosition);
 
 
 	/*
@@ -169,8 +169,8 @@ public:
 	ECharacterType GetTypeCharacter();
 	APD_GenericController* GetController();
 	ACharacter* GetCharacterBP();
-	PD_MG_LogicPosition* GetCurrentLogicalPosition();
-	PD_MG_LogicPosition* GetMovingLogicalPosition();
+	PD_MG_LogicPosition GetCurrentLogicalPosition();
+	PD_MG_LogicPosition GetMovingLogicalPosition();
 
 	//Métodos SET para cada Struct
 	void SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL);
@@ -187,8 +187,8 @@ public:
 	void SetTypeCharacter(ECharacterType ntype_character);
 	void SetController(APD_GenericController* ncontroller);
 	void SetCharacterBP(ACharacter* ncharacter_Player_BP); //BP donde esta el PROP del Character
-	void SetCurrentLogicalPosition(PD_MG_LogicPosition* ncurrentLogicalPosition);
-	void SetMovingLogicalPosition(PD_MG_LogicPosition* nmovingLogicalPosition);
+	void SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition);
+	void SetMovingLogicalPosition(PD_MG_LogicPosition nmovingLogicalPosition);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
 
 };

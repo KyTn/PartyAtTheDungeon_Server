@@ -445,10 +445,10 @@ void PD_GM_GameManager::VisualAttackTick() {
 	
 	FStructOrderAction visualAction = listAttack.Pop();
 	PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
-	FVector* physicPosition=mapManager->LogicToWorldPosition(&logicPosition);
+	FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
 
 	//Peta al no tener actor ni controller
-	//logicCharacter->GetController()->ActionTo(physicPosition->X, physicPosition->Y, visualAction.orderType);
+	//logicCharacter->GetController()->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
 
 
 }

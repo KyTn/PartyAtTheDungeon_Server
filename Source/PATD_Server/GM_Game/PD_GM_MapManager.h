@@ -50,15 +50,15 @@ public:
 	TArray<PD_MG_LogicPosition> GetSpawnPoints();
 
 	// Esta funcion devolverá un Interactuable
-	AActor* getInteractuableAt(PD_MG_LogicPosition* logpos);
+	AActor* getInteractuableAt(PD_MG_LogicPosition logpos);
 
 	//Dada un LogicPosition, te da la posición en el mundo.
-	FVector* LogicToWorldPosition(PD_MG_LogicPosition* pos);
+	const FVector LogicToWorldPosition(PD_MG_LogicPosition pos);
 
 	//Dada la posición en el mundo, te devuelve la posición lógica que estaría asignada a posición en el mundo, exista o no en el mapa. 
-	PD_MG_LogicPosition* WorldToLogicPosition(FVector* pos);
+	PD_MG_LogicPosition WorldToLogicPosition(FVector pos);
 
-	TArray<PD_MG_LogicPosition*> Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition * logPos);
+	TArray<PD_MG_LogicPosition> Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition logPos);
 
 #pragma endregion
 
