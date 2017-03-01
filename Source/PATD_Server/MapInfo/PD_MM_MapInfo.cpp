@@ -32,9 +32,9 @@ void PD_MM_MapInfo::CalculateRooms(PD_MG_StaticMap * sm)
 	PD_MG_LogicPosition* StartFlood = new PD_MG_LogicPosition(0, 0);
 
 	for (int i = 0; i < sm->GetLogicPositions().Num(); i++) {
-		//if (visited.Contains(sm->GetLogicPositions()[i])) {
+		if (visited.Contains(*(sm->GetLogicPositions()[i]))) {
 
-		//}
+		}
 	}
 
 	

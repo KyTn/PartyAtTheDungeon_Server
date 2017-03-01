@@ -220,18 +220,6 @@ void UPD_ServerGameInstance::OnBeginState() {
 	}
 	else if (structServerState->enumServerState == EServerState::GameInProcess){
 
-		/*mapParser = new PD_MG_MapParser();
-
-		PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
-		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
-		///Haria falta una clase Enemy manager, con los enemigos para organizar sus acciones, y llamar a las AI correspondientes
-		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
-		mapManager = new PD_GM_MapManager();
-		mapManager->StaticMapRef = staticMapRef;
-		mapManager->DynamicMapRef = dynamicMapRef;*/
-		
-		
-
 		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
 	else //Caso indeterminado
@@ -258,31 +246,35 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	networkManager->GetSocketManager()->InitTimerActor(TimerActorSpawned);
 
+	if (structServerState->enumServerState == EServerState::WaitingReady) 
+	{
+
+	}
+
 	if (structServerState->enumServerState == EServerState::GameInProcess) {
-		//Quizas esto es tarea del gameManager.
-	///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
-	mapParser = new PD_MG_MapParser();
+			//Quizas esto es tarea del gameManager.
+		///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
+		mapParser = new PD_MG_MapParser();
 
-	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
-	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
+		PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
+		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
 	
-	// Parsea el chorizo
-	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
-	mapManager = new PD_GM_MapManager();
-	mapManager->StaticMapRef = staticMapRef;
-	mapManager->DynamicMapRef = dynamicMapRef;
+		// Parsea el chorizo
+		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
+		mapManager = new PD_GM_MapManager();
+		mapManager->StaticMapRef = staticMapRef;
+		mapManager->DynamicMapRef = dynamicMapRef;
 
 
-	FString mapString = mapManager->StaticMapRef->GetMapString();
-	//Enviar mapa al cliente
-	FStructMap structMap;
-	structMap.stringMap = mapString;
-	networkManager->SendNow(&structMap, -1);
+		FString mapString = staticMapRef->GetMapString();
+		//Enviar mapa al cliente
+		FStructMap structMap;
+		structMap.stringMap = mapString;
+		networkManager->SendNow(&structMap, -1);
 
-	// le pasamos al mapManager un instanciador
-	AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
-	mapManager->instantiator = InstantiatorActor;
-
+		// le pasamos al mapManager un instanciador
+		AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
+		mapManager->instantiator = InstantiatorActor;
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
 		//mapManager->InstantiateStaticMap();
