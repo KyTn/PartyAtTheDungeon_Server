@@ -22,6 +22,7 @@ PD_PlayersManager::~PD_PlayersManager()
 //Funciones de gestion de conexion
 
 void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection, int player) {
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AddNewPlayer"));
 	StructPlayer* structPlayer = new StructPlayer();
 	structPlayer->ID_PLAYER = player;
 	dataPlayers.Add(structPlayer);
@@ -47,7 +48,7 @@ void PD_PlayersManager::setTurnOrders(FStructTurnOrders* turnOrders, int player)
 
 
 bool PD_PlayersManager::AllPlayersReady() {
-	
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersReady"));
 	for (StructPlayer* player : dataPlayers) {
 		if (!player->readyMenu) {
 			return false;
@@ -57,7 +58,7 @@ bool PD_PlayersManager::AllPlayersReady() {
 }
 
 bool PD_PlayersManager::AllPlayersSendOrders() {
-	
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersSendOrders"));
 	for (StructPlayer* player : dataPlayers) {
 		if (!player->turnOrders) {
 			return false;
@@ -79,6 +80,7 @@ bool PD_PlayersManager::AnyPlayerDead() {
 
 
 bool  PD_PlayersManager::AllAnimationEnd() {
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllAnimationEnd"));
 	for (StructPlayer* player : dataPlayers) {
 		if (!player->logic_Character->GetController()->IsAtAnimation()) {
 			return false;
@@ -88,6 +90,7 @@ bool  PD_PlayersManager::AllAnimationEnd() {
 }
 
 int PD_PlayersManager::GetIndexClientMaster() {
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetIndexClientMaster"));
 	for (int i = 0; i < dataPlayers.Num();i++) {
 		StructPlayer* player = dataPlayers[i];
 		if (player->clientMaster) return i;
@@ -97,7 +100,9 @@ int PD_PlayersManager::GetIndexClientMaster() {
 
 //Devuelve el numero de acciones de la lista mas larga
 int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetMaxLenghtActions "));
 	int indexplayer = this->GetPlayerMaxLenghtActions(phase);
+	
 	if (indexplayer != -1) {
 		if (phase == EActionPhase::Move) {
 			return this->GetDataStructPlayer(indexplayer)->turnOrders->listMove.Num();
@@ -112,9 +117,9 @@ int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {
 }
 //Devuelve el index del jugador con la lista de acciones mas larga
 int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
-	int numTicks = 0;
-	int indexPlayer=-1;
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions"));
+	int numTicks = -1;
+	int indexPlayer=-1;
 
 	for (int i = 0; i < this->GetNumPlayers(); i++) {
 		TArray<FStructOrderAction> listActions;
@@ -131,13 +136,14 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 			indexPlayer = i;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Health is %d"), indexPlayer);
+	UE_LOG(LogTemp, Warning, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions: devuelto %d"), indexPlayer);
 
 	return indexPlayer;
 }
 
 //Funcion de acceso directo al struct
 StructPlayer* PD_PlayersManager::GetDataStructPlayer(int player) {
+	
 	CheckPlayerIndex(player);
 	return dataPlayers[player];
 }
@@ -147,6 +153,7 @@ StructPlayer* PD_PlayersManager::GetDataStructPlayer(int player) {
 
 //Funciones private
 bool PD_PlayersManager::CheckPlayerIndex(int player) {
+	
 	if (dataPlayers.IsValidIndex(player) && dataPlayers[player]) {
 		return true;
 	}

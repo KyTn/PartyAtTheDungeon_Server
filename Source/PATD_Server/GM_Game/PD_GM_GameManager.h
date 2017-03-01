@@ -25,9 +25,10 @@ class PATD_SERVER_API PD_GM_GameManager : public PD_NW_iEventObserver
 {
 
 private:
-	LogicTurnInformation* ItemTurnInformation;
+	/*LogicTurnInformation* ItemTurnInformation;
 	LogicTurnInformation* MoveTurnInformation;
-	LogicTurnInformation* AttackTurnInformation;
+	LogicTurnInformation* AttackTurnInformation;*/
+	//void IntitializeTurnStates();
 public:
 	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager);
 	~PD_GM_GameManager();
@@ -61,7 +62,7 @@ public:
 
 	//Funciones de gestion de acciones logicas
 
-	void IntitializeTurnStates();
+	
 
 	void PlayersLogicTurn();
 

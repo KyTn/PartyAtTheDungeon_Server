@@ -31,9 +31,14 @@ PD_GM_GameManager::~PD_GM_GameManager()
 {
 }
 
+void PD_GM_GameManager::InitState() {
+	structGameState = new StructGameState();
+	ChangeState(EGameState::Instantiate_Map);
+
+}
 
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
-
+	/*
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		// Si se recibe del servidor un Start_Match, ir a ese estado. 
 		if (inEventType == UStructType::FStructClientStartMatchOnGM) {
@@ -45,7 +50,7 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 			ChangeState(EGameState::WaitingPlayerOrders);
 		}
 	}
-	else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+	else*/ if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
 		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
@@ -65,7 +70,15 @@ void PD_GM_GameManager::UpdateState() {
 
 	//Creo que es mas claro un if-else gigante que un switch gigante
 	//ESTADO: WaitingActionOrders
-	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
+		//Transicion inmediata de estado
+		this->ChangeState(EGameState::Start_Match);
+
+	}else if (structGameState->enumGameState == EGameState::Start_Match) {
+		//Transicion inmediata de estado
+		this->ChangeState(EGameState::WaitingPlayerOrders);
+
+	}else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 
 		//Transiciones de estados
 		if (playersManager->AllPlayersSendOrders()) {
@@ -113,8 +126,11 @@ void PD_GM_GameManager::OnBeginState() {
 
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		mapManager->InstantiateMap();
+		UpdateState();
 
-
+	}
+	else if (structGameState->enumGameState == EGameState::Start_Match) {
+		UpdateState();
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 		PlayersLogicTurn();
@@ -142,6 +158,7 @@ void PD_GM_GameManager::OnBeginState() {
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 
 		//Enviar a cliente actualizacion del mapa
+		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		UpdateState();//transicion inmediata
 
 
@@ -158,23 +175,18 @@ void PD_GM_GameManager::ChangeState(EGameState newState) {
 	OnBeginState();
 }
 
-
-void PD_GM_GameManager::InitState() {
-	structGameState = new StructGameState();
-	ChangeState(EGameState::Instantiate_Map);
-
-}
-
+/*
 //Funciones de gestion de acciones
 void PD_GM_GameManager::IntitializeTurnStates() {
 	ItemTurnInformation->CurrentState = InteractionStates::Ready;
 	MoveTurnInformation->CurrentState = InteractionStates::Ready;
 	AttackTurnInformation->CurrentState = InteractionStates::Ready;
-}
+}*/
 
 //Control de los turnos
 
 void PD_GM_GameManager::PlayersLogicTurn() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::PlayersLogicTurn"));
 	//Distincion para players o enemigos
 	int numCharacters = 0;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
@@ -195,7 +207,8 @@ void PD_GM_GameManager::LogicTurnItemPhase() {
 }
 
 void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
-	
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnMovePhase"));
+
 	//Distincion para players o enemigos
 	//Calcular el numero de ticks a realizar (el de la lista mas larga)
 	int numTicks = 0;
@@ -218,6 +231,8 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 }
 
 void PD_GM_GameManager::LogicTurnAttackPhase(int numCharacters) {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase"));
+
 	//Distincion para players o enemigos
 	//Calcular el numero de ticks a realizar (el de la lista mas larga)
 	int numTicks = 0;
@@ -244,8 +259,9 @@ void PD_GM_GameManager::LogicItemTick(int tick) {
 }
 
 void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
-		
-	for (int i = 0; numCharacters; i++) {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick"));
+
+	for (int i = 0; i<numCharacters; i++) {
 
 
 		//Distincion para players o enemigos
@@ -267,7 +283,9 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 		FStructOrderAction* order = &listMove[tick];
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AL ATAQUER !"));
 
-		//logicCharacter->MoveToLogicPosition(order);
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
+
+		logicCharacter->MoveToLogicPosition(order);
 
 
 		
@@ -294,9 +312,10 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 }
 
 void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicAttackTick"));
 
 
-	for (int i = 0; numCharacters; i++) {
+	for (int i = 0; i<numCharacters; i++) {
 
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction> listAttack;
@@ -315,6 +334,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 		
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = listAttack[tick];
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
 		//logicCharacter->ActionTo(order.targetLogicPosition, uint32 action);
 		
 	}
@@ -322,6 +342,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 
 }
 void PD_GM_GameManager::VisualTickControl() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualTickControl"));
 
 	//Distincion para players o enemigos
 	int maxLengthAction = 0;
@@ -357,10 +378,11 @@ void PD_GM_GameManager::VisualTickControl() {
 }
 
 void PD_GM_GameManager::VisualMoveTick() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick"));
 
 
 	//Todos a la vez
-	for (int i = 0; playersManager->GetNumPlayers(); i++) {
+	for (int i = 0; i<playersManager->GetNumPlayers(); i++) {
 
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction> listMove;
@@ -378,8 +400,11 @@ void PD_GM_GameManager::VisualMoveTick() {
 
 		FStructOrderAction visualAction = listMove.Pop();
 
+		//Peta al no tener actor ni controller
+		//logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
 		
 		
+
 		//Esto solo esta para pruebas, pues luego la visualizacion no tendra que lidiar con ordenesLogicas (sino con sus propias ordenes preferiblemente)
 		/*if (visualAction.targetDirection == 1)currentLogicPosition->SetY(currentLogicPosition->GetY() + 1);
 		else if (visualAction.targetDirection == 2)currentLogicPosition->SetY(currentLogicPosition->GetY() - 1);
@@ -387,13 +412,14 @@ void PD_GM_GameManager::VisualMoveTick() {
 		else if (visualAction.targetDirection == 4)currentLogicPosition->SetX(currentLogicPosition->GetX() - 1);
 		*/
 
-
-		logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
+		
 
 	}
 }
 
 void PD_GM_GameManager::VisualAttackTick() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
+
 	//Distincion para players o enemigos
 	TArray<FStructOrderAction> listAttack;
 	int indexCharacter;
@@ -414,7 +440,9 @@ void PD_GM_GameManager::VisualAttackTick() {
 	FStructOrderAction visualAction = listAttack.Pop();
 	PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
 	FVector* physicPosition=mapManager->LogicToWorldPosition(&logicPosition);
-	logicCharacter->GetController()->ActionTo(physicPosition->X, physicPosition->Y, visualAction.orderType);
+
+	//Peta al no tener actor ni controller
+	//logicCharacter->GetController()->ActionTo(physicPosition->X, physicPosition->Y, visualAction.orderType);
 
 
 }
@@ -423,11 +451,13 @@ void PD_GM_GameManager::VisualAttackTick() {
 
 
 void PD_GM_GameManager::OnAnimationEnd() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
+
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 		if (playersManager->AllAnimationEnd()) {
 			VisualTickControl();
 		}
-		//Mañana hacer el sistema del callback cuando este el controller subido.
+		
 	}
 
 }

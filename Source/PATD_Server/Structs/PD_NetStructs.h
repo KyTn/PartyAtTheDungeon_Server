@@ -309,7 +309,7 @@ struct FStructUpdateCharacter : public  FStructGeneric
 
 USTRUCT()
 struct FStructNewConnection : public FStructGeneric
-{
+{	//No necesita estar en el serializeManager
 	//FStructNewConnection: struct que crea el networkmanager(no necesita serializacion)
 	GENERATED_BODY()
 

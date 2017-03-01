@@ -116,7 +116,7 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 //		bool isMasterClient				registra como masterclient o no. Default: false.
 //
 void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient = false) {
-
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_NewConnection"));
 	//Registrar en playersManager
 	playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
 
@@ -138,7 +138,7 @@ void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStr
 }
 
 void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
-
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_ConfigMatch"));
 	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
 		//Solo si lo envia el clientMaster
@@ -151,6 +151,7 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 }
 
 void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataStruct, int inPlayer) {
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_LoadPlayerInfo"));
 	FStructCharacter* playerStats = (FStructCharacter*)inDataStruct;
 
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character = new PD_GM_LogicCharacter();
@@ -164,6 +165,7 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 }
 
 void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_PlayerReady"));
 
 	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
