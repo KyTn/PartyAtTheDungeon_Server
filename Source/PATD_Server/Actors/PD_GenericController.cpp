@@ -60,6 +60,8 @@ bool APD_GenericController::MoveTo(float x, float y)
 bool APD_GenericController::ActionTo(float x, float y, uint8 id_action)
 {
 	animationOn = EAnimationType::Attack;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AL ATAQUER !"));
+
 	return true;
 
 }

@@ -265,7 +265,9 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 		
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction* order = &listMove[tick];
-		logicCharacter->MoveToLogicPosition(order);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AL ATAQUER !"));
+
+		//logicCharacter->MoveToLogicPosition(order);
 
 
 		
@@ -314,7 +316,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = listAttack[tick];
 		//logicCharacter->ActionTo(order.targetLogicPosition, uint32 action);
-
+		
 	}
 
 
