@@ -126,6 +126,8 @@ void PD_GM_GameManager::OnBeginState() {
 
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Instantiate_Map"));
+		//Update de los enemigos a traves del dinamic map
+		
 		mapManager->InstantiateMap();
 		UpdateState();
 

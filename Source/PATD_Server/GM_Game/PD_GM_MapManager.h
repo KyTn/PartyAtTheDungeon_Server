@@ -11,7 +11,7 @@ class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
-
+class APD_GenericController;
 
 
 class PATD_SERVER_API PD_GM_MapManager
@@ -61,7 +61,7 @@ public:
 
 	void PD_GM_MapManager::InstantiateMap();
 	void InstantiateStaticMap();
-	void InstantiateDynamicMap(PD_GM_EnemyManager* enemyMan);
+	void InstantiateDynamicMap();
 
 
 #pragma endregion
