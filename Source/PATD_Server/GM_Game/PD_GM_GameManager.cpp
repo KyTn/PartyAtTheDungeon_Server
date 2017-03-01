@@ -125,20 +125,24 @@ void PD_GM_GameManager::OnBeginState() {
 
 
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Instantiate_Map"));
 		mapManager->InstantiateMap();
 		UpdateState();
 
 	}
 	else if (structGameState->enumGameState == EGameState::Start_Match) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match"));
 		UpdateState();
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersLogic"));
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata
 
 
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization){
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersVisualization"));
 		
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
@@ -146,17 +150,18 @@ void PD_GM_GameManager::OnBeginState() {
 
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata
 
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
-
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesVisualization"));
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
-
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		//Enviar a cliente actualizacion del mapa
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		UpdateState();//transicion inmediata
@@ -359,13 +364,12 @@ void PD_GM_GameManager::VisualTickControl() {
 	if (structGameState->enumActionPhase == EActionPhase::Move) {
 		if (maxLengthAction == 0) { //No hay mas acciones de mover
 			structGameState->enumActionPhase = EActionPhase::Attack;
+			VisualTickControl();//Llamar otra vez para que actualice el estado
 		}
 		else {
 			VisualMoveTick();
 		}
-	}
-
-	if (structGameState->enumActionPhase == EActionPhase::Attack) {
+	} else if (structGameState->enumActionPhase == EActionPhase::Attack) {
 		if (maxLengthAction == 0) { //No hay mas acciones de atacar
 			structGameState->enumActionPhase = EActionPhase::EndPhase;
 			//Fin del turno, hacer update de la maquina de estados del GameManager
@@ -426,7 +430,7 @@ void PD_GM_GameManager::VisualAttackTick() {
 	PD_GM_LogicCharacter* logicCharacter=nullptr;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 		indexCharacter = playersManager->GetPlayerMaxLenghtActions(structGameState->enumActionPhase);
-		listAttack = playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listMove;
+		listAttack = playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
 		logicCharacter = playersManager->GetDataStructPlayer(indexCharacter)->logic_Character;
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {

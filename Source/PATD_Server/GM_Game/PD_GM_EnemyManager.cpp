@@ -50,7 +50,7 @@ int PD_GM_EnemyManager::GetMaxLenghtActions(EActionPhase phase) {
 }
 //Devuelve el index del jugador con la lista de acciones mas larga
 int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
-	int numTicks = 0;
+	int numTicks = -1;
 	int indexPlayer = -1;
 
 	for (int i = 0; this->GetEnemies().Num(); i++) {
