@@ -45,6 +45,13 @@ PD_MG_LogicPosition* PD_GM_MapManager::WorldToLogicPosition(FVector* pos) {
 	return new PD_MG_LogicPosition((int)roundf(x), (int)roundf(y));
 }
 
+TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoint()
+{
+
+	TArray<PD_MG_LogicPosition> spawnPoints;
+	return  spawnPoints;
+}
+
 #pragma endregion 
 
 
