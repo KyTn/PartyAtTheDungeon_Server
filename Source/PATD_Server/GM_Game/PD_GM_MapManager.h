@@ -29,6 +29,9 @@ public:
 	PD_GM_MapManager();
 	~PD_GM_MapManager();
 
+
+	void Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm);
+
 	AMapInstantiatorActor* instantiator;
 	PD_GM_GameManager* _GAMEMANAGER;
 

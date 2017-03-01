@@ -18,13 +18,21 @@
 
 PD_GM_MapManager::PD_GM_MapManager()
 {
-	MapInfo = new PD_MM_MapInfo();
-	MapInfo->mapManager = this;
-
 }
 
 PD_GM_MapManager::~PD_GM_MapManager()
 {
+}
+
+
+
+void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
+
+	StaticMapRef = sm;
+	DynamicMapRef = dm;
+
+	// Ya tengo la info del mapa cargada por el Struct o por las refs del estatico y dinamico
+	MapInfo = new PD_MM_MapInfo(this);
 }
 
 #pragma region GET INFO OF THE MAP
@@ -93,15 +101,17 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 		/**/
 		switch (StaticMapRef->GetXYMap()[*StaticMapRef->GetLogicPositions()[i]]) {
 		case 'w':
-			instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]);
+			
+			MapInfo->AddWall(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]));
 			break;
 
 		case '.':
-			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			
+			MapInfo->AddTile(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]));
 			break;
 		case 'd':
 
-			instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]);
+			MapInfo->AddTile(*StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]));
 			break;
 			/*default:
 

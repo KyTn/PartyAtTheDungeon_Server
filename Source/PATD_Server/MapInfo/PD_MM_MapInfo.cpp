@@ -10,8 +10,12 @@
 #pragma region MAP INFO
 
 
-PD_MM_MapInfo::PD_MM_MapInfo()
+PD_MM_MapInfo::PD_MM_MapInfo(PD_GM_MapManager* mM)
 {
+	mapManager = mM;
+
+	//allLogicPos = mapManager->StaticMapRef._LogicPositionsRefs;
+	CalculateRooms();
 }
 
 PD_MM_MapInfo::~PD_MM_MapInfo()
@@ -28,6 +32,40 @@ bool PD_MM_MapInfo::RoomOf(PD_MG_LogicPosition* logpos, PD_MM_Room * room)
 			}
 		}
 	}
+	return false;
+}
+
+bool PD_MM_MapInfo::AddWall(PD_MG_LogicPosition logpos, AActor *wall)
+{
+	if (roomByLogPos.Contains(logpos)) {
+		roomByLogPos[logpos]->walls.Add(logpos, wall);
+		return true;
+	}
+
+
+	return false;
+}
+
+bool PD_MM_MapInfo::AddTile(PD_MG_LogicPosition logpos, AActor* tile)
+{
+	if (roomByLogPos.Contains(logpos)) {
+		roomByLogPos[logpos]->tiles.Add(logpos, tile);
+		return true;
+	}
+
+
+	return false;
+}
+
+bool PD_MM_MapInfo::AddInteractuable(PD_MG_LogicPosition logpos, AActor* wall)
+{
+	/*
+	if (roomByLogPos.Contains(logpos)) {
+		roomByLogPos[logpos]->walls.Append(logpos, wall);
+		return true;
+	}
+	*/
+
 	return false;
 }
 
@@ -52,12 +90,12 @@ Por cada posicion p(x,y) en el mapa
 
 */
 
-void PD_MM_MapInfo::CalculateRooms(PD_MG_StaticMap * sm)
+void PD_MM_MapInfo::CalculateRooms()
 {
 	// Por cada posicion p(x,y) en el mapa
-	for (int i = 0; i < sm->GetLogicPositions().Num(); i++) { 
+	for (int i = 0; i < mapManager->StaticMapRef->GetLogicPositions().Num(); i++) {
 
-		PD_MG_LogicPosition* p = sm->GetLogicPositions()[i];
+		PD_MG_LogicPosition* p = mapManager->StaticMapRef->GetLogicPositions()[i];
 
 		// Si p es un tile o un door
 		if (mapManager->StaticMapRef->GetXYMap()[*p] == '.' ||
@@ -95,6 +133,10 @@ void PD_MM_MapInfo::CalculateRooms(PD_MG_StaticMap * sm)
 				for (int k = 0; k < a.Num(); k++) {
 					r->LogicPosInRoom.AddUnique(*(a[k]));
 				}
+			}
+
+			if (!roomByLogPos.Contains(*p)) {
+				roomByLogPos.Add(*p, r);
 			}
 
 			if (mapManager->StaticMapRef->GetXYMap()[*p] == 's') {

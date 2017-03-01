@@ -261,10 +261,17 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	
 		// Parsea el chorizo
 		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
-		mapManager = new PD_GM_MapManager();
-		mapManager->StaticMapRef = staticMapRef;
-		mapManager->DynamicMapRef = dynamicMapRef;
 
+
+
+
+		// GENERAR EL USTRUC / Static&Dynamic Map
+
+
+
+
+		mapManager = new PD_GM_MapManager();
+		mapManager->Init(staticMapRef, dynamicMapRef); // inicializa las estructuras internas del mapManager (MapInfo)
 
 		FString mapString = staticMapRef->GetMapString();
 		//Enviar mapa al cliente
@@ -275,6 +282,8 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 		// le pasamos al mapManager un instanciador
 		AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
 		mapManager->instantiator = InstantiatorActor;
+
+		
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
 		//mapManager->InstantiateStaticMap();
