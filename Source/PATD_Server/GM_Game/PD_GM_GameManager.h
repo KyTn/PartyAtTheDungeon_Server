@@ -29,7 +29,7 @@ private:
 	LogicTurnInformation* MoveTurnInformation;
 	LogicTurnInformation* AttackTurnInformation;
 public:
-	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_GM_EnemyManager* inEnemyMan);
+	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager);
 	~PD_GM_GameManager();
 
 	PD_PlayersManager* playersManager;

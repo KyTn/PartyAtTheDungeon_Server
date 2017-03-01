@@ -32,6 +32,7 @@ public:
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;
 	void OnAnimationEnd();
+	bool IsAtAnimation();
 		/*
 		//Para mover al personaje de forma visual por el mapa
 		Recibe:

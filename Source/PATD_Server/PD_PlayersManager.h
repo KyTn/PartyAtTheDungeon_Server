@@ -40,6 +40,7 @@ public:
 	bool AllPlayersReady();
 	bool AllPlayersSendOrders();
 	bool AnyPlayerDead();
+	bool AllAnimationEnd();
 	int GetIndexClientMaster();
 
 	int GetMaxLenghtActions(EActionPhase phase);

@@ -16,12 +16,13 @@
 
 
 
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_GM_EnemyManager* inEnemyMan)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
 {
 	InitState();
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
-	enemyManager = inEnemyMan;
+	mapManager->_GAMEMANAGER = this;
+	enemyManager = new PD_GM_EnemyManager();
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 
@@ -229,7 +230,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction> listMove;
-		PD_GM_LogicCharacter* logicCharacter;
+		PD_GM_LogicCharacter* logicCharacter=nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 			listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
@@ -243,8 +244,8 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 		
 		
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-		FStructOrderAction order = listMove[tick];
-//		logicCharacter->MoveToLogicPosition(order);
+		FStructOrderAction* order = &listMove[tick];
+		logicCharacter->MoveToLogicPosition(order);
 
 
 		
@@ -292,7 +293,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 		
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = listAttack[tick];
-		//logicCharacter->ActionTo(PD_MG_LogicPosition targetPosition, uint32 action);
+		//logicCharacter->ActionTo(order.targetLogicPosition, uint32 action);
 
 	}
 
@@ -401,9 +402,9 @@ void PD_GM_GameManager::VisualAttackTick() {
 
 void PD_GM_GameManager::OnAnimationEnd() {
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
-		/*if (playersManager->AllAnimationEnd()) {
-		VisualTickControl();
-		}*/
+		if (playersManager->AllAnimationEnd()) {
+			VisualTickControl();
+		}
 		//Mañana hacer el sistema del callback cuando este el controller subido.
 	}
 

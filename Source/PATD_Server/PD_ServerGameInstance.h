@@ -54,12 +54,14 @@ public:
 	PD_MG_MapParser* mapParser;
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
-	PD_GM_EnemyManager* enemyManager;
+	// PD_GM_EnemyManager* enemyManager; no tiene sentido un enemymanager en el instance. Está en el GameManager
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
 	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test3.dungeon";
 
+	//Funciones para obtener managers
+	PD_GM_GameManager* getGameManager();
 
 
 	//Overwrites - GameInstance

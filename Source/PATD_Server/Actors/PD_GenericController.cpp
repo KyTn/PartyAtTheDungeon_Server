@@ -44,9 +44,12 @@ void APD_GenericController::Tick(float DeltaTime)
 
 void APD_GenericController::OnAnimationEnd() {
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-	//SGI->
+	SGI->getGameManager()->OnAnimationEnd();
 }
-
+bool APD_GenericController::IsAtAnimation() {
+	if (animationOn == EAnimationType::Iddle) return false;
+	else return true;
+}
 
 bool APD_GenericController::MoveTo(float x, float y)
 {

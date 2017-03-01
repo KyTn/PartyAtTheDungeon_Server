@@ -3,6 +3,10 @@
 #include "PATD_Server.h"
 #include "PD_PlayersManager.h"
 
+//Includes de uso
+#include "Actors/PD_GenericController.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+
 //Include of forward declaration
 #include "Structs/PD_ServerStructs.h"//Para todos los structs
 
@@ -70,6 +74,17 @@ bool PD_PlayersManager::AnyPlayerDead() {
 	}
 
 	return false;
+}
+
+
+
+bool  PD_PlayersManager::AllAnimationEnd() {
+	for (StructPlayer* player : dataPlayers) {
+		if (!player->logic_Character->GetController()->IsAtAnimation()) {
+			return false;
+		}
+	}
+	return true;
 }
 
 int PD_PlayersManager::GetIndexClientMaster() {

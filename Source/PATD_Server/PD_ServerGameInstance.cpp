@@ -25,15 +25,10 @@
 
 
 
-//Esquema
-/*
-el clientMaster se conecta al servidor
-Los clientes se meten ahora.
-el clientMaster configura y da ok.
-les sale a todos para elegir su personaje.
-Aqui no se puede conectar nadie mas.
-Lo crean y le dan a ready.
-*/
+#pragma region Get Managers
+//Funciones para obtener managers
+PD_GM_GameManager* UPD_ServerGameInstance::getGameManager() { return gameManager; }
+#pragma endregion 
 
 #pragma region Suscribe to events
 
@@ -268,10 +263,9 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
-	enemyManager = new PD_GM_EnemyManager();
 	
 	// Parsea el chorizo
-	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef, enemyManager);
+	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 	mapManager = new PD_GM_MapManager();
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
@@ -287,13 +281,14 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
 	mapManager->instantiator = InstantiatorActor;
 
-	// le decimos al mapManager que instancia las cosicas en el mundo
-	mapManager->InstantiateStaticMap();
-	mapManager->InstantiateDynamicMap(enemyManager);
 
-	//Aqui cedemos el control al GameManager.
-	gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
-	networkManager->RegisterObserver(gameManager);
+		// le decimos al mapManager que instancia las cosicas en el mundo
+		//mapManager->InstantiateStaticMap();
+		//mapManager->InstantiateDynamicMap();
+
+		//Aqui cedemos el control al GameManager.
+		gameManager = new PD_GM_GameManager(playersManager,mapManager);
+		networkManager->RegisterObserver(gameManager);
 
 	}
 }
