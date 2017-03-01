@@ -81,7 +81,7 @@ public:
 	//Carga de mapa
 	void LoadMap(FString mapName);
 	//Callback cuando el mapa este cargado (Lo llama el estado GameStateInitializer en su beginPlay)
-	void OnMapFinishLoad();
+	void OnLoadedLevel();
 
 	//Inicializa la variable privada ip y el serverName
 	void InitializeServerAddress();
