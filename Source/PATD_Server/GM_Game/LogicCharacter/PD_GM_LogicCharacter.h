@@ -38,7 +38,7 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 
 	//Character
 	AMyCharacterParent* characterParent;
-	AActor* character_Player_BP; //BP donde esta el PROP del Character
+	ACharacter* character_Player_BP; //BP donde esta el PROP del Character
 
 
 	PD_MG_LogicPosition currentLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion actual del personaje
@@ -170,7 +170,7 @@ public:
 	ECharacterType GetTypeCharacter();
 	APD_GenericController* GetController();
 	AMyCharacterParent* GetCharacterParent();
-	AActor* GetCharacterBP();
+	ACharacter* GetCharacterBP();
 	PD_MG_LogicPosition* GetCurrentLogicalPosition();
 	PD_MG_LogicPosition* GetMovingLogicalPosition();
 
@@ -189,7 +189,7 @@ public:
 	void SetTypeCharacter(ECharacterType ntype_character);
 	void SetController(APD_GenericController* ncontroller);
 	void SetCharacterParent(AMyCharacterParent* ncharacterParent);
-	void SetCharacterBP(AActor* ncharacter_Player_BP); //BP donde esta el PROP del Character
+	void SetCharacterBP(ACharacter* ncharacter_Player_BP); //BP donde esta el PROP del Character
 	void SetCurrentLogicalPosition(PD_MG_LogicPosition* ncurrentLogicalPosition);
 	void SetMovingLogicalPosition(PD_MG_LogicPosition* nmovingLogicalPosition);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
