@@ -18,11 +18,12 @@
 
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
 {
-	InitState();
+	
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
+	InitState();
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 
@@ -32,7 +33,19 @@ PD_GM_GameManager::~PD_GM_GameManager()
 
 
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
-	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+
+	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
+		// Si se recibe del servidor un Start_Match, ir a ese estado. 
+		if (inEventType == UStructType::FStructClientStartMatchOnGM) {
+			ChangeState(EGameState::Start_Match);
+		}
+	}
+	else if (structGameState->enumGameState == EGameState::Start_Match) {
+		if (inEventType == UStructType::FStructClientCanGenerateOrders) {
+			ChangeState(EGameState::WaitingPlayerOrders);
+		}
+	}
+	else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
 		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
@@ -98,12 +111,18 @@ void PD_GM_GameManager::UpdateState() {
 void PD_GM_GameManager::OnBeginState() {
 
 
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
+		mapManager->InstantiateMap();
+
+
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata
-		
-		
-	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization){
+
+
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization){
 		
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
@@ -142,7 +161,7 @@ void PD_GM_GameManager::ChangeState(EGameState newState) {
 
 void PD_GM_GameManager::InitState() {
 	structGameState = new StructGameState();
-	structGameState->enumGameState = EGameState::WaitingPlayerOrders;
+	ChangeState(EGameState::Instantiate_Map);
 
 }
 
