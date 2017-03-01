@@ -59,6 +59,7 @@ public:
 
 #pragma region INSTANTIATE MAP
 
+	void PD_GM_MapManager::InstantiateMap();
 	void InstantiateStaticMap();
 	void InstantiateDynamicMap(PD_GM_EnemyManager* enemyMan);
 

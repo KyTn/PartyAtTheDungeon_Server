@@ -7,6 +7,7 @@
 #include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
+#include "PATD_Server/GM_Game/PD_GM_GameManager.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PATD_Server/Actors/Enemies/PD_E_EnemyCharacter.h"
 //include of forward declaration
@@ -49,6 +50,17 @@ PD_MG_LogicPosition* PD_GM_MapManager::WorldToLogicPosition(FVector* pos) {
 
 
 #pragma region INSTANTIATE MAP
+
+
+void PD_GM_MapManager::InstantiateMap()
+{
+	UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateMap "));
+
+	InstantiateStaticMap();
+	InstantiateDynamicMap(_GAMEMANAGER->enemyManager);
+
+}
+
 
 void PD_GM_MapManager::InstantiateStaticMap() {
 

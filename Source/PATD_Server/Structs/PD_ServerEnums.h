@@ -1,6 +1,6 @@
 #pragma once
 
-enum class EGameState { WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingEnemiesLogic, ExecutingEnemiesVisualization,EndOfTurn };
+enum class EGameState {Instantiate_Map, Start_Match, WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingEnemiesLogic, ExecutingEnemiesVisualization,EndOfTurn };
 
 enum class EServerState { WaitingClientMaster, WaitingGameConfiguration, WaitingReady,GameInProcess };
 enum class InteractionStates { Ready, Working, Finish };
