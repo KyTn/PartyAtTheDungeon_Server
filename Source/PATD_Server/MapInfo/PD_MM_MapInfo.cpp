@@ -14,7 +14,12 @@ PD_MM_MapInfo::PD_MM_MapInfo(PD_GM_MapManager* mM)
 {
 	mapManager = mM;
 
-	//allLogicPos = mapManager->StaticMapRef._LogicPositionsRefs;
+
+
+	allLogicPos = TArray<PD_MG_LogicPosition>();
+	rooms = TArray<PD_MM_Room>();
+	roomByLogPos = TMap<PD_MG_LogicPosition, PD_MM_Room*>();
+
 	CalculateRooms();
 }
 
@@ -97,6 +102,8 @@ void PD_MM_MapInfo::CalculateRooms()
 
 		PD_MG_LogicPosition* p = mapManager->StaticMapRef->GetLogicPositions()[i];
 
+		allLogicPos.Add(*p);
+
 		// Si p es un tile o un door
 		if (mapManager->StaticMapRef->GetXYMap()[*p] == '.' ||
 			mapManager->StaticMapRef->GetXYMap()[*p] == 'd' ||
@@ -153,6 +160,12 @@ void PD_MM_MapInfo::CalculateRooms()
 
 PD_MM_Room::PD_MM_Room()
 {
+	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
+
+	tiles = TMap<PD_MG_LogicPosition, AActor*>();
+	walls = TMap<PD_MG_LogicPosition, AActor*>();
+	interactuables = TMap<PD_MG_LogicPosition, AActor*>();
+
 }
 
 PD_MM_Room::~PD_MM_Room()
