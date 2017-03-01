@@ -16,12 +16,12 @@
 
 
 
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_GM_EnemyManager* inEnemyMan)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
 {
 	InitState();
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
-	enemyManager = inEnemyMan;
+	enemyManager = new PD_GM_EnemyManager();
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 

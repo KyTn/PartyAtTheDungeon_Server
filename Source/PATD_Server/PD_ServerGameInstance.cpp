@@ -268,10 +268,9 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 
 	PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 	PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
-	enemyManager = new PD_GM_EnemyManager();
 	
 	// Parsea el chorizo
-	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef, enemyManager);
+	mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
 	mapManager = new PD_GM_MapManager();
 	mapManager->StaticMapRef = staticMapRef;
 	mapManager->DynamicMapRef = dynamicMapRef;
@@ -283,11 +282,11 @@ void UPD_ServerGameInstance::OnMapFinishLoad() {
 		mapManager->instantiator = InstantiatorActor;
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
-		mapManager->InstantiateStaticMap();
-		mapManager->InstantiateDynamicMap(enemyManager);
+		//mapManager->InstantiateStaticMap();
+		//mapManager->InstantiateDynamicMap();
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager, enemyManager);
+		gameManager = new PD_GM_GameManager(playersManager,mapManager);
 		networkManager->RegisterObserver(gameManager);
 
 	//}
