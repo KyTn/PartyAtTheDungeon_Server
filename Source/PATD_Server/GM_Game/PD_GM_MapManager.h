@@ -11,6 +11,7 @@ class PD_MG_StaticMap;
 class PD_MG_DynamicMap;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
+class PD_PlayersManager;
 class APD_GenericController;
 
 
@@ -43,7 +44,7 @@ public:
 	//bool getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
 	//bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
-	TArray<PD_MG_LogicPosition> GetSpawnPoint();
+	TArray<PD_MG_LogicPosition> GetSpawnPoints();
 
 	// Esta funcion devolverá un Interactuable
 	AActor* getInteractuableAt(PD_MG_LogicPosition* logpos);

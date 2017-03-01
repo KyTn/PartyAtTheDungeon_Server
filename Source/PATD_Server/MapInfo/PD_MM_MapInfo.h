@@ -9,6 +9,7 @@
 class PD_MG_LogicPosition;
 class PD_MG_StaticMap;
 class PD_MM_Room;
+class PD_GM_MapManager;
 
 class PATD_SERVER_API PD_MM_MapInfo
 {

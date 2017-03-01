@@ -8,6 +8,7 @@
 #include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
 #include "PATD_Server/GM_Game/PD_GM_GameManager.h"
+#include "PD_PlayersManager.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PATD_Server/Actors/PD_E_Character.h"
 //include of forward declaration
@@ -17,6 +18,9 @@
 
 PD_GM_MapManager::PD_GM_MapManager()
 {
+	MapInfo = new PD_MM_MapInfo();
+	MapInfo->mapManager = this;
+
 }
 
 PD_GM_MapManager::~PD_GM_MapManager()
@@ -32,7 +36,6 @@ bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCh
 */
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
-
 	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
 		if (MapInfo->rooms[i].IsSpawnRoom) {
 			return MapInfo->rooms[i].LogicPosInRoom;
@@ -114,13 +117,15 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	ECharacterType enemyType;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->enemyManager->GetEnemies().Num());
-	/*TArray<PD_MG_LogicPosition*> spawn = MapInfo->GetSpawnPoint();
+	TArray<PD_MG_LogicPosition> spawn = GetSpawnPoints();
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCurrentLogicalPosition(spawn[i]);
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i].logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(spawn[i]));///actualizamos la referencia del BP
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(&spawn[i]);
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(&spawn[i]));
+		///actualizamos la referencia del BP
 
-	}*/
+	}
+
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
 		enemyType = DynamicMapRef->getEnemies()[*DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
