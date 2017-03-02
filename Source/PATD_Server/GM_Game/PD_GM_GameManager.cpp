@@ -7,6 +7,7 @@
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "LogicCharacter/PD_GM_LogicCharacter.h"
 #include "Actors/PD_GenericController.h"
+#include "Actors/Players/PD_CharacterController.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -96,7 +97,7 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 
 		if (structGameState->enumActionPhase == EActionPhase::EndPhase) {
-			this->ChangeState(EGameState::ExecutingEnemiesLogic);
+			//this->ChangeState(EGameState::ExecutingEnemiesLogic);
 		}
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
@@ -328,7 +329,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction> listAttack;
-		PD_GM_LogicCharacter* logicCharacter;
+		PD_GM_LogicCharacter* logicCharacter = nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 			listAttack= playersManager->GetDataStructPlayer(i)->turnOrders->listAttack; 
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
@@ -344,7 +345,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction order = listAttack[tick];
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-		//logicCharacter->ActionTo(order.targetLogicPosition, uint32 action);
+		logicCharacter->ActionTo(order);
 		
 	}
 
@@ -409,7 +410,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		FStructOrderAction visualAction = listMove.Pop();
 
 		//Peta al no tener actor ni controller
-		//logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
+		logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
 		
 		
 
@@ -450,8 +451,7 @@ void PD_GM_GameManager::VisualAttackTick() {
 	FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
 
 	//Peta al no tener actor ni controller
-	//logicCharacter->GetController()->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
-
+    Cast<APD_CharacterController>(logicCharacter->GetController())->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
 
 }
 

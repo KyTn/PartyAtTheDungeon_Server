@@ -38,6 +38,17 @@ public:
 		return new FVector(-1.0f * pos.GetX()*100.0f, pos.GetY() * 100.0f, 0.f);
 	}
 */
+	/*
+		Se pone el bool isCharacter para determina si hay que subir su Z en 100 unidades, y que asi no caiga cuando empiece el mapa
+		en tiempo de ejecucion.
+	*/
+	const FVector ToWorldPosition(bool isCharacter) {
+		if (isCharacter)
+			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 100.f);
+		else
+			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
+	}
+
 	const FVector ToWorldPosition() {
 		return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}
