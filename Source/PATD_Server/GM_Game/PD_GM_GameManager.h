@@ -13,6 +13,7 @@
 class PD_PlayersManager;
 class PD_GM_MapManager;
 class PD_GM_EnemyManager;
+class PD_NW_NetworkManager;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
 struct LogicTurnInformation;
@@ -30,9 +31,10 @@ private:
 	LogicTurnInformation* AttackTurnInformation;*/
 	//void IntitializeTurnStates();
 public:
-	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager);
+	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager);
 	~PD_GM_GameManager();
 
+	PD_NW_NetworkManager* networkManager;
 	PD_PlayersManager* playersManager;
 	PD_GM_MapManager* mapManager;
 	PD_GM_EnemyManager* enemyManager;

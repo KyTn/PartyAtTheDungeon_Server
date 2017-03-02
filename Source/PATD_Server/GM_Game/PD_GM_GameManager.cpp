@@ -13,10 +13,10 @@
 #include "PD_GM_MapManager.h"
 #include "PD_GM_EnemyManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
+#include "NW_Networking/PD_NW_NetworkManager.h"
 
 
-
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager)
 {
 	
 	playersManager = inPlayersManager; 
@@ -24,6 +24,8 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
 	InitState();
+	networkManager = inNetworkManager;
+	networkManager->RegisterObserver(this);
 //	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
 }
 
@@ -134,9 +136,9 @@ void PD_GM_GameManager::OnBeginState() {
 	}
 	else if (structGameState->enumGameState == EGameState::Start_Match) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match"));
+				
 		UpdateState();
-	}
-	else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersLogic"));
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata
