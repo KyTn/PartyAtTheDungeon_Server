@@ -37,10 +37,11 @@ void APD_GenericController::Tick(float DeltaTime)
 
 			}
 		}else if (animationOn == EAnimationType::Move) {
-			if (FVector::PointsAreNear(moveTargetPosition, GetPawn()->GetActorLocation(), toleranceMove)) {
+			/*if (FVector::PointsAreNear(moveTargetPosition, GetPawn()->GetActorLocation(), toleranceMove)) {
 				animationOn = EAnimationType::Iddle;
 				OnAnimationEnd();
-			}
+			}*/
+			OnAnimationEnd();
 		}
 	}
 
