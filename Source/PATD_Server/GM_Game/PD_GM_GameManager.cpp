@@ -275,7 +275,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 
 
 		//Distincion para players o enemigos
-		TArray<FStructOrderAction> listMove;
+		TArray<FStructOrderAction> listMove; 
 		PD_GM_LogicCharacter* logicCharacter=nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 			listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
@@ -352,7 +352,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 
 }
 void PD_GM_GameManager::VisualTickControl() {
-	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualTickControl"));
+	
 
 	//Distincion para players o enemigos
 	int maxLengthAction = 0;
@@ -363,7 +363,7 @@ void PD_GM_GameManager::VisualTickControl() {
 		maxLengthAction = enemyManager->GetMaxLenghtActions(structGameState->enumActionPhase);
 
 	}
-
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualTickControl : Phase: % d  :maxLengthAction: %d"),  static_cast<uint8>(structGameState->enumActionPhase), maxLengthAction);
 	//Logica del VisualTickControl
 
 	if (structGameState->enumActionPhase == EActionPhase::Move) {
@@ -394,20 +394,22 @@ void PD_GM_GameManager::VisualMoveTick() {
 	for (int i = 0; i<playersManager->GetNumPlayers(); i++) {
 
 		//Distincion para players o enemigos
-		TArray<FStructOrderAction> listMove;
+		TArray<FStructOrderAction>* listMove=nullptr;
 		PD_GM_LogicCharacter* logicCharacter=nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
-			listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
+			listMove = &playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 		}
 		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
-			listMove = enemyManager->GetTurnOrders(i)->listMove;
+			listMove = &enemyManager->GetTurnOrders(i)->listMove;
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
 
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght before Pop:%d "), listMove->Num());
 
-		FStructOrderAction visualAction = listMove.Pop();
+		FStructOrderAction visualAction = listMove->Pop();
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght after Pop:%d "), listMove->Num());
 
 		//Peta al no tener actor ni controller
 		logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
@@ -430,23 +432,23 @@ void PD_GM_GameManager::VisualAttackTick() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
 
 	//Distincion para players o enemigos
-	TArray<FStructOrderAction> listAttack;
+	TArray<FStructOrderAction>* listAttack=nullptr;
 	int indexCharacter;
 	PD_GM_LogicCharacter* logicCharacter=nullptr;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 		indexCharacter = playersManager->GetPlayerMaxLenghtActions(structGameState->enumActionPhase);
-		listAttack = playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
+		listAttack = &playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
 		logicCharacter = playersManager->GetDataStructPlayer(indexCharacter)->logic_Character;
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
 		indexCharacter = enemyManager->GetEnemyMaxLenghtActions(structGameState->enumActionPhase);
-		listAttack = enemyManager->GetTurnOrders(indexCharacter)->listAttack;
+		listAttack = &enemyManager->GetTurnOrders(indexCharacter)->listAttack;
 		logicCharacter = enemyManager->GetEnemies()[indexCharacter];
 	}
 
 	//Uno a uno
 	
-	FStructOrderAction visualAction = listAttack.Pop();
+	FStructOrderAction visualAction = listAttack->Pop();
 	PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
 	FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
 

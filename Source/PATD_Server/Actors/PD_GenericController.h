@@ -18,7 +18,7 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 {
 
 
-	EAnimationType animationOn;
+	EAnimationType animationOn = EAnimationType::Iddle;
 	int maxLengthAnimation = 30;
 	int currentTimeAnimation;
 	FVector moveTargetPosition;

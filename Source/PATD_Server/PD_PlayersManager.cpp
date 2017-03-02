@@ -130,13 +130,14 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 			listActions = this->GetDataStructPlayer(i)->turnOrders->listAttack;
 		}
 
+		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : Phase: % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions.Num());
 
 		if (numTicks < (listActions.Num())) {
 			numTicks = listActions.Num();
 			indexPlayer = i;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions: devuelto %d"), indexPlayer);
+	//UE_LOG(LogTemp, Warning, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions: devuelto %d"), indexPlayer);
 
 	return indexPlayer;
 }
