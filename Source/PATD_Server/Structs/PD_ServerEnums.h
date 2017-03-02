@@ -1,6 +1,6 @@
 #pragma once
 
-template <typename T>
+/*template <typename T>
 class EnumParser
 {
     std::map <string, T> enumMap;
@@ -15,7 +15,7 @@ public:
         return iValue->second;
     }
 };
-
+*/
 
 enum class EGameState {Instantiate_Map, Start_Match, WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingEnemiesLogic, ExecutingEnemiesVisualization,EndOfTurn };
 
@@ -31,7 +31,7 @@ enum class PasiveSkills { NotInMyGuard = 1, TheGoodBier = 2, KingInTheNorth = 3,
 
 
 enum class ECharacterType { NoCharacter, Player, Archer, Zombie };
-
+/*
 EnumParser<ECharacterType>::EnumParser()
 {
     enumMap["NoCharacter"] = NoCharacter;
@@ -39,5 +39,5 @@ EnumParser<ECharacterType>::EnumParser()
     enumMap["Archer"] = Archer;
     enumMap["Zombie"] = Zombie;
 }
-
+*/
 enum class EAnimationType {Iddle,Move,Attack};
