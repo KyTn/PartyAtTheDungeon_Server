@@ -19,6 +19,7 @@ private:
 	PD_GM_MapManager* mapMng;
 	TArray<FStructOrderAction*> actions;
 	PD_MG_LogicPosition currentPos;
+	PD_MG_LogicPosition ActionPos;
 public:
 	GENERATED_BODY()
 	APD_EnemyController();
@@ -40,5 +41,11 @@ public:
 	TArray<FStructOrderAction*> GetActions() { return actions;}
 
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
-		bool AreEnemiesNear();
+		void ArePlayersNear();
+
+	UFUNCTION(BlueprintCallable, Category = Behaviour)
+		void AddAttack();
+
+	UFUNCTION(BlueprintCallable, Category = Behaviour)
+		void AddMove();
 };

@@ -43,6 +43,16 @@ bool PD_GM_MapManager::getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericC
 bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 */
 
+bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
+	PD_MG_LogicPosition logpos;
+	logpos.SetX(x);
+	logpos.SetY(y);
+	if (DynamicMapRef->getEnemies().Contains(logpos))
+		if (DynamicMapRef->getEnemies()[logpos].type_Character == ECharacterType::Player)
+			return true;
+	return false;
+}
+
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num Rooms: %d"), MapInfo->rooms.Num());
 	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
@@ -78,6 +88,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_
 
 	return logPos.GetAdjacents(StaticMapRef->GetLogicPositions());
 }
+
 
 #pragma endregion
 
