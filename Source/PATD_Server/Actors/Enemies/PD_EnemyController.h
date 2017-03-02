@@ -3,15 +3,23 @@
 #pragma once
 
 #include "Actors/PD_GenericController.h"
+#include "PATD_Server/Structs/PD_NetStructs.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_EnemyController.generated.h"
 
+
+class PD_GM_MapManager;
 /**
  * 
  */
 UCLASS()
 class PATD_SERVER_API APD_EnemyController : public APD_GenericController
 {
-
+private:
+	PD_GM_MapManager* mapMng;
+	TArray<FStructOrderAction*> actions;
+	PD_MG_LogicPosition currentPos;
+public:
 	GENERATED_BODY()
 	APD_EnemyController();
 	APD_EnemyController(const FString type);
@@ -27,9 +35,9 @@ class PATD_SERVER_API APD_EnemyController : public APD_GenericController
 	virtual bool ActionTo(float x, float y, uint8 id_action) override;
 	virtual bool Animate(uint8 typeAnimation) override;
 	
-	void StartTurn();
+	void StartTurn(PD_GM_MapManager* refMap,PD_MG_LogicPosition inCurrentPos);
 
-
+	TArray<FStructOrderAction*> GetActions() { return actions;}
 
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
 		bool AreEnemiesNear();

@@ -3,6 +3,9 @@
 #include "PATD_Server.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
+#include "PATD_Server/GM_Game/PD_GM_MapManager.h"
+#include "PATD_Server/Structs/PD_NetStructs.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_EnemyController.h"
 
 APD_EnemyController::APD_EnemyController() {
@@ -45,8 +48,11 @@ bool APD_EnemyController::Animate(uint8 typeAnimation)
 	return true;
 }
 
-void APD_EnemyController::StartTurn(){
+void APD_EnemyController::StartTurn(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos){
 	
+
+	this->mapMng = refMap;
+	this->currentPos = inCurrentPos;
 	/*Esto de aqui se llama al empezar el turno de cada enemigo
 			
 	*/
@@ -96,6 +102,5 @@ void APD_EnemyController::StartTurn(){
 bool APD_EnemyController::AreEnemiesNear() {
 	///dentro de este seteariamos variables de la black board, para indicarlo al decorator del behavior tree
 	///Creo que tiene que heredar de AIcontroller
-	bool si = true;
-	return si;
+	
 }
