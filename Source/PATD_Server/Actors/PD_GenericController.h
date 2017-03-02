@@ -18,7 +18,7 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 {
 
 
-	EAnimationType animationOn;
+	EAnimationType animationOn = EAnimationType::Iddle;
 	int maxLengthAnimation = 30;
 	int currentTimeAnimation;
 	FVector moveTargetPosition;
@@ -28,6 +28,8 @@ public:
 	GENERATED_BODY()
 
 	APD_GenericController();
+
+	APD_GenericController(FString type);
 
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;

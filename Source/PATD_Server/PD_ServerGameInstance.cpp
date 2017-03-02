@@ -219,6 +219,25 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 	}
 	else if (structServerState->enumServerState == EServerState::GameInProcess){
+		
+		//Enviar lista de players al cliente
+		FStructInstatiatePlayers listInstantiatePlayers;
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+			if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: id_player e indice de players manager no coincide"));
+			}
+			FStructPlayerInfoAtClient infoPlayer;
+			infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
+			infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+			infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
+			PD_MG_LogicPosition pos = PD_MG_LogicPosition(1, 1); //Hardcodeado
+
+			infoPlayer.logicPosition.positionX = pos.GetX();
+			infoPlayer.logicPosition.positionY = pos.GetY();
+			listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
+		}
+		//Broadcast del listInstantiatePlayers
+		networkManager->SendNow(&listInstantiatePlayers, -1);
 
 		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
@@ -235,8 +254,8 @@ void UPD_ServerGameInstance::OnBeginState() {
 #pragma region MAPS 
 void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
-	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
 
+	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
 
 }
 
@@ -290,8 +309,8 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 		//mapManager->InstantiateDynamicMap();
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager);
-		networkManager->RegisterObserver(gameManager);
+		gameManager = new PD_GM_GameManager(playersManager,mapManager,networkManager);
+		
 
 	}
 }

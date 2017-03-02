@@ -96,7 +96,7 @@ public:
 	Devuelve:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
-	bool ActionTo(PD_MG_LogicPosition targetPosition, uint32 acction);
+	bool ActionTo(FStructOrderAction order);
 
 	/*
 	//Metodo para consumir un item

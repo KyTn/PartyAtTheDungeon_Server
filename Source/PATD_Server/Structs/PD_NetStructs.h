@@ -222,6 +222,28 @@ struct FStructTotalStats
 };
 
 
+USTRUCT()
+struct FStructPlayerInfoAtClient 
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+		FStructSkin structSkin;
+	UPROPERTY()
+		FString ID_character; //Identifica al Jugador que realiza la modificacion
+	UPROPERTY()
+		uint8 playerNum;
+	UPROPERTY()
+		FStructLogicPosition logicPosition;
+
+
+	//Constructor
+	FStructPlayerInfoAtClient()
+	{
+		
+	}
+};
+
 /*
 Procedimiento para agregar un struct:
 Añadir en UstructType el siguiente numero. (,FStruct NombreStruct=17)
@@ -251,7 +273,8 @@ FStructNewConnection=2 struct que crea el networkmanager (no necesita serializac
 
 enum class UStructType {
 	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructMap = 10, FStructOrderMenu = 20, FStructTurnOrders = 30,
-	FStructCharacter = 40, FStructUpdateCharacter = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52
+	FStructCharacter = 40, FStructUpdateCharacter = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52,
+	FStructInstatiatePlayers=60
 };
 
 
@@ -304,6 +327,23 @@ struct FStructUpdateCharacter : public  FStructGeneric
 	FStructUpdateCharacter()
 	{
 		structType = static_cast<uint8>(UStructType::FStructUpdateCharacter);
+	}
+};
+
+
+USTRUCT()
+struct FStructInstatiatePlayers : public FStructGeneric
+{
+	GENERATED_BODY()
+
+		UPROPERTY()
+		TArray<FStructPlayerInfoAtClient> listInfoPlayerAtClient;
+
+
+	//Constructor
+	FStructInstatiatePlayers()
+	{
+		structType = static_cast<uint8>(UStructType::FStructInstatiatePlayers);
 	}
 };
 

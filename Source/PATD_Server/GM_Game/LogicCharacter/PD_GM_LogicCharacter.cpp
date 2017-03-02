@@ -2,7 +2,8 @@
 
 #include "PATD_Server.h"
 #include "PD_GM_LogicCharacter.h"
-
+#include "Actors/Enemies/PD_EnemyController.h"
+#include "Actors/Players/PD_CharacterController.h"
 
 #include <math.h>       /* ceil */
 
@@ -100,15 +101,19 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 	Devuelve true si todo ha ido bien, si algo ha fallado, devuelve false (normalmente a raiz de que la funcion move del controlador
 	devuelva tambien false
 	*/
-	
-	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
-	controller->MoveTo(realPosition.X,realPosition.Y);
 
+	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
+	if (isPlayer){
+			Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+	}
+	else {
+			//Cast<APD_EnemyController> (controller)->MoveTo(realPosition.X, realPosition.Y);
+	}
 	return true;
 }
 
 
-bool PD_GM_LogicCharacter::ActionTo(PD_MG_LogicPosition targetPosition, uint32 action)
+bool PD_GM_LogicCharacter::ActionTo(FStructOrderAction order)
 {
 	/*
 	- OBJETIVO: Para realizar una accion sobre una casilla. Las acciones son Ataques, Habilidades o Interactuar con objeto
@@ -132,6 +137,7 @@ bool PD_GM_LogicCharacter::ActionTo(PD_MG_LogicPosition targetPosition, uint32 a
 	3.2.2 ejecutar el metodo Interacturar() de ese interactuable
 	- SE LLAMA DESDE: El GameManager durante la Fase de Accion
 	*/
+
 	return true;
 }
 void PD_GM_LogicCharacter::ConsumeItem(uint32 idItem)
