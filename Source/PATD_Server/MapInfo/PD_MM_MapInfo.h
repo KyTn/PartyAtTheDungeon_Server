@@ -17,10 +17,11 @@ class PATD_SERVER_API PD_MM_Room
 {
 public:
 	PD_MM_Room();
+	PD_MM_Room(FString idRoom);
 	~PD_MM_Room();
 
 	bool IsSpawnRoom = false;
-
+	FString IDRoom;
 	TArray<PD_MG_LogicPosition> LogicPosInRoom;
 
 	TMap<PD_MG_LogicPosition, AActor*> tiles;

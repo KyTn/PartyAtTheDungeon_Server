@@ -44,12 +44,15 @@ bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCh
 */
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num Rooms: %d"), MapInfo->rooms.Num());
 	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
 		if (MapInfo->rooms[i].IsSpawnRoom) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Hay una habitacion marcada como spawn"));
 			return MapInfo->rooms[i].LogicPosInRoom;
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  NO HAY SPAWN, revisar procedural o chorizo"));
 	return TArray<PD_MG_LogicPosition>();
 }
 
@@ -126,6 +129,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
 	TArray<PD_MG_LogicPosition> spawn = GetSpawnPoints();
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Spawn points Num %d"), spawn.Num());
+
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(PD_MG_LogicPosition(1,1));
