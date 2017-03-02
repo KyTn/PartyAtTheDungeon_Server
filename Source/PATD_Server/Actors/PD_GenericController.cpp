@@ -17,6 +17,10 @@ APD_GenericController::APD_GenericController()
 
 }
 
+APD_GenericController::APD_GenericController(FString type) {
+
+}
+
 void APD_GenericController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime); // Call parent class tick function  

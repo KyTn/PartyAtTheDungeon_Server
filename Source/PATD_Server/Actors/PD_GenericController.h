@@ -29,6 +29,8 @@ public:
 
 	APD_GenericController();
 
+	APD_GenericController(FString type);
+
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;
 	void OnAnimationEnd();
