@@ -24,7 +24,7 @@ APD_GenericController::APD_GenericController(FString type) {
 void APD_GenericController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime); // Call parent class tick function  
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: StateAnim:%d"), static_cast<uint8>(animationOn));
+	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: StateAnim:%d"), static_cast<uint8>(animationOn));
 	if (animationOn != EAnimationType::Iddle)
 	{
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: StateAnim:%d"), static_cast<uint8>(animationOn));
