@@ -17,16 +17,25 @@ class PATD_SERVER_API PD_MM_Room
 {
 public:
 	PD_MM_Room();
-	PD_MM_Room(FString idRoom);
+	PD_MM_Room(int idRoom);
 	~PD_MM_Room();
 
-	bool IsSpawnRoom = false;
-	FString IDRoom;
+	bool IsSpawnRoom;
+	int IDRoom;
+	
 	TArray<PD_MG_LogicPosition> LogicPosInRoom;
 
 	TMap<PD_MG_LogicPosition, AActor*> tiles;
 	TMap<PD_MG_LogicPosition, AActor*> walls;
 	TMap<PD_MG_LogicPosition, AActor*> interactuables;
+
+	bool AddLogicPos(PD_MG_LogicPosition logpos);
+	int GetIDRoom() { return IDRoom; };
+
+	bool AddTile(PD_MG_LogicPosition logpos, AActor* tile);
+	bool AddWall(PD_MG_LogicPosition logpos, AActor* wall);
+	bool AddInteractuable(PD_MG_LogicPosition logpos, AActor* interactuable);
+
 };
 
 
@@ -39,7 +48,7 @@ public:
 
 	PD_GM_MapManager* mapManager;
 
-
+	PD_MM_Room* SpawnRoom;
 	TArray<PD_MG_LogicPosition> allLogicPos;
 	TArray<PD_MM_Room> rooms;
 	TMap<PD_MG_LogicPosition, PD_MM_Room> roomByLogPos;
