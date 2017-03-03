@@ -97,7 +97,9 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 
 		if (structGameState->enumActionPhase == EActionPhase::EndPhase) {
-			//this->ChangeState(EGameState::ExecutingEnemiesLogic);
+		//	this->ChangeState(EGameState::ExecutingEnemiesLogic); 
+		//Salto de pruebas a end of turn para no hacer la logica del enemigo que aun peta.
+			this->ChangeState(EGameState::EndOfTurn);
 		}
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
@@ -291,7 +293,6 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 		
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction* order = &listMove[tick];
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AL ATAQUER !"));
 
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
 

@@ -230,7 +230,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 			infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
 			infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
 			infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
-			PD_MG_LogicPosition pos = PD_MG_LogicPosition(1, 1); //Hardcodeado
+			PD_MG_LogicPosition pos = PD_MG_LogicPosition(2, 1); //Hardcodeado
 
 			infoPlayer.logicPosition.positionX = pos.GetX();
 			infoPlayer.logicPosition.positionY = pos.GetY();
