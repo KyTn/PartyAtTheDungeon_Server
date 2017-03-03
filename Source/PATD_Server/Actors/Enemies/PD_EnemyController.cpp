@@ -3,6 +3,9 @@
 #include "PATD_Server.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
+#include "PATD_Server/GM_Game/PD_GM_MapManager.h"
+#include "PATD_Server/Structs/PD_NetStructs.h"
+#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_EnemyController.h"
 
 APD_EnemyController::APD_EnemyController() {
@@ -45,8 +48,11 @@ bool APD_EnemyController::Animate(uint8 typeAnimation)
 	return true;
 }
 
-void APD_EnemyController::StartTurn(){
+void APD_EnemyController::StartTurn(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos){
 	
+
+	this->mapMng = refMap;
+	this->currentPos = inCurrentPos;
 	/*Esto de aqui se llama al empezar el turno de cada enemigo
 			
 	*/
@@ -54,6 +60,11 @@ void APD_EnemyController::StartTurn(){
 	/*blackboardData->*/
 	///RunBehaviorTree(behaviorTree);///poner el tree en marcha
 	///Blackboard->InitializeBlackboard(*blackboardData);///Inicializar la Black board
+
+	///Blackboard->SetValueAsFloat("AP", 5);
+	///Blackboard->SetValueAsFloat("ArePlayersNear", false);
+
+
 	/*if (!Blackboard->InitializeBlackboard(*blackboardData))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, "Could not load Blackboard");
@@ -73,17 +84,6 @@ void APD_EnemyController::StartTurn(){
 
 	///Esto es por si falla, pone en algunos sitios que apartir de la 4.11 no va bien sin esto, ademas a lo mejor debemos pasarle el Acharacter para que lo posea
 	//BlackboardComponent->InitializeBlackboard(*AICharacter->AIBehavior->BlackboardAsset);
-
-	/*Blackboard.TargetKeyID = BlackboardComponent->GetKeyID("Target");
-	Blackboard.LastSensedLocationID = BlackboardComponent->GetKeyID("LastSensedLocation");
-	Blackboard.NextWeaponID = BlackboardComponent->GetKeyID("NextWeapon");
-	Blackboard.NextWeaponLocationID = BlackboardComponent->GetKeyID("NextWeaponLocation");
-
-	Blackboard.ShouldProcessCommandsID = BlackboardComponent->GetKeyID("ShouldProcessCommands");
-	Blackboard.CommandTypeID = BlackboardComponent->GetKeyID("CommandType");
-	Blackboard.CommandActorID = BlackboardComponent->GetKeyID("CommandActor");
-	Blackboard.CommandLocationID = BlackboardComponent->GetKeyID("CommandLocation");
-	*/
 	//BehaviourComponent->StartTree(*AICharacter->AIBehavior);
 
 
@@ -93,9 +93,44 @@ void APD_EnemyController::StartTurn(){
 	///Basicamente hay que hacer que se puedan llamar desde blueprints
 }
 
-bool APD_EnemyController::AreEnemiesNear() {
+void APD_EnemyController::ArePlayersNear() {
 	///dentro de este seteariamos variables de la black board, para indicarlo al decorator del behavior tree
 	///Creo que tiene que heredar de AIcontroller
-	bool si = true;
-	return si;
+	if (mapMng->IsTherePlayer(currentPos.GetX() + 1, currentPos.GetY())) {
+		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+		ActionPos.SetX(currentPos.GetX() + 1);
+		ActionPos.SetY(currentPos.GetY());
+	}
+	else if (mapMng->IsTherePlayer(currentPos.GetX() - 1, currentPos.GetY())) {
+		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+		ActionPos.SetX(currentPos.GetX() - 1);
+		ActionPos.SetY(currentPos.GetY());
+	}
+	else if (mapMng->IsTherePlayer(currentPos.GetX(), currentPos.GetY() + 1)) {
+		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+		ActionPos.SetX(currentPos.GetX());
+		ActionPos.SetY(currentPos.GetY() + 1);
+	}
+	else if (mapMng->IsTherePlayer(currentPos.GetX(), currentPos.GetY() - 1)) {
+		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+		ActionPos.SetX(currentPos.GetX());
+		ActionPos.SetY(currentPos.GetY() - 1);
+	}
+	else
+		;//Blackboard->SetValueAsFloat("ArePlayersNear", false);	
+}
+
+
+void APD_EnemyController::AddAttack() {
+	//uint32 AP = Blackboard->GetValueAsFloat("AP");
+	//AP--;
+	//Blackboard->SetValueAsFloat("AP", AP);
+	//Crear accion ataque, y añadirsela a la lista de acciones con ActionPos
+}
+
+void APD_EnemyController::AddMove() {
+	//uint32 AP = Blackboard->GetValueAsFloat("AP");
+	//AP--;
+	//Blackboard->SetValueAsFloat("AP", AP);
+	//Crear accion mover(aleatorio), y añadirsela a la lista de acciones con ActionPos
 }

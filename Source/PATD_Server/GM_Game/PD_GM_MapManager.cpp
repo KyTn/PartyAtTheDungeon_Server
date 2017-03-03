@@ -43,13 +43,26 @@ bool PD_GM_MapManager::getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericC
 bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
 */
 
+bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
+	PD_MG_LogicPosition logpos;
+	logpos.SetX(x);
+	logpos.SetY(y);
+	if (DynamicMapRef->getEnemies().Contains(logpos))
+		if (DynamicMapRef->getEnemies()[logpos].type_Character == ECharacterType::Player)
+			return true;
+	return false;
+}
+
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num Rooms: %d"), MapInfo->rooms.Num());
 	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
 		if (MapInfo->rooms[i].IsSpawnRoom) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Hay una habitacion marcada como spawn"));
 			return MapInfo->rooms[i].LogicPosInRoom;
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  NO HAY SPAWN, revisar procedural o chorizo"));
 	return TArray<PD_MG_LogicPosition>();
 }
 
@@ -75,6 +88,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_
 
 	return logPos.GetAdjacents(StaticMapRef->GetLogicPositions());
 }
+
 
 #pragma endregion
 
@@ -126,10 +140,12 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
 	TArray<PD_MG_LogicPosition> spawn = GetSpawnPoints();
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Spawn points Num %d"), spawn.Num());
+
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(PD_MG_LogicPosition(1,1));
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(PD_MG_LogicPosition(1, 1)));
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(PD_MG_LogicPosition(2,1));
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(PD_MG_LogicPosition(2, 1)));
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetController(Cast<APD_GenericController>(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 		///actualizamos la referencia del BP

@@ -82,7 +82,7 @@ bool PD_PlayersManager::AnyPlayerDead() {
 bool  PD_PlayersManager::AllAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllAnimationEnd"));
 	for (StructPlayer* player : dataPlayers) {
-		if (!player->logic_Character->GetController()->IsAtAnimation()) {
+		if (player->logic_Character->GetController()->IsAtAnimation()) {
 			return false;
 		}
 	}
