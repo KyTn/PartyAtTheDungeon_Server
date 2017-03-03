@@ -141,6 +141,7 @@ void PD_GM_GameManager::OnBeginState() {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match"));
 				
 		UpdateState();
+
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersLogic"));
 		PlayersLogicTurn();

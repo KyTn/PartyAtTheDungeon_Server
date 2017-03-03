@@ -60,7 +60,7 @@ bool PD_PlayersManager::AllPlayersReady() {
 bool PD_PlayersManager::AllPlayersSendOrders() {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersSendOrders"));
 	for (StructPlayer* player : dataPlayers) {
-		if (!player->turnOrders) {
+		if ( (player->turnOrders->listAttack.Num() == 0 ) && ( player->turnOrders->listMove.Num() == 0 )) {
 			return false;
 		}
 	}
