@@ -45,76 +45,94 @@ bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent:: Evento recibido:%d Estado del servidor: %d"), static_cast<uint8>(inEventType), static_cast<uint8>(structServerState->enumServerState));
 
-	if (structServerState->enumServerState == EServerState::WaitingClientMaster) {
+
+	if (structServerState->enumServerState == EServerState::StartApp) {
+		// Ningún mensaje puede llegar durante este estado
+	}
+	else if(structServerState->enumServerState == EServerState::WaitingMasterClient) {
 		//Evento NewConnection
 		if (inEventType == UStructType::FStructNewConnection) {
 
 			// registra un jugador entrante como jugador MASTER
 			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, true);
 		}
-	}else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent:: WaitingMasterClient - NOT MATCHING "));
+		}
+	}	 
+	else if(structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
 
 		//Evento NewConnection
 		if (inEventType == UStructType::FStructNewConnection) {
 
 			// registra un jugador entrante como jugador normal
 			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, false);
-
-		//Evento OrderMenu
-		}else if (inEventType == UStructType::FStructOrderMenu) {
+		}
+		else if (inEventType == UStructType::FStructMatchConfig) {
 
 			// Cuando el client Master envía la congif de la partida ... 
 			HandleEvent_ConfigMatch(inDataStruct, inPlayer, inEventType);
-
-
-			//FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
-			//if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
-			//	//Solo si lo envia el clientMaster
-			//	if (inPlayer == playersManager->getIndexClientMaster()) {
-			//		structServerState->gameConfigurationDone = true;
-			//		this->UpdateState();//Cambio de estado
-			//	}
-			//}
-
-
-
 		}
-	}else if (structServerState->enumServerState == EServerState::WaitingReady) {
+		else if (inEventType == UStructType::FStructMatchConfigDone) {
+
+			// Cuando el client Master envía la congif de la partida ... 
+			HandleEvent_ConfigMatchDone(inDataStruct, inPlayer, inEventType);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent:: WaitingGameConfiguration - NOT MATCHING "));
+		}
+
+	}	 
+	else if(structServerState->enumServerState == EServerState::Lobby_Tabern) {
 		//Evento OrderMenu
 		if (inEventType == UStructType::FStructOrderMenu) {
 
 			// Cuando un jugador envía READY, marcarlo como preparado. 
-
 			HandleEvent_PlayerReady(inDataStruct, inPlayer, inEventType);
 
 
 			//FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 			//if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
-
 			//	playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
 			//	this->UpdateState();//Cambio de estado
 			//}
-
-
-
-		//Evento PlayerData
+			//Evento PlayerData
 		}
 		else if (inEventType == UStructType::FStructCharacter) {
 			//Se reciben los datos del jugador y se procesan
 			HandleEvent_LoadPlayerInfo(inDataStruct, inPlayer);
 		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent:: Lobby_Tabern - NOT MATCHING "));
+		}
+	}	 
+	else if(structServerState->enumServerState == EServerState::Launch_Match) {
+
+	}	 
+	else if(structServerState->enumServerState == EServerState::GameInProcess) {
+
+	}	 
+	else if (structServerState->enumServerState == EServerState::Podium) {
+
+	}
+	else if(structServerState->enumServerState == EServerState::OnExit) {
+
+	}
+	else 
+	{
+
 	}
 }
 
+#pragma region Handlers
 
-
-// Registra un jugador entrante. 
-// PARAMS: 
-//		FStructGeneric* inDataStruct	Estructura que recibe del NetManager
-//		int inPlayer					Index del jugador que envía
-//		UStructType inEventType			Tipo de estructura
-//		bool isMasterClient				registra como masterclient o no. Default: false.
-//
+/// Registra un jugador entrante. 
+/// PARAMS: 
+///		FStructGeneric* inDataStruct	Estructura que recibe del NetManager
+///		int inPlayer					Index del jugador que envía
+///		UStructType inEventType			Tipo de estructura
+///		bool isMasterClient				registra como masterclient o no. Default: false.
+///
 void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient = false) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_NewConnection"));
 	//Registrar en playersManager
@@ -133,12 +151,15 @@ void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStr
 	clientResponse.isClientMaster = isMasterClient;
 	networkManager->SendNow(&clientResponse, inPlayer);
 
-	if(isMasterClient) this->UpdateState(); //Cambio de estado al WaitingGameConfiguration
+	//Si es el MasterClient, es que estamos en WaitingMasterClient y cambiamos de estado al WaitingGameConfiguration
+	if(isMasterClient) this->UpdateState(); 
 
 }
 
+/// Cuando el MasterClient cambia un valor de la configuración del match ...
 void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_ConfigMatch"));
+	/*
 	FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 	if (MenuOrderType(menuOrder->orderType) == MenuOrderType::GameConfigurationDone) {
 		//Solo si lo envia el clientMaster
@@ -147,8 +168,34 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 			this->UpdateState();//Cambio de estado
 		}
 	}
+	*/
+	FStructMatchConfig* StructMatchConfig = (FStructMatchConfig*) inDataStruct;
+
+	// Obtener la información y actualizar la configuración del match en el servidor:
+	// StructMatchConfig.id		: id del campo a cambiar
+	// StructMatchConfig.value	: nuevo valor del campo id
+
+	// Enviar la información confirmada a los clientes ... 
+}
+
+/// Cuando el MasterClient termina de configurar el Match ... 
+void UPD_ServerGameInstance::HandleEvent_ConfigMatchDone(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_ConfigMatchDone"));
+	if (inPlayer == playersManager->GetIndexClientMaster()) {
+		structServerState->gameConfigurationDone = true;
+
+		// mandar el MatchConfigDone a todos los clientes, masterclient incluido, como confirmación.
+		FStructMatchConfigDone configDone = FStructMatchConfigDone();
+		configDone.from = 0;
+		networkManager->SendNow(&configDone, -1);
+
+		this->UpdateState();//Cambio de estado
+	}
+
 
 }
+
+
 
 void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataStruct, int inPlayer) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_LoadPlayerInfo"));
@@ -177,73 +224,163 @@ void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruc
 
 #pragma endregion
 
+#pragma endregion
+
 #pragma region ONBEGIN & UPDATE STATES
 
 void UPD_ServerGameInstance::UpdateState() {
-	if (structServerState->enumServerState == EServerState::WaitingClientMaster){
+
+
+	if (structServerState->enumServerState == EServerState::StartApp) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::WaitingMasterClient) {
 		//Transiciones de estados
 		if (playersManager->GetIndexClientMaster() != -1) {
 			this->ChangeState(EServerState::WaitingGameConfiguration);
 		}
-	}else  if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
+	}
+	else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
 		//Transiciones de estados
 		if (structServerState->gameConfigurationDone) {
-			this->ChangeState(EServerState::WaitingReady);
-		}
-	}else if (structServerState->enumServerState == EServerState::WaitingReady) {
-		if (playersManager->AllPlayersReady()) {
-			this->ChangeState(EServerState::GameInProcess);
+			this->ChangeState(EServerState::Lobby_Tabern);
 		}
 	}
+	else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
+		// Si todos los jugadores están ready
+		if (playersManager->AllPlayersReady()) {
+			// enviamos a los jugadores que ya pueden ir al Launch_Match
 
+			FStructClientStartMatchOnGM launchMatch = FStructClientStartMatchOnGM();
+			networkManager->SendNow(&launchMatch, -1);
+	
+			this->ChangeState(EServerState::Launch_Match);
+		}
+	}
+	else if (structServerState->enumServerState == EServerState::Launch_Match) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::GameInProcess) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::Podium) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::OnExit) {
+
+	}
+	else
+	{
+
+	}
 }
 
 void UPD_ServerGameInstance::ChangeState(EServerState newState) {
+	switch (newState)
+	{
+	case EServerState::StartApp:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to StartApp"));
+		break;
+	case EServerState::WaitingMasterClient:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to WaitingMasterClient"));
+		break;
+	case EServerState::WaitingGameConfiguration:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to WaitingGameConfiguration"));
+		break;
+	case EServerState::Lobby_Tabern:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to Lobby_Tabern"));
+		break;
+	case EServerState::Launch_Match:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to Launch_Match"));
+		break;
+	case EServerState::GameInProcess:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to GameInProcess"));
+		break;
+	case EServerState::Podium:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to Podium"));
+		break;
+	case EServerState::OnExit:
+		UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::ChangeState to OnExit"));
+		break;
+	default:
+		break;
+	}
+	
 	structServerState->enumServerState = newState;
 	OnBeginState();
 }
 
 void UPD_ServerGameInstance::OnBeginState() {
-	if (structServerState->enumServerState == EServerState::WaitingClientMaster) {
+
+	if (structServerState->enumServerState == EServerState::StartApp) {
+
+		//Aqui haríamos una espera para la pantalla de inicio, animación inicial y tal ... 
+
+		ChangeState(EServerState::WaitingMasterClient);
+	}
+	else if (structServerState->enumServerState == EServerState::WaitingMasterClient) {
 		
-	}else  if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
-				
+	}
+	else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
 		this->LoadMap(levelsNameDictionary.GetMapName(2));
-		
-	}else if (structServerState->enumServerState == EServerState::WaitingReady) {
+	}
+	else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
+		/* 
 		FStructOrderMenu clientBroadcast;
 		clientBroadcast.orderType = static_cast<uint8>(MenuOrderType::ChangeToLobby);
 		networkManager->SendNow(&clientBroadcast, -1);
-
+		/*  */
 		this->LoadMap(levelsNameDictionary.GetMapName(3));
 
 	}
-	else if (structServerState->enumServerState == EServerState::GameInProcess){
-		
+	else if (structServerState->enumServerState == EServerState::Launch_Match) {
 		//Enviar lista de players al cliente
 		FStructInstatiatePlayers listInstantiatePlayers;
 		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
 			if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: id_player e indice de players manager no coincide"));
+				UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::OnBeginState(): EServerState::Launch_Match:  Launch_Match: id_player e indice de players manager no coincide"));
 			}
 			FStructPlayerInfoAtClient infoPlayer;
 			infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
 			infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
 			infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
-			PD_MG_LogicPosition pos = PD_MG_LogicPosition(2, 1); //Hardcodeado
+			PD_MG_LogicPosition pos = playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition();
+
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: player %d at (%d,%d)"), i, pos.GetX(), pos.GetY());
 
 			infoPlayer.logicPosition.positionX = pos.GetX();
 			infoPlayer.logicPosition.positionY = pos.GetY();
 			listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
 		}
+
+		//CODIGO PROVISIONAL PARA ESPERAR. HAY QUE ARREGLAR EL NETMANAGER
+		int i = 0;
+		float f = 1;
+		while (i < 10000) {
+			UE_LOG(LogTemp, Warning, TEXT("wait cutrisimo %d"), i);
+			i++;
+			f = f*f;
+		}
+		//FIN CODIGO PROVISIONAL
+
 		//Broadcast del listInstantiatePlayers
 		networkManager->SendNow(&listInstantiatePlayers, -1);
-
+		ChangeState(EServerState::GameInProcess);
+		
+	}
+	else if (structServerState->enumServerState == EServerState::GameInProcess) {
+		
 		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
-	else //Caso indeterminado
+	else if (structServerState->enumServerState == EServerState::Podium) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::OnExit) {
+
+	}
+	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginState: WARNING: estado sin inicializacion"));
+
 	}
 
 }
@@ -265,21 +402,27 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	APD_NW_TimerActor* TimerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	networkManager->GetSocketManager()->InitTimerActor(TimerActorSpawned);
 
-	if (structServerState->enumServerState == EServerState::WaitingReady) 
-	{
+	if (structServerState->enumServerState == EServerState::StartApp) {
 
 	}
+	else if (structServerState->enumServerState == EServerState::WaitingMasterClient) {
+		
+	}
+	else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) {
 
-	if (structServerState->enumServerState == EServerState::GameInProcess) {
-			//Quizas esto es tarea del gameManager.
-		///Esto se descomenta de aqui, y se comenta arriba para probar parte de instanciar cosas en el mapa
+	}
+	else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
+		
+		// Mientras están en el lobby, se genera el mapa y se envía a los jugadores (cuando respondan que están en el lobby). 
+
 		mapParser = new PD_MG_MapParser();
 
 		PD_MG_StaticMap* staticMapRef = new PD_MG_StaticMap();
 		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
-	
+
 		// Parsea el chorizo
 		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
+
 
 
 
@@ -291,26 +434,45 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 		mapManager = new PD_GM_MapManager();
 		mapManager->Init(staticMapRef, dynamicMapRef); // inicializa las estructuras internas del mapManager (MapInfo)
+	
+													   
 
+		/*  */
 		FString mapString = staticMapRef->GetMapString();
 		//Enviar mapa al cliente
 		FStructMap structMap;
 		structMap.stringMap = mapString;
 		networkManager->SendNow(&structMap, -1);
+		/*  */
+	}
+	else if (structServerState->enumServerState == EServerState::Launch_Match) {
 
+	}
+	else if (structServerState->enumServerState == EServerState::GameInProcess) {
+		
 		// le pasamos al mapManager un instanciador
 		AMapInstantiatorActor* InstantiatorActor = (AMapInstantiatorActor*)GetWorld()->SpawnActor(AMapInstantiatorActor::StaticClass());
 		mapManager->instantiator = InstantiatorActor;
 
-		
+
 
 		// le decimos al mapManager que instancia las cosicas en el mundo
 		//mapManager->InstantiateStaticMap();
 		//mapManager->InstantiateDynamicMap();
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager,mapManager,networkManager);
-		
+		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager);
+
+
+	}
+	else if (structServerState->enumServerState == EServerState::Podium) {
+
+	}
+	else if (structServerState->enumServerState == EServerState::OnExit) {
+
+	}
+	else
+	{
 
 	}
 }
@@ -329,7 +491,10 @@ void UPD_ServerGameInstance::Init()
 	playersManager = new PD_PlayersManager();
 
 	structServerState = new StructServerState();
-	structServerState->enumServerState = EServerState::WaitingClientMaster;
+
+	ChangeState(EServerState::StartApp);
+	//structServerState->enumServerState = EServerState::StartApp;
+	
 
 	//en el inicialize networking seteamos el gameinstance como observador.
 	InitializeNetworking();
