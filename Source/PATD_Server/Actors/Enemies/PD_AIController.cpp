@@ -7,93 +7,70 @@
 #include "PATD_Server/Structs/PD_NetStructs.h"
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_AIController.h"
+#include <math.h>
 
 APD_AIController::APD_AIController() {
-
+	
+	behaviorTree = Cast<UBehaviorTree>(StaticLoadObject(UBehaviorTree::StaticClass(), nullptr, TEXT("/Game/BluePrints/Enemies/BehaviorTree/Zombie_Tree.Zombie_Tree")));
+	blackboardData = Cast<UBlackboardData>(StaticLoadObject(UBlackboardData::StaticClass(), nullptr, TEXT("/Game/BluePrints/Enemies/BehaviorTree/Zombie_Blackboard.Zombie_Blackboard")));
+	Blackboard = CreateDefaultSubobject<UBlackboardComponent>("Blackboard");
 
 }
 
-APD_AIController::APD_AIController(const FString type) {
-	Super();
+/*APD_AIController::APD_AIController(const FString type) {/// el type tiene que ser un fstring con el nombre del árbol(de hecho, si lo gestionamos por carpetas se podría hacer una minruta)
 
-	//TCHAR* bbChar = new TCHAR();
-	///Crear el tchar con el nombre añadido para llamar a la blackboard y al behavior tree correspondiente
-	//"BlackboardData'/Game/BluePrints/BlackBoard/" + type.GetCharArray() + "." + type.GetCharArray() + "'";
-	//static ConstructorHelpers::FObjectFinder<UBlackboardData> bb(TEXT("BlackboardData'/Game/BluePrints/BT_Building.BT_Building'"));///
-	//static ConstructorHelpers::FObjectFinder<UBehaviorTree> bt(TEXT("BehaviorTree'/Game/BluePrints/BT_Building.BT_Building'"));///
-	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>("Blackboard");
-	//blackboardData = bb.Object;
-	//behaviorTree = bt.Object;
-}
+	FString PathTree = "/Game/BluePrints/Enemies/BehaviorTree/" + type + "_tree." + type;
+	FString PathBB = "/Game/BluePrints/Enemies/Blackboard/" + type + "." + type;
+	behaviorTree = Cast<UBehaviorTree>(StaticLoadObject(UBehaviorTree::StaticClass(), nullptr, *PathTree));
+	blackboardData = Cast<UBlackboardData>(StaticLoadObject(UBlackboardData::StaticClass(), nullptr, *PathBB));
+	Blackboard = CreateDefaultSubobject<UBlackboardComponent>("Blackboard");
+}*/
 
 
-void APD_AIController::StartTurn(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos) {
-
+void APD_AIController::StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos) {
 
 	this->mapMng = refMap;
 	this->currentPos = inCurrentPos;
-	/*Esto de aqui se llama al empezar el turno de cada enemigo
+	aviablePos.Init(true, 4);
 
-	*/
-
-	/*blackboardData->*/
-	///RunBehaviorTree(behaviorTree);///poner el tree en marcha
-	///Blackboard->InitializeBlackboard(*blackboardData);///Inicializar la Black board
-
-	///Blackboard->SetValueAsFloat("AP", 5);
-	///Blackboard->SetValueAsFloat("ArePlayersNear", false);
-
-
-	/*if (!Blackboard->InitializeBlackboard(*blackboardData))
+	if (!Blackboard->InitializeBlackboard(*blackboardData))
 	{
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, "Could not load Blackboard");
-	return;
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, "Could not load Blackboard");
 	}
-	Blackboard->SetValueAsFloat("AttackCooldown", 0.0f);
-
-	AInvadersActor* npc = Cast<AInvadersActor>(GetPawn());
-	if (npc)
-	{
-	Blackboard->SetValueAsObject("SelfActor", GetPawn());
-	if (!RunBehaviorTree(behaviorTree))
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, "Could not run behavior");
-	else
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Green, "Run Behavior Tree");
-	}*/
-
-	///Esto es por si falla, pone en algunos sitios que apartir de la 4.11 no va bien sin esto, ademas a lo mejor debemos pasarle el Acharacter para que lo posea
-	//BlackboardComponent->InitializeBlackboard(*AICharacter->AIBehavior->BlackboardAsset);
-	//BehaviourComponent->StartTree(*AICharacter->AIBehavior);
-
-
-	//http://blog.spissa.com/2014/10/23/introduccion-a-la-ia-en-ue4-variante-en-c/
-
-	///Ahí muestra como se hace las funciones, para que luego se le llamen desde la behaviorTree y como se actualizan valores en la blackboard.
-	///Basicamente hay que hacer que se puedan llamar desde blueprints
+	Blackboard->SetValueAsFloat("AP", 5);
+	Blackboard->SetValueAsFloat("ArePlayersNear", 0);
+	Blackboard->SetValueAsFloat("Attacked", 0);
+	if (!RunBehaviorTree(behaviorTree)){
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, "Could not run behavior");
+	}
 }
 
 void APD_AIController::ArePlayersNear() {
-	///dentro de este seteariamos variables de la black board, para indicarlo al decorator del behavior tree
-	///Creo que tiene que heredar de AIcontroller
-	if (mapMng->IsTherePlayer(currentPos.GetX() + 1, currentPos.GetY())) {
-		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
-		ActionPos.SetX(currentPos.GetX() + 1);
-		ActionPos.SetY(currentPos.GetY());
-	}
-	else if (mapMng->IsTherePlayer(currentPos.GetX() - 1, currentPos.GetY())) {
-		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
-		ActionPos.SetX(currentPos.GetX() - 1);
-		ActionPos.SetY(currentPos.GetY());
-	}
-	else if (mapMng->IsTherePlayer(currentPos.GetX(), currentPos.GetY() + 1)) {
-		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+
+
+	if (mapMng->IsTherePlayer(currentPos.GetX(), currentPos.GetY() + 1)) {
+		Blackboard->SetValueAsFloat("ArePlayersNear", 1);
 		ActionPos.SetX(currentPos.GetX());
 		ActionPos.SetY(currentPos.GetY() + 1);
+		aviablePos[0] = false;
 	}
 	else if (mapMng->IsTherePlayer(currentPos.GetX(), currentPos.GetY() - 1)) {
-		//Blackboard->SetValueAsFloat("ArePlayersNear", true);
+		Blackboard->SetValueAsFloat("ArePlayersNear", 1);
 		ActionPos.SetX(currentPos.GetX());
 		ActionPos.SetY(currentPos.GetY() - 1);
+		aviablePos[1] = false;
+	}
+	else if (mapMng->IsTherePlayer(currentPos.GetX() -1 , currentPos.GetY())) {
+		Blackboard->SetValueAsFloat("ArePlayersNear", 1);
+		ActionPos.SetX(currentPos.GetX() - 1);
+		ActionPos.SetY(currentPos.GetY());
+		aviablePos[2] = false;
+	}
+	else if (mapMng->IsTherePlayer(currentPos.GetX() + 1, currentPos.GetY())) {
+		Blackboard->SetValueAsFloat("ArePlayersNear", 1);
+		ActionPos.SetX(currentPos.GetX() + 1);
+		ActionPos.SetY(currentPos.GetY());
+		aviablePos[3] = false;
 	}
 	else
 		;//Blackboard->SetValueAsFloat("ArePlayersNear", false);	
@@ -101,16 +78,45 @@ void APD_AIController::ArePlayersNear() {
 
 
 void APD_AIController::AddAttack() {
-	//uint32 AP = Blackboard->GetValueAsFloat("AP");
-	//AP--;
-	//Blackboard->SetValueAsFloat("AP", AP);
-	//Crear accion ataque, y añadirsela a la lista de acciones con ActionPos
+
+	FStructOrderAction attack;
+	attack.orderType = 2;
+	if (currentPos.GetX() > ActionPos.GetX())
+		attack.targetDirection=3;//atacar izquierda
+	else if (currentPos.GetX() < ActionPos.GetX())
+		attack.targetDirection = 4;//atacar derecha
+	else if (currentPos.GetY() > ActionPos.GetY())
+		attack.targetDirection = 2;//atacar abajo
+	else if (currentPos.GetX() < ActionPos.GetX())
+		attack.targetDirection = 1;//atacar arriba
+	actions->listAttack.Add(attack);
+	UpdateAP();
+	Blackboard->SetValueAsFloat("Attacked", 1);
 }
 
 void APD_AIController::AddMove() {
-	//uint32 AP = Blackboard->GetValueAsFloat("AP");
-	//AP--;
-	//Blackboard->SetValueAsFloat("AP", AP);
-	//Crear accion mover(aleatorio), y añadirsela a la lista de acciones con ActionPos
+	FStructOrderAction move;
+	move.orderType = 1;
+	uint8 direc;
+	do {
+		direc = FMath::RandRange(0, 3);
+	} while (!aviablePos[direc]);
+	move.targetDirection = direc;
+	actions->listMove.Add(move);
+	UpdateAP();
 }
 
+void APD_AIController::UpdateAP() {
+	uint32 AP = Blackboard->GetValueAsFloat("AP");
+	AP--;
+	Blackboard->SetValueAsFloat("AP", AP);
+}
+
+bool APD_AIController::EndBehaviour() {
+
+	uint32 AP = Blackboard->GetValueAsFloat("AP");
+	if (AP == 0)
+		return true;
+	return false;
+
+}

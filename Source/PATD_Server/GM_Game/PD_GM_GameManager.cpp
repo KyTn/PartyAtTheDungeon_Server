@@ -13,6 +13,7 @@
 #include "PD_PlayersManager.h"
 #include "PD_GM_MapManager.h"
 #include "PD_GM_EnemyManager.h"
+#include "PD_GM_AIManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "NW_Networking/PD_NW_NetworkManager.h"
 
@@ -24,6 +25,7 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	mapManager = inMapManager;
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
+	AIManager = new PD_GM_AIManager();
 	InitState();
 	networkManager = inNetworkManager;
 	networkManager->RegisterObserver(this);
@@ -159,6 +161,7 @@ void PD_GM_GameManager::OnBeginState() {
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
+		CreateEnemyOrders();
 		PlayersLogicTurn();
 		UpdateState(); //transicion inmediata
 
@@ -195,6 +198,15 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 	MoveTurnInformation->CurrentState = InteractionStates::Ready;
 	AttackTurnInformation->CurrentState = InteractionStates::Ready;
 }*/
+
+
+void PD_GM_GameManager::CreateEnemyOrders() {
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
+		enemyManager->getListTurnOrders().Reset();
+		enemyManager->getListTurnOrders().Add(AIManager->AIExecEnemy(enemyManager->GetEnemies()[i],mapManager));
+	}
+}
+
 
 //Control de los turnos
 

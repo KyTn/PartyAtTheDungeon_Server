@@ -16,13 +16,14 @@ class PATD_SERVER_API APD_AIController : public AAIController
 {
 private:
 	PD_GM_MapManager* mapMng;
-	TArray<FStructOrderAction*> actions;
+	FStructTurnOrders* actions;
 	PD_MG_LogicPosition currentPos;
 	PD_MG_LogicPosition ActionPos;
+	TArray<bool> aviablePos;
 public:
 	GENERATED_BODY()
-		APD_AIController();
-	APD_AIController(const FString type);
+	APD_AIController();
+	//APD_AIController(const FString type);
 
 	UPROPERTY(EditAnywhere, Category = "blackboard")
 		UBlackboardData* blackboardData;
@@ -31,9 +32,13 @@ public:
 		UBehaviorTree* behaviorTree;
 
 
-	void StartTurn(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos);
+	void StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition inCurrentPos);
 
-	TArray<FStructOrderAction*> GetActions() { return actions; }
+	FStructTurnOrders* GetActions() { return actions; }
+
+	void UpdateAP();
+
+	bool EndBehaviour();
 
 	UFUNCTION(BlueprintCallable, Category = Behaviour)
 		void ArePlayersNear();
