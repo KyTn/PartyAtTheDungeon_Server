@@ -253,7 +253,7 @@ void UPD_ServerGameInstance::UpdateState() {
 
 			FStructClientStartMatchOnGM launchMatch = FStructClientStartMatchOnGM();
 			networkManager->SendNow(&launchMatch, -1);
-
+	
 			this->ChangeState(EServerState::Launch_Match);
 		}
 	}
@@ -353,14 +353,24 @@ void UPD_ServerGameInstance::OnBeginState() {
 			listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
 		}
 
+		//CODIGO PROVISIONAL PARA ESPERAR. HAY QUE ARREGLAR EL NETMANAGER
+		int i = 0;
+		float f = 1;
+		while (i < 10000) {
+			UE_LOG(LogTemp, Warning, TEXT("wait cutrisimo %d"), i);
+			i++;
+			f = f*f;
+		}
+		//FIN CODIGO PROVISIONAL
+
 		//Broadcast del listInstantiatePlayers
 		networkManager->SendNow(&listInstantiatePlayers, -1);
-
-		//this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
+		ChangeState(EServerState::GameInProcess);
+		
 	}
 	else if (structServerState->enumServerState == EServerState::GameInProcess) {
 		
-
+		this->LoadMap(levelsNameDictionary.GetMapName(4));//Mapa de juego
 	}
 	else if (structServerState->enumServerState == EServerState::Podium) {
 

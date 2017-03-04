@@ -196,12 +196,14 @@ void PD_NW_SocketManager::TimerRefreshFunction() {
 		}
 	}
 
-	for (int i = 0; i < socketArray.Num(); i++) {
+	for (int iSocket = 0; iSocket < socketArray.Num(); iSocket++) {
 		//UE_LOG(LogTemp, Warning, TEXT(">>>> Comprobando sockets lista abiertos ! "));
 		//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
-		TArray<uint8>* inData = socketArray[i]->ReceiveData();
-		if (inData) {
-			HandleNewSocketData(inData, i);
+		TArray<TArray<uint8>*> listPackages= socketArray[iSocket]->ReceiveData();
+		for (int iPackages = 0; iPackages < listPackages.Num(); iPackages++) {
+			
+			HandleNewSocketData(listPackages[iPackages], iSocket);
+			
 		}
 
 	}
