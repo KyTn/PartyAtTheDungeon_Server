@@ -14,26 +14,28 @@ class PATD_SERVER_API PD_SR_SerializerManager
 public:
 	PD_SR_SerializerManager();
 	~PD_SR_SerializerManager();
-	
+
 	//El serializer crea nuevo espacio en memoria y copia el que le llega.
 	//No hace delete de la estructura vieja.
 		//Hay posibilidad de mejorar eso?
 
-TArray<uint8>* SerializeData(FStructGeneric* structGeneric, UStructType type) {
-		switch (type){
+	TArray<uint8>* SerializeData(FStructGeneric* structGeneric, UStructType type) {
+		//UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: intentando serializar algo de tipo %d"), );
+
+		switch (type) {
 		case UStructType::FStructMap: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructMap"));
 			FStructMap* structSpecialization = (FStructMap*)structGeneric;
 			return SerializeDataTemplate<FStructMap>(structSpecialization);
-		
-		 }break;
+
+		}break;
 
 		case UStructType::FStructOrderMenu: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructOrderMenu"));
 			FStructOrderMenu* structSpecialization = (FStructOrderMenu*)structGeneric;
 			return SerializeDataTemplate<FStructOrderMenu>(structSpecialization);
-		
-		 }break;
+
+		}break;
 
 		case UStructType::FStructTurnOrders: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructTurnOrders"));
@@ -41,34 +43,72 @@ TArray<uint8>* SerializeData(FStructGeneric* structGeneric, UStructType type) {
 			return SerializeDataTemplate<FStructTurnOrders>(structSpecialization);
 
 		}break;
+
 		case UStructType::FStructCharacter: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructCharacter"));
 			FStructCharacter* structSpecialization = (FStructCharacter*)structGeneric;
 			return SerializeDataTemplate<FStructCharacter>(structSpecialization);
 
 		}break;
+
 		case UStructType::FStructUpdateCharacter: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructUpdateCharacter"));
 			FStructUpdateCharacter* structSpecialization = (FStructUpdateCharacter*)structGeneric;
 			return SerializeDataTemplate<FStructUpdateCharacter>(structSpecialization);
 
 		}break;
+
 		case UStructType::FStructInstatiatePlayers: {
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructInstatiatePlayers"));
 			FStructInstatiatePlayers* structSpecialization = (FStructInstatiatePlayers*)structGeneric;
 			return SerializeDataTemplate<FStructInstatiatePlayers>(structSpecialization);
 
 		}break;
-			
+
+		case UStructType::FStructMatchConfig: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructMatchConfig"));
+			FStructMatchConfig* structSpecialization = (FStructMatchConfig*)structGeneric;
+			return SerializeDataTemplate<FStructMatchConfig>(structSpecialization);
+
+		}break;
+
+
+		case UStructType::FStructMatchConfigDone: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructMatchConfigDone"));
+			FStructMatchConfigDone* structSpecialization = (FStructMatchConfigDone*)structGeneric;
+			return SerializeDataTemplate<FStructMatchConfigDone>(structSpecialization);
+
+		}break;
+
+
+		case UStructType::FStructClientMapAlreadyInstantiated: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructClientMapAlreadyInstantiated"));
+			FStructClientMapAlreadyInstantiated* structSpecialization = (FStructClientMapAlreadyInstantiated*)structGeneric;
+			return SerializeDataTemplate<FStructClientMapAlreadyInstantiated>(structSpecialization);
+
+		}break;
+
+		case UStructType::FStructClientStartMatchOnGM: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructClientStartMatchOnGM"));
+			FStructClientStartMatchOnGM* structSpecialization = (FStructClientStartMatchOnGM*)structGeneric;
+			return SerializeDataTemplate<FStructClientStartMatchOnGM>(structSpecialization);
+
+		}break;
+
+
+		case UStructType::FStructClientCanGenerateOrders: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructClientCanGenerateOrders"));
+			FStructClientCanGenerateOrders* structSpecialization = (FStructClientCanGenerateOrders*)structGeneric;
+			return SerializeDataTemplate<FStructClientCanGenerateOrders>(structSpecialization);
+
+		}break;
+
 		default:
-			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Tipo de ustruct no reconocido"));
-		break;
-	
+			return nullptr;
+
 		}
-
-		return nullptr;
-
 	}
+
 
 FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 	switch (type) {
@@ -104,6 +144,42 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 	case UStructType::FStructInstatiatePlayers: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructInstatiatePlayers"));
 		return DeserializeDataTemplate<FStructInstatiatePlayers>(data);
+
+	}break;
+
+
+	case UStructType::FStructMatchConfig: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructMatchConfig"));
+		return DeserializeDataTemplate<FStructMatchConfig>(data);
+
+	}break;
+
+
+	case UStructType::FStructMatchConfigDone: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructMatchConfigDone"));
+		return DeserializeDataTemplate<FStructMatchConfigDone>(data);
+
+	}break;
+
+
+	case UStructType::FStructClientMapAlreadyInstantiated: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructClientMapAlreadyInstantiated"));
+		return DeserializeDataTemplate<
+			struct FStructClientMapAlreadyInstantiated>(data);
+
+	}break;
+
+
+	case UStructType::FStructClientStartMatchOnGM: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructClientStartMatchOnGM"));
+		return DeserializeDataTemplate<FStructClientStartMatchOnGM>(data);
+
+	}break;
+
+
+	case UStructType::FStructClientCanGenerateOrders: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructClientCanGenerateOrders"));
+		return DeserializeDataTemplate<FStructClientCanGenerateOrders>(data);
 
 	}break;
 
