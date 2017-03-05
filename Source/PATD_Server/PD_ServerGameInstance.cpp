@@ -334,6 +334,33 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 	}
 	else if (structServerState->enumServerState == EServerState::Launch_Match) {
+		/*
+		Generar los puntos de Spawn de los Personajes - Si no, tienen 0.0 --> El InstiantateMap se hace DESPUES QUE ESTO Y NO SIRVE
+		ACTUALIZAR EL CURRENTLOGICPOSTION de los Personajes de los Jugadores
+		*/
+		TArray<PD_MG_LogicPosition> spawn = mapManager->GetSpawnPoints();
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Spawn points Num %d"), spawn.Num());
+
+		struct FRandomStream randomize = FRandomStream(spawn.Num());
+		TArray<PD_MG_LogicPosition> spawnPoints = TArray<PD_MG_LogicPosition>();
+
+		for (int32 j = 0; j < spawn.Num(); j++) //Shuffel del GetSpawnPoint
+		{
+
+			int index = rand() % (j + 1);
+			spawn.Swap(j, index);
+			//spawnPoints.Add(spawn[randomize.RandHelper(spawn.Num())]);
+		}
+
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("tructServerState->enumServerState == EServerState::Launch_Match - Player %d is at (%d,%d)"), i, spawn[i].GetX(), spawn[i].GetY());
+			playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(spawn[i]);
+
+		}
+
+
+
 		//Enviar lista de players al cliente
 		FStructInstatiatePlayers listInstantiatePlayers;
 		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {

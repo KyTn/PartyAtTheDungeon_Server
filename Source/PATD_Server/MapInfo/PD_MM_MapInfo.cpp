@@ -150,7 +150,8 @@ void PD_MM_MapInfo::CalculateRooms()
 
 					if (mapManager->StaticMapRef->GetXYMap()[p] == 's') {
 						rooms[j].IsSpawnRoom = true;
-						SpawnRoom = &rooms[j];
+						SpawnRoom = &rooms[j] ;
+						SpawnRoomIndex = j;
 						UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - Spawn Room Found! Room %d"), rooms[j].GetIDRoom());
 					}
 					break;
@@ -189,7 +190,8 @@ void PD_MM_MapInfo::CalculateRooms()
 
 				if (mapManager->StaticMapRef->GetXYMap()[p] == 's') {
 					r.IsSpawnRoom = true;
-					SpawnRoom = &r;
+					SpawnRoom = &rooms[rooms.Num()-1];
+					SpawnRoomIndex = rooms.Num() - 1;
 					UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - Spawn Room Found! (2) Room %d"), r.GetIDRoom());
 				}
 			}
@@ -231,7 +233,13 @@ PD_MM_Room::PD_MM_Room()
 
 PD_MM_Room::PD_MM_Room(int idRoom)
 {
-	PD_MM_Room();
+	IsSpawnRoom = false;
+	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
+
+	tiles = TMap<PD_MG_LogicPosition, AActor*>();
+	walls = TMap<PD_MG_LogicPosition, AActor*>();
+	interactuables = TMap<PD_MG_LogicPosition, AActor*>();
+
 	IDRoom = idRoom;
 
 }
