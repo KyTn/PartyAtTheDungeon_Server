@@ -14,6 +14,7 @@ class PD_PlayersManager;
 class PD_GM_MapManager;
 class PD_GM_EnemyManager;
 class PD_NW_NetworkManager;
+class PD_GM_AIManager;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
 struct LogicTurnInformation;
@@ -38,6 +39,7 @@ public:
 	PD_PlayersManager* playersManager;
 	PD_GM_MapManager* mapManager;
 	PD_GM_EnemyManager* enemyManager;
+	PD_GM_AIManager* AIManager;
 	//Tiene que heredar de observer y suscribirse a paquetes de juegos (ordenes).
 	//Tiene un MapManager y un InteractionManager
 	void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
@@ -64,7 +66,7 @@ public:
 
 	//Funciones de gestion de acciones logicas
 
-	
+	void CreateEnemyOrders();
 
 	void PlayersLogicTurn();
 

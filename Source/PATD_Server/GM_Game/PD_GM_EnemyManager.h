@@ -24,4 +24,5 @@ public:
 	FStructTurnOrders* GetTurnOrders(int indexEnemy);
 	int GetEnemyMaxLenghtActions(EActionPhase phase);
 	int GetMaxLenghtActions(EActionPhase phase);
+	TArray<FStructTurnOrders*> getListTurnOrders() { return listTurnOrders; }
 };

@@ -19,7 +19,7 @@ public:
 
 enum class EGameState {Instantiate_Map, Start_Match, WaitingPlayerOrders, ExecutingPlayersLogic, ExecutingPlayersVisualization, ExecutingEnemiesLogic, ExecutingEnemiesVisualization,EndOfTurn };
 
-enum class EServerState { WaitingClientMaster, WaitingGameConfiguration, WaitingReady,GameInProcess };
+enum class EServerState { StartApp, WaitingMasterClient, WaitingGameConfiguration, Lobby_Tabern, Launch_Match, GameInProcess, Podium, OnExit };
 enum class InteractionStates { Ready, Working, Finish };
 enum class EActionPhase { Move=0, Attack=1, EndPhase=2 };
 

@@ -55,15 +55,21 @@ bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num Rooms: %d"), MapInfo->rooms.Num());
+	/*
 	for (int i = 0; i < MapInfo->rooms.Num(); i++) {
 		if (MapInfo->rooms[i].IsSpawnRoom) {
 			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Hay una habitacion marcada como spawn"));
 			return MapInfo->rooms[i].LogicPosInRoom;
 		}
 	}
+	*/
+	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  Room %d num spawnpoints: %d"), MapInfo->SpawnRoom->GetIDRoom(), MapInfo->rooms[MapInfo->SpawnRoom->GetIDRoom()].LogicPosInRoom.Num());
+	//return MapInfo->rooms[MapInfo->SpawnRoom->GetIDRoom()].LogicPosInRoom;
+	
+	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  IDSPAN   %d"), MapInfo->SpawnRoomIndex);
 
-	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  NO HAY SPAWN, revisar procedural o chorizo"));
-	return TArray<PD_MG_LogicPosition>();
+	return MapInfo->rooms[MapInfo->SpawnRoomIndex].LogicPosInRoom;
+
 }
 
 AActor* PD_GM_MapManager::getInteractuableAt(PD_MG_LogicPosition logpos) { return 0; }
@@ -115,7 +121,6 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 		/**/
 		switch (StaticMapRef->GetXYMap()[StaticMapRef->GetLogicPositions()[i]]) {
 		case 'w':
-			
 			MapInfo->AddWall(StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateWall(StaticMapRef->GetLogicPositions()[i]));
 			break;
 
@@ -140,15 +145,17 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	ECharacterType enemyType;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
-	TArray<PD_MG_LogicPosition> spawn = GetSpawnPoints();
-	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Spawn points Num %d"), spawn.Num());
 
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(PD_MG_LogicPosition(1,1));
-		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(PD_MG_LogicPosition(1, 1)));
+
+		//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Player %d is at (%d,%d)"), i, spawnPoints[i].GetX(), spawnPoints[i].GetY());
+
+		//_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(spawnPoints[i]);
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetController(Cast<APD_GenericController>(
-			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 		///actualizamos la referencia del BP
 
 	}
@@ -156,8 +163,6 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 
 		enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
-
-
 
 		switch (enemyType)
 		{
