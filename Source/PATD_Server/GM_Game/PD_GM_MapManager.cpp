@@ -121,6 +121,7 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 
 		case '.':
 		case 'd':
+		case 's':
 			
 			MapInfo->AddTile(StaticMapRef->GetLogicPositions()[i], instantiator->InstantiateTile(StaticMapRef->GetLogicPositions()[i]));
 			break;
