@@ -49,6 +49,8 @@ public:
 	PD_GM_MapManager* mapManager;
 
 	PD_MM_Room* SpawnRoom;
+	int SpawnRoomIndex;
+
 	TArray<PD_MG_LogicPosition> allLogicPos;
 	TArray<PD_MM_Room> rooms;
 	TMap<PD_MG_LogicPosition, PD_MM_Room> roomByLogPos;
