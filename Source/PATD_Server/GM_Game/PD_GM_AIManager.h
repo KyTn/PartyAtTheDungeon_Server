@@ -2,16 +2,23 @@
 
 #pragma once
 
-
+#include "PATD_Server/Actors/Enemies/PD_AIController.h"
+#include "PATD_Server/Actors/Enemies/MyAIClass.h"
 struct FStructTurnOrders;
 class PD_GM_MapManager;
 class PD_GM_LogicCharacter;
+class MyAIClass;
 /**
  * 
  */
 class PATD_SERVER_API PD_GM_AIManager
 {
+private:
+
+	//IAHito* iaH;
+	//APD_AIController* contr;
 public:
+	MyAIClass* MyAI;
 	PD_GM_AIManager();
 	~PD_GM_AIManager();
 

@@ -415,7 +415,7 @@ struct FStructTurnOrders : public FStructGeneric
 {
 	GENERATED_BODY()
 
-		UPROPERTY()
+	UPROPERTY()
 		TArray<FStructOrderAction> listMove;
 
 	UPROPERTY()

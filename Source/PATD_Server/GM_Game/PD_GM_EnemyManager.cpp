@@ -10,7 +10,6 @@
 
 PD_GM_EnemyManager::PD_GM_EnemyManager()
 {
-
 }
 
 PD_GM_EnemyManager::~PD_GM_EnemyManager()
@@ -27,6 +26,13 @@ TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
 	return enemies;
 }
 
+void PD_GM_EnemyManager::newTurn() {
+	listTurnOrders.Reset();
+}
+
+void PD_GM_EnemyManager::AddActionTurn(FStructTurnOrders* turnOrders) {
+	listTurnOrders.Add(turnOrders);
+}
 
 FStructTurnOrders* PD_GM_EnemyManager::GetTurnOrders(int indexEnemy) {
 	return listTurnOrders[indexEnemy];
@@ -53,12 +59,18 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 	int numTicks = -1;
 	int indexPlayer = -1;
 
-	for (int i = 0; this->GetEnemies().Num(); i++) {
+	for (int i = 0; i<this->listTurnOrders.Num(); i++) {
+		UE_LOG(LogTemp, Error, TEXT("Enemigos totales: %i"), this->listTurnOrders.Num());
+		UE_LOG(LogTemp, Error, TEXT("Añade acciones enemy:%i"), i);
 		TArray<FStructOrderAction> listActions;
 		if (phase == EActionPhase::Move) {
+			if (this->listTurnOrders[i]->listMove.Num()>0)
+			UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
 			listActions = this->listTurnOrders[i]->listMove;
 		}
 		else if (phase == EActionPhase::Attack) {
+			UE_LOG(LogTemp, Error, TEXT("Enemigo %i ataca"), i);
+			if(this->listTurnOrders[i]->listAttack.Num()>0)
 			listActions = this->listTurnOrders[i]->listAttack;
 		}
 
@@ -68,5 +80,5 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 			indexPlayer = i;
 		};
 	}
-	return numTicks;
+	return indexPlayer;
 }

@@ -22,6 +22,9 @@ public:
 	void AddEnemy(PD_GM_LogicCharacter* enemy);
 	TArray<PD_GM_LogicCharacter*> GetEnemies();
 	FStructTurnOrders* GetTurnOrders(int indexEnemy);
+
+	void newTurn();
+	void AddActionTurn(FStructTurnOrders* turnOrders);
 	int GetEnemyMaxLenghtActions(EActionPhase phase);
 	int GetMaxLenghtActions(EActionPhase phase);
 	TArray<FStructTurnOrders*> getListTurnOrders() { return listTurnOrders; }

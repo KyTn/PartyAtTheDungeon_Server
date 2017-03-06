@@ -107,7 +107,7 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 			Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 	}
 	else {
-			//Cast<APD_EnemyController> (controller)->MoveTo(realPosition.X, realPosition.Y);
+			///////Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);//////////////////////////////////////////////Peta aqui
 	}
 	return true;
 }

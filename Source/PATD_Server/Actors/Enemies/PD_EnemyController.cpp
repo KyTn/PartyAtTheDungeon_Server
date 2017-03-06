@@ -11,10 +11,17 @@
 
 bool APD_EnemyController::MoveTo(float x, float y)
 {
+	Super::MoveTo(x, y);
+	UE_LOG(LogTemp, Warning, TEXT("Init GameMap"));
+
+	FVector currentPosition = GetPawn()->GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Location is %s"), *currentPosition.ToString());
+
+
 	FVector newPosition = FVector(x, y, 0);
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's new Location is %s"), *newPosition.ToString());
 
 	MoveToLocation(newPosition, -1.0f, true, false, false, true, 0, true);
-
 	return true;
 }
 
