@@ -209,6 +209,7 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skills = &playerStats->skills;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->weapon = &playerStats->weapon;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skin = &playerStats->skin;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->SetIDCharacter("Player_0"+inPlayer);
 }
 
 void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {

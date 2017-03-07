@@ -322,8 +322,6 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick"));
 
 	for (int i = 0; i<numCharacters; i++) {
-
-		
 			//Distincion para players o enemigos
 			TArray<FStructOrderAction> listMove; 
 			PD_GM_LogicCharacter* logicCharacter=nullptr;

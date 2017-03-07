@@ -58,7 +58,7 @@ void APD_GenericController::Tick(float DeltaTime)
 			}
 		}
 	}
-
+	
 }
 
 void APD_GenericController::OnAnimationEnd() {
