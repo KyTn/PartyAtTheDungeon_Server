@@ -55,10 +55,10 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 			ChangeState(EGameState::WaitingPlayerOrders);
 		}
 	}
-	else*/ if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+	else*/ 
+	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) 
+	{
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
-
-		//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::HandleEvent-> Nueva POS LOGICA -> %d %d"), turnStruct->listMove[0].targetLogicPosition.positionX, turnStruct->listMove[0].targetLogicPosition.positionY);
 
 		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
@@ -285,7 +285,9 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 
 	//Ejecutar los ticks
 	for (int i = 0; i < numTicks; i++) {
-		LogicMoveTick(i, numCharacters);
+		//Solo ejecuta al LogicMoveTick si el numero total de movimientos es superior al tick correspodiente
+		//Si no, lo que pasara es que intentara acceder en un tick superior a una posicion del array que no existe
+			LogicMoveTick(i, numCharacters);
 
 	}
 }
@@ -304,7 +306,8 @@ void PD_GM_GameManager::LogicTurnAttackPhase(int numCharacters) {
 	}
 	
 	for (int i = 0; i < numTicks; i++) {
-		LogicAttackTick(i, numCharacters);
+			LogicAttackTick(i, numCharacters);
+		
 	}
 }
 
@@ -320,28 +323,36 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 
 	for (int i = 0; i<numCharacters; i++) {
 
+		
+			//Distincion para players o enemigos
+			TArray<FStructOrderAction> listMove; 
+			PD_GM_LogicCharacter* logicCharacter=nullptr;
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+				if (playersManager->GetDataStructPlayer(i)->turnOrders->listMove.Num() > tick)
+				{
+					listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
+					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
+					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
+					FStructOrderAction* order = &listMove[tick];
 
-		//Distincion para players o enemigos
-		TArray<FStructOrderAction> listMove; 
-		PD_GM_LogicCharacter* logicCharacter=nullptr;
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
-			listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
-			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
-		}
-		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
-			listMove = enemyManager->GetTurnOrders(i)->listMove;
-			logicCharacter = enemyManager->GetEnemies()[i];
-		}
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
+
+					logicCharacter->MoveToLogicPosition(order);
+				}
+			}
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+				listMove = enemyManager->GetTurnOrders(i)->listMove;
+				logicCharacter = enemyManager->GetEnemies()[i];
+				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
+				FStructOrderAction* order = &listMove[tick];
+
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
+
+				logicCharacter->MoveToLogicPosition(order);
+			}
 	
-		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-		FStructOrderAction* order = &listMove[tick];
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick -> Nueva POS LOGICA -> %d %d"), order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
-
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
-
-		logicCharacter->MoveToLogicPosition(order);
-
-	
+			
+		
 		///TODO ALVARO
 		//structPlayer->logicCharacter->ProcessMoveOrder(order);
 
@@ -369,26 +380,34 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 
 	for (int i = 0; i<numCharacters; i++) {
 
-		//Distincion para players o enemigos
-		TArray<FStructOrderAction> listAttack;
-		PD_GM_LogicCharacter* logicCharacter = nullptr;
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
-			listAttack= playersManager->GetDataStructPlayer(i)->turnOrders->listAttack; 
-			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
-		}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
-			listAttack = enemyManager->GetTurnOrders(i)->listAttack;
-			logicCharacter = enemyManager->GetEnemies()[i];
-		}
+			//Distincion para players o enemigos
+			TArray<FStructOrderAction> listAttack;
+			PD_GM_LogicCharacter* logicCharacter = nullptr;
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+				if (playersManager->GetDataStructPlayer(i)->turnOrders->listAttack.Num() > tick)
+				{
+					listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
+					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
+					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
+					FStructOrderAction order = listAttack[tick];
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
+					logicCharacter->ActionTo(order);
+				}
+			}
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+				listAttack = enemyManager->GetTurnOrders(i)->listAttack;
+				logicCharacter = enemyManager->GetEnemies()[i];
+				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
+				FStructOrderAction order = listAttack[tick];
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
+				logicCharacter->ActionTo(order);
+			}
 
-	
-		//Logica del attack tick
 
-		
-		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-		FStructOrderAction order = listAttack[tick];
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-		logicCharacter->ActionTo(order);
-		
+			//Logica del attack tick
+
+
+			
 	}
 
 

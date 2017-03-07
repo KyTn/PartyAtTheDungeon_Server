@@ -112,7 +112,6 @@ public:
 
 FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 	switch (type) {
-	
 
 	case UStructType::FStructMap: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructMap"));
@@ -131,22 +130,24 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 		return DeserializeDataTemplate<FStructTurnOrders>(data);
 
 	}break;
+
 	case UStructType::FStructCharacter: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructCharacter"));
 		return DeserializeDataTemplate<FStructCharacter>(data);
 
 	}break;
+
 	case UStructType::FStructUpdateTurn: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructUpdateTurn"));
 		return DeserializeDataTemplate<FStructUpdateTurn>(data);
 
 	}break;
+
 	case UStructType::FStructInstatiatePlayers: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructInstatiatePlayers"));
 		return DeserializeDataTemplate<FStructInstatiatePlayers>(data);
 
 	}break;
-
 
 	case UStructType::FStructMatchConfig: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructMatchConfig"));

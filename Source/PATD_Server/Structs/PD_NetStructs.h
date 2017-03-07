@@ -34,14 +34,13 @@ enum class EOrderAction { Move = 1, Attack = 2 };
 USTRUCT()
 struct FStructOrderAction {
 
-
 	GENERATED_BODY()
 
 		//EOrderAction
 		UPROPERTY()
 		uint8 orderType;
 
-	//EDirections
+	//EDirectionss
 	UPROPERTY()
 	uint8 targetDirection;
 	UPROPERTY()
