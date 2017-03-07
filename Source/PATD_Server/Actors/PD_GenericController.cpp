@@ -91,7 +91,6 @@ bool APD_GenericController::ActionTo(float x, float y, uint8 id_action)
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
 
 	animationOn = EAnimationType::Attack;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AL ATAQUER !"));
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo: StateAnim:%d"), static_cast<uint8>(animationOn));
 	return true;
 

@@ -57,6 +57,9 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 	}
 	else*/ if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
+
+		//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::HandleEvent-> Nueva POS LOGICA -> %d %d"), turnStruct->listMove[0].targetLogicPosition.positionX, turnStruct->listMove[0].targetLogicPosition.positionY);
+
 		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
 		UpdateState();
 	}
@@ -329,20 +332,16 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			listMove = enemyManager->GetTurnOrders(i)->listMove;
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
-
-
-		
-		
+	
 		//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 		FStructOrderAction* order = &listMove[tick];
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick -> Nueva POS LOGICA -> %d %d"), order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
 
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
 
 		logicCharacter->MoveToLogicPosition(order);
 
-
-		
-		
+	
 		///TODO ALVARO
 		//structPlayer->logicCharacter->ProcessMoveOrder(order);
 
@@ -431,14 +430,13 @@ void PD_GM_GameManager::VisualTickControl() {
 
 void PD_GM_GameManager::VisualMoveTick() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick"));
-	int players;
+	int players = -1;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) 
 		players = playersManager->GetNumPlayers();
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization)
 		players = enemyManager->GetEnemies().Num();
 	//Todos a la vez
 	for (int i = 0; i<players; i++) {
-
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction>* listMove=nullptr;
 		PD_GM_LogicCharacter* logicCharacter=nullptr;
@@ -458,6 +456,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght after Pop:%d "), listMove->Num());
 
 		//Peta al no tener actor ni controller
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
 		logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
 		
 		

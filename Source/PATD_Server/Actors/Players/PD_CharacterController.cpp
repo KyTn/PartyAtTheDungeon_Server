@@ -24,7 +24,7 @@ bool APD_CharacterController::MoveTo(float x, float y)
 	return true;
 }
 
-bool APD_CharacterController::ActionTo(float x, float y, uint8 id_action)
+bool APD_CharacterController::ActionTo(float x, float y, uint8 id_action )
 {
 	Super::ActionTo(x, y,id_action);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "AL ATAQUERRRRRR !!!!!");

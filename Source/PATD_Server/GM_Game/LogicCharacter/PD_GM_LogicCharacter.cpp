@@ -81,6 +81,9 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderActio
 	targetPosition = movingLogicalPosition;
 	*/
 	
+	if (isPlayer)
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveToLogicPosition --> Nueva Posicion Jugador: %f %f"), order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
+
 	currentLogicalPosition = PD_MG_LogicPosition(order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
 	movingLogicalPosition = PD_MG_LogicPosition(order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
 	
