@@ -51,10 +51,10 @@ public:
 
 		}break;
 
-		case UStructType::FStructUpdateCharacter: {
-			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructUpdateCharacter"));
-			FStructUpdateCharacter* structSpecialization = (FStructUpdateCharacter*)structGeneric;
-			return SerializeDataTemplate<FStructUpdateCharacter>(structSpecialization);
+		case UStructType::FStructUpdateTurn: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructUpdateTurn"));
+			FStructUpdateTurn* structSpecialization = (FStructUpdateTurn*)structGeneric;
+			return SerializeDataTemplate<FStructUpdateTurn>(structSpecialization);
 
 		}break;
 
@@ -136,9 +136,9 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 		return DeserializeDataTemplate<FStructCharacter>(data);
 
 	}break;
-	case UStructType::FStructUpdateCharacter: {
-		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructUpdateCharacter"));
-		return DeserializeDataTemplate<FStructUpdateCharacter>(data);
+	case UStructType::FStructUpdateTurn: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructUpdateTurn"));
+		return DeserializeDataTemplate<FStructUpdateTurn>(data);
 
 	}break;
 	case UStructType::FStructInstatiatePlayers: {

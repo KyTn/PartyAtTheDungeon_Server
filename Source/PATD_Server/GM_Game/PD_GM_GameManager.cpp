@@ -74,7 +74,7 @@ bool PD_GM_GameManager::SuscribeToEvents(int inPlayer, UStructType inType) {
 void PD_GM_GameManager::UpdateState() {
 
 	//Creo que es mas claro un if-else gigante que un switch gigante
-	//ESTADO: WaitingActionOrders
+
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		//Transicion inmediata de estado
 		this->ChangeState(EGameState::Start_Match);
@@ -99,9 +99,9 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
 
 		if (structGameState->enumActionPhase == EActionPhase::EndPhase) {
-		//	this->ChangeState(EGameState::ExecutingEnemiesLogic); 
+			this->ChangeState(EGameState::ExecutingEnemiesLogic); 
 		//Salto de pruebas a end of turn para no hacer la logica del enemigo que aun peta.
-			this->ChangeState(EGameState::ExecutingEnemiesLogic);
+			//this->ChangeState(EGameState::EndOfTurn);
 		}
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
@@ -175,7 +175,38 @@ void PD_GM_GameManager::OnBeginState() {
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
+		
 		//Enviar a cliente actualizacion del mapa
+		FStructUpdateTurn structUpdateTurn;
+		//Jugadores
+		for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
+			PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
+			FStructUpdateCharacter structUpdateCharacter;
+			//Conversion de Struct a LogicPosition
+			FStructLogicPosition logicPosition;
+			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+
+			structUpdateCharacter.currentCharacterPosition = logicPosition;
+			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+			structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+		}
+		//Enemigos
+		for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
+			PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
+			FStructUpdateCharacter structUpdateCharacter;
+			//Conversion de Struct a LogicPosition
+			FStructLogicPosition logicPosition = FStructLogicPosition();
+			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+
+			structUpdateCharacter.currentCharacterPosition = logicPosition;
+			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
+		}
+
+		//Envio a todos los clientes con el update del turno
+		networkManager->SendNow(&structUpdateTurn);
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		UpdateState();//transicion inmediata
 
@@ -478,7 +509,8 @@ void PD_GM_GameManager::VisualAttackTick() {
 void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
 
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization || structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
+		//Falta hacer un caso igual para los enemigos.
 		if (playersManager->AllAnimationEnd()) {
 			VisualTickControl();
 		}

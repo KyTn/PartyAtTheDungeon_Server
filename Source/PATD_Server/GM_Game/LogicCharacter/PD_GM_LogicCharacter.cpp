@@ -103,11 +103,16 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 	*/
 
 	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
+	if (!controller) {
+		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
+	}
+
 	if (isPlayer){
 			Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 	}
 	else {
-			///////Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);//////////////////////////////////////////////Peta aqui
+		
+			Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);//////////////////////////////////////////////Peta aqui
 	}
 	return true;
 }
