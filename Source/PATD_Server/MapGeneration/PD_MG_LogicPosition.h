@@ -28,7 +28,7 @@ public:
 		return this->_x == other._x && this->_y == other._y;
 	}
 	
-	friend uint32 PD_MG_LogicPosition::GetTypeHash(const PD_MG_LogicPosition& logpos)
+	friend uint32 GetTypeHash(const PD_MG_LogicPosition& logpos)
 	{
 		return (logpos._x << 16) + logpos._y;
 	}
