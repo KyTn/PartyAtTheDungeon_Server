@@ -22,7 +22,7 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 	int maxLengthAnimation = 5;
 	float currentTimeAnimation=0;
 	FVector moveTargetPosition;
-	float toleranceMove = 150.0;
+	float toleranceMove = 50.0;
 
 public:
 	GENERATED_BODY()

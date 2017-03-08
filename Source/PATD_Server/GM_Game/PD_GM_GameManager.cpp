@@ -525,12 +525,17 @@ void PD_GM_GameManager::VisualAttackTick() {
 void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
 
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization || structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization ) {
 		//Falta hacer un caso igual para los enemigos.
 		if (playersManager->AllAnimationEnd()) {
 			VisualTickControl();
 		}
 		
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
+		if (enemyManager->AllAnimationEnd()) {
+			VisualTickControl();
+		}
 	}
 
 }

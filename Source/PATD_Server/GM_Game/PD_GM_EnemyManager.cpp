@@ -81,3 +81,14 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 	}
 	return indexPlayer;
 }
+
+
+bool  PD_GM_EnemyManager::AllAnimationEnd() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllAnimationEnd"));
+	for (PD_GM_LogicCharacter* enemyLogicCharacter : enemies) {
+		if (enemyLogicCharacter->GetController()->IsAtAnimation()) {
+			return false;
+		}
+	}
+	return true;
+}

@@ -27,6 +27,7 @@ void APD_GenericController::Tick(float DeltaTime)
 	
 	if (animationOn != EAnimationType::Iddle)
 	{
+		
 	//Log invasivo con cada tick en animacion!
 	//	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: StateAnim:%d  : currentTimeAnimation: %f : posicion: %s"), static_cast<uint8>(animationOn), currentTimeAnimation, *(GetPawn()->GetActorLocation().ToString()));
 		if (animationOn == EAnimationType::Attack) {
