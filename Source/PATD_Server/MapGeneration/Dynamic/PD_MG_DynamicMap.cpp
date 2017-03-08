@@ -19,7 +19,7 @@ PD_MG_DynamicMap::~PD_MG_DynamicMap()
 void PD_MG_DynamicMap::AddNewEnemy(PD_MG_LogicPosition lp, ECharacterType type, FString ID_Character) {
 
 	_LogicPositionsRefs.Add(lp);
-
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_DynamicMap::AddNewEnemy: id Enemy:%s"), *ID_Character);
 	struct StructEnemy  structEnemy =  StructEnemy();
 	structEnemy.currentPosition = lp;
 	structEnemy.ID_Character = ID_Character;

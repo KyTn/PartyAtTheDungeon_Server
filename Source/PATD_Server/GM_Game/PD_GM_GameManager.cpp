@@ -203,6 +203,7 @@ void PD_GM_GameManager::OnBeginState() {
 			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
 
 			structUpdateCharacter.currentCharacterPosition = logicPosition;
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
 			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
 		}

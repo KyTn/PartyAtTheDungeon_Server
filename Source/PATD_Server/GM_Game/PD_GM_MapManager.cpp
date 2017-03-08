@@ -191,6 +191,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 				logicCha->SetIsPlayer(false);
 				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
 				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
 				logicCha->SetCharacterBP(charac);
 				logicCha->SetController( Cast<APD_GenericController>(charac->GetController()) );
 				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
