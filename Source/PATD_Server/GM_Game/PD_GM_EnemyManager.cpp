@@ -27,7 +27,7 @@ TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
 }
 
 void PD_GM_EnemyManager::newTurn() {
-	listTurnOrders.Reset();
+	listTurnOrders.Empty();
 }
 
 void PD_GM_EnemyManager::AddActionTurn(FStructTurnOrders* turnOrders) {
@@ -51,25 +51,24 @@ int PD_GM_EnemyManager::GetMaxLenghtActions(EActionPhase phase) {
 		}
 	}
 	return 0;
-
-
 }
+
 //Devuelve el index del jugador con la lista de acciones mas larga
 int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 	int numTicks = -1;
 	int indexPlayer = -1;
 
 	for (int i = 0; i<this->listTurnOrders.Num(); i++) {
-		UE_LOG(LogTemp, Error, TEXT("Enemigos totales: %i"), this->listTurnOrders.Num());
-		UE_LOG(LogTemp, Error, TEXT("Añade acciones enemy:%i"), i);
+	//	(LogTemp, Error, TEXT("Enemigos totales: %i"), this->listTurnOrders.Num());
+	//	UE_LOG(LogTemp, Error, TEXT("Añade acciones enemy:%i"), i);
 		TArray<FStructOrderAction> listActions;
 		if (phase == EActionPhase::Move) {
 			if (this->listTurnOrders[i]->listMove.Num()>0)
-			UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
+			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
 			listActions = this->listTurnOrders[i]->listMove;
 		}
 		else if (phase == EActionPhase::Attack) {
-			UE_LOG(LogTemp, Error, TEXT("Enemigo %i ataca"), i);
+			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i ataca"), i);
 			if(this->listTurnOrders[i]->listAttack.Num()>0)
 			listActions = this->listTurnOrders[i]->listAttack;
 		}

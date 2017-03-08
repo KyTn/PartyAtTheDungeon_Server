@@ -11,8 +11,6 @@
 
 MyAIClass::MyAIClass()
 {
-	//mapMng = new PD_GM_MapManager();
-
 }
 
 MyAIClass::~MyAIClass()
@@ -21,6 +19,8 @@ MyAIClass::~MyAIClass()
 
 void MyAIClass::HStartTurnZombie(PD_GM_MapManager * refMap, PD_MG_LogicPosition pos)
 {
+
+	//UE_LOG(LogTemp, Error, TEXT("Posición inicial enemigo: %f %f"), pos.GetX(), pos.GetY());
 	actions = new FStructTurnOrders();
 	mapMng = refMap;
 	currentPos = pos;
@@ -34,6 +34,7 @@ void MyAIClass::HStartTurnZombie(PD_GM_MapManager * refMap, PD_MG_LogicPosition 
 				HAddAttack();
 			}
 			else
+				AviablePosition();
 				HAddMove();
 		}
 		else
@@ -71,6 +72,21 @@ void MyAIClass::HArePlayersNear()
 		PlayersNear = false;
 }
 
+void MyAIClass::AviablePosition() {
+	if (mapMng->IsThereWall(currentPos.GetX(), currentPos.GetY() + 1)) {
+		aviablePos[0] = false;
+	}
+	else if (mapMng->IsThereWall(currentPos.GetX(), currentPos.GetY() - 1)) {
+		aviablePos[1] = false;
+	}
+	else if (mapMng->IsThereWall(currentPos.GetX() - 1, currentPos.GetY())) {
+		aviablePos[2] = false;
+	}
+	else if (mapMng->IsThereWall(currentPos.GetX() + 1, currentPos.GetY())) {
+		aviablePos[3] = false;
+	}
+}
+
 void MyAIClass::HAddAttack()
 {
 	FStructOrderAction attack;
@@ -86,7 +102,7 @@ void MyAIClass::HAddAttack()
 	actions->listAttack.Add(attack);
 	AP--;
 	Attacked = true;
-	UE_LOG(LogTemp, Error, TEXT("Añade ataque"));
+	//UE_LOG(LogTemp, Error, TEXT("Añade ataque"));
 }
 
 void MyAIClass::HAddMove()
@@ -115,7 +131,15 @@ void MyAIClass::HAddMove()
 			move.targetLogicPosition.positionY = currentPos.GetY();
 			break;
 	}
+	//Actualizamos la posición del enemigo
+
+	//UE_LOG(LogTemp, Error, TEXT("Posición enemigo: %f %f"), currentPos.GetX(), currentPos.GetY());
+	//UE_LOG(LogTemp, Error, TEXT("Movimiento enemigo: %f %f"), move.targetLogicPosition.positionX, move.targetLogicPosition.positionY);
+
+	currentPos.SetX(move.targetLogicPosition.positionX);
+	currentPos.SetY(move.targetLogicPosition.positionY);
+
 	actions->listMove.Add(move);
 	AP--;
-	UE_LOG(LogTemp, Error, TEXT("Añade movimiento"));
+	//UE_LOG(LogTemp, Error, TEXT("Añade movimiento"));
 }

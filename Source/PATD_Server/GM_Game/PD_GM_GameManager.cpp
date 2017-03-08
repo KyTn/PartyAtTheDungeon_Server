@@ -174,7 +174,6 @@ void PD_GM_GameManager::OnBeginState() {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesVisualization"));
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
-		UpdateState();
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));

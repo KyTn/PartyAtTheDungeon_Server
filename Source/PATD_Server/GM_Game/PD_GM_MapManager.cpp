@@ -53,6 +53,15 @@ bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
 	return false;
 }
 
+bool PD_GM_MapManager::IsThereWall(uint32 x, uint32 y) {
+	PD_MG_LogicPosition logpos;
+	logpos.SetX(x);
+	logpos.SetY(y);
+	if (StaticMapRef->GetXYMap()[logpos]=='w' || StaticMapRef->GetXYMap()[logpos] == 'W')
+		return true;
+	return false;
+}
+
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num Rooms: %d"), MapInfo->rooms.Num());
 	/*
@@ -184,7 +193,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
 				logicCha->SetCharacterBP(charac);
 				logicCha->SetController( Cast<APD_GenericController>(charac->GetController()) );
-
+				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
 				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
 
 				_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
@@ -199,6 +208,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
 				logicCha->SetCharacterBP(charac);
 				logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
+				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
 
 				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
 

@@ -34,6 +34,8 @@ public:
 
 	void HArePlayersNear();
 
+	void AviablePosition();
+
 	void HAddAttack();
 
 	void HAddMove();

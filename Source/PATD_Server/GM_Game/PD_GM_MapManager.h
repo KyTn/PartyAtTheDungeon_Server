@@ -46,6 +46,7 @@ public:
 
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Player. 0 si no hay ninguno. 
 	 bool IsTherePlayer(uint32 x, uint32 y);
+	 bool IsThereWall(uint32 x, uint32 y);
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
 	//bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 	TArray<PD_MG_LogicPosition> GetSpawnPoints();

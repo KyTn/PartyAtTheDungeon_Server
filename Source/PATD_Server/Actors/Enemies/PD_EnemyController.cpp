@@ -1,10 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
-#include "PATD_Server/GM_Game/PD_GM_MapManager.h"
-#include "PATD_Server/Structs/PD_NetStructs.h"
 #include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_EnemyController.h"
 

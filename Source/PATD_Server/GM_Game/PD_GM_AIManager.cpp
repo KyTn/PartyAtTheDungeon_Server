@@ -19,8 +19,7 @@ PD_GM_AIManager::~PD_GM_AIManager()
 }
 
 FStructTurnOrders* PD_GM_AIManager::AIExecEnemy(PD_GM_LogicCharacter* charac, PD_GM_MapManager* mngrMap) {
-	FStructTurnOrders* orders;
-	orders = NULL;
+	FStructTurnOrders* orders = new FStructTurnOrders;
 	switch (charac->GetTypeCharacter()) {
 		case ECharacterType::Archer: {
 			//APD_AIController* contr;
