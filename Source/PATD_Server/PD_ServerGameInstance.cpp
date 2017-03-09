@@ -520,6 +520,25 @@ void UPD_ServerGameInstance::Init()
 
 	structServerState = new StructServerState();
 
+	//Set del MapString para mapas "aleatorios"
+	switch (FMath::RandHelper(3)) {
+		case 0: {
+			mapPath = "Content/DungeonTestingMaps/test3.dungeon";
+			mapX = 20;
+			mapY = 20;
+		}break;
+		case 1: {
+			mapPath = "Content/DungeonTestingMaps/test4.dungeon";
+			mapX = 20;
+			mapY = 20;
+		}break;
+		case 2: {
+			mapPath = "Content/DungeonTestingMaps/test5.dungeon";
+			mapX = 30;
+			mapY = 30;
+		}
+	}
+
 	ChangeState(EServerState::StartApp);
 	//structServerState->enumServerState = EServerState::StartApp;
 	
@@ -721,6 +740,12 @@ TArray<bool> UPD_ServerGameInstance::GetPlayersReady()
 	return playersReadyArray;
 }
 
+
+void UPD_ServerGameInstance::GetMapsize(float &SizemapX, float &SizemapY)
+{
+	SizemapX = - ( (((mapX - 1) * 100) / 2) + 1550 );
+	SizemapY = ((mapY - 1) * 100) / 2;
+}
 
 
 #pragma endregion

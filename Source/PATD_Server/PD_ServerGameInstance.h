@@ -58,7 +58,9 @@ public:
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
-	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test3.dungeon";
+	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test5.dungeon";
+	int mapX = 0; //Ancho del mapa
+	int mapY = 0; // Largo del mapa
 
 	//Funciones para obtener managers
 	PD_GM_GameManager* getGameManager();
@@ -121,5 +123,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	TArray<bool> GetPlayersReady();
 
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	void GetMapsize(float &SizemapX, float &SizemapY);
 
 };
