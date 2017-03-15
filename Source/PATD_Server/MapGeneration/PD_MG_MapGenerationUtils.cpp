@@ -24,10 +24,11 @@ PD_MG_MapGenerationUtils::~PD_MG_MapGenerationUtils()
 bool PD_MG_MapGenerationUtils::ReadAndPrepareRoomTemplateInfosFromFile(FString filepath, TArray<RoomTemplateInfo> &roomTemplates) {
 
 	// Leamos el fichero
-	FString FilePath = FPaths::GameDir() + *filepath;
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::ReadAndPrepareRoomTemplateInfosFromFile - reading from %s"), *filepath);
+
 	FString FileData = "";
 
-	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	if (FFileHelper::LoadFileToString(FileData, *filepath))
 	{
 		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::ReadAndPrepareRoomTemplateInfosFromFile el chorizo es:\n %s"), *FileData);
 		return ReadAndPrepareRoomTemplateInfosFromChorizo(FileData, roomTemplates);
@@ -52,9 +53,6 @@ bool PD_MG_MapGenerationUtils::ReadAndPrepareRoomTemplateInfosFromChorizo(FStrin
 		roomTemplates.Add(rti);
 
 	}
-
-
-
 
 	return true;
 }
@@ -336,7 +334,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> 
 	do {
 		// 2 Elegir una casilla C no elegida de M ...
 
-		UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap - Randon searching on (%d,%d) -> (%d,%d) "),
+		UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap - Randon searching on X entre (%d, %d) e Y entre (%d, %d) "),
 			(M.Total_Height / 3), (2 * M.Total_Height / 3),
 			(M.Total_Width / 3), (2 * M.Total_Width / 3));
 
@@ -372,10 +370,14 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> 
 
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of first room: %s - Adding to map ..."), *(R.NAME));
 
-	AddRoomToMapAtLocation(M, R, C, R_pivot);
+	M.AddRoomToMapAtLocation(R, C, R_pivot);
 
 
-
+	/*
+	for (int i = 0; i < R.OPEN_WALLS.Num(); i++) {
+		LWC.Add(R.OPEN_WALLS[i]);
+	}
+	*/
 
 	return false;
 }
@@ -411,11 +413,6 @@ bool PD_MG_MapGenerationUtils::MapCanContainsRoom(MapProceduralInfo &M, RoomTemp
 
 PD_MG_LogicPosition PD_MG_MapGenerationUtils::Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
 	return localPos - R_pivot + C;
-}
-
-
-void PD_MG_MapGenerationUtils::AddRoomToMapAtLocation(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
-	M.AddRoomToMapAtLocation(R, C, R_pivot);
 }
 
 #pragma endregion

@@ -3,7 +3,7 @@ Name: simple_Cuadrada
 tags: NORMAL
 size_x: 8
 size_y: 8
-WWwwwwWW  
+WWwwwwWW
 W......W
 w......w
 w......w
@@ -16,7 +16,7 @@ Name: Cuadrada_1
 tags: NORMAL
 size_x: 8
 size_y: 9
-WWWWWWWW  
+WWWWWWWW
 W..WW..W
 w..WW..w
 w......w
@@ -30,13 +30,13 @@ Name: Cuadrada_2
 tags: NORMAL
 size_x: 9
 size_y: 9
-WWwwwwwWW  
+WWwwwwwWW
 W.......W
 w...,...w
 w..OOO..w
 w.,OOO,.w
 w..OOO..w
-W...,...W  
+W...,...W
 W.......W
 WWwwwwwWW
 START_ROOM
@@ -44,22 +44,22 @@ Name: Boss_simple_Cuadrada_2
 tags: NORMAL
 size_X: 16
 size_Y: 16
-WWwwwwwwwwwwwwwWW
-W...............W
-w...............w
-w...............w
-w......,,.......w
-w.....,,,,......w
-w....,,,,,,.....w
-w...,,,,,,,,....w
-w...,,,,,,,,....w
-w....,,,,,,.....w
-w.....,,,,......w
-w......,,.......w
-w...............w
-w...............w
-W...............W
-WWwwwwwwwwwwwwwWW
+WWwwwwwwwwwwwwWW
+W..............W
+w..............w
+w..............w
+w......,,......w
+w.....,,,,.....w
+w....,,,,,,....w
+w...,,,,,,,,...w
+w...,,,,,,,,...w
+w....,,,,,,....w
+w.....,,,,.....w
+w......,,......w
+w..............w
+w..............w
+W..............W
+WWwwwwwwwwwwwwWW
 START_ROOM
 Name: Rectangular_1
 tags: NORMAL
@@ -78,8 +78,8 @@ WWwwwwwWWWWwwwwwwwWW
 START_ROOM
 Name: forma_L_Cuadrada
 tags: NORMAL
-size_X: 10
-size_Y: 10
+size_X: 12
+size_Y: 11
 WWwwwwwwwwWW
 W..........W
 w..........w
@@ -102,12 +102,11 @@ size_Y: 16
      W....W     
      W....W     
 WWWWWW....WWWWWW
-W..............W 
-w..............w 
-w..............w 
-W..............W 
+W..............W
+w..............w
+w..............w
+W..............W
 WWWWWW....WWWWWW
-     W....W     
      W....W     
      W....W     
      W....W     
