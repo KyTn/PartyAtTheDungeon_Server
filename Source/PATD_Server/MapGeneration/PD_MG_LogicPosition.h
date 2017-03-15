@@ -9,25 +9,35 @@
 class PATD_SERVER_API PD_MG_LogicPosition
 {
 private:
-	uint32 _x;
-	uint32 _y;
+	int32 _x;
+	int32 _y;
 
 public:
 
 	PD_MG_LogicPosition();
-	PD_MG_LogicPosition(uint32 x, uint32 y);
+	PD_MG_LogicPosition(int32 x, int32 y);
 	~PD_MG_LogicPosition();
 
-	uint32 GetX() { return _x; }
-	void SetX(uint32 x) { _x = x; }
-	uint32 GetY() { return _y; }
-	void SetY(uint32 y) { _y = y; }
+	int32 GetX() { return _x; }
+	void SetX(int32 x) { _x = x; }
+	int32 GetY() { return _y; }
+	void SetY(int32 y) { _y = y; }
 	
 	FORCEINLINE bool operator==(const PD_MG_LogicPosition& other) const
 	{
 		return this->_x == other._x && this->_y == other._y;
 	}
 	
+	FORCEINLINE PD_MG_LogicPosition operator-(const PD_MG_LogicPosition& other) const
+	{
+		return PD_MG_LogicPosition(this->_x - other._x, this->_y - other._y);
+	}
+
+	FORCEINLINE PD_MG_LogicPosition operator+(const PD_MG_LogicPosition& other) const
+	{
+		return PD_MG_LogicPosition(this->_x + other._x, this->_y + other._y);
+	}
+
 	friend uint32 GetTypeHash(const PD_MG_LogicPosition& logpos)
 	{
 		return (logpos._x << 16) + logpos._y;

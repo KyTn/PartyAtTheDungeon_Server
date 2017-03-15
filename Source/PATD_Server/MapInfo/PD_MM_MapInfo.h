@@ -38,6 +38,15 @@ public:
 
 };
 
+/*
+
+struct FStruct_Map
+- TMap<LogPos, StaticMapElement> mapElements
+- TMap<LogPos, Room> mapRooms
+- int Total_Height, Total_Width;
+
+
+*/
 
 class PATD_SERVER_API PD_MM_MapInfo
 {

@@ -16,6 +16,7 @@
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_PlayersManager.h"
+#include "MapGeneration/PD_MG_MapGenerator.h"
 #include "MapGeneration/PD_MG_MapParser.h"
 #include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
 #include "GM_Game/PD_GM_MapManager.h"
@@ -317,6 +318,13 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 		//Aqui haríamos una espera para la pantalla de inicio, animación inicial y tal ... 
 
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::OnBeginState - Init MapGenerator ..."));
+		//TArray<RoomTemplateInfo> roomsTemplateInfoArray;
+		//mapGenerationUtils->ReadAndPrepareRoomTemplateInfosFromFile("Content/DungeonTestingMaps/test1.rooms", roomsTemplateInfoArray);
+
+		mapGenerator->Init();
+		mapGenerator->GenerateProceduralMap();
+
 		ChangeState(EServerState::WaitingMasterClient);
 	}
 	else if (structServerState->enumServerState == EServerState::WaitingMasterClient) {
@@ -519,6 +527,8 @@ void UPD_ServerGameInstance::Init()
 	playersManager = new PD_PlayersManager();
 
 	structServerState = new StructServerState();
+
+	mapGenerator = new PD_MG_MapGenerator();
 
 	//Set del MapString para mapas "aleatorios"
 	switch (FMath::RandHelper(3)) {
