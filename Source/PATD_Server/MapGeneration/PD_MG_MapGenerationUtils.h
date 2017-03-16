@@ -25,7 +25,6 @@ struct RoomTemplateInfo {
 	TArray<PD_MG_LogicPosition> NORMAL_TILES;
 	TArray<PD_MG_LogicPosition> SPECIAL_TILES;
 	TArray<PD_MG_LogicPosition> EMPTY_TILES;
-	TArray<PD_MG_LogicPosition> DOORS;
 
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
@@ -53,7 +52,6 @@ struct RoomTemplateInfo {
 		NORMAL_TILES = 	TArray<PD_MG_LogicPosition>();
 		SPECIAL_TILES = TArray<PD_MG_LogicPosition>();
 		EMPTY_TILES = 	TArray<PD_MG_LogicPosition>();
-		DOORS = 		TArray<PD_MG_LogicPosition>();
 
 
 
@@ -64,16 +62,13 @@ struct RoomTemplateInfo {
 			}
 		}
 
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::RoomTemplateInfo - RAW_DATA  (%d,%d)"),
-			RAW_DATA.Num(), RAW_DATA[0].Num());
+		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::RoomTemplateInfo - RAW_DATA  (%d,%d)"), RAW_DATA.Num(), RAW_DATA[0].Num());
 	}
 
 
 	void AddNewLogicPosition(int x, int y, TCHAR c) {
 
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddNewLogicPosition - Adding (%d,%d) - %c - RAW_DATA  (%d,%d)"),
-			x,y,c, RAW_DATA.Num(), RAW_DATA[x].Num());
-
+		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddNewLogicPosition - Adding (%d,%d) - %c - RAW_DATA  (%d,%d)"),x,y,c, RAW_DATA.Num(), RAW_DATA[x].Num());
 
 
 		RAW_DATA[x][y] = c;
@@ -84,33 +79,34 @@ struct RoomTemplateInfo {
 		case 'O':
 			MAP_DATA.Add(p, StaticMapElement::EMPTY);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			EMPTY_TILES.Add(p);
 			break;
 		case '.':
 			MAP_DATA.Add(p, StaticMapElement::NORMAL_TILE);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			NORMAL_TILES.Add(p);
 			break;
 		case ',':
 			MAP_DATA.Add(p, StaticMapElement::SPECIAL_TILE);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			SPECIAL_TILES.Add(p);
 			break;
 		case 'W':
 			MAP_DATA.Add(p, StaticMapElement::WALL_ONLY);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			CLOSED_WALLS.Add(p);
 			break;
 		case 'w':
 			MAP_DATA.Add(p, StaticMapElement::WALL_OR_DOOR);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
-			break;
-		case 'd':
-			MAP_DATA.Add(p, StaticMapElement::DOOR);
-			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			OPEN_WALLS.Add(p);
 			break;
 		default:
 			break;
 		}
 
 
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddNewLogicPosition - Added!"));
+		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddNewLogicPosition - Added!"));
 
 	}
 
@@ -163,8 +159,9 @@ struct MapProceduralInfo {
 			
 			*/
 
+
+			/// AÑADIMOS EL ELEMENTO AL MAPA DE ELEMENTOS
 			StaticMapElement v = R.MAP_DATA[localPos];
-			
 			if (mapElements.Contains(mapPosition)) {
 				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
 				mapElements[mapPosition] = v;
@@ -174,13 +171,43 @@ struct MapProceduralInfo {
 				mapElements.Emplace(mapPosition, v);
 			}
 
-			
+			///AÑADIMOS LA ROOM AL MAPA QUE LOS ALMACENA EN FUNCION DE LA LOGPOS
+			if (mapRooms.Contains(mapPosition)) {
+				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
+				mapRooms[mapPosition] = R;
+			}
+			else {
+				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - creando"));
+				mapRooms.Emplace(mapPosition, R);
+			}
 
-
-			
-			//mapRooms.Add(localPos, R);
 			UpdateBoundingBoxes(mapPosition);
 		}
+
+
+		//ShowMap();
+	}
+
+	void UpdateBoundingBoxes(PD_MG_LogicPosition pos) {
+		if (pos.GetX() < BOUNDING_BOX_TOP_LEFT.GetX()) {
+			BOUNDING_BOX_TOP_LEFT.SetX(pos.GetX());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
+		}
+		if (pos.GetY() < BOUNDING_BOX_TOP_LEFT.GetY()) {
+			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
+		}
+		if (pos.GetX() > BOUNDING_BOX_DOWN_RIGHT.GetX()) {
+			BOUNDING_BOX_DOWN_RIGHT.SetX(pos.GetX());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
+		}
+		if (pos.GetY() > BOUNDING_BOX_DOWN_RIGHT.GetY()) {
+			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
+		}
+	}
+
+	void ShowMap() {
 		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation MAP: "));
 		for (uint32 i = 0; i < Total_Height; i++) {
 			FString s = "";
@@ -219,37 +246,16 @@ struct MapProceduralInfo {
 					}
 				}
 				else {
-					s.AppendChar('_');
+					s.AppendChar('#');
 				}
 			}
 
-			UE_LOG(LogTemp, Log, TEXT("%s"),*s);
+			UE_LOG(LogTemp, Log, TEXT("%s"), *s);
 		}
-
-
-
 
 	}
 
 
-	void UpdateBoundingBoxes(PD_MG_LogicPosition pos) {
-		if (pos.GetX() < BOUNDING_BOX_TOP_LEFT.GetX()) {
-			BOUNDING_BOX_TOP_LEFT.SetX(pos.GetX());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
-		}
-		if (pos.GetY() < BOUNDING_BOX_TOP_LEFT.GetY()) {
-			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
-		}
-		if (pos.GetX() > BOUNDING_BOX_DOWN_RIGHT.GetX()) {
-			BOUNDING_BOX_DOWN_RIGHT.SetX(pos.GetX());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
-		}
-		if (pos.GetY() > BOUNDING_BOX_DOWN_RIGHT.GetY()) {
-			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
-		}
-	}
 
 };
 
@@ -274,7 +280,7 @@ public:
 	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C);
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
-	
+	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1);
 
 private:
 	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);
