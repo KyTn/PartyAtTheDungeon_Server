@@ -101,7 +101,7 @@ PD_MG_LogicPosition PD_GM_MapManager::WorldToLogicPosition(FVector pos) {
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition logPos) {
 
-	return logPos.GetAdjacents(StaticMapRef->GetLogicPositions());
+	return logPos.GetAdjacentsFromList(StaticMapRef->GetLogicPositions());
 }
 
 

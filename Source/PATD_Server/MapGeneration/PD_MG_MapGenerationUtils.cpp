@@ -485,9 +485,11 @@ PD_MG_LogicPosition PD_MG_MapGenerationUtils::Translate_LocalPosInRoom_To_MapPos
 
 bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1) {
 
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at testing from /\\(%d,%d) to \\/(%d,%d)"), W.GetX(), W.GetY(), Waux.GetX(), Waux.GetY());
+
+
 	M.mapElements[W1] = StaticMapElement::DOOR;
-	TArray<PD_MG_LogicPosition> adjac = TArray<PD_MG_LogicPosition>(), wall_adjac = TArray<PD_MG_LogicPosition>();
-	W1.GetAdjacents(adjac);
+	TArray<PD_MG_LogicPosition> adjac = W1.GenerateAdjacentst(), wall_adjac = TArray<PD_MG_LogicPosition>();
 	for (int i = 0; i < adjac.Num(); i++) {
 		if (M.mapElements[adjac[i]] == StaticMapElement::WALL_OR_DOOR) {
 			wall_adjac.Add(adjac[i]);

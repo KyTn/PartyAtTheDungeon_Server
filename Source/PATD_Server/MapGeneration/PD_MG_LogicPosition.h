@@ -65,7 +65,7 @@ public:
 
 
 
-	TArray<PD_MG_LogicPosition> GetAdjacents(TArray<PD_MG_LogicPosition> list) {
+	TArray<PD_MG_LogicPosition> GetAdjacentsFromList(TArray<PD_MG_LogicPosition> list) {
 
 		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
 
@@ -76,6 +76,18 @@ public:
 		}
 		return res;
 	}
+
+	TArray<PD_MG_LogicPosition> GenerateAdjacentst() {
+
+		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
+
+		res.Add(PD_MG_LogicPosition(this->GetX(), this->GetY() - 1));
+		res.Add(PD_MG_LogicPosition(this->GetX(), this->GetY() + 1));
+		res.Add(PD_MG_LogicPosition(this->GetX() + 1, this->GetY()));
+		res.Add(PD_MG_LogicPosition(this->GetX() - 1, this->GetY()));
+		return res;
+	}
+
 
 	int ManhattanDistance(PD_MG_LogicPosition other) {
 		int deltaX = other.GetX() - this->GetX();
