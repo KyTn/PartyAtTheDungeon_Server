@@ -390,6 +390,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 		}
 
 		//CODIGO PROVISIONAL PARA ESPERAR. HAY QUE ARREGLAR EL NETMANAGER
+		/*
 		int i = 0;
 		float f = 1;
 		while (i < 10000) {
@@ -397,6 +398,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 			i++;
 			f = f*f;
 		}
+		*/
 		//FIN CODIGO PROVISIONAL
 
 		//Broadcast del listInstantiatePlayers
