@@ -11,10 +11,10 @@
 
 PD_NW_NetworkManager::PD_NW_NetworkManager()
 {
-	
-	 socketManager= new PD_NW_SocketManager();
-	 eventManager = new PD_NW_EventManager();
-	 serializerManager= new PD_SR_SerializerManager();
+
+	socketManager = new PD_NW_SocketManager();
+	eventManager = new PD_NW_EventManager();
+	serializerManager = new PD_SR_SerializerManager();
 }
 
 PD_NW_NetworkManager::~PD_NW_NetworkManager()
@@ -24,7 +24,7 @@ PD_NW_NetworkManager::~PD_NW_NetworkManager()
 }
 
 
-void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIndex){
+void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIndex) {
 
 
 	int sizeAll = data->Num();
@@ -33,7 +33,7 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 	while (sizeAll > 0) {
 		//UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: socketIndex %d"), socketIndex);
 
-	
+
 		//FStructData dataStruct = *(serializerManager->DeserializeDataTemplate<FStructData>(data)); // Esto tambien es una copia?? ver bien que devolver en cada punto, si puntero referencia o tipo directo!
 
 		//UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: structType %d"), dataStruct.structType);
@@ -68,13 +68,16 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 
 		TArray<uint8> dataaux = TArray<uint8>();
 
+
+		UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: Size SIN cabecera : %d"), size);
 		dataaux.Init(0, size);
-		for (uint32 i = 5; i < size; i++) {
+		for (uint32 i = 5; i < 5 + size; i++) {
 
 			UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: Limpiando cabecera ... [%d:%d]"), i, (*data)[i]);
 
-
-			dataaux.Add((*data)[i]);
+			dataaux[i - 5] = (*data)[i];
+			//dataaux.Emplace((*data)[i], (int)i - 5);
+			//dataaux.Add((*data)[i]);
 		}
 
 		s = "[";
@@ -93,9 +96,9 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 
 
 		FStructGeneric* genericStruct = serializerManager->DeserializeData(&dataaux, UStructType(type)); //Otra copia?
-		genericStruct->structType = type;
+																										 //genericStruct->structType = type;
 		UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: While vuelta %d  : type: %d : type2: %d"), v, type, genericStruct->structType);
-	
+
 		eventManager->GenerateEvent(genericStruct, socketIndex);
 
 		sizeAll -= (5 + size);
@@ -104,7 +107,7 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 	//Falta por hacer que se pueda enviar y recibir una lista (lo del compresor)
 
 
-	
+
 	//serializerManager->DeserializeData(data,
 
 	/*
@@ -121,24 +124,24 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 	FStructGenericList* structList=serializerManager->DeserializeData(data, serializeOk);
 	UE_LOG(LogTemp, Warning, TEXT("Handle Paso2 "));
 
-	//Aqui ya podemos hacer delete del array de datos pues el serializer crea datos nuevos. 
+	//Aqui ya podemos hacer delete del array de datos pues el serializer crea datos nuevos.
 	//delete data;
 	UE_LOG(LogTemp, Warning, TEXT("Handle Paso3 %d"), structList->list.Num());
 
 	for (int i = 0; i < structList->list.Num(); i++)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Handle Paso4 "));
+	UE_LOG(LogTemp, Warning, TEXT("Handle Paso4 "));
 
 
-		FStructGeneric* structEvent = &(structList->list[i]); //Cogemos la referencia. El struct sigue alojado en el array
-		UE_LOG(LogTemp, Warning, TEXT("Handle Paso5 "));
+	FStructGeneric* structEvent = &(structList->list[i]); //Cogemos la referencia. El struct sigue alojado en el array
+	UE_LOG(LogTemp, Warning, TEXT("Handle Paso5 "));
 
-		eventManager->GenerateEvent(structEvent, socketIndex);//Generamos el evento con el puntero. 
+	eventManager->GenerateEvent(structEvent, socketIndex);//Generamos el evento con el puntero.
 
 	}*/
 	//una vez lanzados todos los eventos debemos borrar los datos creados (aqui se borran los structs que reciben en los eventos,
 	//por eso hay que copiarlos si se quieren conservar). 
-//	delete structList;
+	//	delete structList;
 
 
 }
@@ -146,14 +149,14 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 //Este se borrara al hacer el delete de la clase 
 
 void PD_NW_NetworkManager::HandleNewConnectionSocketListener(int socketIndex) {
-	
-	
+
+
 	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewConnectionSocketListener:: socketIndex %d"), socketIndex);
 
 	//Generar el evento de nuevo jugador. 
 	//TODO Transformar a struct de nueva conexion
 	FStructNewConnection* structNewConnection = new FStructNewConnection(); //alaaaa otro new
-	
+
 	eventManager->GenerateEvent(structNewConnection, socketIndex);
 }
 
@@ -237,77 +240,77 @@ bool PD_NW_NetworkManager::SendNow(FStructGeneric* structGeneric, int player) {
 
 		return false;
 	}
-	
+
 }
 
 /*/
 //Funciones publicas para enviar
 bool PD_NW_NetworkManager::SendNow(FStructGeneric* st,int player) {
-	//Para hacer broadcast con -1?
-	
-	TArray<uint8>* data = serializerManager->SerializeData(st);
-	socketManager->SendInfoTo(player, data);
+//Para hacer broadcast con -1?
+
+TArray<uint8>* data = serializerManager->SerializeData(st);
+socketManager->SendInfoTo(player, data);
 
 
-	//Con compresor
-	/*AddToSendList(st, player);
-	SendNow(player);
-	
-	*/
+//Con compresor
+/*AddToSendList(st, player);
+SendNow(player);
+
+*/
 /*
-	return true;
+return true;
 }*/
 //Con compresor
 /*
 bool PD_NW_NetworkManager::SendNow(int player) {//serializamos y enviamos los datos de un jugador, tras esto deberian borrarse¿?
-		
-		
-		
-	bool serializeOk;
-	//Para enviar todo lo pendiente con -1?
-	if (!sendGenericStruct.IsValidIndex(player) || !sendGenericStruct[player]) {
-		return false; //Hay un error por que el FStructGenericList deberia estar creado
-	}
 
-	FStructGenericList* structPlayer = sendGenericStruct[player]; 
-	TArray<uint8>* data = serializerManager->SerializeData(structPlayer, serializeOk); //Esto nos devuelve una copia
-	structPlayer->list.Empty(); //Aqui tenemos nuestro struct-array limpio. Empty llamara a los destructores de los structs internos.
-								//Deberia ser como hacer delete structPlayer y volverlo a crear.
 
-	socketManager->SendInfoTo(player, data);
-	//delete data; //Aqui ya podemos borrar los datos serializados que hemos creado.
+
+bool serializeOk;
+//Para enviar todo lo pendiente con -1?
+if (!sendGenericStruct.IsValidIndex(player) || !sendGenericStruct[player]) {
+return false; //Hay un error por que el FStructGenericList deberia estar creado
+}
+
+FStructGenericList* structPlayer = sendGenericStruct[player];
+TArray<uint8>* data = serializerManager->SerializeData(structPlayer, serializeOk); //Esto nos devuelve una copia
+structPlayer->list.Empty(); //Aqui tenemos nuestro struct-array limpio. Empty llamara a los destructores de los structs internos.
+//Deberia ser como hacer delete structPlayer y volverlo a crear.
+
+socketManager->SendInfoTo(player, data);
+//delete data; //Aqui ya podemos borrar los datos serializados que hemos creado.
 
 //	structPlayer->list.Empty();
 //	sendGenericStruct->Insert(*structPlayer, player); Vaciar la posicion de ese jugador en el servidor del buffer de enviar datos
-	return serializeOk;
+return serializeOk;
 }
 
 bool PD_NW_NetworkManager::AddToSendList(FStructGeneric* st, int player) {//Actualiza los datos del buffer de salida de ese cliente
-	if (!sendGenericStruct.IsValidIndex(player) || !sendGenericStruct[player]) {
-		return false; //Hay un error por que el FStructGenericList deberia estar creado
-	}
-	
-	FStructGenericList* structPlayer = sendGenericStruct[player];
+if (!sendGenericStruct.IsValidIndex(player) || !sendGenericStruct[player]) {
+return false; //Hay un error por que el FStructGenericList deberia estar creado
+}
 
-	//Necesitamos hacer una copia para poder borrar estos structs sin miedo a que se borren en la capa de aplicacion.
-	FStructGeneric* structCopy = new FStructGeneric(*st);
-	
-	
-	structPlayer->list.Add(*structCopy);//Aqui hara una copia del FStruct? Creo que no. Por eso los copiamos.
+FStructGenericList* structPlayer = sendGenericStruct[player];
 
-	//sendGenericStruct->Insert(*structPlayer,player);
-	//compressionManager.AddToSendList(st, player);
-	return true;
+//Necesitamos hacer una copia para poder borrar estos structs sin miedo a que se borren en la capa de aplicacion.
+FStructGeneric* structCopy = new FStructGeneric(*st);
+
+
+structPlayer->list.Add(*structCopy);//Aqui hara una copia del FStruct? Creo que no. Por eso los copiamos.
+
+//sendGenericStruct->Insert(*structPlayer,player);
+//compressionManager.AddToSendList(st, player);
+return true;
 }
 
 */
 
 int  PD_NW_NetworkManager::ConnectTo(FString ip, int port) {
-	int player=socketManager->ConnectDataSocket(ip, port);
+	int player = socketManager->ConnectDataSocket(ip, port);
 	if (player == -1) {
 		//ERROR!!
 		UE_LOG(LogTemp, Error, TEXT("No se ha podido crear el Socket Cliente! "));
-		
+
 	}
 	else {
 		//Insertamos el buffer igual que para un nuevo jugador que venga del listener.
