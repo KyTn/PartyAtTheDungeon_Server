@@ -79,7 +79,7 @@ public:
 	void LogicAttackTick(int tick, int numCharacters);
 	void LogicItemTick(int tick);
 
-
+	void CallbackAttack();
 
 	//Funciones de gestion de visualizacion (visualization manager)
 	//Esto lo llamara la parte visual (controller o actor) cuando finalize su animacion, para cambiar de estado o hacer lo que coresponda

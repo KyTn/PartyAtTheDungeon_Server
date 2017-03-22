@@ -36,7 +36,7 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 		ZombieClass = (UClass*)ZombieBlueprint.Object->GeneratedClass;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerBlueprint(TEXT("Blueprint'/Game/Blueprints/Players/Player.Player'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerBlueprint(TEXT("Blueprint'/Game/Blueprints/Players/Legionario.Legionario'"));
 	if (PlayerBlueprint.Object) {
 		PlayerClass= (UClass*)PlayerBlueprint.Object->GeneratedClass;
 	}

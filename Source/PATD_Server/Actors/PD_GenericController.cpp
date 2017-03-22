@@ -6,7 +6,7 @@
 //Includes de uso
 #include "PD_ServerGameInstance.h"
 #include "GM_Game/PD_GM_GameManager.h"
-
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 
@@ -90,8 +90,14 @@ bool APD_GenericController::MoveTo(float x, float y)
 bool APD_GenericController::ActionTo(float x, float y, uint8 id_action)
 {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
-
 	animationOn = EAnimationType::Attack;
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	UBoolProperty* MyFloatProp = FindField<UBoolProperty>(AnimInst->GetClass(), "EnableAttack");
+	if (MyFloatProp != NULL) {
+		bool FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
+		MyFloatProp->SetPropertyValue_InContainer(AnimInst, true);
+		FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
+	}
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo: StateAnim:%d"), static_cast<uint8>(animationOn));
 	return true;
 
@@ -102,3 +108,9 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 	return true;
 }
 
+void APD_GenericController::CallbackAttackEnd() {
+	UE_LOG(LogTemp, Log, TEXT("Attack End!!!!!!!!!!"));
+	
+	
+	///llamar una función del game manager 
+}

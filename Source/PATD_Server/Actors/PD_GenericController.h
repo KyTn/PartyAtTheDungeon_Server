@@ -73,6 +73,7 @@ public:
 	etc.
 	*/
 	
-	
+		UFUNCTION(BlueprintCallable, Category = PD_Animation)
+		void CallbackAttackEnd();
 	
 };
