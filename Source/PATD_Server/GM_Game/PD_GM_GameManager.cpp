@@ -474,7 +474,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 
 		//Peta al no tener actor ni controller
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
-		logicCharacter->MoveToPhysicalPosition(logicCharacter->GetCurrentLogicalPosition());
+		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 		
 		
 
@@ -519,8 +519,19 @@ void PD_GM_GameManager::VisualAttackTick() {
 
 }
 
+/*
+void PD_GM_GameManager::CallbackMoveEnd() {
+	//Mirar si todos han terminado de moverse y en ese caso pasar al siguiente tick
+}
 
+void PD_GM_GameManager::CallbackAnimEnd() {
+	//mirar si todos han terminado su animacion y en ese caso pasar al siguiente tick
+}
 
+void PD_GM_GameManager::CallbackPlaySecondaryAnims() {
+	//lanzar las animaciones secundarias. 
+}
+*/
 
 void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));

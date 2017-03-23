@@ -111,6 +111,6 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 void APD_GenericController::CallbackAttackEnd() {
 	UE_LOG(LogTemp, Log, TEXT("Attack End!!!!!!!!!!"));
 	
-	
+	OnAnimationEnd();
 	///llamar una función del game manager 
 }
