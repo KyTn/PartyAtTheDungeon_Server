@@ -37,7 +37,7 @@ void APD_GenericController::Tick(float DeltaTime)
 				//currentTimeAnimation -= maxLengthAnimation;
 				currentTimeAnimation = 0;
 				UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: Finalizando animacion de ataque correctamente."));
-				OnAnimationEnd();
+				//OnAnimationEnd();
 
 			}
 			
