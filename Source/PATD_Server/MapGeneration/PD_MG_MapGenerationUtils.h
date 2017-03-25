@@ -292,7 +292,7 @@ struct MapProceduralInfo {
 						break;
 
 					case StaticMapElement::WALL_ONLY:
-						s.AppendChar('W');
+						s.AppendChar('w');
 						break;
 
 					case StaticMapElement::WALL_OR_DOOR:
