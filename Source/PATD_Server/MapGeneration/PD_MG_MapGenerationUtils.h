@@ -123,6 +123,7 @@ struct MapProceduralInfo {
 	TMap<PD_MG_LogicPosition, StaticMapElement> mapElements;
 	TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
 	
+
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
 
@@ -202,7 +203,7 @@ struct MapProceduralInfo {
 			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
 		}
 		if (pos.GetY() > BOUNDING_BOX_DOWN_RIGHT.GetY()) {
-			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
+			BOUNDING_BOX_DOWN_RIGHT.SetY(pos.GetY());
 			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
 		}
 	}
@@ -255,7 +256,66 @@ struct MapProceduralInfo {
 
 	}
 
+	void ShowMapOnBoundingBox() {
+		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::ShowMapOnBoundingBox FROM(%d,%d) TO(%d,%d) MAP: \n%s"), BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY(), BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY(), *ToString());
 
+	}
+
+
+	FString ToString() {
+		FString s = "v0.1\ndefeatboss\n";
+		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetX() - BOUNDING_BOX_TOP_LEFT.GetX());
+		s.AppendChar('\n'); 
+		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetY() - BOUNDING_BOX_TOP_LEFT.GetY());
+		s.AppendChar('\n');
+		for (int i = BOUNDING_BOX_TOP_LEFT.GetX(); i <= BOUNDING_BOX_DOWN_RIGHT.GetX(); i++) {
+			PD_MG_LogicPosition p;
+			for (int j = BOUNDING_BOX_TOP_LEFT.GetY(); j <= BOUNDING_BOX_DOWN_RIGHT.GetY(); j++) {
+				p = PD_MG_LogicPosition(i, j);
+				if (mapElements.Contains(p)) {
+					switch (mapElements[p])
+					{
+					case StaticMapElement::EMPTY:
+						s.AppendChar('O');
+						break;
+
+					case StaticMapElement::DOOR:
+						s.AppendChar('d');
+						break;
+
+					case StaticMapElement::NORMAL_TILE:
+						s.AppendChar('.');
+						break;
+
+					case StaticMapElement::SPECIAL_TILE:
+						s.AppendChar(',');
+						break;
+
+					case StaticMapElement::WALL_ONLY:
+						s.AppendChar('W');
+						break;
+
+					case StaticMapElement::WALL_OR_DOOR:
+						s.AppendChar('w');
+						break;
+
+					case StaticMapElement::SPAWN_POINT:
+						s.AppendChar('s');
+						break;
+					default:
+						break;
+					}
+				}
+				else {
+					s.AppendChar(' ');
+				}
+			}
+
+			s.AppendChar('\n');
+		}
+
+		return s;
+	}
 
 };
 
@@ -274,13 +334,15 @@ public:
 	bool GetPreloadedData(TArray<RoomTemplateInfo> &roomTemplates);
 
 
-	bool GenerateRandomStaticMap(TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width);
+	bool GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width);
 
 	bool Hard_Check_CanBeColocated(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
-	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C);
+	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1);
+
+	void MarkARoomAsSpawingRoom(MapProceduralInfo &M);
 
 private:
 	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);

@@ -38,6 +38,10 @@ void PD_MG_MapGenerator::Init()
 
 
 
-void PD_MG_MapGenerator::GenerateProceduralMap() {
-	mgUtils.GenerateRandomStaticMap(roomTemplateArray, 100, 100);
+FString PD_MG_MapGenerator::GenerateProceduralMap(/* OPTIONS */) {
+	MapProceduralInfo map = MapProceduralInfo(100,100);
+	mgUtils.GenerateRandomStaticMap(map, roomTemplateArray, 100, 100);
+	FString s = map.ToString();
+	s.Append("\n0");
+	return s;
 }

@@ -42,4 +42,4 @@ EnumParser<ECharacterType>::EnumParser()
 */
 enum class EAnimationType {Iddle,Move,Attack};
 
-enum class StaticMapElement { EMPTY= 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd'};
+enum class StaticMapElement { EMPTY= 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', SPAWN_POINT = 's'};

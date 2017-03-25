@@ -17,6 +17,6 @@ public:
 
 	void Init();
 
-	/*FString*/ void GenerateProceduralMap();
+	FString GenerateProceduralMap();
 
 };

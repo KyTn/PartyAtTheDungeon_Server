@@ -302,9 +302,9 @@ Dado un mapa M de W de ancho por H de alto y una lista de habitaciones LR.
 */
 
 
-bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width) {
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width) {
 
-	MapProceduralInfo M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
+	M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
 	//M.Total_Height = _Total_Height;
 	//M.Total_Width = _Total_Width;
 	//M.BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition(_Total_Height, _Total_Width);
@@ -358,7 +358,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> 
 	} while (!Hard_Check_CanBeColocated(M, R, C, R_pivot));
 
 	// Si se puede colocar, lo incrustamos en el mapa y actualizamos la lista de walls 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of first room: %s - Adding to map ..."), *(R.NAME));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of first room: %s - Adding to map ..."), *(R.NAME));
 	M.AddRoomToMapAtLocation(R, C, R_pivot);
 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding %d openwalls "), R.OPEN_WALLS.Num());
@@ -366,14 +366,14 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> 
 		LWC.Add(Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot));
 		LW.Add(Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot));
 
-		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) openwalls "), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot).GetY());
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) openwalls "), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], C, R_pivot).GetY());
 	}
 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding %d closedwalls "), R.CLOSED_WALLS.Num());
 	for (int i = 0; i < R.CLOSED_WALLS.Num(); i++) {
 		LW.Add(Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], C, R_pivot));
 
-		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) CLOSED_WALLS "), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], C, R_pivot).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], C, R_pivot).GetY());
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) CLOSED_WALLS "), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], C, R_pivot).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], C, R_pivot).GetY());
 	}
 
 	//for (int vuelta = 0; vuelta < 5; vuelta++) {
@@ -399,47 +399,53 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(TArray<RoomTemplateInfo> 
 		// hacemos matching
 		if (Hard_Check_CanBeColocated(M, R, W1, W2)) {
 
-			UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap W1(%d,%d) W2(%d,%d)"), W1.GetX(), W1.GetY(), W2.GetX(), W2.GetY());
-			UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of next room: %s"), *(R.NAME));
+			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap W1(%d,%d) W2(%d,%d)"), W1.GetX(), W1.GetY(), W2.GetX(), W2.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of next room: %s"), *(R.NAME));
 			
 			M.AddRoomToMapAtLocation(R, W1, W2);
 
 
 			//meter puerta y si se puede, puerta doble
-			if (Put_Door_Tryng_doubleDoor_at(M, W1)) {
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Double door!"));
-			}
+			Put_Door_Tryng_doubleDoor_at(M, W1);
+			//if (Put_Door_Tryng_doubleDoor_at(M, W1)) {
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Double door!"));
+			//}
 
 
 			for (int i = 0; i < R.OPEN_WALLS.Num(); i++) {
 				LWC.Add(Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2));
 				LW.Add(Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2));
 
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) openwalls "), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2).GetY());
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) openwalls "), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.OPEN_WALLS[i], W1, W2).GetY());
 			}
 
 			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding %d closedwalls "), R.CLOSED_WALLS.Num());
 			for (int i = 0; i < R.CLOSED_WALLS.Num(); i++) {
 				LW.Add(Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], W1, W2));
 
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) CLOSED_WALLS "), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], W1, W2).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], W1, W2).GetY());
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding (%d,%d) CLOSED_WALLS "), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], W1, W2).GetX(), Translate_LocalPosInRoom_To_MapPosition(R.CLOSED_WALLS[i], W1, W2).GetY());
 			}
 			
 			roomPlaced++;
 
 
-			M.ShowMap();
+			//M.ShowMap();
 		}
 	}
 
-	return false;
+
+	MarkARoomAsSpawingRoom(M);
+
+	//M.ShowMapOnBoundingBox();
+
+	return true;
 }
 
 
 // comprueba que la habitacion R se puede colocar en el mapa M haciendo coincidientes los puntos C y R_pivot, siendo C un punto en el mapa y R_pivot una posicion local a R.
 bool PD_MG_MapGenerationUtils::Hard_Check_CanBeColocated(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
 
-	if (!MapCanContainsRoom(M, R, C)) return false;
+	if (!MapCanContainsRoom(M, R, C, R_pivot)) return false;
 		
 	
 	PD_MG_LogicPosition W = Translate_LocalPosInRoom_To_MapPosition(R.BOUNDING_BOX_TOP_LEFT, C, R_pivot);
@@ -465,10 +471,10 @@ bool PD_MG_MapGenerationUtils::Hard_Check_CanBeColocated(MapProceduralInfo &M, R
 	
 }
 
-bool PD_MG_MapGenerationUtils::MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C) {
+bool PD_MG_MapGenerationUtils::MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
 
-	PD_MG_LogicPosition cornerTopLeft = C - R.BOUNDING_BOX_TOP_LEFT;
-	PD_MG_LogicPosition cornerDownRight = C - R.BOUNDING_BOX_DOWN_RIGHT;
+	PD_MG_LogicPosition cornerTopLeft = Translate_LocalPosInRoom_To_MapPosition(R.BOUNDING_BOX_TOP_LEFT, C, R_pivot);
+	PD_MG_LogicPosition cornerDownRight = Translate_LocalPosInRoom_To_MapPosition(R.BOUNDING_BOX_DOWN_RIGHT, C, R_pivot);
 
 	if (cornerTopLeft.GetX() < 0 || cornerTopLeft.GetY() < 0 ||
 		cornerDownRight.GetX() >= (int)M.Total_Height || cornerDownRight.GetY() >= (int)M.Total_Width) {
@@ -501,6 +507,22 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 	}
 
 	return false;
+}
+
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
+
+	PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Height));
+
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
+
+
+	while (!(M.mapElements.Contains(p) && M.mapElements[p] == StaticMapElement::NORMAL_TILE)) {
+		p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Height));
+
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
+	}
+
+	M.mapElements[p] = StaticMapElement::SPAWN_POINT;
 }
 
 

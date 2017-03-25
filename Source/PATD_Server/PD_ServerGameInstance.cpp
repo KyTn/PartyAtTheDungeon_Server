@@ -323,7 +323,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 		//mapGenerationUtils->ReadAndPrepareRoomTemplateInfosFromFile("Content/DungeonTestingMaps/test1.rooms", roomsTemplateInfoArray);
 
 		mapGenerator->Init();
-		mapGenerator->GenerateProceduralMap();
+		
 
 		ChangeState(EServerState::WaitingMasterClient);
 	}
@@ -339,6 +339,9 @@ void UPD_ServerGameInstance::OnBeginState() {
 		clientBroadcast.orderType = static_cast<uint8>(MenuOrderType::ChangeToLobby);
 		networkManager->SendNow(&clientBroadcast, -1);
 		/*  */
+
+		mapPath = mapGenerator->GenerateProceduralMap();
+
 		this->LoadMap(levelsNameDictionary.GetMapName(3));
 
 	}
@@ -459,8 +462,8 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 		PD_MG_DynamicMap* dynamicMapRef = new PD_MG_DynamicMap();
 
 		// Parsea el chorizo
-		mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
-
+		//mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
+		mapParser->StartParsingFromChorizo(&mapPath, staticMapRef, dynamicMapRef);
 
 
 
@@ -533,6 +536,8 @@ void UPD_ServerGameInstance::Init()
 	mapGenerator = new PD_MG_MapGenerator();
 
 	//Set del MapString para mapas "aleatorios"
+
+	/*
 	switch (FMath::RandHelper(3)) {
 		case 0: {
 			mapPath = "Content/DungeonTestingMaps/test3.dungeon";
@@ -550,7 +555,7 @@ void UPD_ServerGameInstance::Init()
 			mapY = 30;
 		}
 	}
-
+	*/
 	ChangeState(EServerState::StartApp);
 	//structServerState->enumServerState = EServerState::StartApp;
 	
