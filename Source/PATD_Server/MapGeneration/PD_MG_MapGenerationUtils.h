@@ -264,9 +264,9 @@ struct MapProceduralInfo {
 
 	FString ToString() {
 		FString s = "v0.1\ndefeatboss\n";
-		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetX() - BOUNDING_BOX_TOP_LEFT.GetX());
+		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetX() - BOUNDING_BOX_TOP_LEFT.GetX() +1);
 		s.AppendChar('\n'); 
-		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetY() - BOUNDING_BOX_TOP_LEFT.GetY());
+		s.AppendInt(BOUNDING_BOX_DOWN_RIGHT.GetY() - BOUNDING_BOX_TOP_LEFT.GetY()+2);
 		s.AppendChar('\n');
 		for (int i = BOUNDING_BOX_TOP_LEFT.GetX(); i <= BOUNDING_BOX_DOWN_RIGHT.GetX(); i++) {
 			PD_MG_LogicPosition p;
