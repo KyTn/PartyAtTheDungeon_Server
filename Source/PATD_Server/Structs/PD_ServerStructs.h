@@ -44,7 +44,7 @@ struct StructPlayer {
 //Usado por: GameManager
 struct StructGameState {
 	EGameState enumGameState;
-	EActionPhase enumActionPhase;
+//	EActionPhase enumActionPhase;
 	
 };
 
@@ -55,9 +55,8 @@ struct StructServerState {
 	bool gameConfigurationDone;
 };
 
-//Estados en los que se puede encontrar cada Logic Turn
 
-//Usado por: InteractionsManager
-struct LogicTurnInformation {
-	InteractionStates CurrentState;
+//Usado por: GameManager - Para maquina de estados de las Fases del Juego
+struct StructGamePhase {
+	EServerPhase enumGamePhase;
 };

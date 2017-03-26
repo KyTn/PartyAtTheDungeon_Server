@@ -49,7 +49,7 @@ public:
 
 	//Struct con el estado para la maquina de estados del gameManager
 	StructGameState* structGameState;
-		
+	StructGamePhase* structGamePhase;
 	//Funciones de gestion del estado (maquina de estados)
 
 	//Funciones de configuracion de la maquina
@@ -61,8 +61,16 @@ public:
 	//Funciones auxiliares
 	//Control directo del estado, llama a OnBeginState
 	void ChangeState(EGameState newState);
+	
+
 	void InitState();
 
+
+	
+	void UpdatePhase();
+	void OnBeginPhase();
+	void ChangePhase(EServerPhase newPhase);
+	void InitPhase();
 
 	//Funciones de gestion de acciones logicas
 

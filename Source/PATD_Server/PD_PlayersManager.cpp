@@ -136,6 +136,8 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 			numTicks = listActions.Num();
 			indexPlayer = i;
 		}
+		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : : % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions.Num());
+
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions: devuelto %d"), indexPlayer);
 

@@ -26,10 +26,12 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
 	AIManager = new PD_GM_AIManager();
-	InitState();
 	networkManager = inNetworkManager;
 	networkManager->RegisterObserver(this);
-//	interactionManager = new PD_GM_InteractionsManager(inPlayersManager, inMapManager);
+	structGameState = new StructGameState();
+	structGamePhase = new StructGamePhase();
+	InitState();
+
 }
 
 PD_GM_GameManager::~PD_GM_GameManager()
@@ -37,7 +39,7 @@ PD_GM_GameManager::~PD_GM_GameManager()
 }
 
 void PD_GM_GameManager::InitState() {
-	structGameState = new StructGameState();
+	
 	ChangeState(EGameState::Instantiate_Map);
 
 }
@@ -80,45 +82,36 @@ void PD_GM_GameManager::UpdateState() {
 
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		//Transicion inmediata de estado
+
 		this->ChangeState(EGameState::Start_Match);
+		
 
 	}else if (structGameState->enumGameState == EGameState::Start_Match) {
 		//Transicion inmediata de estado
-		this->ChangeState(EGameState::WaitingPlayerOrders);
-
-	}else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
-
-		//Transiciones de estados
-		if (playersManager->AllPlayersSendOrders()) {
-			this->ChangeState(EGameState::ExecutingPlayersLogic);
-		}
-
-	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
-
-		//Transicion inmediata de estado
-		this->ChangeState(EGameState::ExecutingPlayersVisualization);
 		
 
-	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
-
-		if (structGameState->enumActionPhase == EActionPhase::EndPhase) {
-			this->ChangeState(EGameState::ExecutingEnemiesLogic); 
-		//Salto de pruebas a end of turn para no hacer la logica del enemigo que aun peta.
-			//this->ChangeState(EGameState::EndOfTurn);
+		this->ChangeState(EGameState::WaitingPlayerOrders);
+		
+	}else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+		
+		//Transiciones de estados
+		if (playersManager->AllPlayersSendOrders()) {
+			this->ChangeState(EGameState::ExecutingPlayersTurn);
 		}
 
-	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
-		//Transicion inmediata de estado
-		this->ChangeState(EGameState::ExecutingEnemiesVisualization);
+		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
+			this->ChangeState(EGameState::ExecutingEnemiesTurn);
+		}
+		
 
+	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
-	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
-
-		if (structGameState->enumActionPhase == EActionPhase::EndPhase) {
+		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
 			this->ChangeState(EGameState::EndOfTurn);
 		}
-
+	
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 
@@ -139,43 +132,53 @@ void PD_GM_GameManager::OnBeginState() {
 		//Update de los enemigos a traves del dinamic map
 		
 		mapManager->InstantiateMap();
+		
 		UpdateState();
 
 	}
 	else if (structGameState->enumGameState == EGameState::Start_Match) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match"));
-				
+
+
 		UpdateState();
 
-	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	} else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+		FStructClientCanGenerateOrders clientGenerateOrders = FStructClientCanGenerateOrders();
+		networkManager->SendNow(&clientGenerateOrders, -1);
+
+		UpdateState();
+
+	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersLogic"));
 		PlayersLogicTurn();
-		UpdateState(); //transicion inmediata
+		InitPhase();
+		
 
 
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization){
+	/*else if (structGameState->enumGameState == EGameState::ExecutingPlayersT){
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersVisualization"));
 		
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
 		
 
-	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+	}*/
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
 		enemyManager->newTurn();
 		CreateEnemyOrders();
 		PlayersLogicTurn();
-		UpdateState(); //transicion inmediata
+		InitPhase();
+		
 
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
+	/*else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesVisualization"));
 		structGameState->enumActionPhase = EActionPhase::Move; //Empezamos en fase de mover y a partir de ahi lo controla el VisualTickControl
 		VisualTickControl();
 
-	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
+	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		
 		//Enviar a cliente actualizacion del mapa
@@ -207,7 +210,7 @@ void PD_GM_GameManager::OnBeginState() {
 			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
 		}
-
+		 
 		//Envio a todos los clientes con el update del turno
 		networkManager->SendNow(&structUpdateTurn);
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
@@ -249,10 +252,10 @@ void PD_GM_GameManager::PlayersLogicTurn() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::PlayersLogicTurn"));
 	//Distincion para players o enemigos
 	int numCharacters = 0;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		numCharacters = playersManager->GetNumPlayers();
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		numCharacters = enemyManager->GetEnemies().Num();
 	}
 
@@ -272,10 +275,10 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 	//Distincion para players o enemigos
 	//Calcular el numero de ticks a realizar (el de la lista mas larga)
 	int numTicks = 0;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Move);
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
 	}
 
@@ -298,10 +301,10 @@ void PD_GM_GameManager::LogicTurnAttackPhase(int numCharacters) {
 	//Distincion para players o enemigos
 	//Calcular el numero de ticks a realizar (el de la lista mas larga)
 	int numTicks = 0;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
 	}
 	
@@ -325,7 +328,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			//Distincion para players o enemigos
 			TArray<FStructOrderAction> listMove; 
 			PD_GM_LogicCharacter* logicCharacter=nullptr;
-			if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 				if (playersManager->GetDataStructPlayer(i)->turnOrders->listMove.Num() > tick)
 				{
 					listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
@@ -338,7 +341,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 					logicCharacter->MoveToLogicPosition(order);
 				}
 			}
-			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				listMove = enemyManager->GetTurnOrders(i)->listMove;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
@@ -381,7 +384,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 			//Distincion para players o enemigos
 			TArray<FStructOrderAction> listAttack;
 			PD_GM_LogicCharacter* logicCharacter = nullptr;
-			if (structGameState->enumGameState == EGameState::ExecutingPlayersLogic) {
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 				if (playersManager->GetDataStructPlayer(i)->turnOrders->listAttack.Num() > tick)
 				{
 					listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
@@ -392,7 +395,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 					logicCharacter->ActionTo(order);
 				}
 			}
-			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesLogic) {
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				listAttack = enemyManager->GetTurnOrders(i)->listAttack;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
@@ -410,6 +413,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 
 
 }
+/*
 void PD_GM_GameManager::VisualTickControl() {
 	
 
@@ -443,25 +447,26 @@ void PD_GM_GameManager::VisualTickControl() {
 			VisualAttackTick();
 		}
 	}
-}
+}*/
 
 void PD_GM_GameManager::VisualMoveTick() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick"));
 	int players = -1;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) 
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
 		players = playersManager->GetNumPlayers();
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization)
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
 		players = enemyManager->GetEnemies().Num();
+
 	//Todos a la vez
 	for (int i = 0; i<players; i++) {
 		//Distincion para players o enemigos
 		TArray<FStructOrderAction>* listMove=nullptr;
 		PD_GM_LogicCharacter* logicCharacter=nullptr;
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 			listMove = &playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 		}
-		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 			listMove = &enemyManager->GetTurnOrders(i)->listMove;
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
@@ -475,17 +480,6 @@ void PD_GM_GameManager::VisualMoveTick() {
 		//Peta al no tener actor ni controller
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
 		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
-		
-		
-
-		//Esto solo esta para pruebas, pues luego la visualizacion no tendra que lidiar con ordenesLogicas (sino con sus propias ordenes preferiblemente)
-		/*if (visualAction.targetDirection == 1)currentLogicPosition->SetY(currentLogicPosition->GetY() + 1);
-		else if (visualAction.targetDirection == 2)currentLogicPosition->SetY(currentLogicPosition->GetY() - 1);
-		else if (visualAction.targetDirection == 3)currentLogicPosition->SetX(currentLogicPosition->GetX() + 1);
-		else if (visualAction.targetDirection == 4)currentLogicPosition->SetX(currentLogicPosition->GetX() - 1);
-		*/
-
-		
 
 	}
 }
@@ -497,27 +491,33 @@ void PD_GM_GameManager::VisualAttackTick() {
 	TArray<FStructOrderAction>* listAttack=nullptr;
 	int indexCharacter;
 	PD_GM_LogicCharacter* logicCharacter=nullptr;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization) {
-		indexCharacter = playersManager->GetPlayerMaxLenghtActions(structGameState->enumActionPhase);
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		indexCharacter = playersManager->GetPlayerMaxLenghtActions(EActionPhase::Attack);
 		listAttack = &playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
 		logicCharacter = playersManager->GetDataStructPlayer(indexCharacter)->logic_Character;
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
-		indexCharacter = enemyManager->GetEnemyMaxLenghtActions(structGameState->enumActionPhase);
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		indexCharacter = enemyManager->GetEnemyMaxLenghtActions(EActionPhase::Attack);
 		listAttack = &enemyManager->GetTurnOrders(indexCharacter)->listAttack;
 		logicCharacter = enemyManager->GetEnemies()[indexCharacter];
 	}
 
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick despues de players/enemigos"));
+
 	//Uno a uno
 	
 	FStructOrderAction visualAction = listAttack->Pop();
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 0"));
 	PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 1"));
 	FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
-
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 2"));
 	//Peta al no tener actor ni controller
     Cast<APD_CharacterController>(logicCharacter->GetController())->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 3"));
 
-}
+}	
+
 
 /*
 void PD_GM_GameManager::CallbackMoveEnd() {
@@ -536,17 +536,148 @@ void PD_GM_GameManager::CallbackPlaySecondaryAnims() {
 void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
 
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersVisualization ) {
-		//Falta hacer un caso igual para los enemigos.
-		if (playersManager->AllAnimationEnd()) {
-			VisualTickControl();
+		if (playersManager->AllAnimationEnd() && enemyManager->AllAnimationEnd()) {
+			//Aqui deberia estar en un estado de fase que sea tick (no INI)
+			UpdatePhase();
 		}
+
+}
+
+
+#pragma region GM PHASE MACHINE 
+
+void PD_GM_GameManager::InitPhase() {
+	ChangePhase(EServerPhase::MoveIni);
+
+}
+
+// Esta funcion cambia el estado actual al pasado por parametros y llama al OnBeginState del mismo.
+void PD_GM_GameManager::ChangePhase(EServerPhase newPhase)
+{
+	structGamePhase->enumGamePhase = newPhase;
+	OnBeginPhase();
+}
+
+void PD_GM_GameManager::UpdatePhase()
+{
+	if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
+	{
+		//Distincion para players o enemigos
+		int maxLengthAction = 0;
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Move);
+		}
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
+		}
+
+		if (maxLengthAction != 0) {
+			ChangePhase(EServerPhase::MoveTick); //Hay acciones por lo que volvemos a repetir el tick.
+		}
+		else {
+			ChangePhase(EServerPhase::AttackIni);
+		}
+
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
+	{
+		//Distincion para players o enemigos
+		int maxLengthAction = 0;
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Move);
+		}
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
+		}
+
+		if (maxLengthAction != 0) {
+			ChangePhase(EServerPhase::MoveTick); //Hay acciones por lo que volvemos a repetir el tick.
+		}
+		else {
+			ChangePhase(EServerPhase::AttackIni);
+		}
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
+	{
+		//Distincion para players o enemigos
+		int maxLengthAction = 0;
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
+		}
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
+		}
+
+		if (maxLengthAction != 0) {
+			ChangePhase(EServerPhase::AttackTick); //Hay acciones por lo que volvemos a repetir el tick.
+		}
+		else {
+			ChangePhase(EServerPhase::EndAllPhases);
+		}
+
 		
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesVisualization) {
-		if (enemyManager->AllAnimationEnd()) {
-			VisualTickControl();
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
+	{
+		//Distincion para players o enemigos
+		int maxLengthAction = 0;
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
 		}
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
+		}
+
+		if (maxLengthAction != 0) {
+			ChangePhase(EServerPhase::AttackTick); //Hay acciones por lo que volvemos a repetir el tick.
+		}
+		else {
+			ChangePhase(EServerPhase::EndAllPhases);
+		}
+	
+	}
+	else //Caso indeterminado
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::UpdatePhase: WARNING: estado sin inicializacion"));
 	}
 
 }
+
+void PD_GM_GameManager::OnBeginPhase()
+{
+	if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveIni"));
+		//Llamar al procceso del movimiento logico
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveTick"));
+		VisualMoveTick();
+
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
+		//Llamar al procceso del ataque logico
+		UpdatePhase();
+
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackTick"));
+		VisualAttackTick();
+
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: EndAllPhases"));
+		UpdateState(); //Devolvemos el flujo a la maquina de estados del game manager (no de fases)
+	}else //Caso indeterminado
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: WARNING: estado sin inicializacion"));
+	}
+
+}
+#pragma endregion

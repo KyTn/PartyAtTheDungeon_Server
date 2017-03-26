@@ -484,7 +484,7 @@ struct FStructClientStartMatchOnGM : public FStructGeneric
 {
 	GENERATED_BODY()
 
-		FStructClientStartMatchOnGM() {
+	FStructClientStartMatchOnGM() {
 		structType = static_cast<uint8>(UStructType::FStructClientStartMatchOnGM);
 	}
 };
@@ -495,7 +495,7 @@ struct FStructClientCanGenerateOrders : public FStructGeneric
 {
 	GENERATED_BODY()
 
-		FStructClientCanGenerateOrders() {
+	FStructClientCanGenerateOrders() {
 		structType = static_cast<uint8>(UStructType::FStructClientCanGenerateOrders);
 	}
 };

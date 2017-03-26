@@ -20,7 +20,7 @@ public:
 		//Hay posibilidad de mejorar eso?
 
 	TArray<uint8>* SerializeData(FStructGeneric* structGeneric, UStructType type) {
-		//UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: intentando serializar algo de tipo %d"), );
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: ") );
 
 		switch (type) {
 		case UStructType::FStructMap: {
