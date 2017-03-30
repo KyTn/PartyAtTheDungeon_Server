@@ -16,9 +16,12 @@
 UCLASS()
 class PATD_SERVER_API APD_GenericController : public AAIController
 {
+	//Este nombre es el que tienen que tener las maquinas de estados del BP de anim (animInstance)
+	FString animStateMachineName = "animStateMachine";
+	//Este es el nombre que tiene que tener el estado de Idle para reconocerlo como tal
+	FString idleStateName = "Idle";
 
-
-	EAnimationType animationOn = EAnimationType::Iddle;
+	bool isMoving = false;
 	int maxLengthAnimation = 5;
 	float currentTimeAnimation=0;
 	FVector moveTargetPosition;
@@ -33,7 +36,10 @@ public:
 
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;
+
+	UFUNCTION(BlueprintCallable, Category = PD_Animation)
 	void OnAnimationEnd();
+
 	bool IsAtAnimation();
 		/*
 		//Para mover al personaje de forma visual por el mapa
@@ -73,7 +79,7 @@ public:
 	etc.
 	*/
 	
-		UFUNCTION(BlueprintCallable, Category = PD_Animation)
-		void CallbackAttackEnd();
+	//	UFUNCTION(BlueprintCallable, Category = PD_Animation)
+	//	void CallbackAttackEnd();
 	
 };
