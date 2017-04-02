@@ -3,10 +3,10 @@
 #pragma once
 
 #include "AIController.h"
-#include "PATD_Server/Structs/PD_NetStructs.h"
+//#include "PATD_Server/Structs/PD_NetStructs.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
-#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
+//#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_AIController.generated.h"
 
 
@@ -19,15 +19,15 @@ class PD_GM_MapManager;
 UCLASS()
 class PATD_SERVER_API APD_AIController : public AAIController
 {
-private:
-	PD_GM_MapManager* mapMng;
+	GENERATED_BODY()
+//private:
+	/*PD_GM_MapManager* mapMng;
 	FStructTurnOrders* actions;
 	PD_MG_LogicPosition currentPos;
 	PD_MG_LogicPosition ActionPos;
 	TArray<bool> aviablePos;
-	APD_E_Character* ch;
+	APD_E_Character* ch;*/
 public:
-	GENERATED_BODY()
 		APD_AIController();
 	//APD_AIController(const FString type);
 
@@ -35,17 +35,17 @@ public:
 		UBlackboardData* blackboardData;
 
 	UPROPERTY(EditAnywhere, Category = "behavior")
-		UBehaviorTree* behaviorTree;
+		UBehaviorTree* behaviorTree;*/
 
-	/*UPROPERTY(EditAnywhere, Category = "behavior")
-	UBlackboardComponent * Blackboard;
-	*/
-	/*UPROPERTY(EditAnywhere, Category = "behavior")
-		UBehaviorTreeComponent* behaviorTreeComp;
+	UPROPERTY(transient)
+		UBlackboardComponent* BlackboardComp;
+	
+	UPROPERTY(transient)
+		UBehaviorTreeComponent* BehaviorTreeComp;
 
-	//void Possess(APawn* charac) OVERRIDE;
+	void Possess(APawn* charac) override;
 
-	void StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition pos);
+	/*void StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition pos);
 
 	FStructTurnOrders* GetActions() { return actions; }
 

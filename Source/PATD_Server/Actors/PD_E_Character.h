@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
 #include "PD_E_Character.generated.h"
 
 UCLASS()
@@ -23,6 +24,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
+
+	UPROPERTY(EditAnywhere, Category = "behavior")
+		UBehaviorTree* behaviorTree;
 	
 };

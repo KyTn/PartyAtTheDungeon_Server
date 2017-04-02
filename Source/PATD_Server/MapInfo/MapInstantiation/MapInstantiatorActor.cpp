@@ -60,33 +60,7 @@ void AMapInstantiatorActor::Tick(float DeltaTime)
 #pragma region INSTANTIATORS
 
 
-/*
-AActor* AMapInstantiatorActor::InstantiateTile(PD_MG_LogicPosition logpos)
-{
-return GetWorld()->SpawnActor<APD_E_ElementActor>(TileClass, PD_MG_LogicPosition::LogicToWorldPosition(logpos), FRotator(0.0f, 0.f, 0.f));
-}
 
-AActor* AMapInstantiatorActor::InstantiateWall(PD_MG_LogicPosition logpos)
-{
-return GetWorld()->SpawnActor<APD_E_ElementActor>(WallClass, PD_MG_LogicPosition::LogicToWorldPosition(logpos), FRotator(0.0f, 0.f, 0.f));
-}
-
-APD_E_Character* AMapInstantiatorActor::InstantiateArcher(PD_MG_LogicPosition logpos) {
-return GetWorld()->SpawnActor<APD_E_Character>(ArcherClass, PD_MG_LogicPosition::LogicToWorldPosition(logpos), FRotator(0.0f, 0.f, 0.f));
-}
-
-APD_E_Character* AMapInstantiatorActor::InstantiateZombie(PD_MG_LogicPosition logpos) {
-return GetWorld()->SpawnActor<APD_E_Character>(ZombieClass, PD_MG_LogicPosition::LogicToWorldPosition(logpos), FRotator(0.0f, 0.f, 0.f));
-}
-
-APD_E_Character* AMapInstantiatorActor::InstantiatePlayer(PD_MG_LogicPosition logpos) {
-return GetWorld()->SpawnActor<APD_E_Character>(PlayerClass, PD_MG_LogicPosition::LogicToWorldPosition(logpos), FRotator(0.0f, 0.f, 0.f));
-}
-*/
-
-
-
-/* */
 AActor* AMapInstantiatorActor::InstantiateTile(PD_MG_LogicPosition logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(TileClass, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
@@ -108,7 +82,6 @@ APD_E_Character* AMapInstantiatorActor::InstantiateZombie(PD_MG_LogicPosition lo
 APD_E_Character* AMapInstantiatorActor::InstantiatePlayer(PD_MG_LogicPosition logpos) {
 	return GetWorld()->SpawnActor<APD_E_Character>(PlayerClass, logpos.ToWorldPosition(true), FRotator(0.0f, 0.f, 0.f));
 }
-/* */
 #pragma endregion
 
 

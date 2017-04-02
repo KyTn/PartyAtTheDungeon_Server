@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
-//#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-//#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
-#include "PATD_Server/GM_Game/PD_GM_MapManager.h"
-#include "PATD_Server/Structs/PD_NetStructs.h"
-#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "PATD_Server/Actors/PD_E_Character.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PD_AIController.h"
@@ -23,37 +22,26 @@ APD_AIController::APD_AIController(){// : AAIController() {
 	}
 
 	//behaviorTree = Cast<UBehaviorTree>(StaticLoadObject(UBehaviorTree::StaticClass(), nullptr, TEXT("Blueprint'/Game/BluePrints/Enemies/BehaviorTree/Zombie_Tree.Zombie_Tree'")));
-	//blackboardData = Cast<UBlackboardData>(StaticLoadObject(UBlackboardData::StaticClass(), nullptr, TEXT("Blueprint'/Game/BluePrints/Enemies/BehaviorTree/Zombie_Blackboard.Zombie_Blackboard'")));
-	Blackboard = CreateDefaultSubobject<UBlackboardComponent>("Blackboard");
-	behaviorTreeComp = CreateDefaultSubobject<UBehaviorTreeComponent>("behaviorTree");*/
+	//blackboardData = Cast<UBlackboardData>(StaticLoadObject(UBlackboardData::StaticClass(), nullptr, TEXT("Blueprint'/Game/BluePrints/Enemies/BehaviorTree/Zombie_Blackboard.Zombie_Blackboard'")));*/
+	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
+	BehaviorTreeComp = CreateDefaultSubobject<UBehaviorTreeComponent>("BehaviorTreeComp");
 }
 
-/*APD_AIController::APD_AIController(const FString type) {/// el type tiene que ser un fstring con el nombre del árbol(de hecho, si lo gestionamos por carpetas se podría hacer una minruta)
-
-FString PathTree = "/Game/BluePrints/Enemies/BehaviorTree/" + type + "_tree." + type;
-FString PathBB = "/Game/BluePrints/Enemies/Blackboard/" + type + "." + type;
-behaviorTree = Cast<UBehaviorTree>(StaticLoadObject(UBehaviorTree::StaticClass(), nullptr, *PathTree));
-blackboardData = Cast<UBlackboardData>(StaticLoadObject(UBlackboardData::StaticClass(), nullptr, *PathBB));
-Blackboard = CreateDefaultSubobject<UBlackboardComponent>("Blackboard");
-}*/
-
-/*void APD_AIController::Possess(APawn* charac)
+void APD_AIController::Possess(APawn* charac)
 {
 Super::Possess(charac);
 
-ch = Cast<APD_E_Character>(charac);
+APD_E_Character* ch = Cast<APD_E_Character>(charac);
 
-// start behavior
-if (ch && ch->BotBehavior)
-{
-Blackboard->InitializeBlackboard(*ch->BotBehavior->BlackboardAsset);
+	if (ch && ch->behaviorTree)
+	{
+		BlackboardComp->InitializeBlackboard(*ch->behaviorTree->BlackboardAsset);
 
-// Get the enemy blackboard ID, and store it to access that blackboard key later.
-
-
-//behaviorTreeComp->StartTree(*ch->BotBehavior);
+		BlackboardComp->SetValueAsInt("AP",0);
+		//habria que setear los ap
+		BehaviorTreeComp->StartTree(*ch->behaviorTree);
+	}
 }
-}*/
 /*
 void APD_AIController::StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition pos) {
 
