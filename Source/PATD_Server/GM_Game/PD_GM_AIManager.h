@@ -24,4 +24,5 @@ public:
 
 	FStructTurnOrders* AIExecEnemy(PD_GM_LogicCharacter* charac, PD_GM_MapManager* mngrMap);
 
+	void StartCalculateAIEnemy(PD_GM_LogicCharacter* charac);
 };
