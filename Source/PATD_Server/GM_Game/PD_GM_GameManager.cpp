@@ -106,11 +106,19 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
-			this->ChangeState(EGameState::ExecutingEnemiesTurn);
+			this->ChangeState(EGameState::WaitingEnemiesOrders);
 		}
 		
 
-	}else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+	}else if (structGameState->enumGameState == EGameState::WaitingEnemiesOrders) {
+
+		//Transiciones de estados
+		//if (enemyManager->AllPlayersSendOrders()) {
+			this->ChangeState(EGameState::ExecutingEnemiesTurn);
+	//	}
+
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
 			this->ChangeState(EGameState::EndOfTurn);
@@ -168,10 +176,15 @@ void PD_GM_GameManager::OnBeginState() {
 		
 
 	}*/
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
+	else if (structGameState->enumGameState == EGameState::WaitingEnemiesOrders) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: WaitingEnemiesOrders"));
 		enemyManager->newTurn();
 		CreateEnemyOrders();
+		UpdateState();
+
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
 		PlayersLogicTurn();
 		InitPhase();
 		
@@ -249,6 +262,12 @@ void PD_GM_GameManager::CreateEnemyOrders() {
 	}
 }
 
+void PD_GM_GameManager::CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders) {
+	//Asignar las ordenes al character del id
+
+	//Comprobar si estan todas para pasar de fase
+
+}
 
 //Control de los turnos
 

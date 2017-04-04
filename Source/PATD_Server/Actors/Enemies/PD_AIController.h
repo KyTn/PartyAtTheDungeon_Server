@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "AIController.h"
-//#include "PATD_Server/Structs/PD_NetStructs.h"
+#include "PATD_Server/Structs/PD_NetStructs.h"
+#include "Actors/PD_GenericController.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
-//#include "PATD_Server/MapGeneration/PD_MG_LogicPosition.h"
 #include "PD_AIController.generated.h"
 
 
@@ -17,25 +16,15 @@ class PD_GM_MapManager;
 *
 */
 UCLASS()
-class PATD_SERVER_API APD_AIController : public AAIController
+class PATD_SERVER_API APD_AIController : public APD_GenericController
 {
 	GENERATED_BODY()
-//private:
-	/*PD_GM_MapManager* mapMng;
-	FStructTurnOrders* actions;
-	PD_MG_LogicPosition currentPos;
-	PD_MG_LogicPosition ActionPos;
-	TArray<bool> aviablePos;
-	APD_E_Character* ch;*/
+private:
+		PD_GM_MapManager* mapMng;
+		FStructTurnOrders* actions;
+		PD_GM_LogicCharacter* currentcharac;
 public:
 		APD_AIController();
-	//APD_AIController(const FString type);
-
-	/*UPROPERTY(EditAnywhere, Category = "blackboard")
-		UBlackboardData* blackboardData;
-
-	UPROPERTY(EditAnywhere, Category = "behavior")
-		UBehaviorTree* behaviorTree;*/
 
 	UPROPERTY(transient)
 		UBlackboardComponent* BlackboardComp;
@@ -45,20 +34,19 @@ public:
 
 	void Possess(APawn* charac) override;
 
-	/*void StartTurnZombie(PD_GM_MapManager* refMap, PD_MG_LogicPosition pos);
+	void StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
+	void EndAITurnCalculation();
 
-	FStructTurnOrders* GetActions() { return actions; }
+	PD_GM_MapManager* GetMapMng() { return mapMng; };
+	FStructTurnOrders* GetTurnOrders() { return actions; };
+	PD_GM_LogicCharacter* GetLogicCharacter() { return currentcharac; };
 
-	void UpdateAP();
 
-	bool EndBehaviour();
 
-	UFUNCTION(BlueprintCallable, Category = Behaviour)
-		void ArePlayersNear();
+	virtual bool MoveTo(float x, float y) override;
+	virtual bool ActionTo(float x, float y, uint8 id_action) override;
+	virtual bool Animate(uint8 typeAnimation) override;
 
-	UFUNCTION(BlueprintCallable, Category = Behaviour)
-		void AddAttack();
 
-	UFUNCTION(BlueprintCallable, Category = Behaviour)
-		void AddMove();*/
+
 };

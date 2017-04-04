@@ -42,3 +42,13 @@ FStructTurnOrders* PD_GM_AIManager::AIExecEnemy(PD_GM_LogicCharacter* charac, PD
 	}
 	return orders;
 }
+void PD_GM_AIManager::StartCalculateAIEnemy(PD_GM_LogicCharacter* charac) {
+	//Inicializar arbol
+	//Setear el id del character
+
+}
+
+void PD_GM_AIManager::OnCalculateAIEnd(FString id, FStructTurnOrders* turnOrders) {
+	//setear el resultado por el id
+
+}
