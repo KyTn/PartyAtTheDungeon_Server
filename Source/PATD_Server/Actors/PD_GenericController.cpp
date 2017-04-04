@@ -8,6 +8,9 @@
 #include "GM_Game/PD_GM_GameManager.h"
 #include "Animation/AnimInstance.h"
 
+//Includes Forward
+#include "PD_SplineActors.h"
+
 // Sets default values
 
 APD_GenericController::APD_GenericController()
@@ -29,7 +32,10 @@ void APD_GenericController::Tick(float DeltaTime)
 	if (isMoving)
 	{
 		
-			if (FVector::PointsAreNear(moveTargetPosition, GetPawn()->GetActorLocation(), toleranceMove)) {
+		MoveWithSpline();
+		
+
+			/*if (FVector::PointsAreNear(moveTargetPosition, GetPawn()->GetActorLocation(), toleranceMove)) {
 				UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: Finalizando animacion de movimiento correctamente."));
 				isMoving = false;
 				OnAnimationEnd();
@@ -44,6 +50,7 @@ void APD_GenericController::Tick(float DeltaTime)
 				OnAnimationEnd();
 
 			}
+			*/
 	}
 	
 }
@@ -73,9 +80,9 @@ bool APD_GenericController::IsAtAnimation() {
 bool APD_GenericController::MoveTo(float x, float y)
 {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveTo"));
-	moveTargetPosition.X = x;
-	moveTargetPosition.Y = y;
-	moveTargetPosition.Z = GetPawn()->GetActorLocation().Z; //Todo en el mismo plano
+	//moveTargetPosition.X = x;
+	//moveTargetPosition.Y = y;
+	//moveTargetPosition.Z = GetPawn()->GetActorLocation().Z; //Todo en el mismo plano
 	isMoving = true;
 
 	
@@ -110,3 +117,54 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 	OnAnimationEnd();
 	///llamar una función del game manager 
 }*/
+
+
+//Funcion para mover al Character mediante Splines
+void APD_GenericController::MoveWithSpline()
+{
+	
+
+	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
+	FVector currentPosition = GetPawn()->GetActorLocation();
+
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
+
+	//Se comparan las posiciones entre la actual del Character y su posicion final para ver si ha llegado a su destino y tiene que dejar de moverse
+
+	if (!lastPosition.Equals(currentPosition, 50.0)) //Compara con un offset de error
+	{
+		GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
+
+		GetPawn()->AddMovementInput(GetActorForwardVector(), 0.0, false); //add entrada de movimiento
+
+		GetPawn()->SetActorLocation(spline->GetSplineComponent()->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la posicion del character
+
+		GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
+
+		distance = distance + 10; //actualizamos el variable
+
+	}
+	else
+	{
+		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
+		GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
+		isMoving = false;
+		distance = 0;
+		OnAnimationEnd();
+	}
+
+}
+
+APD_SplineActors* APD_GenericController::GetSpline()
+{
+	if (spline)
+		return spline;
+	else
+		return nullptr;
+}
+
+void APD_GenericController::SetSpline(APD_SplineActors* newSpline)
+{
+	spline = newSpline;
+}

@@ -105,19 +105,56 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 	devuelva tambien false
 	*/
 
+	//Ponemos como ocupado el spline elegido
+	//logicCharacter->GetController()->GetSpline()->SetIsUsing(true);
+	//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
+	//logicCharacter->GetController()->GetSpline()->SetToActorLocation(logicCharacter->GetController()->GetPawn()->GetActorLocation());
+	//Seteamos el Spline Component con los puntos a los que queremos movernos
+	//FVector newPositionWorld = mapManager->LogicToWorldPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
+	
+	
+	
 	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
+
+	TArray<FVector> WorldPositionToMove = TArray<FVector>();
+	//como primer indice del array se añade la posicion actual del  character
+	//mejor transformar la posicion anterior de logic a Mundo
+	WorldPositionToMove.Add(Cast<APD_CharacterController>(controller)->GetPawn()->GetActorLocation());
+	WorldPositionToMove.Add(realPosition);
+
+
 	if (!controller) {
 		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
 	}
 
 	if (isPlayer){
+			//Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+			
+			//Ponemos como ocupado el spline elegido
+			Cast<APD_CharacterController>(controller)->GetSpline()->SetIsUsing(true);
+			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
+			Cast<APD_CharacterController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_CharacterController>(controller)->GetPawn()->GetActorLocation());
+			//Seteamos el Spline Component con los puntos a los que queremos movernos
+			Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
+			//Llamamos al metodo Mover del Controller
 			Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 	}
 	else {
 		
+			//Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+
+			//Ponemos como ocupado el spline elegido
+			Cast<APD_EnemyController>(controller)->GetSpline()->SetIsUsing(true);
+			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
+			Cast<APD_EnemyController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_EnemyController>(controller)->GetPawn()->GetActorLocation());
+			//Seteamos el Spline Component con los puntos a los que queremos movernos
+			Cast<APD_EnemyController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
+			//Llamamos al metodo Mover del Controller
 			Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+
 	}
 	return true;
+
 }
 
 

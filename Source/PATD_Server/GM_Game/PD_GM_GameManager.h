@@ -15,9 +15,12 @@ class PD_GM_MapManager;
 class PD_GM_EnemyManager;
 class PD_NW_NetworkManager;
 class PD_GM_AIManager;
+class APD_GM_SplineManager;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
 struct LogicTurnInformation;
+
+#include "Components/SplineComponent.h"
 
 
 /**
@@ -32,7 +35,7 @@ private:
 	LogicTurnInformation* AttackTurnInformation;*/
 	//void IntitializeTurnStates();
 public:
-	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager);
+	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager);
 	~PD_GM_GameManager();
 
 	PD_NW_NetworkManager* networkManager;
@@ -40,6 +43,11 @@ public:
 	PD_GM_MapManager* mapManager;
 	PD_GM_EnemyManager* enemyManager;
 	PD_GM_AIManager* AIManager;
+
+	APD_GM_SplineManager* splineManager;
+
+
+
 	//Tiene que heredar de observer y suscribirse a paquetes de juegos (ordenes).
 	//Tiene un MapManager y un InteractionManager
 	void HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);

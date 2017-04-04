@@ -8,6 +8,8 @@
 #include "LogicCharacter/PD_GM_LogicCharacter.h"
 #include "Actors/PD_GenericController.h"
 #include "Actors/Players/PD_CharacterController.h"
+#include "Components/SplineComponent.h"
+
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -16,13 +18,15 @@
 #include "PD_GM_AIManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "NW_Networking/PD_NW_NetworkManager.h"
+#include "PD_GM_SplineManager.h"
 
 
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
 {
 	
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
+	splineManager = inSplineManager;
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
 	AIManager = new PD_GM_AIManager();
@@ -479,6 +483,11 @@ void PD_GM_GameManager::VisualMoveTick() {
 
 		//Peta al no tener actor ni controller
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
+		
+		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+		
+
+
 		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 
 	}
@@ -648,6 +657,12 @@ void PD_GM_GameManager::OnBeginPhase()
 	if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveIni"));
+		//Limpiar todos los splines del splineManager para que todos los instanciados esten disponibles
+		for (int i = 0; i < splineManager->splinesPool.Num(); i++)
+		{
+			splineManager->splinesPool[i]->RemovePoints();
+		}
+
 		//Llamar al procceso del movimiento logico
 		UpdatePhase();
 	}
