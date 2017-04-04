@@ -5,10 +5,13 @@
 
 //forward declarations
 #include "Structs/PD_ServerEnums.h"
+class APD_SplineActors;
 
 //include de unreal
 #include "AIController.h"
+#include "Components/SplineComponent.h"
 #include "PD_GenericController.generated.h"
+
 
 /**
  * 
@@ -27,12 +30,23 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 	FVector moveTargetPosition;
 	float toleranceMove = 50.0;
 
+	//For Spline
+	APD_SplineActors*  spline;
+	float distance = 0.0f;
+
 public:
 	GENERATED_BODY()
 
 	APD_GenericController();
 
 	APD_GenericController(FString type);
+
+	void SetSpline(APD_SplineActors* newSpline);
+	APD_SplineActors* GetSpline();
+
+
+	//Funcion para moverse por el mundo con splines
+	void MoveWithSpline();
 
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;

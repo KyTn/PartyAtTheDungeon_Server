@@ -11,6 +11,8 @@
 #include "MapGeneration/Dynamic/PD_MG_DynamicMap.h"
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "GM_Game/PD_GM_SplineManager.h"
+
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -502,7 +504,9 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 		//mapManager->InstantiateDynamicMap();
 
 		//Aqui cedemos el control al GameManager.
-		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager);
+		APD_GM_SplineManager* splineManager = (APD_GM_SplineManager*)GetWorld()->SpawnActor(APD_GM_SplineManager::StaticClass());
+
+		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager, splineManager);
 
 
 	}

@@ -18,7 +18,7 @@ bool APD_CharacterController::MoveTo(float x, float y)
 	FVector newPosition = FVector(x, y, 0);
 	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's new Location is %s"), *newPosition.ToString());
 
-	MoveToLocation(newPosition, -1.0f, true, false, false, true, 0, true);
+	//MoveToLocation(newPosition, -1.0f, true, false, false, true, 0, true);
 	
 
 	return true;
