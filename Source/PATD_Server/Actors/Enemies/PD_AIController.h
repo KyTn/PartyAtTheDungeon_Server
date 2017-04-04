@@ -21,7 +21,7 @@ class PATD_SERVER_API APD_AIController : public APD_GenericController
 	GENERATED_BODY()
 private:
 		PD_GM_MapManager* mapMng;
-		FStructTurnOrders* actions;
+		FStructTurnOrders actions;
 		PD_GM_LogicCharacter* currentcharac;
 public:
 		APD_AIController();
@@ -38,7 +38,7 @@ public:
 	void EndAITurnCalculation();
 
 	PD_GM_MapManager* GetMapMng() { return mapMng; };
-	FStructTurnOrders* GetTurnOrders() { return actions; };
+	FStructTurnOrders* GetTurnOrders() { return &actions; };
 	PD_GM_LogicCharacter* GetLogicCharacter() { return currentcharac; };
 
 

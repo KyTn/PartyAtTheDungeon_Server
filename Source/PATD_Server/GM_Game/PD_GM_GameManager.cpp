@@ -109,9 +109,9 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::WaitingEnemiesOrders) {
 
 		//Transiciones de estados
-		//if (enemyManager->AllPlayersSendOrders()) {
+		if (enemyManager->AllEnemiesHaveOrders()) {
 			this->ChangeState(EGameState::ExecutingEnemiesTurn);
-	//	}
+		}
 
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
@@ -254,14 +254,19 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
-		enemyManager->AddActionTurn(AIManager->AIExecEnemy(enemyManager->GetEnemies()[i],mapManager));
+		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
+		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
+	//	enemyManager->AddActionTurn(AIManager->AIExecEnemy(enemyManager->GetEnemies()[i],mapManager));
 	}
 }
 
 void PD_GM_GameManager::CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders) {
 	//Asignar las ordenes al character del id
+	int index =enemyManager->GetIndexByID(idCharacter);
+	enemyManager->getListTurnOrders()[index] = turnOrders;
+	//Comprobar si estan todas para pasar de estado
+	UpdateState();
 
-	//Comprobar si estan todas para pasar de fase
 
 }
 

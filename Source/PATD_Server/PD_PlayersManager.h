@@ -53,5 +53,5 @@ public:
 
 	TArray<StructPlayer*> GetDataPlayers() { return dataPlayers;}
 
-
+	PD_GM_LogicCharacter* GetCharacterByID(FString id);
 };

@@ -28,4 +28,9 @@ public:
 	int GetMaxLenghtActions(EActionPhase phase);
 	TArray<FStructTurnOrders*> getListTurnOrders() { return listTurnOrders; }
 	bool AllAnimationEnd();
+
+	PD_GM_LogicCharacter* GetCharacterByID(FString id);
+	int GetIndexByID(FString id);
+
+	bool AllEnemiesHaveOrders();
 };

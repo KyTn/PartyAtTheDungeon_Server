@@ -92,3 +92,37 @@ bool  PD_GM_EnemyManager::AllAnimationEnd() {
 	}
 	return true;
 }
+
+PD_GM_LogicCharacter* PD_GM_EnemyManager::GetCharacterByID(FString id) {
+	for (int i = 0; i < enemies.Num(); i++) {
+		if (enemies[i]->GetIDCharacter() == id) {
+			return enemies[i];
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
+	return nullptr;
+}
+
+int PD_GM_EnemyManager::GetIndexByID(FString id) {
+	for (int i = 0; i < enemies.Num(); i++) {
+		if (enemies[i]->GetIDCharacter() == id) {
+			return i;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
+	return -1;
+}
+
+
+
+bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders"));
+
+	for (int i = 0; i < enemies.Num();i++) {
+
+		if ((listTurnOrders[i]->listAttack.Num() == 0) && (listTurnOrders[i]->listMove.Num() == 0)) {
+			return false;
+		}
+	}
+	return true;
+}

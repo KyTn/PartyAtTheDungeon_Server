@@ -35,8 +35,8 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 	mapMng = refMap;
 	currentcharac = logicCharacter;
 
-	actions->listMove.Empty();
-	actions->listAttack.Empty();
+	actions.listMove.Empty();
+	actions.listAttack.Empty();
 	BlackboardComp->SetValueAsInt("AP", 5);
 }
 
@@ -44,7 +44,7 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 void APD_AIController::EndAITurnCalculation() {
 
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), actions);
+	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), &actions);
 }
 
 
