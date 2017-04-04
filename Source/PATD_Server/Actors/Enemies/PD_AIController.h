@@ -34,6 +34,19 @@ public:
 
 	void Possess(APawn* charac) override;
 
-	void StartTurn(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
+	void StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
+	void EndAITurnCalculation();
+
+	PD_GM_MapManager* GetMapMng() { return mapMng; };
+	FStructTurnOrders* GetTurnOrders() { return actions; };
+	PD_GM_LogicCharacter* GetLogicCharacter() { return currentcharac; };
+
+
+
+	virtual bool MoveTo(float x, float y) override;
+	virtual bool ActionTo(float x, float y, uint8 id_action) override;
+	virtual bool Animate(uint8 typeAnimation) override;
+
+
 
 };

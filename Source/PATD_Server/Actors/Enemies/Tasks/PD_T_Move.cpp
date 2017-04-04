@@ -7,7 +7,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "PATD_Server/Actors/Enemies/PD_AIController.h"
 #include "PD_T_Move.h"
-
+#include "GM_Game/PD_GM_MapManager.h"
 
 
 EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory) {
@@ -16,8 +16,11 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 	if (ap > 0)
 	{
 		//recorrerse el array de jugadores y hacer el pathfinding a sus logicposition, si hay alguno dentro de rango, ap-1 (para poder atacar) nos movemos a su lado, y sino...
+		
 		//true areplayersnear, y rellenar con la direccion
 		APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+		AIController->GetMapMng();
+
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", true);
 		return EBTNodeResult::Succeeded;
 	}

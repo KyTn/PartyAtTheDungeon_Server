@@ -18,7 +18,7 @@ EBTNodeResult::Type UPD_T_Idle::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", false);
 			APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
-			//llamar al callback
+			AIController->EndAITurnCalculation();
 		}
 		return EBTNodeResult::Failed;
 	}

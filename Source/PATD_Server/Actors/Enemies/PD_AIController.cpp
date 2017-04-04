@@ -10,6 +10,7 @@
 #include "PD_ServerGameInstance.h"
 #include "PD_AIController.h"
 #include <math.h>
+#include "GM_Game/PD_GM_GameManager.h"
 
 APD_AIController::APD_AIController(){
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
@@ -29,7 +30,7 @@ APD_E_Character* ch = Cast<APD_E_Character>(charac);
 	}
 }
 
-void APD_AIController::StartTurn(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter) 
+void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter) 
 {
 	mapMng = refMap;
 	currentcharac = logicCharacter;
@@ -39,9 +40,43 @@ void APD_AIController::StartTurn(PD_GM_MapManager* refMap, PD_GM_LogicCharacter*
 	BlackboardComp->SetValueAsInt("AP", 5);
 }
 
-/*
-void APD_AIController::endTurn() {
+
+void APD_AIController::EndAITurnCalculation() {
 
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-//instance->game(->iamanager)
-}*/
+	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), actions);
+}
+
+
+
+
+
+bool APD_AIController::MoveTo(float x, float y)
+{
+	Super::MoveTo(x, y);
+	UE_LOG(LogTemp, Warning, TEXT("Init GameMap"));
+
+	FVector currentPosition = GetPawn()->GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("Enemy Location is %s"), *currentPosition.ToString());
+
+
+	FVector newPosition = FVector(x, y, 0);
+	UE_LOG(LogTemp, Warning, TEXT("Enemy new Location is %s"), *newPosition.ToString());
+
+	MoveToLocation(newPosition, -1.0f, true, false, false, true, 0, true);
+	return true;
+}
+
+bool APD_AIController::ActionTo(float x, float y, uint8 id_action)
+{
+	Super::ActionTo(x, y, id_action);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "AL ATAQUERRRRRR !!!!!");
+
+	return true;
+
+}
+
+bool APD_AIController::Animate(uint8 typeAnimation)
+{
+	return true;
+}

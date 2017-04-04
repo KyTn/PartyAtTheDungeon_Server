@@ -72,10 +72,12 @@ public:
 	void ChangePhase(EServerPhase newPhase);
 	void InitPhase();
 
-	//Funciones de gestion de acciones logicas
-
+	//Funciones para crear las ordenes de los enemigos
 	void CreateEnemyOrders();
+	void CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders);
 
+
+	//Funciones de gestion de acciones logicas
 	void PlayersLogicTurn();
 
 	void LogicTurnItemPhase();
