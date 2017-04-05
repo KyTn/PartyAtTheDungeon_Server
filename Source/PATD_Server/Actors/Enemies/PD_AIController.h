@@ -12,6 +12,7 @@
 class APD_E_Character;
 class PD_GM_LogicCharacter;
 class PD_GM_MapManager;
+class PD_GM_Pathfinder;
 /**
 *
 */
@@ -23,6 +24,7 @@ private:
 		PD_GM_MapManager* mapMng;
 		FStructTurnOrders actions;
 		PD_GM_LogicCharacter* currentcharac;
+		PD_GM_Pathfinder* pathfinder;
 public:
 		APD_AIController();
 
@@ -37,10 +39,11 @@ public:
 	void StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
 	void EndAITurnCalculation();
 
+
 	PD_GM_MapManager* GetMapMng() { return mapMng; };
 	FStructTurnOrders* GetTurnOrders() { return &actions; };
 	PD_GM_LogicCharacter* GetLogicCharacter() { return currentcharac; };
-
+	PD_GM_Pathfinder* GetPathFinder() { return pathfinder; };
 
 	/*
 	virtual bool MoveTo(float x, float y) override;

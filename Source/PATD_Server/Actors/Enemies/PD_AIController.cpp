@@ -11,6 +11,7 @@
 #include "PD_AIController.h"
 #include <math.h>
 #include "GM_Game/PD_GM_GameManager.h"
+#include "PATD_Server/GM_Game/Pathfinder/PD_GM_Pathfinder.h"
 
 APD_AIController::APD_AIController(){
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
@@ -30,10 +31,11 @@ APD_E_Character* ch = Cast<APD_E_Character>(charac);
 	}
 }
 
-void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter) 
+void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter)
 {
 	mapMng = refMap;
 	currentcharac = logicCharacter;
+	pathfinder = new PD_GM_Pathfinder(mapMng);
 
 	actions.listMove.Empty();
 	actions.listAttack.Empty();
@@ -43,14 +45,12 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 
 void APD_AIController::EndAITurnCalculation() {
 
-	
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
 	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), &actions);
 }
 
 
 
-/*
 
 bool APD_AIController::MoveTo(float x, float y)
 {
@@ -80,4 +80,4 @@ bool APD_AIController::ActionTo(float x, float y, uint8 id_action)
 bool APD_AIController::Animate(uint8 typeAnimation)
 {
 	return true;
-}*/
+}
