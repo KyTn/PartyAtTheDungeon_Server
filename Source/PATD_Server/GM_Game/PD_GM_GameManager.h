@@ -14,7 +14,6 @@ class PD_PlayersManager;
 class PD_GM_MapManager;
 class PD_GM_EnemyManager;
 class PD_NW_NetworkManager;
-class PD_GM_AIManager;
 class APD_GM_SplineManager;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
@@ -42,7 +41,6 @@ public:
 	PD_PlayersManager* playersManager;
 	PD_GM_MapManager* mapManager;
 	PD_GM_EnemyManager* enemyManager;
-	PD_GM_AIManager* AIManager;
 
 	APD_GM_SplineManager* splineManager;
 

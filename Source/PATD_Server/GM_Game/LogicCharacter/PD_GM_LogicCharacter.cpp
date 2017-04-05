@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_GM_LogicCharacter.h"
-#include "Actors/Enemies/PD_EnemyController.h"
+#include "Actors/Enemies/PD_AIController.h"
 #include "Actors/Players/PD_CharacterController.h"
 
 #include <math.h>       /* ceil */
@@ -144,13 +144,13 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 			//Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 
 			//Ponemos como ocupado el spline elegido
-			Cast<APD_EnemyController>(controller)->GetSpline()->SetIsUsing(true);
+			Cast<APD_AIController>(controller)->GetSpline()->SetIsUsing(true);
 			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
-			Cast<APD_EnemyController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_EnemyController>(controller)->GetPawn()->GetActorLocation());
+			Cast<APD_AIController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_AIController>(controller)->GetPawn()->GetActorLocation());
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
-			Cast<APD_EnemyController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
+			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
 			//Llamamos al metodo Mover del Controller
-			Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+			Cast<APD_AIController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 
 	}
 	return true;
