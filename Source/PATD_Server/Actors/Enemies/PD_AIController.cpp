@@ -50,7 +50,7 @@ void APD_AIController::EndAITurnCalculation() {
 }
 
 
-
+/*
 
 bool APD_AIController::MoveTo(float x, float y)
 {
@@ -80,4 +80,4 @@ bool APD_AIController::ActionTo(float x, float y, uint8 id_action)
 bool APD_AIController::Animate(uint8 typeAnimation)
 {
 	return true;
-}
+}*/
