@@ -68,7 +68,7 @@ public:
 
 	//Funciones para obtener managers
 	PD_GM_GameManager* getGameManager();
-
+	PD_PlayersManager* getPlayerManager();
 
 	//Overwrites - GameInstance
 	virtual void Init();

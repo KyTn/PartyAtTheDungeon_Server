@@ -31,6 +31,7 @@
 #pragma region Get Managers
 //Funciones para obtener managers
 PD_GM_GameManager* UPD_ServerGameInstance::getGameManager() { return gameManager; }
+PD_PlayersManager* UPD_ServerGameInstance::getPlayerManager() { return playersManager; }
 #pragma endregion 
 
 #pragma region Suscribe to events

@@ -43,13 +43,14 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 
 void APD_AIController::EndAITurnCalculation() {
 
+	
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
 	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), &actions);
 }
 
 
 
-
+/*
 
 bool APD_AIController::MoveTo(float x, float y)
 {
@@ -79,4 +80,4 @@ bool APD_AIController::ActionTo(float x, float y, uint8 id_action)
 bool APD_AIController::Animate(uint8 typeAnimation)
 {
 	return true;
-}
+}*/
