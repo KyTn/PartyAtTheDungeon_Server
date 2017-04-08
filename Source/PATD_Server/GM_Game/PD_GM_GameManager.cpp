@@ -15,7 +15,6 @@
 #include "PD_PlayersManager.h"
 #include "PD_GM_MapManager.h"
 #include "PD_GM_EnemyManager.h"
-#include "PD_GM_AIManager.h"
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_GM_SplineManager.h"
@@ -29,7 +28,6 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	splineManager = inSplineManager;
 	mapManager->_GAMEMANAGER = this;
 	enemyManager = new PD_GM_EnemyManager();
-	AIManager = new PD_GM_AIManager();
 	networkManager = inNetworkManager;
 	networkManager->RegisterObserver(this);
 	structGameState = new StructGameState();
@@ -260,7 +258,6 @@ void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
 		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
-	//	enemyManager->AddActionTurn(AIManager->AIExecEnemy(enemyManager->GetEnemies()[i],mapManager));
 	}
 }
 

@@ -8,6 +8,11 @@
 #include "PATD_Server/Actors/PD_E_Character.h"
 #include "PD_T_Attack.h"
 
+#include "PATD_Server/Actors/Enemies/PD_AIController.h"
+#include "PD_ServerGameInstance.h"
+#include "PD_PlayersManager.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+
 EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
@@ -16,7 +21,26 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 		bool arePlayersNear = OwnerComp.GetBlackboardComponent()->GetValueAsBool("ArePlayersNear");
 		if (arePlayersNear) 
 		{
-			int direccionAttack = OwnerComp.GetBlackboardComponent()->GetValueAsInt("direccionAttack");
+
+
+			FString idCharacterAttacked = OwnerComp.GetBlackboardComponent()->GetValueAsString("idCharacterAttacked");
+			APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(AIController->GetGameInstance());
+			PD_GM_LogicCharacter* logicCharacterAttacked =SGI->getPlayerManager()->GetCharacterByID(idCharacterAttacked);
+			
+			FStructTurnOrders* turnStruct =AIController->GetTurnOrders();
+			
+			FStructOrderAction attackOrder = FStructOrderAction();
+			attackOrder.orderType = static_cast<uint8>(EOrderAction::Attack);
+			FStructLogicPosition logicPositionStruct = FStructLogicPosition();
+			logicPositionStruct.positionX = logicCharacterAttacked->GetCurrentLogicalPosition().GetX();
+			logicPositionStruct.positionY = logicCharacterAttacked->GetCurrentLogicalPosition().GetY();
+			attackOrder.targetLogicPosition = logicPositionStruct;
+
+			turnStruct->listAttack.Add(attackOrder);
+			
+			/*int direccionAttack = OwnerComp.GetBlackboardComponent()->GetValueAsInt("direccionAttack");
 			switch (direccionAttack) {
 				case 1:
 					;
@@ -37,7 +61,7 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 				default:
 					;
 					break;
-			}
+			}*/
 
 			return EBTNodeResult::Succeeded;
 		}
