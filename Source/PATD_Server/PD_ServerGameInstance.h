@@ -33,7 +33,7 @@ class PD_GM_EnemyManager;
 *
 */
 	
-UCLASS()															//Interfaz observer para reaccionar a eventos del netmanager
+UCLASS() //Interfaz observer para reaccionar a eventos del netmanager
 class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_NW_iEventObserver
 	
 
@@ -59,12 +59,18 @@ public:
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
 	// PD_GM_EnemyManager* enemyManager; no tiene sentido un enemymanager en el instance. Está en el GameManager
+
+
+	//Camara Server del nivel 4
+	ACameraActor* CameraServer;
+
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
 	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test5.dungeon";
 	int mapX = 0; //Ancho del mapa
 	int mapY = 0; // Largo del mapa
+
 
 	//Funciones para obtener managers
 	PD_GM_GameManager* getGameManager();
@@ -130,4 +136,36 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	void GetMapsize(float &SizemapX, float &SizemapY);
 
+	///Funciones para el manejo de la camara
+
+	//Registra la Camara en el GameInstance para su uso
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	void Camera_Register(ACameraActor* inCameraServer);
+
+	//Mueve la camara en funcion de la posicion de los players
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	void Camera_MoveOnlyPlayers(); 
+
+	//Mueve la camara en funcion de la posicion de los players
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	void Camera_MoveInMovementPhase(TArray<FVector> targetPositions);
+
+	//modifica el Zoom o el FOV de la camara en funcion de los players
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	void Camera_ZoomOnlyPlayers();
+
+	//modifica el Zoom o el FOV de la camara en funcion de los players
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	void Camera_ZoomInMovementPhase(TArray<FVector> targetPositions);
+
+	//Calcula la posicion intermedia entre todos los players  - Para Move()
+	FVector FindAvaragePosition(TArray<FVector> desiredPositions);
+
+	//Calcula el FOV de la camara - Para Zoom()
+	float FindRequiredSize(TArray<FVector> desiredPositions);
+
+
+
+	//Configura la posicion inicial de la camara
+	//void SetStartPositionAndSize();
 };

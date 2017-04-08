@@ -37,7 +37,6 @@ METODOS DEL ACTOR
 
 void APD_SplineActors::RemovePoints() //Remove todos los puntos del Spline
 {
-	UE_LOG(LogTemp, Warning, TEXT("APD_SplineActors::RemovePoints()"));
 	spline->ClearSplinePoints(true); //Con true se hace UPDATE a los splinesPoints
 }
 

@@ -9,7 +9,7 @@
 #include "Actors/PD_GenericController.h"
 #include "Actors/Players/PD_CharacterController.h"
 #include "Components/SplineComponent.h"
-
+#include "../PD_ServerGameInstance.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -478,6 +478,9 @@ void PD_GM_GameManager::VisualTickControl() {
 }*/
 
 void PD_GM_GameManager::VisualMoveTick() {
+	//Array para guardar las nuevas posiciones de destinos y calcular el movimiento de la camara en la visualizacion
+	TArray<PD_MG_LogicPosition> newPositionsToMove = TArray<PD_MG_LogicPosition>();
+
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick"));
 	int players = -1;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
@@ -499,22 +502,46 @@ void PD_GM_GameManager::VisualMoveTick() {
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
-
+		
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght before Pop:%d "), listMove->Num());
 
 		FStructOrderAction visualAction = listMove->Pop();
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght after Pop:%d "), listMove->Num());
+
+		//Se añade al vector la nueva posicion a la que moverse ------- Cambiar cuando se pase varias posiciones....
+		newPositionsToMove.Add(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 
 		//Peta al no tener actor ni controller
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
 		
 		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
 		
-
-
 		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 
 	}
+
+	//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+	if (SGI)
+	{
+		//Pasas todo el Array de posiciones logicas a fisicas para el meotodo MOVER
+		TArray<FVector> targetPositions = TArray<FVector>();
+		for (int j = 0; j < newPositionsToMove.Num(); j++)
+		{
+			targetPositions.Add(mapManager->LogicToWorldPosition(newPositionsToMove[j]));
+		}
+
+		//Añades todas las posiciones de los jugadores del turno anterior al Array
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		{
+			targetPositions.Add(playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetActorLocation());
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager"));
+		SGI->Camera_MoveInMovementPhase(targetPositions);
+		SGI->Camera_ZoomInMovementPhase(targetPositions);
+	}
+
 }
 
 void PD_GM_GameManager::VisualAttackTick() {
