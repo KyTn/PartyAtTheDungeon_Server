@@ -44,10 +44,10 @@ int PD_GM_EnemyManager::GetMaxLenghtActions(EActionPhase phase) {
 	int indexplayer = this->GetEnemyMaxLenghtActions(phase);
 	if (indexplayer != -1) {
 		if (phase == EActionPhase::Move) {
-			return this->listTurnOrders[indexplayer]->listMove.Num();
+			return this->listTurnOrders[indexplayer]->positionsToMove.Num();
 		}
 		else if (phase == EActionPhase::Attack) {
-			return this->listTurnOrders[indexplayer]->listAttack.Num();
+			return this->listTurnOrders[indexplayer]->actions.Num();
 		}
 	}
 	return 0;
@@ -61,21 +61,22 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 	for (int i = 0; i<this->listTurnOrders.Num(); i++) {
 	//	(LogTemp, Error, TEXT("Enemigos totales: %i"), this->listTurnOrders.Num());
 	//	UE_LOG(LogTemp, Error, TEXT("Añade acciones enemy:%i"), i);
-		TArray<FStructOrderAction> listActions;
+
+		int listActions;
 		if (phase == EActionPhase::Move) {
-			if (this->listTurnOrders[i]->listMove.Num()>0)
+			if (this->listTurnOrders[i]->positionsToMove.Num() > 0) {}
 			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
-			listActions = this->listTurnOrders[i]->listMove;
+			listActions = this->listTurnOrders[i]->positionsToMove.Num();
 		}
 		else if (phase == EActionPhase::Attack) {
 			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i ataca"), i);
-			if(this->listTurnOrders[i]->listAttack.Num()>0)
-			listActions = this->listTurnOrders[i]->listAttack;
+			if(this->listTurnOrders[i]->actions.Num()>0) {}
+			listActions = this->listTurnOrders[i]->actions.Num();
 		}
 
 
-		if (numTicks < (listActions.Num())) {
-			numTicks = listActions.Num();
+		if (numTicks < (listActions)) {
+			numTicks = listActions;
 			indexPlayer = i;
 		};
 	}
@@ -120,7 +121,7 @@ bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
 
 	for (int i = 0; i < enemies.Num();i++) {
 
-		if ((listTurnOrders[i]->listAttack.Num() == 0) && (listTurnOrders[i]->listMove.Num() == 0)) {
+		if ((listTurnOrders[i]->actions.Num() == 0) && (listTurnOrders[i]->positionsToMove.Num() == 0)) {
 			return false;
 		}
 	}

@@ -12,7 +12,7 @@
 //=================================
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FStructLogicPosition {
 
 	GENERATED_BODY()
@@ -24,6 +24,26 @@ struct FStructLogicPosition {
 
 	FStructLogicPosition() {
 
+	}
+
+};
+
+//Struct que se usa para crear un target en una accion (ataque o habilidad)
+USTRUCT()
+struct FStructTargetToAction {
+
+	GENERATED_BODY()
+
+		UPROPERTY()
+		uint32 id_action; //puede ser ataque basico, habilidad, defensa
+	UPROPERTY()
+		TArray<FStructLogicPosition> positions;
+	UPROPERTY()
+		TArray<FString> id_character;
+
+	FStructTargetToAction() {
+		positions = TArray<FStructLogicPosition>();
+		id_character = TArray<FString>();
 	}
 
 };
@@ -408,7 +428,7 @@ struct FStructOrderMenu : public FStructGeneric
 
 };
 
-USTRUCT()
+/*USTRUCT()
 struct FStructTurnOrders : public FStructGeneric
 {
 	GENERATED_BODY()
@@ -424,7 +444,33 @@ struct FStructTurnOrders : public FStructGeneric
 		structType = static_cast<uint8>(UStructType::FStructTurnOrders);
 	}
 };
+*/
+USTRUCT()
+struct FStructTurnOrders : public FStructGeneric
+{
+	GENERATED_BODY()
 
+		UPROPERTY()
+		TArray<uint32> consumablesToConsume;
+
+	UPROPERTY()
+		TArray<FStructLogicPosition> positionsToMove;
+
+	UPROPERTY()
+		TArray<uint32> interactuablesToInteract;
+
+	UPROPERTY()
+		TArray<FStructTargetToAction> actions;
+
+	FStructTurnOrders() {
+		consumablesToConsume = TArray<uint32>();
+		positionsToMove = TArray<FStructLogicPosition>();
+		interactuablesToInteract = TArray<uint32>();
+		actions = TArray<FStructTargetToAction>();
+
+		structType = static_cast<uint8>(UStructType::FStructTurnOrders);
+	}
+};
 
 
 USTRUCT()

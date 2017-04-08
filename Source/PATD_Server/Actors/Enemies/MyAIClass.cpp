@@ -99,7 +99,7 @@ void MyAIClass::HAddAttack()
 		attack.targetDirection = 2;//atacar abajo
 	else if (currentPos.GetX() < ActionPos.GetX())
 		attack.targetDirection = 1;//atacar arriba
-	actions->listAttack.Add(attack);
+//	actions->.Add(attack);
 	AP--;
 	Attacked = true;
 	//UE_LOG(LogTemp, Error, TEXT("Añade ataque"));
@@ -139,7 +139,8 @@ void MyAIClass::HAddMove()
 	currentPos.SetX(move.targetLogicPosition.positionX);
 	currentPos.SetY(move.targetLogicPosition.positionY);
 
-	actions->listMove.Add(move);
+
+	///actions->listMove.Add(move);
 	AP--;
 	//UE_LOG(LogTemp, Error, TEXT("Añade movimiento"));
 }

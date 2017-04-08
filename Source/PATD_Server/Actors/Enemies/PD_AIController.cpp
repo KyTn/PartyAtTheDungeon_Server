@@ -37,8 +37,8 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 	currentcharac = logicCharacter;
 	pathfinder = new PD_GM_Pathfinder(mapMng);
 
-	actions.listMove.Empty();
-	actions.listAttack.Empty();
+	actions.positionsToMove.Empty();
+	actions.actions.Empty();
 	BlackboardComp->SetValueAsInt("AP", 5);
 }
 

@@ -38,7 +38,7 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 			logicPositionStruct.positionY = logicCharacterAttacked->GetCurrentLogicalPosition().GetY();
 			attackOrder.targetLogicPosition = logicPositionStruct;
 
-			turnStruct->listAttack.Add(attackOrder);
+			///turnStruct->listAttack.Add(attackOrder);
 			
 			/*int direccionAttack = OwnerComp.GetBlackboardComponent()->GetValueAsInt("direccionAttack");
 			switch (direccionAttack) {

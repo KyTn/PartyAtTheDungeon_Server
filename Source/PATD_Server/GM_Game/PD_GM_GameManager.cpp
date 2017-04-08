@@ -354,9 +354,9 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			TArray<FStructOrderAction> listMove; 
 			PD_GM_LogicCharacter* logicCharacter=nullptr;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-				if (playersManager->GetDataStructPlayer(i)->turnOrders->listMove.Num() > tick)
+				if (playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num() > tick)
 				{
-					listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
+					//listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 					FStructOrderAction* order = &listMove[tick];
@@ -367,7 +367,7 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-				listMove = enemyManager->GetTurnOrders(i)->listMove;
+				//listMove = enemyManager->GetTurnOrders(i)->listMove;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 				FStructOrderAction* order = &listMove[tick];
@@ -410,9 +410,9 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 			TArray<FStructOrderAction> listAttack;
 			PD_GM_LogicCharacter* logicCharacter = nullptr;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-				if (playersManager->GetDataStructPlayer(i)->turnOrders->listAttack.Num() > tick)
+				if (playersManager->GetDataStructPlayer(i)->turnOrders->actions.Num() > tick)
 				{
-					listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
+					//listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
 					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 					FStructOrderAction order = listAttack[tick];
@@ -421,7 +421,7 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-				listAttack = enemyManager->GetTurnOrders(i)->listAttack;
+				//listAttack = enemyManager->GetTurnOrders(i)->listAttack;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 				FStructOrderAction order = listAttack[tick];
@@ -491,11 +491,11 @@ void PD_GM_GameManager::VisualMoveTick() {
 		TArray<FStructOrderAction>* listMove=nullptr;
 		PD_GM_LogicCharacter* logicCharacter=nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-			listMove = &playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
+			//listMove = &playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 		}
 		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-			listMove = &enemyManager->GetTurnOrders(i)->listMove;
+			//listMove = &enemyManager->GetTurnOrders(i)->listMove;
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
@@ -550,12 +550,12 @@ void PD_GM_GameManager::VisualAttackTick() {
 	PD_GM_LogicCharacter* logicCharacter=nullptr;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		indexCharacter = playersManager->GetPlayerMaxLenghtActions(EActionPhase::Attack);
-		listAttack = &playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
+	//	listAttack = &playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
 		logicCharacter = playersManager->GetDataStructPlayer(indexCharacter)->logic_Character;
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		indexCharacter = enemyManager->GetEnemyMaxLenghtActions(EActionPhase::Attack);
-		listAttack = &enemyManager->GetTurnOrders(indexCharacter)->listAttack;
+//		listAttack = &enemyManager->GetTurnOrders(indexCharacter)->listAttack;
 		logicCharacter = enemyManager->GetEnemies()[indexCharacter];
 	}
 

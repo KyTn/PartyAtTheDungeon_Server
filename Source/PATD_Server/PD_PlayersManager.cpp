@@ -60,7 +60,7 @@ bool PD_PlayersManager::AllPlayersReady() {
 bool PD_PlayersManager::AllPlayersSendOrders() {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersSendOrders"));
 	for (StructPlayer* player : dataPlayers) {
-		if ( (player->turnOrders->listAttack.Num() == 0 ) && ( player->turnOrders->listMove.Num() == 0 )) {
+		if ( (player->turnOrders->actions.Num() == 0 ) && ( player->turnOrders->positionsToMove.Num() == 0 )) {
 			return false;
 		}
 	}
@@ -105,10 +105,10 @@ int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {
 	
 	if (indexplayer != -1) {
 		if (phase == EActionPhase::Move) {
-			return this->GetDataStructPlayer(indexplayer)->turnOrders->listMove.Num();
+			return this->GetDataStructPlayer(indexplayer)->turnOrders->positionsToMove.Num();
 		}
 		else if (phase == EActionPhase::Attack) {
-			return this->GetDataStructPlayer(indexplayer)->turnOrders->listAttack.Num();
+			return this->GetDataStructPlayer(indexplayer)->turnOrders->actions.Num();
 		}
 	}
 	return 0;
@@ -122,21 +122,21 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 	int indexPlayer=-1;
 
 	for (int i = 0; i < this->GetNumPlayers(); i++) {
-		TArray<FStructOrderAction> listActions;
+		int listActions;
 		if (phase == EActionPhase::Move) {
-			listActions = this->GetDataStructPlayer(i)->turnOrders->listMove;
+			listActions = this->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num();
 		}
 		else if (phase == EActionPhase::Attack) {
-			listActions = this->GetDataStructPlayer(i)->turnOrders->listAttack;
+			listActions = this->GetDataStructPlayer(i)->turnOrders->actions.Num();
 		}
 
-		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : Phase: % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions.Num());
+		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : Phase: % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions);
 
-		if (numTicks < (listActions.Num())) {
-			numTicks = listActions.Num();
+		if (numTicks < (listActions)) {
+			numTicks = listActions;
 			indexPlayer = i;
 		}
-		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : : % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions.Num());
+		UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions : : % d  :index: %d  :lenght: %d"), static_cast<uint8>(phase), i, listActions);
 
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("PD_PlayersManager::GetPlayerMaxLenghtActions: devuelto %d"), indexPlayer);

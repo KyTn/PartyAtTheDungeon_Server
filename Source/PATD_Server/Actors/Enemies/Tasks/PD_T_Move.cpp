@@ -50,7 +50,7 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 				logicPositionStruct.positionY = logicPos.GetY();
 				moveOrder.targetLogicPosition = logicPositionStruct;
 
-				turnStruct->listAttack.Add(moveOrder);
+///				turnStruct->listAttack.Add(moveOrder);
 			}
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", ap-minim.Num());
 		}
