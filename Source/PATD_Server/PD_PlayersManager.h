@@ -55,4 +55,12 @@ public:
 	TArray<StructPlayer*> GetDataPlayers() { return dataPlayers;}
 
 	PD_GM_LogicCharacter* GetCharacterByID(FString id);
+
+#pragma region Map Already Instantiated FUNCTIONS
+
+	bool Check_All_Players_Have_Map_Already_Instantiated();
+	void Mark_Player_As_Map_Already_Instantiated(int player);
+
+#pragma endregion
+
 };

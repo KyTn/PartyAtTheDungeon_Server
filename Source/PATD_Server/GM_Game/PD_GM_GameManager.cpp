@@ -19,6 +19,7 @@
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_GM_SplineManager.h"
 
+#include "Actors/Enemies/PD_AIController.h"
 
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
 {
@@ -40,6 +41,10 @@ PD_GM_GameManager::~PD_GM_GameManager()
 {
 }
 
+
+#pragma region State Machine
+
+
 void PD_GM_GameManager::InitState() {
 	
 	ChangeState(EGameState::Instantiate_Map);
@@ -47,20 +52,24 @@ void PD_GM_GameManager::InitState() {
 }
 
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
-	/*
+	
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		// Si se recibe del servidor un Start_Match, ir a ese estado. 
-		if (inEventType == UStructType::FStructClientStartMatchOnGM) {
+		if (inEventType == UStructType::FStructClientMapAlreadyInstantiated) {
+			// marcamos al player que ya ha instanciado el mapa
+			playersManager->Mark_Player_As_Map_Already_Instantiated(inPlayer);
+
+			// Si todos han instanciado el mapa, mandamos mensaje de pasar al Start_Match a los clientes
+			if (playersManager->Check_All_Players_Have_Map_Already_Instantiated()) {
+				Send_FStructClientStartMatchOnGM();
+			}
 			ChangeState(EGameState::Start_Match);
 		}
 	}
 	else if (structGameState->enumGameState == EGameState::Start_Match) {
-		if (inEventType == UStructType::FStructClientCanGenerateOrders) {
-			ChangeState(EGameState::WaitingPlayerOrders);
-		}
+		
 	}
-	else*/ 
-	if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) 
+	else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) 
 	{
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
 
@@ -73,7 +82,13 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 }
 
 bool PD_GM_GameManager::SuscribeToEvents(int inPlayer, UStructType inType) {
-	if (inType == UStructType::FStructTurnOrders) return true; //Suscrito a TurnOrders
+	if (inType == UStructType::FStructTurnOrders) return true;								
+	else if (inType == UStructType::FStructClientCanGenerateOrders) return true;			
+	else if (inType == UStructType::FStructClientMapAlreadyInstantiated) return true;		
+	else if (inType == UStructType::FStructClientStartMatchOnGM) return true;				
+	else if (inType == UStructType::FStructInstatiatePlayers) return true;					
+	else if (inType == UStructType::FStructOrderMenu) return true;							
+	else if (inType == UStructType::FStructUpdateTurn) return true;							
 	else return false;
 }
 
@@ -84,14 +99,12 @@ void PD_GM_GameManager::UpdateState() {
 
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		//Transicion inmediata de estado
-
-		this->ChangeState(EGameState::Start_Match);
+		//this->ChangeState(EGameState::Start_Match);
 		
 
 	}else if (structGameState->enumGameState == EGameState::Start_Match) {
 		//Transicion inmediata de estado
-		
-
+		// pero este estado está pensado para la presentacion y animación inicial del mapa y de la mision
 		this->ChangeState(EGameState::WaitingPlayerOrders);
 		
 	}else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
@@ -244,6 +257,21 @@ void PD_GM_GameManager::ChangeState(EGameState newState) {
 	structGameState->enumGameState = newState;
 	OnBeginState();
 }
+
+#pragma endregion
+
+#pragma region Send to Clients Functions
+
+// Si todos los clientes han enviado un FStructClientMapAlreadyInstantiated, 
+// se le envia un FStructClientStartMatchOnGM para que puedan pasar al Start_Match
+bool PD_GM_GameManager::Send_FStructClientStartMatchOnGM() {
+	FStructClientStartMatchOnGM msg = FStructClientStartMatchOnGM();
+	return networkManager->SendNow(&msg, -1);
+}
+
+#pragma endregion
+
+
 
 /*
 //Funciones de gestion de acciones

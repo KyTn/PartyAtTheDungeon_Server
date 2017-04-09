@@ -7,7 +7,6 @@
 #include "Structs/PD_ServerStructs.h"//Para todos los structs
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
-
 PD_GM_EnemyManager::PD_GM_EnemyManager()
 {
 }
@@ -62,7 +61,7 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 	//	(LogTemp, Error, TEXT("Enemigos totales: %i"), this->listTurnOrders.Num());
 	//	UE_LOG(LogTemp, Error, TEXT("Añade acciones enemy:%i"), i);
 
-		int listActions;
+		int listActions = 0;
 		if (phase == EActionPhase::Move) {
 			if (this->listTurnOrders[i]->positionsToMove.Num() > 0) {}
 			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);

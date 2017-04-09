@@ -58,6 +58,9 @@ public:
 	StructGamePhase* structGamePhase;
 	//Funciones de gestion del estado (maquina de estados)
 
+
+#pragma region State Machine
+
 	//Funciones de configuracion de la maquina
 	//Transiciones
 	void UpdateState();
@@ -72,11 +75,28 @@ public:
 	void InitState();
 
 
+#pragma endregion
+
+
+#pragma region Send to Clients Functions
+
+	// Si todos los clientes han enviado un FStructClientMapAlreadyInstantiated, 
+	// se le envia un FStructClientStartMatchOnGM para que puedan pasar al Start_Match
+	bool Send_FStructClientStartMatchOnGM();
+
+#pragma endregion
+
+
+
 	
+#pragma region Phase Machine 
+
 	void UpdatePhase();
 	void OnBeginPhase();
 	void ChangePhase(EServerPhase newPhase);
 	void InitPhase();
+
+#pragma endregion
 
 	//Funciones para crear las ordenes de los enemigos
 	void CreateEnemyOrders();

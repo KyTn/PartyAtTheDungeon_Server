@@ -122,7 +122,7 @@ int PD_PlayersManager::GetPlayerMaxLenghtActions(EActionPhase phase) {
 	int indexPlayer=-1;
 
 	for (int i = 0; i < this->GetNumPlayers(); i++) {
-		int listActions;
+		int listActions = 0;
 		if (phase == EActionPhase::Move) {
 			listActions = this->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num();
 		}
@@ -175,3 +175,38 @@ PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByID(FString id) {
 	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
 	return nullptr;
 }
+
+
+#pragma region Map Already Instantiated FUNCTIONS
+
+bool PD_PlayersManager::Check_All_Players_Have_Map_Already_Instantiated() {
+
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::Check_All_Players_Have_Map_Already_Instantiated()"));
+
+
+	for (int i = 0; i < dataPlayers.Num(); i++) 
+	{
+		if (!dataPlayers[i]->mapAlreadyInstantiated)
+		{
+
+			UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::Check_All_Players_Have_Map_Already_Instantiated() player with no map instantiated found! ID_PLAYER=%d"), dataPlayers[i]->ID_PLAYER);
+			return false;
+		}
+	}
+	return true;
+
+}
+
+
+void PD_PlayersManager::Mark_Player_As_Map_Already_Instantiated(int player) {
+
+	for (int i = 0; i < dataPlayers.Num(); i++) {
+		if (dataPlayers[i]->ID_PLAYER == player) {
+			dataPlayers[i]->mapAlreadyInstantiated = true;
+			UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::Mark_Player_As_Map_Already_Instantiated() Update mapAlreadyInstantiated on ID_PLAYER=%d"), dataPlayers[i]->ID_PLAYER);
+
+		}
+	}
+}
+
+#pragma endregion

@@ -14,6 +14,10 @@ struct StructPlayer {
 
 	//Menu options and configuration
 	bool readyMenu;
+	
+	// Si el cliente del jugador a instanciado ya el mapa o no. 
+	bool mapAlreadyInstantiated;
+
 
 	bool clientMaster;
 	//Ingame data
