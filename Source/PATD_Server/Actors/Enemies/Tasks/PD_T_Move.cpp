@@ -42,15 +42,12 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 
 			for (PD_MG_LogicPosition logicPos : minim)
 			{
-				FStructOrderAction moveOrder = FStructOrderAction();
-				moveOrder.orderType = static_cast<uint8>(EOrderAction::Move);
 				FStructLogicPosition logicPositionStruct = FStructLogicPosition();
 
 				logicPositionStruct.positionX = logicPos.GetX();
 				logicPositionStruct.positionY = logicPos.GetY();
-				moveOrder.targetLogicPosition = logicPositionStruct;
-
-///				turnStruct->listAttack.Add(moveOrder);
+			
+				turnStruct->positionsToMove.Add(logicPositionStruct);
 			}
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", ap-minim.Num());
 		}
