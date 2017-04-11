@@ -407,8 +407,15 @@ void UPD_ServerGameInstance::OnBeginState() {
 		*/
 		//FIN CODIGO PROVISIONAL
 
+		//No hacemos broadcast porque enviamos un paquete a cada uno indicando cual es el ID de su propio personaje
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+			listInstantiatePlayers.idClientCharacter= playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+			networkManager->SendNow(&listInstantiatePlayers, i);
+		}
+
 		//Broadcast del listInstantiatePlayers
-		networkManager->SendNow(&listInstantiatePlayers, -1);
+	//	networkManager->SendNow(&listInstantiatePlayers, -1);
+
 		ChangeState(EServerState::GameInProcess);
 		
 	}
