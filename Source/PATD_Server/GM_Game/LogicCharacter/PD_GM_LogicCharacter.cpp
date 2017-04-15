@@ -85,44 +85,15 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderActio
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveToLogicPosition --> Nueva Posicion Jugador: %f %f"), order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
 
 	currentLogicalPosition = PD_MG_LogicPosition(order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
-	movingLogicalPosition = PD_MG_LogicPosition(order->targetLogicPosition.positionX, order->targetLogicPosition.positionY);
 	
 	return &currentLogicalPosition;
 }
 
 
-bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosition)
+bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsToMove)
 {
-	/*
-	- OBJETIVO: Mueve al personaje hasta la posicion fisica establecida anteriormente en simulacion
-	- PROCESO:
-	1. Recibe la posicion logica a la que se tiene que mover el personaje durante la Fase de Movimiento
-	2. Con el MapManager convierte la posicion logica en fisica
-	3.  Actualiza  las variables currentLogicalPosition a la recibida por parametro
-	4.Con el PlayerManager coge su personaje y llama a la funcion MoveTo() de su controlador
-	- SE LLAMA DESDE: Desde el GameManager cuando sea el turno de visualizar el movimiento.
-	Devuelve true si todo ha ido bien, si algo ha fallado, devuelve false (normalmente a raiz de que la funcion move del controlador
-	devuelva tambien false
-	*/
 
-	//Ponemos como ocupado el spline elegido
-	//logicCharacter->GetController()->GetSpline()->SetIsUsing(true);
-	//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
-	//logicCharacter->GetController()->GetSpline()->SetToActorLocation(logicCharacter->GetController()->GetPawn()->GetActorLocation());
-	//Seteamos el Spline Component con los puntos a los que queremos movernos
-	//FVector newPositionWorld = mapManager->LogicToWorldPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 	
-	
-	
-	FVector realPosition = mapMng->LogicToWorldPosition(targetPosition);
-
-	TArray<FVector> WorldPositionToMove = TArray<FVector>();
-	//como primer indice del array se añade la posicion actual del  character
-	//mejor transformar la posicion anterior de logic a Mundo
-	WorldPositionToMove.Add(Cast<APD_CharacterController>(controller)->GetPawn()->GetActorLocation());
-	WorldPositionToMove.Add(realPosition);
-
-
 	if (!controller) {
 		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
 	}
@@ -135,9 +106,9 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
 			Cast<APD_CharacterController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_CharacterController>(controller)->GetPawn()->GetActorLocation());
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
-			Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
+			Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(listPositionsToMove);
 			//Llamamos al metodo Mover del Controller
-			Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+			Cast<APD_CharacterController>(controller)->MoveTo(0,0); ///Hablar con CARLOS y MARCOS para ver como tocar esto sin afectar a su EnemyController
 	}
 	else {
 		
@@ -148,9 +119,9 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(PD_MG_LogicPosition targetPosi
 			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
 			Cast<APD_AIController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_AIController>(controller)->GetPawn()->GetActorLocation());
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
-			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(WorldPositionToMove);
+			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(listPositionsToMove);
 			//Llamamos al metodo Mover del Controller
-			Cast<APD_AIController>(controller)->MoveTo(realPosition.X, realPosition.Y);
+			Cast<APD_AIController>(controller)->MoveTo(0,0);
 
 	}
 	return true;
@@ -317,7 +288,9 @@ ECharacterType PD_GM_LogicCharacter::GetTypeCharacter() { return type_character;
 APD_GenericController* PD_GM_LogicCharacter::GetController() { return controller; }
 ACharacter* PD_GM_LogicCharacter::GetCharacterBP() { return character_Player_BP; }
 PD_MG_LogicPosition PD_GM_LogicCharacter::GetCurrentLogicalPosition() { return currentLogicalPosition; }
-PD_MG_LogicPosition PD_GM_LogicCharacter::GetMovingLogicalPosition() { return movingLogicalPosition; }
+TArray<PD_MG_LogicPosition> PD_GM_LogicCharacter::GetMovingLogicalPosition() { return movingLogicalPosition; }
+
+bool PD_GM_LogicCharacter::GetIsStoppingByCollision() { return isStoppingByCollision; }
 
 //SET
 void PD_GM_LogicCharacter::SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL)
@@ -428,5 +401,5 @@ void PD_GM_LogicCharacter::SetTypeCharacter(ECharacterType nID_character) { type
 void PD_GM_LogicCharacter::SetController(APD_GenericController* ncontroller) { controller = ncontroller; }
 void PD_GM_LogicCharacter::SetCharacterBP(ACharacter* ncharacter_Player_BP) { character_Player_BP = ncharacter_Player_BP; }
 void PD_GM_LogicCharacter::SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition) { currentLogicalPosition = ncurrentLogicalPosition; }
-void PD_GM_LogicCharacter::SetMovingLogicalPosition(PD_MG_LogicPosition nmovingLogicalPosition) { movingLogicalPosition = nmovingLogicalPosition; }
 void PD_GM_LogicCharacter::SetMapManager(PD_GM_MapManager* nmapManager) { mapMng = nmapManager; }
+void PD_GM_LogicCharacter::SetIsStoppingByCollision(bool nIsStoppingByCollision) { isStoppingByCollision = nIsStoppingByCollision; }

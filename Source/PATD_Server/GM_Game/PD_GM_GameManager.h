@@ -115,6 +115,12 @@ public:
 	void LogicAttackTick(int tick, int numCharacters);
 	void LogicItemTick(int tick);
 
+	//Funciones para gestionar el choque - devuelve si se ha chocado y a perdido (true) o no ha chocado o no ha perdido éste (false)
+	bool  CheckAndManageCollisionWithPlayers(int indexDataPlayers, int tick, int numCharacters);
+	bool  CheckAndManageCollisionWithEnemies(int indexDataPlayers, int tick, int numCharacters);
+	bool  CheckAndManageCollisionWithMapElements(int indexDataPlayers, int tick, int  numCharacters);
+	bool  CheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck);
+
 	void CallbackAttack();
 
 	//Funciones de gestion de visualizacion (visualization manager)

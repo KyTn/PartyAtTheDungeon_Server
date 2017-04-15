@@ -330,14 +330,20 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 	int numTicks = 0;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Move);
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		{
+			playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Empty(); //limpiar el array de moverse logicamente
+		}
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
+		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+		{
+			enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Empty(); //limpiar el array de moverse logicamente
+		}
 	}
 
 	
-
-
 
 	//Ejecutar los ticks
 	for (int i = 0; i < numTicks; i++) {
@@ -382,20 +388,36 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			TArray<FStructOrderAction> listMove; 
 			PD_GM_LogicCharacter* logicCharacter=nullptr;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-				if (playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num() > tick)
+				if (!playersManager->GetDataStructPlayer(i)->logic_Character->GetIsStoppingByCollision() && playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num() > tick)
 				{
+					
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
+
+					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithPlayers(i, tick, numCharacters));
+
+					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithEnemies(i, tick, numCharacters));
+
+					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
+
+
+					/*
 					//listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 					FStructOrderAction* order = &listMove[tick];
-
-					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
-
 					logicCharacter->MoveToLogicPosition(order);
+					*/
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-				//listMove = enemyManager->GetTurnOrders(i)->listMove;
+				
+				enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithPlayers(i, tick, numCharacters));
+
+				enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithEnemies(i, tick, numCharacters));
+
+				enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
+				
+				/*
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
 				FStructOrderAction* order = &listMove[tick];
@@ -403,30 +425,197 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
 
 				logicCharacter->MoveToLogicPosition(order);
+				*/
 			}
 	
 			
-		
-		///TODO ALVARO
-		//structPlayer->logicCharacter->ProcessMoveOrder(order);
-
-		//structPlayer->turnOrders->listMove.Remove(order); //O marcar como consumida
-
-		//Llamada a moverse actor provisional
-		//Aqui en realidad no tendriamos la posicion final en el logicCharacter, pues podria haber choques 
-		//al moverse los siguientes personajes.
-		
-		///TODO ALVARO
-		//PD_GM_PlayerLogicCharacter* logicCharacter = structPlayer->logicCharacter;
-		//PD_MG_LogicPosition* logicPosition = logicCharacter->getLogicPosition(); 
-		//FVector* realPosition = mapManager->LogicToWorldPosition(logicPosition);
-		
-		///TODO ALVARO
-		//playersManager->getDataStructPlayer(i)->actorController->Move(realPosition->X, realPosition->Y);
-
 	}
 	//Comprobar que choques.//Resolucion de conflictos
 }
+
+
+
+
+//Funciones de CHOQUE
+bool  PD_GM_GameManager::CheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck)
+{
+	//Devuelve true si hay algo en esa posicion - False si esta libre
+	bool thereIsSomething = false;
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++) //Check For Players
+	{
+		if (positionToCheck == playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition())
+			thereIsSomething = true;
+	}
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		if (positionToCheck == enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition())
+			thereIsSomething = true;
+	}
+
+	return thereIsSomething;
+
+}
+
+
+bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers, int tick, int numCharacters)
+{
+	/*
+		Comprueba si ha habido choque con los otros jugadores durante la fase de movimiento
+	1 - Comprueba su posicion con todos los otros jugadores en el tick
+	2 - Si ha habido chocque, comprobar quien sale perdiendo. 
+	3 - Actualizar las posiciones logicas respecto a esto -> movingLogicalPos.Add(nuevaposicion);
+	4 - Actualizar al otro player su bool isStoppingPlayer
+	5 - Seguir comprobando hasta que no queden jugadores.
+	*/
+	PD_MG_LogicPosition LogicPosPlayerToCheck;
+	PD_MG_LogicPosition LogicPosOtherPlayerToCheck;
+	bool isCollisionOrCollisionLost = false;
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		  LogicPosPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX,
+			playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		LogicPosPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionX,
+			enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionY);
+	}
+	
+
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) //Los jugadores comprueban su posicion con el resto de jugadores en ese mismo tick
+	{
+		for (int i = 0; i < numCharacters; i++)
+		{
+			if (indexDataPlayers != i)
+			{
+				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionX,
+					playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionY);
+				if (LogicPosPlayerToCheck == LogicPosOtherPlayerToCheck) //Si las dos son iguales, se va a producir una collision -> se comprueba quien gana
+				{
+					if (playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->GetTotalStats()->CH >=
+						playersManager->GetDataStructPlayer(i)->logic_Character->GetTotalStats()->CH)
+					{
+						//El Jugador a comprobar gana el choque, El otro se pone su variable isStoppingByCollision a true y se busca una posicion a la que ir
+						playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(true);
+
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosOtherPlayerToCheck);
+						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+						{
+							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+								LogicPosOtherPlayerToCheck = possibleNewPositionToMove[j]; 
+							break;
+						}
+
+						playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Add(LogicPosOtherPlayerToCheck);
+
+					}
+					else
+					{
+						//El Jugador a comprobar pierde el choque, se setea la variable isCollisionOrCollisionLost a true y se da una nueva posicion del mapa a la que se desplaza el jugador
+						isCollisionOrCollisionLost = true;
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosPlayerToCheck);
+						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+						{
+							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+								LogicPosPlayerToCheck = possibleNewPositionToMove[j];
+							break;
+						}
+					}
+				}
+			}
+		}
+		//Añadir al Array movingLogicalPosition la posicion que se esta comprobando para ver si se mueve ahi u es otra diferente por el choque
+		playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->GetMovingLogicalPosition().Add(LogicPosPlayerToCheck);
+		return isCollisionOrCollisionLost;
+	}
+
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
+	{
+		//A priori cuando es el turno de movimiento de los enemigos, no se sabe cuando pueden chocar con un player, para que sea correcto
+		//los desplazamientos de los jugadores-enemigos, este se tiene que hacer cuando collision REALMENTE-- en el apartado logico no se puede hacer nada
+		//A PRIORI!
+	}
+	
+	return isCollisionOrCollisionLost;
+}
+
+
+bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers, int tick, int  numCharacters)
+{
+	PD_MG_LogicPosition LogicPosPlayerToCheck;
+	PD_MG_LogicPosition LogicPosOtherPlayerToCheck;
+	bool isCollisionOrCollisionLost = false;
+
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		LogicPosPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX,
+			playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		LogicPosPlayerToCheck = PD_MG_LogicPosition(0, 0);
+		PD_MG_LogicPosition(enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionX,
+			enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionY);
+	}
+
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
+	{
+		//Al igual que en el metodo CheckPlayers -> en el turno de los jugadores es dificil decir cuando un enemigo con el que se ha producdido 
+		//un choque se tiene que mover-> hay que hacerlo cuando se producza realmente el choque
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
+	{
+		//Cuando se chequean los enemigos, en la fase de movimiento todos se estan moviendo a la vez, hay que comprobar el tick de cada enemigo
+		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+		{
+			if (indexDataPlayers !=  i )
+			{
+				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionX,
+					enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionY);
+				if (LogicPosPlayerToCheck == LogicPosOtherPlayerToCheck) //Si las dos son iguales, se va a producir una collision -> se comprueba quien gana
+				{
+					if (enemyManager->GetEnemies()[indexDataPlayers]->GetTotalStats()->CH >=
+						enemyManager->GetEnemies()[i]->GetTotalStats()->CH)
+					{
+						//El Enemigo char a comprobar gana el choque, El otro se pone su variable isStoppingByCollision a true y se busca una posicion a la que ir
+						enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(true);
+
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosOtherPlayerToCheck);
+						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+						{
+							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+								LogicPosOtherPlayerToCheck = possibleNewPositionToMove[j];
+							break;
+						}
+
+						enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Add(LogicPosOtherPlayerToCheck);
+
+					}
+					else
+					{
+						//El Enemigo char a comprobar pierde el choque, se setea la variable isCollisionOrCollisionLost a true y se da una nueva posicion del mapa a la que se desplaza el jugador
+						isCollisionOrCollisionLost = true;
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosPlayerToCheck);
+						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+						{
+							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+								LogicPosPlayerToCheck = possibleNewPositionToMove[j];
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return isCollisionOrCollisionLost;
+}
+
+
+
+bool  PD_GM_GameManager::CheckAndManageCollisionWithMapElements(int indexDataPlayers, int tick, int  numCharacters)
+{
+	return false;
+}
+
+
 
 void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicAttackTick"));
@@ -514,20 +703,34 @@ void PD_GM_GameManager::VisualMoveTick() {
 		players = enemyManager->GetEnemies().Num();
 
 	//Todos a la vez
-	for (int i = 0; i<players; i++) {
+	PD_GM_LogicCharacter* logicCharacter = nullptr;
+
+	for (int i = 0; i < players; i++) {
 		//Distincion para players o enemigos
-		TArray<FStructOrderAction>* listMove=nullptr;
-		PD_GM_LogicCharacter* logicCharacter=nullptr;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-			//listMove = &playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
 			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 		}
 		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-			//listMove = &enemyManager->GetTurnOrders(i)->listMove;
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
+		//Set un spline para dicho character
+		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+
+		TArray<FVector> positionsToMove = TArray<FVector>();
+		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
+		{
+			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
+		}
+
+		logicCharacter->MoveToPhysicalPosition(positionsToMove);
 		
+		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
+		logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
+	}
+
+		/*
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght before Pop:%d "), listMove->Num());
 
 		FStructOrderAction visualAction = listMove->Pop();
@@ -542,8 +745,9 @@ void PD_GM_GameManager::VisualMoveTick() {
 		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
 		
 		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
-
-	}
+		*/
+		
+	//FUNCION DE CAMARA
 
 	//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
@@ -551,21 +755,35 @@ void PD_GM_GameManager::VisualMoveTick() {
 	{
 		//Pasas todo el Array de posiciones logicas a fisicas para el meotodo MOVER
 		TArray<FVector> targetPositions = TArray<FVector>();
-		for (int j = 0; j < newPositionsToMove.Num(); j++)
+		for (int k = 0; k < players; k++)
 		{
-			targetPositions.Add(mapManager->LogicToWorldPosition(newPositionsToMove[j]));
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+				targetPositions.Add(mapManager->LogicToWorldPosition(
+					playersManager->GetDataPlayers()[k]->logic_Character->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+			}
+			if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+				targetPositions.Add(mapManager->LogicToWorldPosition(
+					enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+			}
 		}
 
 		//Añades todas las posiciones de los jugadores del turno anterior al Array
-		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		for (int z = 0; z < players; z++)
 		{
-			targetPositions.Add(playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetActorLocation());
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+				targetPositions.Add(playersManager->GetDataPlayers()[z]->logic_Character->GetCharacterBP()->GetActorLocation());
+			}
+			if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+				targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+			}
 		}
 
 		UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager"));
 		SGI->Camera_MoveInMovementPhase(targetPositions);
 		SGI->Camera_ZoomInMovementPhase(targetPositions);
 	}
+
+	
 
 }
 

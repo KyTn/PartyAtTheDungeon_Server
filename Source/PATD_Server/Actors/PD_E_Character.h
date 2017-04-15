@@ -6,6 +6,8 @@
 #include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
 #include "PD_E_Character.generated.h"
 
+class PD_GM_LogicCharacter;
+
 UCLASS()
 class PATD_SERVER_API APD_E_Character : public ACharacter
 {
@@ -14,6 +16,9 @@ class PATD_SERVER_API APD_E_Character : public ACharacter
 public:
 	// Sets default values for this character's properties
 	APD_E_Character();
+
+	//Variable Logic Character para tener doble referencia y poder llamar a los metodos logicos con metodos del Character
+	PD_GM_LogicCharacter* logic_character;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -24,6 +29,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void SetLogicCharacter(PD_GM_LogicCharacter* nlogic_character);
+	PD_GM_LogicCharacter* GetLogicCharacter();
 
 	UPROPERTY(EditAnywhere, Category = "behavior")
 		UBehaviorTree* behaviorTree;

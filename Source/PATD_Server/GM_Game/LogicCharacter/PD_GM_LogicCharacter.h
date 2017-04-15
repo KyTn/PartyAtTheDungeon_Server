@@ -41,7 +41,8 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 
 
 	PD_MG_LogicPosition currentLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion actual del personaje
-	PD_MG_LogicPosition movingLogicalPosition = PD_MG_LogicPosition(0, 0); //Posicion del personaje en cada tick (Todo Logico, el personaje NO SE MUEVE)
+	TArray<PD_MG_LogicPosition> movingLogicalPosition = TArray<PD_MG_LogicPosition>(); //Array de posiciiones logicas en las que se movera en la fase de movimiento
+	bool isStoppingByCollision = false; //determina si se ha parado por collision (y ha perdido esta) //False no se para, true si se para
 
 	//Referencia al Mapa de la partida para que se pueda Mover-atacar-interactuar con los elementos del mismo
 	PD_GM_MapManager* mapMng;
@@ -85,7 +86,7 @@ public:
 	Devuelve:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
-	bool MoveToPhysicalPosition(PD_MG_LogicPosition targetPosition);
+	bool MoveToPhysicalPosition(TArray<FVector> listPositionsToMove);
 
 
 	/*
@@ -170,7 +171,8 @@ public:
 	APD_GenericController* GetController();
 	ACharacter* GetCharacterBP();
 	PD_MG_LogicPosition GetCurrentLogicalPosition();
-	PD_MG_LogicPosition GetMovingLogicalPosition();
+	TArray<PD_MG_LogicPosition> GetMovingLogicalPosition();
+	bool GetIsStoppingByCollision();
 
 	//Métodos SET para cada Struct
 	void SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL);
@@ -188,7 +190,7 @@ public:
 	void SetController(APD_GenericController* ncontroller);
 	void SetCharacterBP(ACharacter* ncharacter_Player_BP); //BP donde esta el PROP del Character
 	void SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition);
-	void SetMovingLogicalPosition(PD_MG_LogicPosition nmovingLogicalPosition);
+	void SetIsStoppingByCollision(bool nIsStoppingByCollision);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
 
 };
