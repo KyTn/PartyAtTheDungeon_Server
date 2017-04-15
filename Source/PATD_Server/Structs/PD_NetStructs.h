@@ -54,17 +54,18 @@ enum class EOrderAction { Move = 1, Attack = 2 };
 USTRUCT()
 struct FStructOrderAction {
 
+
 	GENERATED_BODY()
 
 		//EOrderAction
 		UPROPERTY()
 		uint8 orderType;
 
-	//EDirectionss
+	//EDirections
 	UPROPERTY()
-	uint8 targetDirection;
+		uint8 targetDirection;
 	UPROPERTY()
-	FStructLogicPosition targetLogicPosition;
+		FStructLogicPosition targetLogicPosition;
 	/*
 	LogicPosition targetTile;
 	CharacterId targetCharacter;
@@ -242,11 +243,11 @@ struct FStructTotalStats
 
 
 USTRUCT()
-struct FStructPlayerInfoAtClient 
+struct FStructPlayerInfoAtClient
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+		UPROPERTY()
 		FStructSkin structSkin;
 	UPROPERTY()
 		FString ID_character; //Identifica al Jugador que realiza la modificacion
@@ -259,7 +260,7 @@ struct FStructPlayerInfoAtClient
 	//Constructor
 	FStructPlayerInfoAtClient()
 	{
-		
+
 	}
 };
 
@@ -283,6 +284,8 @@ struct FStructUpdateCharacter
 	{
 	}
 };
+
+
 
 /*
 Procedimiento para agregar un struct:
@@ -314,7 +317,7 @@ FStructNewConnection=2 struct que crea el networkmanager (no necesita serializac
 enum class UStructType {
 	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructMap = 10, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
 	FStructCharacter = 40, FStructUpdateTurn = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52,
-	FStructInstatiatePlayers=60
+	FStructInstatiatePlayers = 60
 };
 
 
@@ -349,12 +352,16 @@ struct FStructCharacter : public  FStructGeneric
 };
 
 
+
+
 USTRUCT()
 struct FStructInstatiatePlayers : public FStructGeneric
 {
 	GENERATED_BODY()
 
 		UPROPERTY()
+		FString idClientCharacter;
+	UPROPERTY()
 		TArray<FStructPlayerInfoAtClient> listInfoPlayerAtClient;
 
 
@@ -402,9 +409,9 @@ struct FStructMap : public FStructGeneric
 enum class MenuOrderType {
 	NullOrder = -1,
 	//Ordenes que recibe el servidor. 
-	 GameConfigurationDone = 1,  ClientReady = 4,
+	GameConfigurationDone = 1, ClientReady = 4,
 	//Ordenes que recibe el cliente. 
-	 Welcome = 6,  ChangeToLobby = 8,  InvalidConnection = 10
+	Welcome = 6, ChangeToLobby = 8, InvalidConnection = 10
 };
 USTRUCT()
 struct FStructOrderMenu : public FStructGeneric
@@ -413,12 +420,12 @@ struct FStructOrderMenu : public FStructGeneric
 
 		UPROPERTY()
 		uint8 orderType;
-		
-		//Usadas por welcome
-		UPROPERTY()
+
+	//Usadas por welcome
+	UPROPERTY()
 		uint8 playerIndex;
-		UPROPERTY()
-		bool isClientMaster=false;
+	UPROPERTY()
+		bool isClientMaster = false;
 
 	//Constructor
 	FStructOrderMenu()
@@ -431,20 +438,23 @@ struct FStructOrderMenu : public FStructGeneric
 /*USTRUCT()
 struct FStructTurnOrders : public FStructGeneric
 {
-	GENERATED_BODY()
+GENERATED_BODY()
 
-	UPROPERTY()
-		TArray<FStructOrderAction> listMove;
+UPROPERTY()
+TArray<FStructOrderAction> listMove;
 
-	UPROPERTY()
-		TArray<FStructOrderAction> listAttack;
+UPROPERTY()
+TArray<FStructOrderAction> listAttack;
 
 
-	FStructTurnOrders() {
-		structType = static_cast<uint8>(UStructType::FStructTurnOrders);
-	}
+FStructTurnOrders() {
+listMove = TArray<FStructOrderAction>();
+listAttack = TArray<FStructOrderAction>();
+structType = static_cast<uint8>(UStructType::FStructTurnOrders);
+}
 };
 */
+
 USTRUCT()
 struct FStructTurnOrders : public FStructGeneric
 {
@@ -530,7 +540,7 @@ struct FStructClientStartMatchOnGM : public FStructGeneric
 {
 	GENERATED_BODY()
 
-	FStructClientStartMatchOnGM() {
+		FStructClientStartMatchOnGM() {
 		structType = static_cast<uint8>(UStructType::FStructClientStartMatchOnGM);
 	}
 };
@@ -541,13 +551,17 @@ struct FStructClientCanGenerateOrders : public FStructGeneric
 {
 	GENERATED_BODY()
 
-	FStructClientCanGenerateOrders() {
+		FStructClientCanGenerateOrders() {
 		structType = static_cast<uint8>(UStructType::FStructClientCanGenerateOrders);
 	}
 };
 
 
 
+
+//
+//Sirve para actualizar el estado de un character cuando se ha iniciado la partida
+//Solo se van a enviar los atributos del character que sean necesarios
 USTRUCT()
 struct FStructUpdateTurn : public  FStructGeneric
 {

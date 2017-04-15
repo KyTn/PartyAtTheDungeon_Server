@@ -31,37 +31,10 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 			
 			FStructTurnOrders* turnStruct =AIController->GetTurnOrders();
 			
-			FStructOrderAction attackOrder = FStructOrderAction();
-			attackOrder.orderType = static_cast<uint8>(EOrderAction::Attack);
-			FStructLogicPosition logicPositionStruct = FStructLogicPosition();
-			logicPositionStruct.positionX = logicCharacterAttacked->GetCurrentLogicalPosition().GetX();
-			logicPositionStruct.positionY = logicCharacterAttacked->GetCurrentLogicalPosition().GetY();
-			attackOrder.targetLogicPosition = logicPositionStruct;
-
-			///turnStruct->listAttack.Add(attackOrder);
-			
-			/*int direccionAttack = OwnerComp.GetBlackboardComponent()->GetValueAsInt("direccionAttack");
-			switch (direccionAttack) {
-				case 1:
-					;
-					//atacar arriba
-					break;
-				case 2:
-					;
-					//atacar abajo
-					break;
-				case 3:
-					;
-					//atacar derecha
-					break;
-				case 4:
-					;
-					//atacar izquierda
-					break;
-				default:
-					;
-					break;
-			}*/
+			FStructTargetToAction attackOrder = FStructTargetToAction();
+			attackOrder.id_action = 0; //Ataque basico
+			attackOrder.id_character.Add(idCharacterAttacked);
+			turnStruct->actions.Add(attackOrder);
 
 			return EBTNodeResult::Succeeded;
 		}
