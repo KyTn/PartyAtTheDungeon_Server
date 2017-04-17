@@ -344,6 +344,8 @@ public:
 
 	void MarkARoomAsSpawingRoom(MapProceduralInfo &M);
 
+	FString EnemiesGeneration(MapProceduralInfo &M);
+
 private:
 	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);
 	void ParseTags(TArray<FString>& tags, FString braquets);
