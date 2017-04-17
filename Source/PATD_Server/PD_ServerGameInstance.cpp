@@ -786,108 +786,22 @@ void UPD_ServerGameInstance::Camera_Register(ACameraActor* inCameraServer)
 	CameraServer = inCameraServer;
 }
 
-//Mueve la camara en funcion de la posicion de los players
-void UPD_ServerGameInstance::Camera_MoveOnlyPlayers()
-{
-	TArray<FVector> desiredPositions = TArray<FVector>();
 
+TArray<FVector> UPD_ServerGameInstance::getPlayersPositions()
+{
+	TArray<FVector> desieredPositions = TArray<FVector>();
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
-		desiredPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
+		desieredPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
 	}
 
-	CameraServer->SetActorLocation(FindAvaragePosition(desiredPositions));
+	return desieredPositions;
 }
 
-void UPD_ServerGameInstance::Camera_MoveInMovementPhase(TArray<FVector> targetPositions)
+TArray<FVector> UPD_ServerGameInstance::getTargetPositions()
 {
-	CameraServer->SetActorLocation(FindAvaragePosition(targetPositions));
+	return targetPositionsToCenterCamera;
 }
-
-//modifica el Zoom o el FOV de la camara en funcion de los players
-void UPD_ServerGameInstance::Camera_ZoomOnlyPlayers()
-{
-	TArray<FVector> desiredPositions = TArray<FVector>();
-
-	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
-	{
-		desiredPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
-	}
-
-	float FOV = FindRequiredSize(desiredPositions);
-	UE_LOG(LogTemp, Warning, TEXT(" FOV %f"), FOV);
-
-	CameraServer->GetCameraComponent()->FieldOfView = FOV;
-}
-
-void UPD_ServerGameInstance::Camera_ZoomInMovementPhase(TArray<FVector> targetPositions)
-{
-	float FOV = FindRequiredSize(targetPositions);
-
-	UE_LOG(LogTemp, Warning, TEXT(" FOV %f"), FOV);
-
-	CameraServer->GetCameraComponent()->FieldOfView = FOV;
-}
-
-//Calcula la posicion intermedia entre todos los players  - Para Move()
-FVector UPD_ServerGameInstance::FindAvaragePosition(TArray<FVector> desiredPositions)
-{
-	FVector avaragePos = FVector(0.0f);
-	int numTargets = 0;
-
-	for (int i = 0; i < desiredPositions.Num(); i++)
-	{
-		// mapManager->LogicToWorldPosition(playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition());
-		FVector aux_posPlayer = desiredPositions[i];
-		aux_posPlayer = aux_posPlayer + FVector(-400.0f, 0.0f, 0.0f); //se suma un vector Z para darle altura a la camara (pasar el 2000 a const cuando  se requiera)
-
-		avaragePos += aux_posPlayer;
-		UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Location is %s"),*aux_posPlayer.ToString());
-		numTargets++;
-	}
-
-	if (numTargets > 0)
-		avaragePos /= numTargets;
-
-	avaragePos.Z = CameraServer->GetActorLocation().Z; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
-
-	UE_LOG(LogTemp, Warning, TEXT("CVamera's Location is %s"), *avaragePos.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("numTargets %d"), numTargets);
-
-	return avaragePos;
-}
-
-//Calcula el FOV de la camara - Para Zoom()
-float UPD_ServerGameInstance::FindRequiredSize(TArray<FVector> desiredPositions)
-{
-	float maxDistance = 0.0f;
-	float distanceBetween2objects = 0.0f;
-	FVector currentPointToTest = FVector(0.0f);
-
-	for (int i = 0; i < desiredPositions.Num(); i++)
-	{
-		currentPointToTest = desiredPositions[i];
-
-		for (int j = 0; j < desiredPositions.Num(); j++)
-		{
-			if (currentPointToTest != desiredPositions[j])
-			{
-				distanceBetween2objects = FVector::Dist(currentPointToTest, desiredPositions[j]);
-				if (distanceBetween2objects > maxDistance) 
-				{
-					maxDistance = distanceBetween2objects;
-				}
-			}
-		}
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Max Distance %f"), maxDistance);
-
-
-	return FMath::Clamp((maxDistance/100),75.0f,120.0f);
-}
-
-
 #pragma endregion
 
 

@@ -10,6 +10,7 @@
 #include "Actors/Players/PD_CharacterController.h"
 #include "Components/SplineComponent.h"
 #include "../PD_ServerGameInstance.h"
+#include"../ServerCamera.h"
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -715,7 +716,10 @@ void PD_GM_GameManager::VisualMoveTick() {
 		}
 
 		//Set un spline para dicho character
-		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+		if (!logicCharacter->GetController()->GetSpline()) 
+		{
+			logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
 		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
@@ -747,8 +751,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
 		*/
 		
-	//FUNCION DE CAMARA
-
+	///FUNCION DE CAMARA
 	//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 	if (SGI)
@@ -778,9 +781,14 @@ void PD_GM_GameManager::VisualMoveTick() {
 			}
 		}
 
+		SGI->targetPositionsToCenterCamera = targetPositions;
+
 		UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager"));
-		SGI->Camera_MoveInMovementPhase(targetPositions);
-		SGI->Camera_ZoomInMovementPhase(targetPositions);
+		Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(targetPositions);
+		
+		FOutputDeviceNull ar;
+		const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
+		Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
 	}
 
 	

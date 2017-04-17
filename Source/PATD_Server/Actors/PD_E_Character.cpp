@@ -11,12 +11,16 @@ APD_E_Character::APD_E_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	OnActorHit.AddDynamic(this, &APD_E_Character::OnHit);
+
 }
 
 // Called when the game starts or when spawned
 void APD_E_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 	
 }
 
@@ -42,3 +46,27 @@ PD_GM_LogicCharacter* APD_E_Character::GetLogicCharacter()
 {
 	return logic_character;
 }
+
+void APD_E_Character::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	APD_E_Character* me = Cast<APD_E_Character>(SelfActor);
+	APD_E_Character* other = Cast<APD_E_Character>(OtherActor);
+
+	if ((me != nullptr) && (other != nullptr) ) //Los dos son characters
+	{
+		if (me->GetLogicCharacter()->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
+		{
+			//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+			me->GetLogicCharacter()->MoveWhenCollisionLost();
+		}
+	}
+}
+
+/* Por si acaso hay que usar el metodo de recibir hit
+void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+FColor DisplayColor = FColor::Green;
+const FString DebugMessage(OtherActor->GetName());
+GEngine->AddOnScreenDebugMessage(-1, 5.0f, DisplayColor, DebugMessage);
+}
+*/

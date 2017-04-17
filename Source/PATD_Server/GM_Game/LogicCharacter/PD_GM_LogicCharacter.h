@@ -152,6 +152,10 @@ public:
 	*/
 	int8 GetEvasionCharacter();
 
+	//Moverse cuando se choca con alquien y pierde el choque
+	void MoveWhenCollisionLost();
+
+
 	/* ===================
 	METODOS AUXILIARES GET Y SET
 	========================= */

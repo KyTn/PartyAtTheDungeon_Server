@@ -170,6 +170,9 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetController(Cast<APD_GenericController>(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 
+		//Seteamos el spline de los jugadores.
+		Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
+			_GAMEMANAGER->splineManager->GetSpline());
 		//Set de color of the Character --> Esto se deberia llevar a una fucnion del CharacterLogic para cambiar desde ahi la skin
 		const FString command = FString::Printf(TEXT("ChangeMaterial %d"), i);
 

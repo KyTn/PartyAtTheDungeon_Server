@@ -6,6 +6,8 @@
 #include "Actors/Players/PD_CharacterController.h"
 
 #include <math.h>       /* ceil */
+#include "GM_Game/PD_GM_GameManager.h"
+#include "../../PD_ServerGameInstance.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -103,6 +105,8 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 			
 			//Ponemos como ocupado el spline elegido
 			Cast<APD_CharacterController>(controller)->GetSpline()->SetIsUsing(true);
+			//limpiamos los puntos del spline anteriores
+			Cast<APD_CharacterController>(controller)->GetSpline()->RemovePoints();
 			//Seteamos su posicion con la posicion ACTUAL en el MUNDO del Character a Mover
 			Cast<APD_CharacterController>(controller)->GetSpline()->SetToActorLocation(Cast<APD_CharacterController>(controller)->GetPawn()->GetActorLocation());
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
@@ -269,6 +273,87 @@ int8 PD_GM_LogicCharacter::GetEvasionCharacter()
 	return EvasionTotal;
 
 }
+
+void PD_GM_LogicCharacter::MoveWhenCollisionLost()
+{
+	//Remove the splines point and set the character
+	if (!controller) {
+		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
+	}
+
+	if (isPlayer)
+	{
+		//Limpiamos los puntos del spline
+		Cast<APD_CharacterController>(controller)->GetSpline()->RemovePoints();
+
+		//Seteamos el spline en la posicion del actor
+		Cast<APD_CharacterController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
+
+		//Seteamos los nuevos puntos del spline para moverse
+		TArray<FVector> newPositionsToMove = TArray<FVector>();
+		newPositionsToMove.Add(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
+
+		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Adyacents_To(GetCurrentLogicalPosition());
+		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+		{
+
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+			if (SGI)
+			{
+				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+				{
+					newPositionsToMove.Add(mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]));
+					SetCurrentLogicalPosition(possibleNewPositionToMove[j]);
+					break;
+				}
+			}
+
+		}
+
+		//Seteamos el Spline Component con los puntos a los que queremos movernos
+		Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
+		//Llamamos al metodo Mover del Controller
+		Cast<APD_CharacterController>(controller)->MoveTo(0, 0);
+
+		
+	}
+	else
+	{
+		//Limpiamos los puntos del spline
+		Cast<APD_AIController>(controller)->GetSpline()->RemovePoints();
+
+		//Seteamos el spline en la posicion del actor
+		Cast<APD_AIController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
+
+		//Seteamos los nuevos puntos del spline para moverse
+		TArray<FVector> newPositionsToMove = TArray<FVector>();
+		newPositionsToMove.Add(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
+
+		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Adyacents_To(GetCurrentLogicalPosition());
+		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
+		{
+
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+			if (SGI)
+			{
+				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+				{
+					newPositionsToMove.Add(mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]));
+					SetCurrentLogicalPosition(possibleNewPositionToMove[j]);
+					break;
+				}
+			}
+
+		}
+
+		//Seteamos el Spline Component con los puntos a los que queremos movernos
+		Cast<APD_AIController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
+		//Llamamos al metodo Mover del Controller
+		Cast<APD_AIController>(controller)->MoveTo(0, 0);
+
+	}
+}
+
 
 /* ===============
 METODOS GET Y SET PARA STRUCTS DE STATS y DATOS
