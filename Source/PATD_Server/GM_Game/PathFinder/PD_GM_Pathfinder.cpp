@@ -109,19 +109,26 @@ bool MapSearchNode::IsGoal(MapSearchNode &nodeGoal)
 bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSearchNode *parent_node)
 {
 
-	int parent_x = -1;
-	int parent_y = -1;
 
+	PD_MG_LogicPosition parentLogicPosition(-1, -1);
 	if (parent_node)
 	{
-		parent_x = parent_node->x;
-		parent_y = parent_node->y;
+		parentLogicPosition.SetX(parent_node->x);
+		parentLogicPosition.SetY(parent_node->y);
+	
 	}
 
-	TArray<PD_MG_LogicPosition> adyacentsList= mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(parent_x, parent_y));
+//	UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
+
+	TArray<PD_MG_LogicPosition> adyacentsList= mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(x,y));
 
 	for (PD_MG_LogicPosition adyacentLogicPosition : adyacentsList) {
-		if (mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY())) {
+		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==%d,%d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY()), !(adyacentLogicPosition == parentLogicPosition));
+		if (!mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY()) 
+		&& !(adyacentLogicPosition== parentLogicPosition)
+			)
+		{
+		//	UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
 			MapSearchNode NewNode;
 			NewNode = MapSearchNode(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager);
 			astarsearch->AddSuccessor(NewNode);
@@ -169,6 +176,9 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 
 		int searchState;
 		int searchSteps = 0;
+
+		UE_LOG(LogTemp, Log, TEXT("Pathfinding de %d,%d a %d,%d"),  posFrom.GetX(), posFrom.GetY(), posTo.GetX(), posTo.GetY());
+
 
 		do
 		{

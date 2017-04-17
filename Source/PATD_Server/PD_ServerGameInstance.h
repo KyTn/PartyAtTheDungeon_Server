@@ -63,6 +63,7 @@ public:
 
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
+	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();
 
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
@@ -142,29 +143,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	void Camera_Register(ACameraActor* inCameraServer);
 
-	//Mueve la camara en funcion de la posicion de los players
+	
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-	void Camera_MoveOnlyPlayers(); 
+	TArray<FVector> getPlayersPositions();
 
-	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-	void Camera_MoveInMovementPhase(TArray<FVector> targetPositions);
-
-	//modifica el Zoom o el FOV de la camara en funcion de los players
-	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-	void Camera_ZoomOnlyPlayers();
-
-	//modifica el Zoom o el FOV de la camara en funcion de los players
-	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-	void Camera_ZoomInMovementPhase(TArray<FVector> targetPositions);
-
-	//Calcula la posicion intermedia entre todos los players  - Para Move()
-	FVector FindAvaragePosition(TArray<FVector> desiredPositions);
-
-	//Calcula el FOV de la camara - Para Zoom()
-	float FindRequiredSize(TArray<FVector> desiredPositions);
-
-
+	TArray<FVector> getTargetPositions();
 
 	//Configura la posicion inicial de la camara
 	//void SetStartPositionAndSize();
