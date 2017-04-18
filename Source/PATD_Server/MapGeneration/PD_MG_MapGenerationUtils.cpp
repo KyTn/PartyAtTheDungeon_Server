@@ -525,6 +525,49 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
 	M.mapElements[p] = StaticMapElement::SPAWN_POINT;
 }
 
+FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
+	/* 1) Primero definimos el número de tiles por enemigo, despues cogemos las keys del tMap de las salas.
+	   2) Las recorremos, descartando la de spawn, contamos los tiles normales que tiene.
+	   3) Dentro de cada sala elegimos una posición al azar y la seleccionamos, si es válida( si no hay otro) para poner un enemigo en ella.
+	   4) Una vez recorridas todas las salas, recorremos el array de las posiciones de enemigos y guardamos uno al azar en cada una de ellas.
+	*/
 
+	int TilesPerEnemy = 15, enemy;
+	int totalEnemies;
+	TArray <PD_MG_LogicPosition> keys;
+	TArray <PD_MG_LogicPosition> enemies;
+	TArray <uint32> visited;
+	M.mapRooms.GenerateKeyArray(keys);
+	PD_MG_LogicPosition spawn = *M.mapElements.FindKey(StaticMapElement::SPAWN_POINT);
+	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.mapRooms.Num());
+	for (size_t i = 0; i < M.mapRooms.Num(); i++)
+	{
+		if (!M.mapRooms[keys[i]].NORMAL_TILES.Contains(spawn) && !visited.Contains(M.mapRooms[keys[i]].ID)) {
+			visited.Add(M.mapRooms[keys[i]].ID);
+			totalEnemies = M.mapRooms[keys[i]].NORMAL_TILES.Num();
+			totalEnemies /= TilesPerEnemy;
+			int j = 0;
+			UE_LOG(LogTemp, Log, TEXT("Enemigosss "));
+			while (j < totalEnemies)
+			{
+				int pos = rand() % M.mapRooms[keys[i]].NORMAL_TILES.Num();//Cogemos una posicion aleatoria
+				if (!enemies.Contains(M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
+					UE_LOG(LogTemp, Log, TEXT("Enemigosss %i"), i);
+					enemies.Add(M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
+					j++;
+				}
+			}
+		}
+	}
+	FString enemiesString = FString::FromInt(enemies.Num()) + '\n';
+	for (size_t i = 0; i < enemies.Num(); i++)
+	{
+		enemy = rand() % 2 + 2;///Esto es para conseguir un enemigo aleatorio rand da un número entre 0 y 1, y le sumamos 2, para que sea 2 o 3.
+		enemiesString += FString::FromInt(enemy) + ':' + FString::FromInt(enemies[i].GetX()) + ',' + FString::FromInt(enemies[i].GetY()) +'\n';
+
+	}
+	UE_LOG(LogTemp, Log, TEXT("Enemigos %s"), *enemiesString);
+	return enemiesString;
+}
 
 #pragma endregion
