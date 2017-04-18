@@ -43,6 +43,6 @@ FString PD_MG_MapGenerator::GenerateProceduralMap(/* OPTIONS */) {
 	mgUtils.GenerateRandomStaticMap(map, roomTemplateArray, 100, 100);
 	FString s = map.ToString();
 	//s.Append(mgUtils.EnemiesGeneration(map));
-	//s.Append("\n0");
+	s.Append("\n0");
 	return s;
 }

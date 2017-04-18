@@ -437,7 +437,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	MarkARoomAsSpawingRoom(M);
 
 	//M.ShowMapOnBoundingBox();
-
+	M.TrimBoundingBoxOfRoomsInMap();
 	return true;
 }
 
@@ -552,7 +552,8 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 			{
 				int pos = FMath::RandRange(0, M.mapRooms[keys[i]].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
 				if (!enemies.Contains(M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
-					UE_LOG(LogTemp, Log, TEXT("Enemigosss %i"), i);
+					UE_LOG(LogTemp, Log, TEXT("Enemigosss %d"), M.mapRooms[keys[i]].ID);
+					UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
 					enemies.Add(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
 					j++;
 				}
