@@ -64,6 +64,7 @@ public:
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
 	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();
+	TArray<AActor*> actorsToHide = TArray<AActor*>();
 
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
@@ -142,13 +143,20 @@ public:
 	//Registra la Camara en el GameInstance para su uso
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	void Camera_Register(ACameraActor* inCameraServer);
+	//Registra la Camara en el GameInstance para su uso
 
+	//UFUNCTION(BlueprintCallable, Category = "CameraControl")
+		//void CameraRail_Register(ACameraRig_Rail* inCameraRigRail);
 	
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	TArray<FVector> getPlayersPositions();
 
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	TArray<FVector> getTargetPositions();
+
+
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+	TArray<AActor*> HiddenActorsBlockPlayers(FVector PositionPlayer);
 
 	//Configura la posicion inicial de la camara
 	//void SetStartPositionAndSize();

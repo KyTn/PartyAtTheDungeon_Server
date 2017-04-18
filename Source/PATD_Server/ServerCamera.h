@@ -25,7 +25,7 @@ public:
 
 	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-		void Camera_MoveOnlyPlayers();
+		FVector Camera_MoveOnlyPlayers();
 
 	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")

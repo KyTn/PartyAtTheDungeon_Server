@@ -13,6 +13,7 @@
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_SplineManager.h"
 #include "math.h"
+#include "MapInfo/PD_MM_MapInfo.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -786,7 +787,11 @@ void UPD_ServerGameInstance::Camera_Register(ACameraActor* inCameraServer)
 	CameraServer = inCameraServer;
 }
 
-
+/*void UPD_ServerGameInstance::CameraRail_Register(ACameraRig_Rail* inCameraRigRail)
+{
+	CameraRail = inCameraRigRail;
+}
+*/
 TArray<FVector> UPD_ServerGameInstance::getPlayersPositions()
 {
 	TArray<FVector> desieredPositions = TArray<FVector>();
@@ -802,6 +807,44 @@ TArray<FVector> UPD_ServerGameInstance::getTargetPositions()
 {
 	return targetPositionsToCenterCamera;
 }
+
+TArray<AActor*> UPD_ServerGameInstance::HiddenActorsBlockPlayers(FVector PositionPlayer)
+{
+	//reiniciamos todos los muros para que se vean
+
+	for (int i = 0; i < actorsToHide.Num(); i++)
+	{
+		actorsToHide[i]->SetActorHiddenInGame(false);
+	}
+
+	PD_MM_Room* roomWhereWallsExits = nullptr;
+
+	PD_MG_LogicPosition logicWallPosition = mapManager->WorldToLogicPosition(PositionPlayer);
+
+	
+	roomWhereWallsExits = mapManager->MapInfo->RoomOf(logicWallPosition);
+	
+		if (roomWhereWallsExits == nullptr) {
+			UE_LOG(LogTemp, Warning, TEXT("fallo al adquir room"));
+
+		}
+		else {
+			//UE_LOG(LogTemp, Warning, TEXT("HiddenActorsBlockPlayers::num %d"), roomWhereWallsExits->walls.Num());
+			for (auto& Elem : roomWhereWallsExits->walls)
+			{
+				PD_MG_LogicPosition positionToCheck = Elem.Key;
+				if (positionToCheck.GetY() == logicWallPosition.GetY())
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("HiddenActorsBlockPlayers::name wall %s"), *Elem.Value->GetName());
+					actorsToHide.Add(Elem.Value);
+				}
+			}
+		}	
+		
+
+	return actorsToHide;
+}
+
 #pragma endregion
 
 

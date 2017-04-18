@@ -34,7 +34,7 @@ void AServerCamera::Tick(float DeltaTime)
 
 
 //Mueve la camara en funcion de la posicion de los players
-void AServerCamera::Camera_MoveOnlyPlayers()
+FVector AServerCamera::Camera_MoveOnlyPlayers()
 {
 	TArray<FVector> desiredPositions = TArray<FVector>();
 
@@ -46,9 +46,11 @@ void AServerCamera::Camera_MoveOnlyPlayers()
 			desiredPositions.Add(SGI->mapManager->LogicToWorldPosition(SGI->playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
 		}
 
-		SetActorLocation(FindAvaragePosition(desiredPositions));
+		//SetActorLocation(FindAvaragePosition(desiredPositions));
+		return FindAvaragePosition(desiredPositions);
 	}
 	
+	return FVector(0, 0, 0);
 }
 
 void AServerCamera::Camera_MoveInMovementPhase(TArray<FVector> targetPositions)
@@ -77,7 +79,7 @@ FVector AServerCamera::FindAvaragePosition(TArray<FVector> desiredPositions)
 	if (numTargets > 0)
 		avaragePos /= numTargets;
 
-	avaragePos.Z = GetActorLocation().Z; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
+	avaragePos.Z = 600.0f; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
 
 	UE_LOG(LogTemp, Warning, TEXT("CVamera's Location is %s"), *avaragePos.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("numTargets %d"), numTargets);

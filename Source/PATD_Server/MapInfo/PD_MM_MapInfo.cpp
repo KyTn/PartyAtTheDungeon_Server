@@ -27,22 +27,54 @@ PD_MM_MapInfo::~PD_MM_MapInfo()
 {
 }
 
-bool PD_MM_MapInfo::RoomOf(PD_MG_LogicPosition logpos, PD_MM_Room *room)
-{
+PD_MM_Room* PD_MM_MapInfo::RoomOf(PD_MG_LogicPosition logpos) {
+	//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d"), roomByLogPos[logpos].walls.Num());
+	TArray<PD_MG_LogicPosition> positions = TArray<PD_MG_LogicPosition>();
+	roomByLogPos.GenerateKeyArray(positions);
+
 	for (int i = 0; i < rooms.Num(); i++) {
 		for (int j = 0; j < rooms[i].LogicPosInRoom.Num(); j++) {
 			if (rooms[i].LogicPosInRoom[j] == logpos) {
-				room = &rooms[i];
-				return true;
+				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d %d"), rooms[i].LogicPosInRoom[j].GetX(), rooms[i].LogicPosInRoom[j].GetY());
+
+				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d"), rooms[i].walls.Num());
+				
+				return  &(rooms[i]);
 			}
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 bool PD_MM_MapInfo::AddWall(PD_MG_LogicPosition logpos, AActor *wall)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("logpos %d %d"), logpos.GetX(), logpos.GetY());
+
+	for (int i = 0; i < rooms.Num(); i++)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::AddWall %d numm: %d"), rooms[i].GetIDRoom(), rooms[i].LogicPosInRoom.Num());
+
+		for (int j = 0; j < rooms[i].LogicWallPosInRoom.Num(); j++)
+		{
+
+			if (rooms[i].LogicWallPosInRoom[j] == logpos) {
+				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::room %d numPos: %d numWalls:%d"), i , rooms[i].LogicPosInRoom.Num(), rooms[i].walls.Num());
+				FString s = "Wall (";
+				s.AppendInt(logpos.GetX());
+				s.Append(",");
+				s.AppendInt(logpos.GetY());
+				s.Append(")");
+				//wall->SetActorLabel(*s);
+				//roomByLogPos[logpos].walls.Add(logpos, wall);
+				rooms[i].walls.Add(logpos, wall);
+				return true;
+			}
+		}
+	}
+
+	/*
 	if (roomByLogPos.Contains(logpos)) {
+		UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::AddWall"));
 		FString s = "Wall (";
 		s.AppendInt(logpos.GetX());
 		s.Append(",");
@@ -52,7 +84,7 @@ bool PD_MM_MapInfo::AddWall(PD_MG_LogicPosition logpos, AActor *wall)
 		roomByLogPos[logpos].walls.Add(logpos, wall);
 		return true;
 	}
-
+	*/
 
 	return false;
 }
@@ -120,7 +152,10 @@ void PD_MM_MapInfo::CalculateRooms()
 
 		// Si p es un tile o un door
 		if (mapManager->StaticMapRef->GetXYMap()[p] == '.' ||
-			mapManager->StaticMapRef->GetXYMap()[p] == 's') {
+			mapManager->StaticMapRef->GetXYMap()[p] == 's' ||
+			mapManager->StaticMapRef->GetXYMap()[p] == 'w' || 
+			mapManager->StaticMapRef->GetXYMap()[p] == 'W' )
+			{
 
 			// Tener una referencia a una habitacion r
 			++tilesProcess;
@@ -141,8 +176,16 @@ void PD_MM_MapInfo::CalculateRooms()
 					TArray<PD_MG_LogicPosition> a = mapManager->Get_LogicPosition_Adyacents_To(p);
 					for (int k = 0; k < a.Num(); k++) {
 						if (mapManager->StaticMapRef->GetXYMap()[a[k]] == '.' ||
-							mapManager->StaticMapRef->GetXYMap()[a[k]] == 's') {
+							mapManager->StaticMapRef->GetXYMap()[a[k]] == 's' ) {
+						
 							rooms[j].AddLogicPos(a[k]);
+							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
+
+						}
+						if (mapManager->StaticMapRef->GetXYMap()[a[k]] == 'w' ||
+							mapManager->StaticMapRef->GetXYMap()[a[k]] == 'W') {
+
+							rooms[j].AddLogicWallPos(a[k]);
 							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
 
 						}
@@ -174,10 +217,14 @@ void PD_MM_MapInfo::CalculateRooms()
 				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - \tadding to Room created at (%d,%d) %d adjacents ... "), p.GetX(), p.GetY(), a.Num() );
 				for (int k = 0; k < a.Num(); k++) {
 					if (mapManager->StaticMapRef->GetXYMap()[a[k]] == '.' ||
-						mapManager->StaticMapRef->GetXYMap()[a[k]] == 's') {
+						mapManager->StaticMapRef->GetXYMap()[a[k]] == 's'  ) {
 							r.AddLogicPos(a[k]);
 							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
-
+					}
+					if (mapManager->StaticMapRef->GetXYMap()[a[k]] == 'w' ||
+						mapManager->StaticMapRef->GetXYMap()[a[k]] == 'W') {
+						r.AddLogicWallPos(a[k]);
+						//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
 					}
 				}
 
@@ -223,6 +270,7 @@ PD_MM_Room::PD_MM_Room()
 {
 	IsSpawnRoom = false;
 	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
+	LogicWallPosInRoom = TArray<PD_MG_LogicPosition>();
 
 	tiles = TMap<PD_MG_LogicPosition, AActor*>();
 	walls = TMap<PD_MG_LogicPosition, AActor*>();
@@ -235,6 +283,7 @@ PD_MM_Room::PD_MM_Room(int idRoom)
 {
 	IsSpawnRoom = false;
 	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
+	LogicWallPosInRoom = TArray<PD_MG_LogicPosition>();
 
 	tiles = TMap<PD_MG_LogicPosition, AActor*>();
 	walls = TMap<PD_MG_LogicPosition, AActor*>();
@@ -250,6 +299,7 @@ PD_MM_Room::~PD_MM_Room()
 }
 
 bool PD_MM_Room::AddLogicPos(PD_MG_LogicPosition logpos) { return LogicPosInRoom.AddUnique(logpos) >= 0; }
+bool PD_MM_Room::AddLogicWallPos(PD_MG_LogicPosition logpos) { return LogicWallPosInRoom.AddUnique(logpos) >= 0; }
 bool PD_MM_Room::AddTile(PD_MG_LogicPosition logpos, AActor* tile){ return false; }
 bool PD_MM_Room::AddWall(PD_MG_LogicPosition logpos, AActor* wall){ return false; }
 bool PD_MM_Room::AddInteractuable(PD_MG_LogicPosition logpos, AActor* interactuable) { return false; }
