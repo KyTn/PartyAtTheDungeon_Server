@@ -16,6 +16,7 @@ struct RoomTemplateInfo {
 	TArray<FString> TAGS;
 	uint32 WIDTH;
 	uint32 HEIGHT;
+
 	TArray<TArray<TCHAR>> RAW_DATA;
 	TArray<PD_MG_LogicPosition> LOCAL_LOGIC_POSITIONS_ON_ROOM;
 	TMap<PD_MG_LogicPosition, StaticMapElement> MAP_DATA;
@@ -26,8 +27,8 @@ struct RoomTemplateInfo {
 	TArray<PD_MG_LogicPosition> SPECIAL_TILES;
 	TArray<PD_MG_LogicPosition> EMPTY_TILES;
 
-	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
-	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
+	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT; // son globales (al mapa) no locales de la sala
+	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT; // son globales (al mapa) no locales de la sala
 
 	RoomTemplateInfo() {}
 
@@ -110,6 +111,17 @@ struct RoomTemplateInfo {
 
 	}
 
+	void UpdateBoundingBoxes(PD_MG_LogicPosition BB_TOP_LEFT_IN_MAP) {
+		BOUNDING_BOX_TOP_LEFT = BB_TOP_LEFT_IN_MAP;
+		BOUNDING_BOX_DOWN_RIGHT.SetX(BB_TOP_LEFT_IN_MAP.GetX() + WIDTH);
+		BOUNDING_BOX_DOWN_RIGHT.SetY(BB_TOP_LEFT_IN_MAP.GetY() + HEIGHT);
+	}
+
+	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos) {
+		return BOUNDING_BOX_TOP_LEFT + localPos;
+	}
+
+
 
 	FORCEINLINE bool operator==(const RoomTemplateInfo& other) const
 	{
@@ -149,9 +161,18 @@ struct MapProceduralInfo {
 			C.GetX(), C.GetY(),
 			R_pivot.GetX(), R_pivot.GetY(), *(R.NAME));
 
+		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(R.LOCAL_LOGIC_POSITIONS_ON_ROOM[0], C, R_pivot);
+
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];
 			PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
+
+			if (bb_t_l.GetX() < mapPosition.GetX() &&
+				bb_t_l.GetY() < mapPosition.GetY()) {
+				bb_t_l.SetX(mapPosition.GetX());
+				bb_t_l.SetY(mapPosition.GetY());
+			}
+
 
 			/*
 			UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - Adding L(%d,%d) to M(%d,%d)"), 
@@ -184,6 +205,9 @@ struct MapProceduralInfo {
 
 			UpdateBoundingBoxes(mapPosition);
 		}
+
+
+		R.UpdateBoundingBoxes(bb_t_l);
 
 
 		//ShowMap();
