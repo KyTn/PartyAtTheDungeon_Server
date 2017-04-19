@@ -69,7 +69,7 @@ FVector AServerCamera::FindAvaragePosition(TArray<FVector> desiredPositions)
 	{
 		// mapManager->LogicToWorldPosition(playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition());
 		FVector aux_posPlayer = desiredPositions[i];
-		aux_posPlayer = aux_posPlayer + FVector(-400.0f, 0.0f, 0.0f); //se suma un vector Z para darle altura a la camara (pasar el 2000 a const cuando  se requiera)
+		//aux_posPlayer = aux_posPlayer + FVector(-400.0f, 0.0f, 0.0f); //se suma un vector Z para darle altura a la camara (pasar el 2000 a const cuando  se requiera)
 
 		avaragePos += aux_posPlayer;
 		//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Location is %s"), *aux_posPlayer.ToString());
