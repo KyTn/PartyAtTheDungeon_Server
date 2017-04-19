@@ -16,7 +16,9 @@
 
 EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory) {
 
+	
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
+	UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: ap:%d"),ap);
 	if (ap > 0)
 	{
 		//recorrerse el array de jugadores y hacer el pathfinding a sus logicposition, si hay alguno dentro de rango, ap-1 (para poder atacar) nos movemos a su lado, y sino...
@@ -28,7 +30,7 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 		TArray<StructPlayer*> playerList = SGI->playersManager->GetDataPlayers();
 		for (StructPlayer* playerStruct : playerList) {
 			aux = AIController->GetPathFinder()->getPathFromTo(AIController->GetLogicCharacter()->GetCurrentLogicalPosition(),playerStruct->logic_Character->GetCurrentLogicalPosition());
-			if ((minim.Num()==0 || aux.Num()<minim.Num()) && aux.Num()!=0) {
+			if ((minim.Num()==0 || aux.Num()<minim.Num()) && aux.Num()!=0 ) {
 				minim.Empty();
 				minim = aux;
 				aux.Empty();
@@ -36,8 +38,8 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 			}
 		}
 		minim.RemoveAt(minim.Num()-1);
-		if (ap > minim.Num()) {
-
+		if (ap > minim.Num()&& minim.Num()>0) {
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Enemigo va a moverse con pathfinder"));
 			FStructTurnOrders* turnStruct = AIController->GetTurnOrders();
 
 			for (PD_MG_LogicPosition logicPos : minim)
@@ -51,8 +53,11 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 			}
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", ap-minim.Num());
 		}
-		else
+		else {
+			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
 			;//aleatorio
+		}
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Setting Moved true"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", true);
 		return EBTNodeResult::Succeeded;
 	}

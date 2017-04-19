@@ -68,15 +68,21 @@ bool APD_GenericController::IsAtAnimation() {
 	//Comprobamos el estado de la maquina de estados y si esta isMoving=true
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	int stateMachineIndex = -1;
-		AnimInst->GetStateMachineIndexAndDescription(FName(*animStateMachineName), stateMachineIndex,nullptr);
-	
-	// FName currentState= AnimInst->GetCurrentStateName(stateMachineIndex);
+	if (AnimInst) {
+		AnimInst->GetStateMachineIndexAndDescription(FName(*animStateMachineName), stateMachineIndex, nullptr);
+		//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation: stateMachineIndex: %d"), stateMachineIndex);
+		FName currentState = AnimInst->GetCurrentStateName(stateMachineIndex);
 
-	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation antes de comprobar: currentState:%s  isMoving:%d "), *currentState.ToString(), isMoving);
-	
-	//if (currentState.ToString().Compare(idleStateName)==0 && !isMoving) return false;
-	//else return true;
-	return true;
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation antes de comprobar: currentState:%s  isMoving:%d "), *currentState.ToString(), isMoving);
+
+		if (currentState.ToString().Compare(idleStateName) == 0 && !isMoving) return false;
+		else return true;
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation: ERROR: No hay AnimInstance para este character"));
+		return false; //si no tiene animInst no deberia poder estar haciendo animaciones
+	}
+	//return true;
 }
 
 bool APD_GenericController::MoveTo(float x, float y)

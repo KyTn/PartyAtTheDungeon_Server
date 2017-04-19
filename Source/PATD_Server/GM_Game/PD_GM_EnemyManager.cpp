@@ -26,7 +26,13 @@ TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
 }
 
 void PD_GM_EnemyManager::newTurn() {
-	listTurnOrders.Empty();
+	listTurnOrders.Empty(); //Esto deberia llamar a los destructores de los new que hacemos abajo.
+	for (int i = 0; i < enemies.Num(); i++) {
+		listTurnOrders.Add(new FStructTurnOrders());
+	}
+	//listTurnOrders.AddDefaulted(enemies.Num());//Iniciamos un struct de turno por cada enemigo que tenemos
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::newTurn: Index of ListTurnOrders %d"), listTurnOrders.Num());
+
 }
 
 void PD_GM_EnemyManager::AddActionTurn(FStructTurnOrders* turnOrders) {
