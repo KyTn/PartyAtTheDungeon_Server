@@ -7,6 +7,8 @@
 #include "PD_ServerGameInstance.h"
 #include "GM_Game/PD_GM_GameManager.h"
 #include "Animation/AnimInstance.h"
+#include "GM_Game/PD_GM_EnemyManager.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 //Includes Forward
 #include "PD_SplineActors.h"
@@ -89,10 +91,10 @@ bool APD_GenericController::MoveTo(float x, float y)
 	return true;
 }
 
-bool APD_GenericController::ActionTo(float x, float y, uint8 id_action)
+bool APD_GenericController::ActionTo(FStructTargetToAction action)
 {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
-	
+
 	//Activar enableAttack en el BP de anim
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	UBoolProperty* MyFloatProp = FindField<UBoolProperty>(AnimInst->GetClass(), "EnableAttack");
@@ -101,7 +103,19 @@ bool APD_GenericController::ActionTo(float x, float y, uint8 id_action)
 		MyFloatProp->SetPropertyValue_InContainer(AnimInst, true);
 		FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
 	}
-	;
+
+
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->enemyManager;
+
+	for (int i = 0; i < action.id_character.Num(); i++) {
+		if (enemyManager->GetCharacterByID(action.id_character[i])) {
+			enemyManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(100);
+		}
+	}
+
+
+
+
 	return true;
 
 }

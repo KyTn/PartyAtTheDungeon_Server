@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_CharacterController.h"
-
+#include "Structs/PD_NetStructs.h"
 
 
 
@@ -24,9 +24,9 @@ bool APD_CharacterController::MoveTo(float x, float y)
 	return true;
 }
 
-bool APD_CharacterController::ActionTo(float x, float y, uint8 id_action )
+bool APD_CharacterController::ActionTo(FStructTargetToAction action)
 {
-	Super::ActionTo(x, y,id_action);
+	Super::ActionTo(action);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "AL ATAQUERRRRRR !!!!!");
 	
 	return true;
