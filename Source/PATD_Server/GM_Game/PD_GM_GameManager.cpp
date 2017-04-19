@@ -210,6 +210,16 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		
+		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
+			structPlayer->turnOrders->positionsToMove.Empty();
+			structPlayer->turnOrders->actions.Empty();
+			structPlayer->turnOrders->consumablesToConsume.Empty();
+			structPlayer->turnOrders->interactuablesToInteract.Empty();
+
+		}
+
+
+
 		//Enviar a cliente actualizacion del mapa
 		FStructUpdateTurn structUpdateTurn;
 		//Jugadores
@@ -739,7 +749,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		
 		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-		//logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
+		logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
 	}
 
 	///FUNCION DE CAMARA
@@ -844,6 +854,7 @@ void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
 
 		if (playersManager->AllAnimationEnd() && enemyManager->AllAnimationEnd()) {
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd: TRUE"));
 			//Aqui deberia estar en un estado de fase que sea tick (no INI)
 			UpdatePhase();
 		}
@@ -888,7 +899,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
-		//Distincion para players o enemigos
+		/*//Distincion para players o enemigos
 		int maxLengthAction = 0;
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Move);
@@ -900,9 +911,9 @@ void PD_GM_GameManager::UpdatePhase()
 		if (maxLengthAction != 0) {
 			ChangePhase(EServerPhase::MoveTick); //Hay acciones por lo que volvemos a repetir el tick.
 		}
-		else {
+		else {*/
 			ChangePhase(EServerPhase::AttackIni);
-		}
+	//	}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{

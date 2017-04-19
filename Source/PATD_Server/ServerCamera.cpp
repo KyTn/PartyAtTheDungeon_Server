@@ -72,7 +72,7 @@ FVector AServerCamera::FindAvaragePosition(TArray<FVector> desiredPositions)
 		aux_posPlayer = aux_posPlayer + FVector(-400.0f, 0.0f, 0.0f); //se suma un vector Z para darle altura a la camara (pasar el 2000 a const cuando  se requiera)
 
 		avaragePos += aux_posPlayer;
-		UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Location is %s"), *aux_posPlayer.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Location is %s"), *aux_posPlayer.ToString());
 		numTargets++;
 	}
 
@@ -81,8 +81,8 @@ FVector AServerCamera::FindAvaragePosition(TArray<FVector> desiredPositions)
 
 	avaragePos.Z = 600.0f; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
 
-	UE_LOG(LogTemp, Warning, TEXT("CVamera's Location is %s"), *avaragePos.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("numTargets %d"), numTargets);
+	//UE_LOG(LogTemp, Warning, TEXT("CVamera's Location is %s"), *avaragePos.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("numTargets %d"), numTargets);
 
 	return avaragePos;
 }
