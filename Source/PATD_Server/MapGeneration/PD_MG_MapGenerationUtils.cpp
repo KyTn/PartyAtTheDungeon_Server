@@ -359,7 +359,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 
 	// Si se puede colocar, lo incrustamos en el mapa y actualizamos la lista de walls 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of first room: %s - Adding to map ..."), *(R.NAME));
-	M.AddRoomToMapAtLocation(R, C, R_pivot);
+	M.AddRoomToMapAtLocation(R, C, R_pivot, 0);
 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Adding %d openwalls "), R.OPEN_WALLS.Num());
 	for (int i = 0; i < R.OPEN_WALLS.Num(); i++) {
@@ -385,7 +385,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	LRT.Empty();
 	LCT.Empty();
 
-	int roomPlaced = 0;
+	int roomPlaced = 1;
 	while (roomPlaced < 10) {
 		// Elegimos un wall de la lista de posibles
 		W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
@@ -402,7 +402,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap W1(%d,%d) W2(%d,%d)"), W1.GetX(), W1.GetY(), W2.GetX(), W2.GetY());
 			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Name of next room: %s"), *(R.NAME));
 			
-			M.AddRoomToMapAtLocation(R, W1, W2);
+			M.AddRoomToMapAtLocation(R, W1, W2, roomPlaced);
 
 
 			//meter puerta y si se puede, puerta doble
@@ -432,7 +432,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 			//M.ShowMap();
 		}
 	}
-
+	M.NUM_ROOMS = roomPlaced;
 
 	MarkARoomAsSpawingRoom(M);
 
@@ -511,18 +511,20 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 
 void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
 
-	PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Height));
+	PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
+	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetX() - M.BOUNDING_BOX_TOP_LEFT.GetX()), FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetY() - M.BOUNDING_BOX_TOP_LEFT.GetY()));
 
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 
 
 	while (!(M.mapElements.Contains(p) && M.mapElements[p] == StaticMapElement::NORMAL_TILE)) {
-		p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Height));
-
+		//p = PD_MG_LogicPosition(FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetX()- M.BOUNDING_BOX_TOP_LEFT.GetX()), FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetY() - M.BOUNDING_BOX_TOP_LEFT.GetY()));
+		p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
 		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 	}
-
+	M.SPAWN_ID = M.mapRooms[p].ID;
 	M.mapElements[p] = StaticMapElement::SPAWN_POINT;
+
 }
 
 FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
@@ -532,28 +534,29 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 	   4) Una vez recorridas todas las salas, recorremos el array de las posiciones de enemigos y guardamos uno al azar en cada una de ellas.
 	*/
 
-	int TilesPerEnemy = 15, enemy;
+	int TilesPerEnemy = 20, enemy;
 	int totalEnemies;
 	TArray <PD_MG_LogicPosition> keys;
 	TArray <PD_MG_LogicPosition> enemies;
 	TArray <uint32> visited;
 	M.mapRooms.GenerateKeyArray(keys);
-	PD_MG_LogicPosition spawn = *M.mapElements.FindKey(StaticMapElement::SPAWN_POINT);
-	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.mapRooms.Num());
+	UE_LOG(LogTemp, Log, TEXT("Generacion de enemigos"));
+	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.NUM_ROOMS);
+	UE_LOG(LogTemp, Log, TEXT("Sala de spawn %i"), M.SPAWN_ID);
 	for (size_t i = 0; i < M.mapRooms.Num(); i++)
 	{
-		if (!M.mapRooms[keys[i]].NORMAL_TILES.Contains(spawn) && !visited.Contains(M.mapRooms[keys[i]].ID)) {
+		if (M.mapRooms[keys[i]].ID!= M.SPAWN_ID && !visited.Contains(M.mapRooms[keys[i]].ID)) {
 			visited.Add(M.mapRooms[keys[i]].ID);
 			totalEnemies = M.mapRooms[keys[i]].NORMAL_TILES.Num();
 			totalEnemies /= TilesPerEnemy;
 			int j = 0;
-			UE_LOG(LogTemp, Log, TEXT("Enemigosss "));
+			UE_LOG(LogTemp, Log, TEXT("Sala %d visitada, tiene %i enemigos, con un total de tiles disponibles %i"), M.mapRooms[keys[i]].ID, totalEnemies, M.mapRooms[keys[i]].NORMAL_TILES.Num());
 			while (j < totalEnemies)
 			{
 				int pos = FMath::RandRange(0, M.mapRooms[keys[i]].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
 				if (!enemies.Contains(M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
-					UE_LOG(LogTemp, Log, TEXT("Enemigosss %d"), M.mapRooms[keys[i]].ID);
-					UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
+					UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[keys[i]].ID);
+					//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
 					enemies.Add(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
 					j++;
 				}
