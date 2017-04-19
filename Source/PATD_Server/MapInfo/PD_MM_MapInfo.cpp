@@ -152,9 +152,7 @@ void PD_MM_MapInfo::CalculateRooms()
 
 		// Si p es un tile o un door
 		if (mapManager->StaticMapRef->GetXYMap()[p] == '.' ||
-			mapManager->StaticMapRef->GetXYMap()[p] == 's' ||
-			mapManager->StaticMapRef->GetXYMap()[p] == 'w' || 
-			mapManager->StaticMapRef->GetXYMap()[p] == 'W' )
+			mapManager->StaticMapRef->GetXYMap()[p] == 's'  )
 			{
 
 			// Tener una referencia a una habitacion r
@@ -182,13 +180,7 @@ void PD_MM_MapInfo::CalculateRooms()
 							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
 
 						}
-						if (mapManager->StaticMapRef->GetXYMap()[a[k]] == 'w' ||
-							mapManager->StaticMapRef->GetXYMap()[a[k]] == 'W') {
-
-							rooms[j].AddLogicWallPos(a[k]);
-							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
-
-						}
+						
 					}
 
 					if (mapManager->StaticMapRef->GetXYMap()[p] == 's') {
@@ -221,11 +213,7 @@ void PD_MM_MapInfo::CalculateRooms()
 							r.AddLogicPos(a[k]);
 							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
 					}
-					if (mapManager->StaticMapRef->GetXYMap()[a[k]] == 'w' ||
-						mapManager->StaticMapRef->GetXYMap()[a[k]] == 'W') {
-						r.AddLogicWallPos(a[k]);
-						//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
-					}
+					
 				}
 
 				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - num tiles on room before add adjacents: %d"), r.LogicPosInRoom.Num());
