@@ -21,7 +21,9 @@
 #include "PD_GM_SplineManager.h"
 
 #include "Actors/Enemies/PD_AIController.h"
+#include "Actors/PD_GenericController.h"
 
+#include "Structs/PD_NetStructs.h"
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
 {
 	
@@ -295,12 +297,14 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
 		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
 	}
 }
 
 void PD_GM_GameManager::CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders) {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CallbackEndCreateEnemyOrders, enemyID:%s"), *idCharacter);
 	//Asignar las ordenes al character del id
 	int index =enemyManager->GetIndexByID(idCharacter);
 	enemyManager->getListTurnOrders()[index] = turnOrders;
@@ -805,32 +809,68 @@ void PD_GM_GameManager::VisualAttackTick() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
 
 	//Distincion para players o enemigos
-	TArray<FStructOrderAction>* listAttack=nullptr;
+	TArray<FStructTargetToAction> listAttack;
 	int indexCharacter;
 	PD_GM_LogicCharacter* logicCharacter=nullptr;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		indexCharacter = playersManager->GetPlayerMaxLenghtActions(EActionPhase::Attack);
-	//	listAttack = &playersManager->GetDataStructPlayer(indexCharacter)->turnOrders->listAttack;
-		logicCharacter = playersManager->GetDataStructPlayer(indexCharacter)->logic_Character;
+		
+
+		for (int i = 0; i < indexCharacter; i++) {
+			listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->actions;
+			//logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
+
+			// 1) todos los bufos
+			// 2) habilidades que causan estados
+			// 3) habilidades que hacen que te muevas (cargas)
+			// 4) ataques normales y otras habilidades 
+			// 5) habilidades que hacen que muevan a los otros
+
+			// de momento vamos a hacerlo de forma secuencial sin ordenar...
+			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetController()->ActionTo(listAttack[index_action]);
+			}
+		}
+
+
+
+
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		indexCharacter = enemyManager->GetEnemyMaxLenghtActions(EActionPhase::Attack);
-//		listAttack = &enemyManager->GetTurnOrders(indexCharacter)->listAttack;
-		logicCharacter = enemyManager->GetEnemies()[indexCharacter];
+		//listAttack = &enemyManager->GetTurnOrders(indexCharacter)->actions;
+		//logicCharacter = enemyManager->GetEnemies()[indexCharacter];
+
+		for (int i = 0; i < indexCharacter; i++) {
+			listAttack = enemyManager->GetTurnOrders(indexCharacter)->actions;
+			//logicCharacter = enemyManager->GetEnemies()[indexCharacter];
+
+			// 1) todos los bufos
+			// 2) habilidades que causan estados
+			// 3) habilidades que hacen que te muevas (cargas)
+			// 4) ataques normales y otras habilidades 
+			// 5) habilidades que hacen que muevan a los otros
+
+			// de momento vamos a hacerlo de forma secuencial sin ordenar...
+			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
+				enemyManager->GetEnemies()[indexCharacter]->GetController()->ActionTo(listAttack[index_action]);
+			}
+		}
+
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick despues de players/enemigos"));
 
 	//Uno a uno
 	
-	FStructOrderAction visualAction = listAttack->Pop();
+	//FStructTargetToAction visualAction = listAttack->Pop();
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 0"));
-	PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
+	//PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 1"));
-	FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
+	//FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 2"));
 	//Peta al no tener actor ni controller
-    Cast<APD_CharacterController>(logicCharacter->GetController())->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
+    //Cast<APD_CharacterController>(logicCharacter->GetController())->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 3"));
 
 }	

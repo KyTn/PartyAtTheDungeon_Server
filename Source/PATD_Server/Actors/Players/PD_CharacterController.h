@@ -6,6 +6,7 @@
 
 //include de unreal
 #include "Actors/PD_GenericController.h"
+#include "Structs/PD_NetStructs.h"
 #include "PD_CharacterController.generated.h"
 
 
@@ -23,7 +24,7 @@ public:
 	GENERATED_BODY()
 	
 	virtual bool MoveTo(float x, float y) override;
-	virtual bool ActionTo(float x, float y, uint8 id_action) override;
+	virtual bool ActionTo(FStructTargetToAction action) override;
 	virtual bool Animate(uint8 typeAnimation) override;
 	
 

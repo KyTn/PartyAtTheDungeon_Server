@@ -5,6 +5,7 @@
 
 //forward declarations
 #include "Structs/PD_ServerEnums.h"
+#include "Structs/PD_NetStructs.h"
 class APD_SplineActors;
 
 //include de unreal
@@ -67,11 +68,10 @@ public:
 	/*
 	//Para realizar una accion ya sea habilidad, ataque o interaccion
 	Recibe:
-	- La posicion fisica en X e Y de donde tiene que lanzar la accion
-	- el ID con la accion a realizar
+	- FStructTargetToAction action: toda la info necesaria para resolver el ataque
 	Devuelve true si se ha completado con exito, de otra forma false
 	*/
-	virtual bool ActionTo(float x, float y, uint8 id_action);
+	virtual bool ActionTo(FStructTargetToAction action);
 
 
 	/*

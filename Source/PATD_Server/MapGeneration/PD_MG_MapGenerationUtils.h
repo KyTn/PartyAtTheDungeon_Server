@@ -136,8 +136,8 @@ struct MapProceduralInfo {
 
 	TMap<PD_MG_LogicPosition, StaticMapElement> mapElements;
 	TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
-	
-
+	uint32 SPAWN_ID;
+	int NUM_ROOMS;
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
 
@@ -157,7 +157,7 @@ struct MapProceduralInfo {
 	}
 
 
-	void AddRoomToMapAtLocation(RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
+	void AddRoomToMapAtLocation(RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot, uint32 ID) {
 		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - Adding %d logicpositions C(%d,%d) R_p(%d,%d) of room %s"), 
 			R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(),
 			C.GetX(), C.GetY(),
@@ -165,6 +165,7 @@ struct MapProceduralInfo {
 
 		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(R.LOCAL_LOGIC_POSITIONS_ON_ROOM[0], C, R_pivot);
 		R.UpdateBoundingBoxes(bb_t_l);
+		R.ID = ID;
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];
 			PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
