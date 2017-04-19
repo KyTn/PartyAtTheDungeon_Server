@@ -437,7 +437,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	MarkARoomAsSpawingRoom(M);
 
 	//M.ShowMapOnBoundingBox();
-
+	M.TrimBoundingBoxOfRoomsInMap();
 	return true;
 }
 
@@ -550,10 +550,11 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 			UE_LOG(LogTemp, Log, TEXT("Enemigosss "));
 			while (j < totalEnemies)
 			{
-				int pos = rand() % M.mapRooms[keys[i]].NORMAL_TILES.Num();//Cogemos una posicion aleatoria
+				int pos = FMath::RandRange(0, M.mapRooms[keys[i]].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
 				if (!enemies.Contains(M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
-					UE_LOG(LogTemp, Log, TEXT("Enemigosss %i"), i);
-					enemies.Add(M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
+					UE_LOG(LogTemp, Log, TEXT("Enemigosss %d"), M.mapRooms[keys[i]].ID);
+					UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
+					enemies.Add(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
 					j++;
 				}
 			}
@@ -562,9 +563,9 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 	FString enemiesString = FString::FromInt(enemies.Num()) + '\n';
 	for (size_t i = 0; i < enemies.Num(); i++)
 	{
+		///TODO: Cuando se cambie el enumerado de los characters, hay que cambiar aqui para que se spawneen diferentes enemigos. 
 		enemy = rand() % 2 + 2;///Esto es para conseguir un enemigo aleatorio rand da un número entre 0 y 1, y le sumamos 2, para que sea 2 o 3.
-		enemiesString += FString::FromInt(enemy) + ':' + FString::FromInt(enemies[i].GetX()) + ',' + FString::FromInt(enemies[i].GetY()) +'\n';
-
+		enemiesString += FString::FromInt(enemy) + ':' + FString::FromInt(enemies[i].GetX()) + ',' + FString::FromInt(enemies[i].GetY()) + '\n';
 	}
 	UE_LOG(LogTemp, Log, TEXT("Enemigos %s"), *enemiesString);
 	return enemiesString;
