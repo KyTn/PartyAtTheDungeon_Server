@@ -49,17 +49,23 @@ PD_GM_LogicCharacter* APD_E_Character::GetLogicCharacter()
 
 void APD_E_Character::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
-	APD_E_Character* me = Cast<APD_E_Character>(SelfActor);
-	APD_E_Character* other = Cast<APD_E_Character>(OtherActor);
+	//APD_E_Character* me = Cast<APD_E_Character>(SelfActor);
+	APD_E_Character* other = Cast<APD_E_Character>(Hit.GetActor());
 
-	if ((me != nullptr) && (other != nullptr) ) //Los dos son characters
+	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit %s name of actor hited> %s"), *GetName() , *other->GetName());
+	/*
+	if (other != nullptr) //Los dos son characters
 	{
-		if (me->GetLogicCharacter()->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
+
+		if (logic_character->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
 		{
 			//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
-			me->GetLogicCharacter()->MoveWhenCollisionLost();
+			logic_character->MoveWhenCollisionLost();
 		}
 	}
+	*/
 }
 
 /* Por si acaso hay que usar el metodo de recibir hit

@@ -173,9 +173,9 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		//Seteamos el spline de los jugadores.
 		Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
 			_GAMEMANAGER->splineManager->GetSpline());
+		
 		//Set de color of the Character --> Esto se deberia llevar a una fucnion del CharacterLogic para cambiar desde ahi la skin
-		const FString command = FString::Printf(TEXT("ChangeMaterial %d"), i);
-
+		/*const FString command = FString::Printf(TEXT("ChangeMaterial %d"), i);
 		if (_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->CallFunctionByNameWithArguments(*command, ar, NULL, true))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap -- EXITO EN LLAMAR A LA FUNCION"));
@@ -183,6 +183,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		else{
 			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDynamicMap - EEROR EN LLAMATR A LA FUNCION"), _GAMEMANAGER->playersManager->GetNumPlayers());
 		}	
+		*/
 		///actualizamos la referencia del BP
 
 	}

@@ -198,4 +198,5 @@ public:
 	void SetIsStoppingByCollision(bool nIsStoppingByCollision);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
 
+	void ClearMovingLogicalPosition();
 };

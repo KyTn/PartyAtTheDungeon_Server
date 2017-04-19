@@ -343,14 +343,14 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 		numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Move);
 		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 		{
-			playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Empty(); //limpiar el array de moverse logicamente
+			playersManager->GetDataStructPlayer(i)->logic_Character->ClearMovingLogicalPosition(); //limpiar el array de moverse logicamente
 		}
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
 		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 		{
-			enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Empty(); //limpiar el array de moverse logicamente
+			enemyManager->GetEnemies()[i]->ClearMovingLogicalPosition(); //limpiar el array de moverse logicamente
 		}
 	}
 
@@ -503,7 +503,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 		{
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 2"));
 
-			if (indexDataPlayers != i)
+			if (indexDataPlayers != i && (playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num()) > tick  )
 			{
 				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionX,
 					playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionY);
@@ -523,7 +523,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 							break;
 						}
 
-						playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Add(LogicPosOtherPlayerToCheck);
+						playersManager->GetDataStructPlayer(i)->logic_Character->AddMovementLogicalPosition(LogicPosOtherPlayerToCheck);
 
 					}
 					else
@@ -583,7 +583,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers
 		//Cuando se chequean los enemigos, en la fase de movimiento todos se estan moviendo a la vez, hay que comprobar el tick de cada enemigo
 		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 		{
-			if (indexDataPlayers !=  i )
+			if (indexDataPlayers != i && (enemyManager->getListTurnOrders()[i]->positionsToMove.Num()) > tick)
 			{
 				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionX,
 					enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionY);
@@ -603,7 +603,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers
 							break;
 						}
 
-						enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Add(LogicPosOtherPlayerToCheck);
+						enemyManager->GetEnemies()[i]->AddMovementLogicalPosition(LogicPosOtherPlayerToCheck);
 
 					}
 					else

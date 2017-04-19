@@ -67,14 +67,14 @@ bool APD_GenericController::IsAtAnimation() {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	int stateMachineIndex = -1;
 		AnimInst->GetStateMachineIndexAndDescription(FName(*animStateMachineName), stateMachineIndex,nullptr);
-	FName currentState= AnimInst->GetCurrentStateName(stateMachineIndex);
-
 	
+	// FName currentState= AnimInst->GetCurrentStateName(stateMachineIndex);
 
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation antes de comprobar: currentState:%s  isMoving:%d "), *currentState.ToString(), isMoving);
+	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation antes de comprobar: currentState:%s  isMoving:%d "), *currentState.ToString(), isMoving);
 	
-	if (currentState.ToString().Compare(idleStateName)==0 && !isMoving) return false;
-	else return true;
+	//if (currentState.ToString().Compare(idleStateName)==0 && !isMoving) return false;
+	//else return true;
+	return true;
 }
 
 bool APD_GenericController::MoveTo(float x, float y)
