@@ -295,12 +295,14 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
 		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
 	}
 }
 
 void PD_GM_GameManager::CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders) {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CallbackEndCreateEnemyOrders, enemyID:%s"), *idCharacter);
 	//Asignar las ordenes al character del id
 	int index =enemyManager->GetIndexByID(idCharacter);
 	enemyManager->getListTurnOrders()[index] = turnOrders;

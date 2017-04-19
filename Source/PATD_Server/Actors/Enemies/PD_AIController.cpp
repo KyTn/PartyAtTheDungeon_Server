@@ -33,6 +33,7 @@ APD_E_Character* ch = Cast<APD_E_Character>(charac);
 
 void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter)
 {
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::StartAITurnCalcultion"));
 	mapMng = refMap;
 	currentcharac = logicCharacter;
 	pathfinder = new PD_GM_Pathfinder(mapMng);

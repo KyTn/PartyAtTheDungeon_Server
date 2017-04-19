@@ -79,7 +79,7 @@ bool MapSearchNode::IsSameState(MapSearchNode &rhs)
 
 void MapSearchNode::PrintNodeInfo()
 {
-	UE_LOG(LogTemp, Log, TEXT("MapSearchNode::PrintNodeInfo: x:%d , y:%d"),this->x,this->y);
+//	UE_LOG(LogTemp, Log, TEXT("MapSearchNode::PrintNodeInfo: x:%d , y:%d"),this->x,this->y);
 }
 
 // Here's the heuristic function that estimates the distance from a Node
