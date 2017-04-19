@@ -143,7 +143,11 @@ uint32 PD_MG_MapParser::ReadRawMap(TArray<FString> fileReaded, uint32 firstIndex
 	for (uint32 i = firstIndex; i < staticMapRef->GetHeight() + firstIndex; i++) {
 		TArray<TCHAR> ta = fileReaded[i].GetCharArray();
 		for (uint32 j = 0; j < staticMapRef->GetWidth(); j++) {
-			staticMapRef->AddNewLogicPosition(i- firstIndex, j, ta[j]);
+			if (ta[j] != ' ' && ta[j] != '\n' && ta[j] != '\0')
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Mapa pos (%d,%d) char %c"), i - firstIndex, j, ta[j]);
+				staticMapRef->AddNewLogicPosition(i - firstIndex, j, ta[j]);
+			}
 		}
 	}
 	return staticMapRef->GetHeight() + firstIndex;
@@ -164,7 +168,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 		dynamicMapRef->AddEnemyDictionary(fileReaded[i].GetCharArray()[0], enemyValue);*/
 		enemyLine = fileReaded[i].GetCharArray();
 		enemyLine.RemoveAt(enemyLine.Num() - 1);
-		enemyLine.RemoveAt(enemyLine.Num() - 1);
+		//enemyLine.RemoveAt(enemyLine.Num() - 1);
 	
 		j = 0; num = 1; intType=0; x = 0; y = 0;
 		while (enemyLine[j]!=':')
@@ -196,7 +200,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 			case ECharacterType::Archer: {
 			
 				FString id = "Arch" + FString::FromInt(i);
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Archer %s"), *id);
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Archer %s in pos (%d,%d)"), *id, lp.GetX(),lp.GetY());
 				//enemyMan->AddEnemie(ch);
 				dynamicMapRef->AddNewEnemy(lp, type,id);
 				break;
@@ -206,7 +210,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 				FString id = "Zomb" + FString::FromInt(i);
 				//enemyMan->AddEnemie(ch);
 				dynamicMapRef->AddNewEnemy(lp, type,id);
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Zombie %s"), *id);
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Zombie %s in pos (%d,%d)"), *id, lp.GetX(), lp.GetY());
 				break;
 			}
 		}
