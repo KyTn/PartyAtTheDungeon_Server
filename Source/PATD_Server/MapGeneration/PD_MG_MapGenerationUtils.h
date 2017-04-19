@@ -116,7 +116,7 @@ struct RoomTemplateInfo {
 		BOUNDING_BOX_TOP_LEFT.SetY(BB_TOP_LEFT_IN_MAP.GetY());
 		BOUNDING_BOX_DOWN_RIGHT.SetX(BB_TOP_LEFT_IN_MAP.GetX() + HEIGHT);
 		BOUNDING_BOX_DOWN_RIGHT.SetY(BB_TOP_LEFT_IN_MAP.GetY() + WIDTH);
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes - New BB_TL(%d,%d) of room %s"),	BOUNDING_BOX_TOP_LEFT.GetX(),	BOUNDING_BOX_TOP_LEFT.GetY(), *NAME);
+		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes - New BB_TL(%d,%d) of room %s"),	BOUNDING_BOX_TOP_LEFT.GetX(),	BOUNDING_BOX_TOP_LEFT.GetY(), *NAME);
 	}
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos) {
@@ -164,7 +164,6 @@ struct MapProceduralInfo {
 			R_pivot.GetX(), R_pivot.GetY(), *(R.NAME));
 
 		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(R.LOCAL_LOGIC_POSITIONS_ON_ROOM[0], C, R_pivot);
-		//UE_LOG(LogTemp, Log, TEXT("BB_T_L = %d,%d"), bb_t_l.GetX(), bb_t_l.GetY());
 		R.UpdateBoundingBoxes(bb_t_l);
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];

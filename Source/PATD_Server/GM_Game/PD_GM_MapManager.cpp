@@ -155,7 +155,7 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 void PD_GM_MapManager::InstantiateDynamicMap() {
 	ECharacterType enemyType;
 
-	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Enemies Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Players Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
 
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
 	{
