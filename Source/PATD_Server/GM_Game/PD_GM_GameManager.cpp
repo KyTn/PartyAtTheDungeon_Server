@@ -475,6 +475,9 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		  LogicPosPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX,
 			playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
+		  UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers %d %d"), playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX
+		  , playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
+
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		LogicPosPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionX,
@@ -484,8 +487,12 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) //Los jugadores comprueban su posicion con el resto de jugadores en ese mismo tick
 	{
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 1"));
+
 		for (int i = 0; i < numCharacters; i++)
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 2"));
+
 			if (indexDataPlayers != i)
 			{
 				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionX,
@@ -525,7 +532,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 			}
 		}
 		//Añadir al Array movingLogicalPosition la posicion que se esta comprobando para ver si se mueve ahi u es otra diferente por el choque
-		playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->GetMovingLogicalPosition().Add(LogicPosPlayerToCheck);
+		playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->AddMovementLogicalPosition(LogicPosPlayerToCheck);
 		return isCollisionOrCollisionLost;
 	}
 
@@ -731,26 +738,10 @@ void PD_GM_GameManager::VisualMoveTick() {
 		logicCharacter->MoveToPhysicalPosition(positionsToMove);
 		
 		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
-		logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
+		//logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
 	}
 
-		/*
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght before Pop:%d "), listMove->Num());
-
-		FStructOrderAction visualAction = listMove->Pop();
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick : lenght after Pop:%d "), listMove->Num());
-
-		//Se añade al vector la nueva posicion a la que moverse ------- Cambiar cuando se pase varias posiciones....
-		newPositionsToMove.Add(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
-
-		//Peta al no tener actor ni controller
-		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualMoveTick -->  Posicion Jugador: %d %d"), logicCharacter->GetCurrentLogicalPosition().GetX(), logicCharacter->GetCurrentLogicalPosition().GetY());
-		
-		logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
-		
-		logicCharacter->MoveToPhysicalPosition(PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY));
-		*/
-		
 	///FUNCION DE CAMARA
 	//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
@@ -762,11 +753,16 @@ void PD_GM_GameManager::VisualMoveTick() {
 		{
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 				targetPositions.Add(mapManager->LogicToWorldPosition(
-					playersManager->GetDataPlayers()[k]->logic_Character->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+					//playersManager->GetDataPlayers()[k]->logic_Character->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+					playersManager->GetDataPlayers()[k]->logic_Character->GetCurrentLogicalPosition()));
+
 			}
 			if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				targetPositions.Add(mapManager->LogicToWorldPosition(
-					enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+					//enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+					enemyManager->GetEnemies()[k]->GetCurrentLogicalPosition()));
+
+
 			}
 		}
 
@@ -784,11 +780,11 @@ void PD_GM_GameManager::VisualMoveTick() {
 		SGI->targetPositionsToCenterCamera = targetPositions;
 
 		UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager"));
-		Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(targetPositions);
+		//Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(targetPositions);
 		
 		FOutputDeviceNull ar;
 		const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
-		Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
+		//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
 	}
 
 	

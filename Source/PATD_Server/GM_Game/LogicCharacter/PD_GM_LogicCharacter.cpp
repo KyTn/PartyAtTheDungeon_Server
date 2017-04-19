@@ -444,6 +444,8 @@ void PD_GM_LogicCharacter::SetTotalStats()
 		totalStats->AP = ceil((basicStats->AGI + basicStats->DES) / 2) - 5;
 	}
 	totalStats->APTotal = initBaseStats->APBase + totalStats->AP;
+	totalStats->APCurrent = totalStats->APTotal;
+
 	//Choque
 	if ((basicStats->POD + basicStats->MAL) < 10)
 	{
@@ -486,5 +488,9 @@ void PD_GM_LogicCharacter::SetTypeCharacter(ECharacterType nID_character) { type
 void PD_GM_LogicCharacter::SetController(APD_GenericController* ncontroller) { controller = ncontroller; }
 void PD_GM_LogicCharacter::SetCharacterBP(ACharacter* ncharacter_Player_BP) { character_Player_BP = ncharacter_Player_BP; }
 void PD_GM_LogicCharacter::SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition) { currentLogicalPosition = ncurrentLogicalPosition; }
+void PD_GM_LogicCharacter::AddMovementLogicalPosition(PD_MG_LogicPosition nnewLogicalPosition)
+{
+	movingLogicalPosition.Add(nnewLogicalPosition);
+}
 void PD_GM_LogicCharacter::SetMapManager(PD_GM_MapManager* nmapManager) { mapMng = nmapManager; }
 void PD_GM_LogicCharacter::SetIsStoppingByCollision(bool nIsStoppingByCollision) { isStoppingByCollision = nIsStoppingByCollision; }

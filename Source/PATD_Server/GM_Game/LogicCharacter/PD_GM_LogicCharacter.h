@@ -194,6 +194,7 @@ public:
 	void SetController(APD_GenericController* ncontroller);
 	void SetCharacterBP(ACharacter* ncharacter_Player_BP); //BP donde esta el PROP del Character
 	void SetCurrentLogicalPosition(PD_MG_LogicPosition ncurrentLogicalPosition);
+	void AddMovementLogicalPosition(PD_MG_LogicPosition nnewLogicalPosition);
 	void SetIsStoppingByCollision(bool nIsStoppingByCollision);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
 
