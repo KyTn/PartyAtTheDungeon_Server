@@ -18,9 +18,10 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 
 	
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
-	UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: ap:%d"),ap);
+	//UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: ap:%d"),ap);
 	if (ap > 0)
 	{
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: task move empezando"));
 		//recorrerse el array de jugadores y hacer el pathfinding a sus logicposition, si hay alguno dentro de rango, ap-1 (para poder atacar) nos movemos a su lado, y sino...
 		
 		//true areplayersnear, y rellenar con la direccion
@@ -54,10 +55,11 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", ap-minim.Num());
 		}
 		else {
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Enemigo no se mueve por que esta lejos"));
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
-			;//aleatorio
+			//aleatorio
 		}
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Setting Moved true"));
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Setting Moved true"));
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", true);
 		return EBTNodeResult::Succeeded;
 	}

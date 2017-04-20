@@ -27,6 +27,8 @@ EBTNodeResult::Type UPD_T_Idle::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 		}
 		return EBTNodeResult::Failed;
 	}
-	else
+	else {
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: comenzando IA"));
 		return EBTNodeResult::Succeeded;
+	}
 }

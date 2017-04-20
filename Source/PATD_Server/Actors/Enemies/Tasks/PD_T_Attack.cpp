@@ -17,9 +17,11 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 {
 	
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
-	UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: ap:%d"), ap);
+	UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack empezando"));
+	
 	if (ap>0)
 	{
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack tiene ap"));
 		bool arePlayersNear = OwnerComp.GetBlackboardComponent()->GetValueAsBool("ArePlayersNear");
 		if (arePlayersNear) 
 		{
@@ -39,16 +41,20 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 			turnStruct->actions.Add(attackOrder);
 
 			//Poner el ap a 0 indica que ha acabado el calculo.
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack con player near - finalizando"));
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("AP", 0);
 			return EBTNodeResult::Succeeded;
 		}
 		else {
-
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin player near - finalizando"));
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("AP", 0);
 			return EBTNodeResult::Failed;
 		}
 			
 	}
-	else
+	else {
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin ap - finalizando"));
 		return EBTNodeResult::Failed;
+	}
+		
 }

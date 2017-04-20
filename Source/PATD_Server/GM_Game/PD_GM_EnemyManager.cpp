@@ -137,6 +137,6 @@ bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
 			numWithOrders++;
 		}
 	}
-	if (numWithOrders>2) return true;
+	if (numWithOrders>0) return true;
 	else return false;
 }
