@@ -753,7 +753,9 @@ void PD_GM_GameManager::VisualMoveTick() {
 		
 		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-		logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num()-1]);
+		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
+			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
+		}
 	}
 
 	///FUNCION DE CAMARA

@@ -79,7 +79,7 @@ FVector AServerCamera::FindAvaragePosition(TArray<FVector> desiredPositions)
 	if (numTargets > 0)
 		avaragePos /= numTargets;
 
-	avaragePos.Z = 600.0f; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
+	avaragePos.Z = 800.0f; //Con esta parte a priori no es necesario sumar la Z, le ponemos la que tenga la camara
 
 	//UE_LOG(LogTemp, Warning, TEXT("CVamera's Location is %s"), *avaragePos.ToString());
 	//UE_LOG(LogTemp, Warning, TEXT("numTargets %d"), numTargets);

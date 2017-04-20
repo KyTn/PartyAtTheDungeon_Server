@@ -11,6 +11,8 @@
 #include "PD_PlayersManager.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "PATD_Server/Actors/PD_E_Character.h"
+#include "PATD_Server/Actors/PD_SplineActors.h"
+#include "GM_Game/PD_GM_SplineManager.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
@@ -171,8 +173,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 
 		//Seteamos el spline de los jugadores.
-		Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
-			_GAMEMANAGER->splineManager->GetSpline());
+		//Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
+			//_GAMEMANAGER->splineManager->GetSpline());
 		
 		//Set de color of the Character --> Esto se deberia llevar a una fucnion del CharacterLogic para cambiar desde ahi la skin
 		/*const FString command = FString::Printf(TEXT("ChangeMaterial %d"), i);

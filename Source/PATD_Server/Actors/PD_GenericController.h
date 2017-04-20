@@ -32,7 +32,7 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 	float toleranceMove = 50.0;
 
 	//For Spline
-	APD_SplineActors*  spline;
+	APD_SplineActors*  spline = nullptr;
 	float distance = 0.0f;
 
 public:
