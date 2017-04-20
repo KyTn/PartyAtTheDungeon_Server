@@ -26,17 +26,17 @@ TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
 }
 
 void PD_GM_EnemyManager::newTurn() {
-	listTurnOrders.Empty(); //Esto deberia llamar a los destructores de los new que hacemos abajo.
+	listTurnOrders.Empty(); 
 	for (int i = 0; i < enemies.Num(); i++) {
-		listTurnOrders.Add(new FStructTurnOrders());
+		listTurnOrders.Add(nullptr);
 	}
-	//listTurnOrders.AddDefaulted(enemies.Num());//Iniciamos un struct de turno por cada enemigo que tenemos
+	//listTurnOrders.AddDefaulted(enemies.Num());//Iniciamos una posicion en el array con null para cada enemigo. Cuando esta posicion no sea null consideramos que ha recibido ordenes
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::newTurn: Index of ListTurnOrders %d"), listTurnOrders.Num());
 
 }
 
-void PD_GM_EnemyManager::AddActionTurn(FStructTurnOrders* turnOrders) {
-	listTurnOrders.Add(turnOrders);
+void PD_GM_EnemyManager::AddActionTurn(FStructTurnOrders* turnOrders, int indexEnemy) {
+	listTurnOrders[indexEnemy]= turnOrders;
 }
 
 FStructTurnOrders* PD_GM_EnemyManager::GetTurnOrders(int indexEnemy) {
@@ -124,11 +124,19 @@ int PD_GM_EnemyManager::GetIndexByID(FString id) {
 bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders"));
 
+	int numWithOrders = 0;
 	for (int i = 0; i < enemies.Num();i++) {
 
-		if ((listTurnOrders[i]->actions.Num() == 0) && (listTurnOrders[i]->positionsToMove.Num() == 0)) {
-			return false;
+		//(listTurnOrders[i]->actions.Num() == 0) && (listTurnOrders[i]->positionsToMove.Num() == 0)
+		if (!listTurnOrders[i] ) {
+			listTurnOrders[i] = new FStructTurnOrders();
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders: Enemigo numero %d no tiene ordenes"),i);
+			//return false;
+		}
+		else {
+			numWithOrders++;
 		}
 	}
-	return true;
+	if (numWithOrders>2) return true;
+	else return false;
 }

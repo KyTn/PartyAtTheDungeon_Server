@@ -169,6 +169,7 @@ void PD_GM_GameManager::OnBeginState() {
 		UpdateState();
 
 	} else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: WaitingPlayerOrders"));
 		FStructClientCanGenerateOrders clientGenerateOrders = FStructClientCanGenerateOrders();
 		networkManager->SendNow(&clientGenerateOrders, -1);
 
@@ -247,7 +248,7 @@ void PD_GM_GameManager::OnBeginState() {
 			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
 
 			structUpdateCharacter.currentCharacterPosition = logicPosition;
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
+		//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
 			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
 		}
@@ -304,10 +305,15 @@ void PD_GM_GameManager::CreateEnemyOrders() {
 }
 
 void PD_GM_GameManager::CallbackEndCreateEnemyOrders(FString idCharacter, FStructTurnOrders* turnOrders) {
-	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CallbackEndCreateEnemyOrders, enemyID:%s"), *idCharacter);
+	
 	//Asignar las ordenes al character del id
 	int index =enemyManager->GetIndexByID(idCharacter);
-	enemyManager->getListTurnOrders()[index] = turnOrders;
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CallbackEndCreateEnemyOrders, enemyID:%s Index:%d"), *idCharacter, index);
+	if (!turnOrders) {
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CallbackEndCreateEnemyOrders, enemyID:%s Index:%d ERROR no TURNORDERS"), *idCharacter, index);
+
+	}
+	enemyManager->AddActionTurn(turnOrders, index);
 	//Comprobar si estan todas para pasar de estado
 	UpdateState();
 
