@@ -102,18 +102,9 @@ bool APD_GenericController::ActionTo(FStructTargetToAction action)
 {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
 
-	//Activar enableAttack en el BP de anim
-	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
-	UBoolProperty* MyFloatProp = FindField<UBoolProperty>(AnimInst->GetClass(), "EnableAttack");
-	if (MyFloatProp != NULL) {
-		bool FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
-		MyFloatProp->SetPropertyValue_InContainer(AnimInst, true);
-		FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
-	}
 
-
-	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->enemyManager;
-	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->playersManager;
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->enemyManager;
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->playersManager;
 
 
 	for (int i = 0; i < action.id_character.Num(); i++) {
@@ -127,6 +118,24 @@ bool APD_GenericController::ActionTo(FStructTargetToAction action)
 			playersManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(150);
 		}
 	}
+
+
+
+	//Activar enableAttack en el BP de anim
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* MyFloatProp = FindField<UBoolProperty>(AnimInst->GetClass(), "EnableAttack");
+		if (MyFloatProp != NULL) {
+			bool FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
+			MyFloatProp->SetPropertyValue_InContainer(AnimInst, true);
+			FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+	}
+
+
 
 
 	return true;

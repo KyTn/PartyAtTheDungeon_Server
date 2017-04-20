@@ -169,6 +169,7 @@ bool PD_PlayersManager::CheckPlayerIndex(int player) {
 PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByID(FString id) {
 	for (int i = 0; i < dataPlayers.Num(); i++) {
 		if (dataPlayers[i]->logic_Character->GetIDCharacter() == id) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID : probando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
 			return dataPlayers[i]->logic_Character;
 		}
 	}

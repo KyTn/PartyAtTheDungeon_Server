@@ -186,9 +186,23 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float receivedDamage)
 	3. Comprobar si HPCurrent <= 0. Si es asi, actualizar la variable isDead
 	- SE LLAMA DESDE: Cualquier Actor - Personaje o Enemigo que dañe a otro
 	*/
-	GetTotalStats()->APCurrent = -receivedDamage;
-	if (GetTotalStats()->APCurrent <= 0)
+	if (receivedDamage > GetTotalStats()->HPCurrent) {
+		GetTotalStats()->HPCurrent = 0;
+	}
+	else {
+		GetTotalStats()->HPCurrent -= receivedDamage;
+	}
+	
+
+	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s  come %d de daño y tiene ahora %d de vida"), *GetIDCharacter(), receivedDamage,GetTotalStats()->HPCurrent);
+	if (GetTotalStats()->HPCurrent <= 0) {
 		GetCharacterBP()->SetActorHiddenInGame(true);
+		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s se murio"),*GetIDCharacter());
+		if (isPlayer) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "HAS PERDIDO PRINGAO!");
+	}
+
+	
+	
 }
 
 //Devuelve la tirada que le pidan para resolver los conflictos

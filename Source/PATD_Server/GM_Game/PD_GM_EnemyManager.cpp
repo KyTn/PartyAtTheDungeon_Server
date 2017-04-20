@@ -105,7 +105,7 @@ PD_GM_LogicCharacter* PD_GM_EnemyManager::GetCharacterByID(FString id) {
 			return enemies[i];
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_EnemyManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
 	return nullptr;
 }
 
@@ -115,7 +115,7 @@ int PD_GM_EnemyManager::GetIndexByID(FString id) {
 			return i;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_EnemyManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
 	return -1;
 }
 
