@@ -129,14 +129,16 @@ bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
 
 		//(listTurnOrders[i]->actions.Num() == 0) && (listTurnOrders[i]->positionsToMove.Num() == 0)
 		if (!listTurnOrders[i] ) {
-			listTurnOrders[i] = new FStructTurnOrders();
+			//listTurnOrders[i] = new FStructTurnOrders();
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders: Enemigo numero %d no tiene ordenes"),i);
-			//return false;
+			return false;
 		}
 		else {
 			numWithOrders++;
 		}
 	}
-	if (numWithOrders>0) return true;
-	else return false;
+	//if (numWithOrders>0) return true;
+	//else return false;
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders: Todos los enemigos (%d) tienen ordenes "), numWithOrders);
+	return true;
 }

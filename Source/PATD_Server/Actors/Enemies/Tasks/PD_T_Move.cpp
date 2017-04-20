@@ -15,18 +15,21 @@
 #include "Structs/PD_ServerStructs.h"
 
 EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory) {
+	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 
-	
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
+	
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: task move empezando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+	
 	//UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: ap:%d"),ap);
 	if (ap > 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: task move empezando"));
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: task move con .ap%d idEnemy:%s"), ap,*AIController->GetLogicCharacter()->GetIDCharacter());
 		//recorrerse el array de jugadores y hacer el pathfinding a sus logicposition, si hay alguno dentro de rango, ap-1 (para poder atacar) nos movemos a su lado, y sino...
 		
 		//true areplayersnear, y rellenar con la direccion
 		TArray<PD_MG_LogicPosition> minim, aux;
-		APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+		
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(AIController->GetGameInstance());
 		TArray<StructPlayer*> playerList = SGI->playersManager->GetDataPlayers();
 		for (StructPlayer* playerStruct : playerList) {
@@ -40,7 +43,7 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 		}
 		minim.RemoveAt(minim.Num()-1);
 		if (ap > minim.Num()&& minim.Num()>0) {
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Enemigo va a moverse con pathfinder"));
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Enemigo va a moverse con pathfinder .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 			FStructTurnOrders* turnStruct = AIController->GetTurnOrders();
 
 			for (PD_MG_LogicPosition logicPos : minim)
@@ -55,14 +58,15 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", ap-minim.Num());
 		}
 		else {
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Enemigo no se mueve por que esta lejos"));
+			UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Enemigo no se mueve por que esta lejos .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
 			//aleatorio
 		}
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Setting Moved true"));
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Setting Moved true .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", true);
 		return EBTNodeResult::Succeeded;
 	}
 	else
+		UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Terminando por no .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		return EBTNodeResult::Failed;
 }

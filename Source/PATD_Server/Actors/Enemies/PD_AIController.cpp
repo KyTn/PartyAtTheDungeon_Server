@@ -27,7 +27,11 @@ APD_E_Character* ch = Cast<APD_E_Character>(charac);
 	{
 		BlackboardComp->InitializeBlackboard(*ch->behaviorTree->BlackboardAsset);
 		BlackboardComp->SetValueAsInt("AP",0);
-		BehaviorTreeComp->StartTree(*ch->behaviorTree);
+	
+		/*BehaviorTreeComp->StartTree(*ch->behaviorTree);
+		BehaviorTreeComp->RestartTree();
+		BehaviorTreeComp->Start
+		*/
 	}
 }
 
@@ -41,13 +45,18 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 	actions.positionsToMove.Empty();
 	actions.actions.Empty();
 	BlackboardComp->SetValueAsInt("AP", 5);
+
+	APD_E_Character* ch = Cast<APD_E_Character>(GetPawn());
+	BehaviorTreeComp->StartTree(*ch->behaviorTree, EBTExecutionMode::Looped);
 }
 
 
 void APD_AIController::EndAITurnCalculation() {
 
+	BehaviorTreeComp->StopTree();
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
 	SGI->getGameManager()->CallbackEndCreateEnemyOrders(currentcharac->GetIDCharacter(), &actions);
+
 }
 
 

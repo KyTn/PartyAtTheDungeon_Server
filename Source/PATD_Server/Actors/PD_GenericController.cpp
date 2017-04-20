@@ -99,6 +99,8 @@ bool APD_GenericController::MoveTo(float x, float y)
 
 bool APD_GenericController::ActionTo(FStructTargetToAction action)
 {
+	
+
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
 
 	//Activar enableAttack en el BP de anim
@@ -111,7 +113,7 @@ bool APD_GenericController::ActionTo(FStructTargetToAction action)
 	}
 
 
-	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->enemyManager;
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->enemyManager;
 
 	for (int i = 0; i < action.id_character.Num(); i++) {
 		if (enemyManager->GetCharacterByID(action.id_character[i])) {
