@@ -54,7 +54,7 @@ public:
 	*/
 	const FVector ToWorldPosition(bool isCharacter) {
 		if (isCharacter)
-			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 100.f);
+			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 40.f);
 		else
 			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}

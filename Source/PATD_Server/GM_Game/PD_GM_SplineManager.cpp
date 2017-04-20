@@ -23,7 +23,10 @@ void APD_GM_SplineManager::BeginPlay()
 		APD_SplineActors* splineActor = (APD_SplineActors*)GetWorld()->SpawnActor(APD_SplineActors::StaticClass());
 
 		splinesPool.Add(splineActor);
+	}
 
+	if (splinesPool.Num() > 0){
+		UE_LOG(LogTemp, Log, TEXT("APD_GM_SplineManager::GetSpline Begin - num spline : %d"), splinesPool.Num());
 	}
 
 }
@@ -40,10 +43,14 @@ APD_SplineActors* APD_GM_SplineManager::GetSpline()
 
 	bool allUsed = true;
 
+	UE_LOG(LogTemp, Log, TEXT("APD_GM_SplineManager::GetSpline - num spline : %d"), splinesPool.Num());
+
 	for (int i = 0; i < splinesPool.Num(); i++)
 	{
 		if (splinesPool[i]->GetIsUsing() == false)
 		{
+			UE_LOG(LogTemp, Log, TEXT("APD_GM_SplineManager::GetSpline - index spline : %d"), i);
+
 			splinesPool[i]->SetIsUsing(true);
 			allUsed = false;
 			return splinesPool[i];
