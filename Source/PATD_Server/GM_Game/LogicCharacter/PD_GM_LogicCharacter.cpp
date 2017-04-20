@@ -186,6 +186,9 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float receivedDamage)
 	3. Comprobar si HPCurrent <= 0. Si es asi, actualizar la variable isDead
 	- SE LLAMA DESDE: Cualquier Actor - Personaje o Enemigo que dañe a otro
 	*/
+	GetTotalStats()->APCurrent = -receivedDamage;
+	if (GetTotalStats()->APCurrent <= 0)
+		GetCharacterBP()->SetActorHiddenInGame(true);
 }
 
 //Devuelve la tirada que le pidan para resolver los conflictos

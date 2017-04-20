@@ -158,6 +158,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	TArray<AActor*> HiddenActorsBlockPlayers(FVector PositionPlayer);
 
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+	int  GetConditionsOfGame();
+
 	//Configura la posicion inicial de la camara
 	//void SetStartPositionAndSize();
 };

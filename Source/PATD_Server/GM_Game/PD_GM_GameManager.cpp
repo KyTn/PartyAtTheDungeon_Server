@@ -221,43 +221,51 @@ void PD_GM_GameManager::OnBeginState() {
 
 		}
 
-
-
-		//Enviar a cliente actualizacion del mapa
-		FStructUpdateTurn structUpdateTurn;
-		//Jugadores
-		for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
-			PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
-			FStructUpdateCharacter structUpdateCharacter;
-			//Conversion de Struct a LogicPosition
-			FStructLogicPosition logicPosition;
-			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
-
-			structUpdateCharacter.currentCharacterPosition = logicPosition;
-			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-			structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+		if (CheckWinGameConditions()) //Jugadores Ganan la partida
+		{
+			
 		}
-		//Enemigos
-		for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
-			PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
-			FStructUpdateCharacter structUpdateCharacter;
-			//Conversion de Struct a LogicPosition
-			FStructLogicPosition logicPosition = FStructLogicPosition();
-			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+		else if (CheckLoseGameConditions()) //Jugadores pierden la partida
+		{
 
-			structUpdateCharacter.currentCharacterPosition = logicPosition;
-		//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
-			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
 		}
-		 
-		//Envio a todos los clientes con el update del turno
-		networkManager->SendNow(&structUpdateTurn);
-		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
-		UpdateState();//transicion inmediata
+		else
+		{
+			//Enviar a cliente actualizacion del mapa
+			FStructUpdateTurn structUpdateTurn;
+			//Jugadores
+			for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
+				PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
+				FStructUpdateCharacter structUpdateCharacter;
+				//Conversion de Struct a LogicPosition
+				FStructLogicPosition logicPosition;
+				logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+				logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
 
+				structUpdateCharacter.currentCharacterPosition = logicPosition;
+				structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+				structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+			}
+			//Enemigos
+			for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
+				PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
+				FStructUpdateCharacter structUpdateCharacter;
+				//Conversion de Struct a LogicPosition
+				FStructLogicPosition logicPosition = FStructLogicPosition();
+				logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+				logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+
+				structUpdateCharacter.currentCharacterPosition = logicPosition;
+				//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
+				structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+				structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
+			}
+
+			//Envio a todos los clientes con el update del turno
+			networkManager->SendNow(&structUpdateTurn);
+			//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
+			UpdateState();//transicion inmediata
+		}
 
 	}else //Caso indeterminado
 	{
@@ -1068,3 +1076,31 @@ void PD_GM_GameManager::OnBeginPhase()
 
 }
 #pragma endregion
+
+bool PD_GM_GameManager::CheckWinGameConditions()
+{
+	int enemiesDied = 0;
+
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		if (enemyManager->GetEnemies()[i]->GetTotalStats()->APCurrent <= 0)
+			enemiesDied++;
+	}
+	if (enemyManager->GetEnemies().Num() == enemiesDied)
+		return true; //all enemies died
+	else
+		return false;
+}
+
+bool PD_GM_GameManager::CheckLoseGameConditions()
+{
+	bool playersLose = false;
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		if (playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->APCurrent <= 0)
+			playersLose = true;
+	}
+
+	return playersLose;
+}

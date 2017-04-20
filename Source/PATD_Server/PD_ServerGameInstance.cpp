@@ -845,6 +845,19 @@ TArray<AActor*> UPD_ServerGameInstance::HiddenActorsBlockPlayers(FVector Positio
 	return actorsToHide;
 }
 
+int  UPD_ServerGameInstance::GetConditionsOfGame()
+{
+	if (gameManager->CheckWinGameConditions())
+		return 2;
+	else if (gameManager->CheckLoseGameConditions())
+		return 1;
+	else
+		return 0;
+
+	// 0 - no pasa nada
+	// 1 - Jugadores pierden
+	// 2 - Jugadores Ganan
+}
 #pragma endregion
 
 

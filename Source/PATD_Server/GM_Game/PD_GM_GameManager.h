@@ -130,4 +130,8 @@ public:
 	void VisualTickControl();
 	void VisualMoveTick();
 	void VisualAttackTick();
+
+	bool CheckWinGameConditions();
+
+	bool CheckLoseGameConditions();
 };
