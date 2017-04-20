@@ -8,6 +8,7 @@
 #include "GM_Game/PD_GM_GameManager.h"
 #include "Animation/AnimInstance.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
+#include "PD_PlayersManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 //Includes Forward
@@ -112,14 +113,20 @@ bool APD_GenericController::ActionTo(FStructTargetToAction action)
 
 
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->enemyManager;
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetOwner()->GetGameInstance())->gameManager->playersManager;
+
 
 	for (int i = 0; i < action.id_character.Num(); i++) {
 		if (enemyManager->GetCharacterByID(action.id_character[i])) {
-			enemyManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(100);
+			enemyManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(150);
 		}
 	}
 
-
+	for (int i = 0; i < action.id_character.Num(); i++) {
+		if (playersManager->GetCharacterByID(action.id_character[i])) {
+			playersManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(150);
+		}
+	}
 
 
 	return true;
