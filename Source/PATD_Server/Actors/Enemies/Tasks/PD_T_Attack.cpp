@@ -22,7 +22,7 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 	
 	if (ap>0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack tiene ap .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+		//	UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack tiene ap .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		//bool arePlayersNear = OwnerComp.GetBlackboardComponent()->GetValueAsBool("ArePlayersNear");
 		//if (arePlayersNear) 
 		if(true)
@@ -43,19 +43,19 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 			turnStruct->actions.Add(attackOrder);
 
 			//Poner el ap a 0 indica que ha acabado el calculo.
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack con player near - finalizando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+			//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack con player near - finalizando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
 			return EBTNodeResult::Succeeded;
 		}
 		else {
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin player near - finalizando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+			//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin player near - finalizando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
 			return EBTNodeResult::Failed;
 		}
 			
 	}
 	else {
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin ap - finalizando  .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+		//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin ap - finalizando  .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		return EBTNodeResult::Failed;
 	}
 		

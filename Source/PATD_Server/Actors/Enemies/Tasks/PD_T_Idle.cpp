@@ -20,15 +20,15 @@ EBTNodeResult::Type UPD_T_Idle::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 	//	UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: Entrando en ap==0"));
 		if (moved)
 		{
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: ap:%d moved:%d  idEnemy:%s"), ap, moved, *AIController->GetLogicCharacter()->GetIDCharacter());
-			UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: Entrando en EndAITurnCalculation idEnemy:%s"), *AIController->GetLogicCharacter()->GetIDCharacter());
+			//UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: ap:%d moved:%d  idEnemy:%s"), ap, moved, *AIController->GetLogicCharacter()->GetIDCharacter());
+			//UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: Entrando en EndAITurnCalculation idEnemy:%s"), *AIController->GetLogicCharacter()->GetIDCharacter());
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool("Moved", false);
 			AIController->EndAITurnCalculation();
 		}
 		return EBTNodeResult::Failed;
 	}
 	else {
-		UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: comenzando IA ap:%d moved:%d  idEnemy:%s"), ap, moved, *AIController->GetLogicCharacter()->GetIDCharacter()); 
+		//UE_LOG(LogTemp, Log, TEXT("PD_T_Idle:: comenzando IA ap:%d moved:%d  idEnemy:%s"), ap, moved, *AIController->GetLogicCharacter()->GetIDCharacter()); 
 		return EBTNodeResult::Succeeded;
 	}
 }

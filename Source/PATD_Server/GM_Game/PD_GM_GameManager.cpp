@@ -216,8 +216,8 @@ void PD_GM_GameManager::OnBeginState() {
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
 			structPlayer->turnOrders->positionsToMove.Empty();
 			structPlayer->turnOrders->actions.Empty();
-			structPlayer->turnOrders->consumablesToConsume.Empty();
-			structPlayer->turnOrders->interactuablesToInteract.Empty();
+			//structPlayer->turnOrders->consumablesToConsume.Empty();
+			//structPlayer->turnOrders->interactuablesToInteract.Empty();
 
 		}
 
@@ -1083,7 +1083,7 @@ bool PD_GM_GameManager::CheckWinGameConditions()
 
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 	{
-		if (enemyManager->GetEnemies()[i]->GetTotalStats()->APCurrent <= 0)
+		if (enemyManager->GetEnemies()[i]->GetTotalStats()->HPCurrent <= 0)
 			enemiesDied++;
 	}
 	if (enemyManager->GetEnemies().Num() == enemiesDied)
@@ -1098,7 +1098,7 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
-		if (playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->APCurrent <= 0)
+		if (playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->HPCurrent <= 0)
 			playersLose = true;
 	}
 

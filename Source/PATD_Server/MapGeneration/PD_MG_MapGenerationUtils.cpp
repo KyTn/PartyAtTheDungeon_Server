@@ -543,7 +543,7 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 	UE_LOG(LogTemp, Log, TEXT("Generacion de enemigos"));
 	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.NUM_ROOMS);
 	UE_LOG(LogTemp, Log, TEXT("Sala de spawn %i"), M.SPAWN_ID);
-	for (size_t i = 0; i < M.mapRooms.Num(); i++)
+	for (int i = 0; i < M.mapRooms.Num(); i++)
 	{
 		if (M.mapRooms[keys[i]].ID!= M.SPAWN_ID && !visited.Contains(M.mapRooms[keys[i]].ID)) {
 			visited.Add(M.mapRooms[keys[i]].ID);
@@ -564,7 +564,7 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 		}
 	}
 	FString enemiesString = FString::FromInt(enemies.Num()) + '\n';
-	for (size_t i = 0; i < enemies.Num(); i++)
+	for (int i = 0; i < enemies.Num(); i++)
 	{
 		///TODO: Cuando se cambie el enumerado de los characters, hay que cambiar aqui para que se spawneen diferentes enemigos. 
 		enemy = rand() % 2 + 2;///Esto es para conseguir un enemigo aleatorio rand da un número entre 0 y 1, y le sumamos 2, para que sea 2 o 3.
