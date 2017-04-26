@@ -21,9 +21,10 @@ PD_PlayersManager::~PD_PlayersManager()
 
 //Funciones de gestion de conexion
 
-void PD_PlayersManager::AddNewPlayer(FStructNewConnection* newClientConnection, int player) {
+void PD_PlayersManager::AddNewPlayer(FString newID_Client, int player) {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AddNewPlayer"));
 	StructPlayer* structPlayer = new StructPlayer();
+	structPlayer->ID_Client = newID_Client;
 	structPlayer->ID_PLAYER = player;
 	dataPlayers.Add(structPlayer);
 }
@@ -97,6 +98,23 @@ int PD_PlayersManager::GetIndexClientMaster() {
 	}
 	return -1;
 }
+
+
+StructPlayer* PD_PlayersManager::GetStructPlayerByIDClient(FString ID_ClientToSearch)
+{
+	for (int i = 0; i < dataPlayers.Num(); i++) {
+		if (dataPlayers[i]->ID_Client == ID_ClientToSearch) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->ID_Client);
+			return dataPlayers[i];
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient ERROR: No se ha encontrado cliente con id %s"), *ID_ClientToSearch);
+	return nullptr;
+}
+
+
+
+
 
 //Devuelve el numero de acciones de la lista mas larga
 int PD_PlayersManager::GetMaxLenghtActions(EActionPhase phase) {

@@ -96,6 +96,10 @@ public:
 	//Esta es la funcion que repetira el timer. Deberia recopilar los datos recibidos en los sockets e ir llamando a las funciones de salida
 	void TimerRefreshFunction();
 
+	//Sirve para realizar la reconexion de un cliente al server. Al desconectarse el cliente deja el socket abierto y crea uno nuevo.
+	//Hay que connectar el nuevo con el viejo (el nuevo ocupa la posicion en el array del viejo) y cerrar el nuevo
+	void ReconnectSockets(int oldSocket, int newSocket);
+
 
 	///* CLIENTE */
 	//Inicializa el SocketManager como Clinete

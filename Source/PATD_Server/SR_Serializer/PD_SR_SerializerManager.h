@@ -103,6 +103,27 @@ public:
 
 		}break;
 
+		case UStructType::FStructRequestIDClient: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructRequestIDClient"));
+			FStructRequestIDClient* structSpecialization = (FStructRequestIDClient*)structGeneric;
+			return SerializeDataTemplate<FStructRequestIDClient>(structSpecialization);
+
+		}break;
+
+		case UStructType::FStructClientID: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructClientID"));
+			FStructClientID* structSpecialization = (FStructClientID*)structGeneric;
+			return SerializeDataTemplate<FStructClientID>(structSpecialization);
+
+		}break;
+
+		case UStructType::FStructWelcome: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructWelcome"));
+			FStructWelcome* structSpecialization = (FStructWelcome*)structGeneric;
+			return SerializeDataTemplate<FStructWelcome>(structSpecialization);
+
+		}break;
+
 		default:
 			return nullptr;
 
@@ -181,6 +202,24 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 	case UStructType::FStructClientCanGenerateOrders: {
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructClientCanGenerateOrders"));
 		return DeserializeDataTemplate<FStructClientCanGenerateOrders>(data);
+
+	}break;
+
+	case UStructType::FStructRequestIDClient: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructRequestIDClient"));
+		return DeserializeDataTemplate<FStructRequestIDClient>(data);
+
+	}break;
+
+	case UStructType::FStructClientID: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructClientID"));
+		return DeserializeDataTemplate<FStructClientID>(data);
+
+	}break;
+
+	case UStructType::FStructWelcome: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructWelcome"));
+		return DeserializeDataTemplate<FStructWelcome>(data);
 
 	}break;
 

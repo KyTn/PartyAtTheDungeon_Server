@@ -12,6 +12,8 @@ struct StructPlayer {
 	// indica el player que es
 	int ID_PLAYER;
 
+	FString ID_Client;
+
 	//Menu options and configuration
 	bool readyMenu;
 	

@@ -282,3 +282,14 @@ FString PD_NW_SocketManager::StateString() {
 	}
 	return out;
 }
+
+
+void PD_NW_SocketManager::ReconnectSockets(int oldSocket, int newSocket)
+{
+	delete socketArray[oldSocket];
+
+	socketArray[oldSocket] = socketArray[newSocket];
+	
+	socketArray[newSocket] = nullptr;
+	socketArray.RemoveAt(newSocket);
+}

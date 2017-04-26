@@ -50,7 +50,22 @@ bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent:: Evento recibido:%d Estado del servidor: %d"), static_cast<uint8>(inEventType), static_cast<uint8>(structServerState->enumServerState));
 
+	//Este IF es el Inicio de una nueva conexion. Simplemente da la bienvenida al nuevo cliente y sirve para pedir a este su ID_Cliente (Comprobar que el cliente existe o no)
+	if (inEventType == UStructType::FStructNewConnection) {
 
+		// registra un jugador entrante como jugador MASTER
+		HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, true);
+	}
+
+	//Este IF es identificar si existe o no el cliente conectado y pasarle la informacion del estado del servidor y sus datos
+	if (inEventType == UStructType::FStructClientID) {
+
+		// registra un jugador entrante como jugador MASTER
+		HandleEvent_IDClient(inDataStruct, inPlayer, inEventType);
+	}
+
+
+	///A partir de AQUI empiezan los IF de cada ESTADO
 	if (structServerState->enumServerState == EServerState::StartApp) {
 		// Ningún mensaje puede llegar durante este estado
 	}
@@ -59,7 +74,7 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 		if (inEventType == UStructType::FStructNewConnection) {
 
 			// registra un jugador entrante como jugador MASTER
-			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, true);
+			//HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, true);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent:: WaitingMasterClient - NOT MATCHING "));
@@ -71,7 +86,7 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 		if (inEventType == UStructType::FStructNewConnection) {
 
 			// registra un jugador entrante como jugador normal
-			HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, false);
+			//HandleEvent_NewConnection(inDataStruct, inPlayer, inEventType, false);
 		}
 		else if (inEventType == UStructType::FStructMatchConfig) {
 
@@ -140,26 +155,80 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 ///
 void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType, bool isMasterClient = false) {
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_NewConnection"));
-	//Registrar en playersManager
-	playersManager->AddNewPlayer((FStructNewConnection*)inDataStruct, inPlayer);
+	
+	FStructRequestIDClient clienteWelcome;
+	networkManager->SendNow(&clienteWelcome, inPlayer);
 
-	if (isMasterClient) {
-		StructPlayer* structPlayer = playersManager->GetDataStructPlayer(inPlayer);
-		structPlayer->clientMaster = true; //Es el ClientMaster
-										   //Contestar al cliente
-	}
-
-	//Enviamos al cliente el success 
-	FStructOrderMenu clientResponse;
-	clientResponse.orderType = static_cast<uint8>(MenuOrderType::Welcome);
-	clientResponse.playerIndex = inPlayer;
-	clientResponse.isClientMaster = isMasterClient;
-	networkManager->SendNow(&clientResponse, inPlayer);
-
-	//Si es el MasterClient, es que estamos en WaitingMasterClient y cambiamos de estado al WaitingGameConfiguration
-	if(isMasterClient) this->UpdateState(); 
-
+	/*
+	
+	*/
 }
+
+///Cuando el Cliente envia su IDCliente al Servidor
+void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType)
+{
+	FStructClientID* ID_Client = (FStructClientID*)inDataStruct;
+	StructPlayer* aux_theClient = playersManager->GetStructPlayerByIDClient(ID_Client->ID_Client);
+	if (aux_theClient) //Existe el Cliente ya en el Server - Reconexión
+	{
+		networkManager->GetSocketManager()->ReconnectSockets(aux_theClient->ID_PLAYER, inPlayer);
+
+		if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
+		{
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::ConfigureMatch);
+			clientResponse.playerIndex = aux_theClient->ID_PLAYER;
+			clientResponse.isClientMaster = aux_theClient->clientMaster;
+			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
+		}
+	}
+	else //No existe el Cliente en el Server - Nuevo Cliente (SI PROCEDE SEGUN ESTADO)
+	{
+		if (structServerState->enumServerState == EServerState::WaitingMasterClient) //Inicio
+		{
+			//Registrar en playersManager
+			playersManager->AddNewPlayer(ID_Client->ID_Client, inPlayer);
+
+			StructPlayer* structPlayer = playersManager->GetDataStructPlayer(inPlayer);
+			structPlayer->clientMaster = true; //Es el ClientMaster
+			//Contestar al cliente
+			//Enviamos al cliente el success 
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::ConfigureMatch);
+			clientResponse.playerIndex = inPlayer;
+			clientResponse.isClientMaster = true;
+			networkManager->SendNow(&clientResponse, inPlayer);
+
+			//Como ya tenemos un Cliente, actualizamos el estado a menu principal del Servidor
+			this->UpdateState();
+		}
+		else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
+		{
+			//Registrar en playersManager
+			playersManager->AddNewPlayer(ID_Client->ID_Client, inPlayer);
+
+			StructPlayer* structPlayer = playersManager->GetDataStructPlayer(inPlayer);
+			structPlayer->clientMaster = false; //Es el ClientMaster
+											   //Contestar al cliente
+											   //Enviamos al cliente el success 
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::WaitingMatchConfiguration);
+			clientResponse.playerIndex = inPlayer;
+			clientResponse.isClientMaster = false;
+			networkManager->SendNow(&clientResponse, inPlayer);
+		}
+		else  //EL JUEGO SE ENCUENTRA EN PARTIDA  Y NO ACEPTA NUEVOS CLIENTES
+		{
+			
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::NoConnectionAllowed);
+
+			networkManager->SendNow(&clientResponse, inPlayer);
+		}
+	}
+}
+
+
 
 /// Cuando el MasterClient cambia un valor de la configuración del match ...
 void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {

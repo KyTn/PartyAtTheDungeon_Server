@@ -29,7 +29,7 @@ public:
 
 	//Funciones de gestion de conexion
 
-	void AddNewPlayer(FStructNewConnection* newClientConnection, int player);
+	void AddNewPlayer(FString newID_Client, int player);
 	int GetNumPlayers();
 
 
@@ -42,6 +42,7 @@ public:
 	bool AnyPlayerDead();
 	bool AllAnimationEnd();
 	int GetIndexClientMaster();
+	StructPlayer* GetStructPlayerByIDClient(FString ID_ClientToSearch);
 
 	int GetMaxLenghtActions(EActionPhase phase);
 	int GetPlayerMaxLenghtActions(EActionPhase phase);
