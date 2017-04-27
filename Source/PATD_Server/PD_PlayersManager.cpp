@@ -60,12 +60,11 @@ bool PD_PlayersManager::AllPlayersReady() {
 
 bool PD_PlayersManager::AllPlayersSendOrders() {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersSendOrders"));
+	bool checkAllPlayerSendData = true;
 	for (StructPlayer* player : dataPlayers) {
-		if ( (player->turnOrders->actions.Num() == 0 ) && ( player->turnOrders->positionsToMove.Num() == 0 )) {
-			return false;
-		}
+			checkAllPlayerSendData = checkAllPlayerSendData && player->playerSendOrder;
 	}
-	return true;
+	return checkAllPlayerSendData;
 }
 
 bool PD_PlayersManager::AnyPlayerDead() {
@@ -205,6 +204,7 @@ bool PD_PlayersManager::Check_All_Players_Have_Map_Already_Instantiated() {
 
 	for (int i = 0; i < dataPlayers.Num(); i++) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("mapAlreadyInstantiated for player %d is  %s"), dataPlayers[i]->ID_PLAYER,(dataPlayers[i]->mapAlreadyInstantiated ? TEXT("True") : TEXT("False")));
 		if (!dataPlayers[i]->mapAlreadyInstantiated)
 		{
 
@@ -219,13 +219,17 @@ bool PD_PlayersManager::Check_All_Players_Have_Map_Already_Instantiated() {
 
 void PD_PlayersManager::Mark_Player_As_Map_Already_Instantiated(int player) {
 
-	for (int i = 0; i < dataPlayers.Num(); i++) {
+	/*for (int i = 0; i < dataPlayers.Num(); i++) {
 		if (dataPlayers[i]->ID_PLAYER == player) {
 			dataPlayers[i]->mapAlreadyInstantiated = true;
 			UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::Mark_Player_As_Map_Already_Instantiated() Update mapAlreadyInstantiated on ID_PLAYER=%d"), dataPlayers[i]->ID_PLAYER);
 
 		}
 	}
+	*/
+	dataPlayers[player]->mapAlreadyInstantiated = true;
+	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::Mark_Player_As_Map_Already_Instantiated() Update mapAlreadyInstantiated on ID_PLAYER=%d"), dataPlayers[player]->ID_PLAYER);
+
 }
 
 #pragma endregion

@@ -65,8 +65,9 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 			// Si todos han instanciado el mapa, mandamos mensaje de pasar al Start_Match a los clientes
 			if (playersManager->Check_All_Players_Have_Map_Already_Instantiated()) {
 				Send_FStructClientStartMatchOnGM();
+				ChangeState(EGameState::Start_Match);
 			}
-			ChangeState(EGameState::Start_Match);
+			
 		}
 	}
 	else if (structGameState->enumGameState == EGameState::Start_Match) {
@@ -77,6 +78,7 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
 
 		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
+		playersManager->GetDataStructPlayer(inPlayer)->playerSendOrder = true; 
 		UpdateState();
 	}
 	
@@ -111,7 +113,6 @@ void PD_GM_GameManager::UpdateState() {
 		this->ChangeState(EGameState::WaitingPlayerOrders);
 		
 	}else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
-		
 		//Transiciones de estados
 		if (playersManager->AllPlayersSendOrders()) {
 			this->ChangeState(EGameState::ExecutingPlayersTurn);
@@ -177,7 +178,7 @@ void PD_GM_GameManager::OnBeginState() {
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingPlayersLogic"));
-		PlayersLogicTurn();
+		//PlayersLogicTurn();
 		InitPhase();
 		
 
@@ -200,7 +201,7 @@ void PD_GM_GameManager::OnBeginState() {
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: ExecutingEnemiesLogic"));
-		PlayersLogicTurn();
+		//PlayersLogicTurn();
 		InitPhase();
 		
 
@@ -216,6 +217,7 @@ void PD_GM_GameManager::OnBeginState() {
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
 			structPlayer->turnOrders->positionsToMove.Empty();
 			structPlayer->turnOrders->actions.Empty();
+			structPlayer->playerSendOrder = false;
 			//structPlayer->turnOrders->consumablesToConsume.Empty();
 			//structPlayer->turnOrders->interactuablesToInteract.Empty();
 
@@ -1044,6 +1046,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		}
 
 		//Llamar al procceso del movimiento logico
+		PlayersLogicTurn();
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
