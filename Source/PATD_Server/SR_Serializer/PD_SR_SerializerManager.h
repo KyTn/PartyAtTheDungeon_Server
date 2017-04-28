@@ -125,6 +125,8 @@ public:
 		}break;
 
 		default:
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
+
 			return nullptr;
 
 		}
@@ -224,7 +226,7 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 	}break;
 
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Tipo de ustruct no reconocido"));
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
 		break;
 	}
 

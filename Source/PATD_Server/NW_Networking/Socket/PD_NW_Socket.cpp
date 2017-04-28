@@ -76,7 +76,7 @@ bool PD_NW_Socket::SendData(TArray<uint8>* sendData) {
 
 	//Mirar si la el CountBytes funciona adecuadamente o esta metiendo bytes de mas para el array. (este serializando de mas)
 
-	
+
 	bool successful = socket->Send(sendData->GetData(), sendData->Num(), bytesReceived);
 	UE_LOG(LogTemp, Error, TEXT("Nivel Socket:>>> SendData :  want to send: %d, send: %d"), sendData->Num(), bytesReceived);
 	if (successful) {
@@ -90,18 +90,19 @@ bool PD_NW_Socket::SendData(TArray<uint8>* sendData) {
 	return successful;
 }
 
-TArray<TArray<uint8>*> PD_NW_Socket::ReceiveData() {
+TArray<uint8>* PD_NW_Socket::ReceiveData() {
 
-	TArray<TArray<uint8>*> listPackages;
+
 	//Ahora mismo, al no tener datos para recibir y el que haya un error se devuelve lo mismo, null.
 	// ERROR!
 	if (!socket)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Nivel Socket:>>> No hay Socket Creado! "));
-		return listPackages;
+		//		return listPackages;
 	}
 
 	TArray<uint8>* receivedData = nullptr;
+	TArray<uint8>* receivedDataTotal = new TArray<uint8>();
 
 	uint32 Size;
 	//El while nos come todos los pendings pero solo se queda con el ultimo. No tiene mucho sentido
@@ -110,7 +111,7 @@ TArray<TArray<uint8>*> PD_NW_Socket::ReceiveData() {
 	while (socket->HasPendingData(Size))
 	{
 
-		
+
 		//Estamos creando los datos nuevos en el HEAP
 		receivedData = new TArray<uint8>(); //Aqui creamos reserva de memoria en heap para el array.
 		receivedData->Init(0, FMath::Min(Size, 65507u));
@@ -119,25 +120,25 @@ TArray<TArray<uint8>*> PD_NW_Socket::ReceiveData() {
 		socket->Recv(receivedData->GetData(), receivedData->Num(), Read);
 
 		UE_LOG(LogTemp, Error, TEXT("Nivel Socket:>>> ReceiveData : bucle while numero %d:, size: %d, read: %d"), i, Size, Read);
-		
+
 
 
 		// ERROR!
 		if (receivedData == nullptr || receivedData->Num() <= 0)
 		{
 			//	UE_LOG(LogTemp, Error, TEXT(">>>> No se han enviado datos ! "));
-			return listPackages; //No Data Received
+			return receivedDataTotal; //No Data Received
 		}
 		else {
 			//	UE_LOG(LogTemp, Warning, TEXT(">>>> Se van a enviar DATOS :) ! "));
 		}
 
-		listPackages.Add(receivedData);
-		
+		receivedDataTotal->Append(*receivedData);
+
 		i++; //solo para debug
 	}
 
-	return listPackages;
+	return receivedDataTotal;
 }
 
 
@@ -208,7 +209,7 @@ PD_NW_Socket* PD_NW_Socket::ReceiveNewConnection() {
 void PD_NW_Socket::InitAsListener(FString ip, int port) {
 	//Muevo aqui el codigo que antes estaba en el gameinstance (castIP). Por que al fin y al cabo la inicializacion
 	//es partiendo de la logica de Unreal.
-	UE_LOG(LogTemp, Warning, TEXT("Nivel Socket: InitAsListener: ip:%s port %d "),*ip,port);
+	UE_LOG(LogTemp, Warning, TEXT("Nivel Socket: InitAsListener: ip:%s port %d "), *ip, port);
 
 	//IP Formatting
 	ip.Replace(TEXT(" "), TEXT(""));
@@ -224,7 +225,7 @@ void PD_NW_Socket::InitAsListener(FString ip, int port) {
 	{
 		ipArray.Add(FCString::Atoi(*Parts[i]));
 	}
-	
+
 
 	FIPv4Endpoint Endpoint(FIPv4Address(ipArray[0], ipArray[1], ipArray[2], ipArray[3]), port);
 	this->socket = FTcpSocketBuilder("Listener Socket").AsReusable().BoundToEndpoint(Endpoint).Listening(8);
