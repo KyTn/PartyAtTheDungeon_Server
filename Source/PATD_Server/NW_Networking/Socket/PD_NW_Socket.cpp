@@ -105,8 +105,7 @@ TArray<uint8>* PD_NW_Socket::ReceiveData() {
 	TArray<uint8>* receivedDataTotal = new TArray<uint8>();
 
 	uint32 Size;
-	//El while nos come todos los pendings pero solo se queda con el ultimo. No tiene mucho sentido
-	//Lo dejamos en un unico if, y la informacion que pueda seguir habiendo se quedara para el siguiente tick
+	//el while hace append de todo lo que reciba hasta agotar el buffer de entrada (cuando no haya hasPendingData)
 	int i = 0;
 	while (socket->HasPendingData(Size))
 	{
