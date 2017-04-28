@@ -181,6 +181,29 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 			clientResponse.isClientMaster = aux_theClient->clientMaster;
 			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
 		}
+		else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::Lobby_Tabern);
+			clientResponse.playerIndex = aux_theClient->ID_PLAYER;
+			clientResponse.isClientMaster = aux_theClient->clientMaster;
+			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
+			/*  */
+
+			//Esto no deberia no ir en el staticmapref?
+			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
+			FString mapString = mapManager->StaticMapRef->GetMapString();
+			//Enviar mapa al cliente
+			FStructMap structMap;
+			structMap.stringMap = mapString;
+			networkManager->SendNow(&structMap, -1);
+			//Con esto ya va a la taberna.
+		}
+		else if (structServerState->enumServerState == EServerState::GameInProcess) {
+			//
+
+		}else if (structServerState->enumServerState == EServerState::Launch_Match) {
+			//Aqui yo pienso que podemos no dejar entrar al nuevo. Poner algo asi como "el juego esta cargando, por favor intenta reconectarte cuando termine"
+		}
 	}
 	else //No existe el Cliente en el Server - Nuevo Cliente (SI PROCEDE SEGUN ESTADO)
 	{
