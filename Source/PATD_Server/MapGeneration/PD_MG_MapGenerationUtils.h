@@ -91,6 +91,7 @@ struct RoomTemplateInfo {
 			MAP_DATA.Add(p, StaticMapElement::SPECIAL_TILE);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			SPECIAL_TILES.Add(p);
+			NORMAL_TILES.Add(p);
 			break;
 		case 'W':
 			MAP_DATA.Add(p, StaticMapElement::WALL_ONLY);
@@ -162,20 +163,21 @@ struct MapProceduralInfo {
 			R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(),
 			C.GetX(), C.GetY(),
 			R_pivot.GetX(), R_pivot.GetY(), *(R.NAME));
-
-		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(R.LOCAL_LOGIC_POSITIONS_ON_ROOM[0], C, R_pivot);
+		PD_MG_LogicPosition start;
+		start.SetX(0); start.SetY(0);///Se deberia coger la (0,0) porque sino da problemas de desplazamiento
+		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(start, C, R_pivot);
 		R.UpdateBoundingBoxes(bb_t_l);
 		R.ID = ID;
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];
-			PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
+			//PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
 
-			if (bb_t_l.GetX() > mapPosition.GetX() &&
+			/*if (bb_t_l.GetX() > mapPosition.GetX() &&
 				bb_t_l.GetY() > mapPosition.GetY()) {
 				bb_t_l.SetX(mapPosition.GetX());
 				bb_t_l.SetY(mapPosition.GetY());
 				R.UpdateBoundingBoxes(bb_t_l);
-			}
+			}*/
 
 
 			/// AÑADIMOS EL ELEMENTO AL MAPA DE ELEMENTOS
