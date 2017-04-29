@@ -24,7 +24,7 @@ struct StructPlayer {
 	bool clientMaster;
 	//Ingame data
 	FStructTurnOrders* turnOrders;
-
+	bool playerSendOrder;
 	//PD_MG_LogicPosition* logicPosition;
 //	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
@@ -37,7 +37,9 @@ struct StructPlayer {
 	StructPlayer() {
 		clientMaster = false;
 		readyMenu = false; //¿que es esto?
+		mapAlreadyInstantiated = false;
 		turnOrders = new FStructTurnOrders();
+		playerSendOrder = false;
 		player_character = new FStructCharacter();
 		update_character = new FStructUpdateCharacter();
 	}
