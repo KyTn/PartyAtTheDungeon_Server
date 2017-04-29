@@ -288,7 +288,7 @@ PD_MM_Room::~PD_MM_Room()
 
 bool PD_MM_Room::AddLogicPos(PD_MG_LogicPosition logpos) { return LogicPosInRoom.AddUnique(logpos) >= 0; }
 bool PD_MM_Room::AddLogicWallPos(PD_MG_LogicPosition logpos) { return LogicWallPosInRoom.AddUnique(logpos) >= 0; }
-bool PD_MM_Room::AddTile(PD_MG_LogicPosition logpos, AActor* tile){ return false; }
-bool PD_MM_Room::AddWall(PD_MG_LogicPosition logpos, AActor* wall){ return false; }
-bool PD_MM_Room::AddInteractuable(PD_MG_LogicPosition logpos, AActor* interactuable) { return false; }
+bool PD_MM_Room::AddTile(PD_MG_LogicPosition logpos, AActor* tile) { return tiles.Add(logpos, tile) != nullptr; }
+bool PD_MM_Room::AddWall(PD_MG_LogicPosition logpos, AActor* wall){ return walls.Add(logpos, wall) != nullptr; }
+bool PD_MM_Room::AddInteractuable(PD_MG_LogicPosition logpos, AActor* interactuable) { return interactuables.Add(logpos, interactuable) != nullptr; }
 #pragma endregion

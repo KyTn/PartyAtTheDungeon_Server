@@ -23,7 +23,7 @@ struct StructPlayer {
 	bool clientMaster;
 	//Ingame data
 	FStructTurnOrders* turnOrders;
-	bool playerSendOrder;
+	//bool playerSendOrder;
 	//PD_MG_LogicPosition* logicPosition;
 //	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
