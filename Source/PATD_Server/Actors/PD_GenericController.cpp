@@ -165,8 +165,8 @@ void APD_GenericController::MoveWithSpline()
 	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
 	FVector currentPosition = GetPawn()->GetActorLocation();
 
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
 
 	//Se comparan las posiciones entre la actual del Character y su posicion final para ver si ha llegado a su destino y tiene que dejar de moverse
 
@@ -194,7 +194,7 @@ void APD_GenericController::MoveWithSpline()
 	{
 		FName boneName = "cabesa";
 		bool newSimulate = false;
-		bool includeSelf = true;
+		bool includeSelf = false;
 		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
 		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
 		GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);

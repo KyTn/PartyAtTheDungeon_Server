@@ -319,7 +319,7 @@ Por claridad es mejor que el nombre del struct coincida con el del enumerado. (a
 */
 
 enum class UStructType {
-	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructRequestIDClient = 3, FStructClientID = 4 , FStructWelcome = 5, FStructPing = 6, FStructPong = 7, FStructMap = 10, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
+	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructRequestIDClient = 3, FStructClientID = 4 , FStructWelcome = 5, FStructPing = 6, FStructPong = 7, FStructLostConnection=8, FStructMap = 10, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
 	FStructCharacter = 40, FStructUpdateTurn = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52,
 	FStructInstatiatePlayers = 60
 };
@@ -329,6 +329,43 @@ enum class UStructType {
 //=================================
 ///Structs SERIALIZABLES (heredan de FStructGeneric) (Se envian)
 //=================================
+
+//se generan en el propio networkmanager
+
+USTRUCT()
+struct FStructNewConnection : public FStructGeneric
+{	//No necesita estar en el serializeManager
+	//FStructNewConnection: struct que crea el networkmanager(no necesita serializacion)
+	GENERATED_BODY()
+
+
+
+		//Constructor
+		FStructNewConnection()
+	{
+		structType = static_cast<uint8>(UStructType::FStructNewConnection);
+	}
+
+};
+
+USTRUCT()
+struct FStructLostConnection : public FStructGeneric
+{	//No necesita estar en el serializeManager
+	//FStructNewConnection: struct que crea el networkmanager(no necesita serializacion)
+	GENERATED_BODY()
+
+		uint8 indexPlayer;
+
+		//Constructor
+		FStructLostConnection()
+	{
+		structType = static_cast<uint8>(UStructType::FStructLostConnection);
+	}
+
+};
+
+
+
 
 //COMPROBACION DE RED
 USTRUCT()
@@ -462,21 +499,7 @@ struct FStructInstatiatePlayers : public FStructGeneric
 	}
 };
 
-USTRUCT()
-struct FStructNewConnection : public FStructGeneric
-{	//No necesita estar en el serializeManager
-	//FStructNewConnection: struct que crea el networkmanager(no necesita serializacion)
-	GENERATED_BODY()
 
-
-
-		//Constructor
-		FStructNewConnection()
-	{
-		structType = static_cast<uint8>(UStructType::FStructNewConnection);
-	}
-
-};
 
 USTRUCT()
 struct FStructMap : public FStructGeneric

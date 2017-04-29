@@ -82,6 +82,9 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 			playersManager->GetDataStructPlayer(inPlayer)->playerSendOrder = true;
 			UpdateState();
 		}
+		else if (inEventType == UStructType::FStructLostConnection) {
+			UpdateState();
+		}
 	}
 	
 	//if(playerManager->AllPlayersSendOrders())
@@ -95,7 +98,8 @@ bool PD_GM_GameManager::SuscribeToEvents(int inPlayer, UStructType inType) {
 	else if (inType == UStructType::FStructClientStartMatchOnGM) return true;				
 	else if (inType == UStructType::FStructInstatiatePlayers) return true;					
 	else if (inType == UStructType::FStructOrderMenu) return true;							
-	else if (inType == UStructType::FStructUpdateTurn) return true;							
+	else if (inType == UStructType::FStructUpdateTurn) return true;	
+	else if (inType == UStructType::FStructLostConnection) return true;
 	else return false;
 }
 
@@ -119,6 +123,7 @@ void PD_GM_GameManager::UpdateState() {
 		if (playersManager->AllPlayersSendOrders()) {
 			this->ChangeState(EGameState::ExecutingPlayersTurn);
 		}
+
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
@@ -775,7 +780,9 @@ void PD_GM_GameManager::VisualMoveTick() {
 		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 		{
-			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
+			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
+			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+			positionsToMove.Add(v);
 		}
 
 		logicCharacter->MoveToPhysicalPosition(positionsToMove);

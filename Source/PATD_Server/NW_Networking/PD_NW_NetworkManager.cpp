@@ -329,6 +329,10 @@ bool PD_NW_NetworkManager::CheckForPongAllClients() //comprueba que todos los cl
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Desconectado"), i));
 				SGI->playersManager->GetDataPlayers()[i]->isConnected = false;
 				allClientsConnected = false;
+				FStructLostConnection lostConnection;
+				lostConnection.indexPlayer = i;
+				eventManager->GenerateEvent(&lostConnection, i);
+
 			}
 
 			if (SGI->playersManager->GetDataPlayers()[i]->pingPong == 2) // SI ha recibido el pong que lo cambia a 2 --> mirar HandlePong_Event
@@ -336,6 +340,7 @@ bool PD_NW_NetworkManager::CheckForPongAllClients() //comprueba que todos los cl
 				if (!SGI->playersManager->GetDataPlayers()[i]->isConnected)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Conectado"), i));
+
 				}
 				SGI->playersManager->GetDataPlayers()[i]->isConnected = true;
 			}
