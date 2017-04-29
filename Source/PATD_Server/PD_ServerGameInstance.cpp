@@ -203,6 +203,54 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 		else if (structServerState->enumServerState == EServerState::GameInProcess) {
 			//
 			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - GameInProcess"));
+			FStructWelcome clientResponse;
+			clientResponse.GameState = static_cast<uint8>(GameState::GameInProcess);
+			clientResponse.playerIndex = aux_theClient->ID_PLAYER;
+			clientResponse.isClientMaster = aux_theClient->clientMaster;
+			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
+			//Con esto iria al ReconnectingInGame state
+
+
+			//Esto no deberia no ir en el staticmapref?
+			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
+			FString mapString = mapManager->StaticMapRef->GetMapString();
+			//Enviar mapa al cliente
+			FStructMap structMap;
+			structMap.stringMap = mapString;
+			networkManager->SendNow(&structMap, -1);
+		
+			//Habria que pasarle un struct con su propio personaje, ya que no lo va a poder crear porque no pasa por el lobby
+
+			//Con esto hacemos que haga launchMatch como cuando todos dan ready en el lobby
+			FStructClientStartMatchOnGM launchMatch = FStructClientStartMatchOnGM();
+			networkManager->SendNow(&launchMatch, -1);
+
+
+			//Enviar lista de players al cliente
+			FStructInstatiatePlayers listInstantiatePlayers;
+			for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+				if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
+					UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::OnBeginState(): EServerState::Launch_Match:  Launch_Match: id_player e indice de players manager no coincide"));
+				}
+				FStructPlayerInfoAtClient infoPlayer;
+				infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
+				infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+				infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
+				PD_MG_LogicPosition pos = playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition();
+
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: player %d at (%d,%d)"), i, pos.GetX(), pos.GetY());
+
+				infoPlayer.logicPosition.positionX = pos.GetX();
+				infoPlayer.logicPosition.positionY = pos.GetY();
+				listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
+			}
+
+			//No hacemos broadcast porque enviamos un paquete a cada uno indicando cual es el ID de su propio personaje
+			for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+				listInstantiatePlayers.idClientCharacter = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+				networkManager->SendNow(&listInstantiatePlayers, i);
+			}
+
 
 		}else if (structServerState->enumServerState == EServerState::Launch_Match) {
 			//Aqui yo pienso que podemos no dejar entrar al nuevo. Poner algo asi como "el juego esta cargando, por favor intenta reconectarte cuando termine"

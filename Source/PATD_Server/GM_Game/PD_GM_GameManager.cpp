@@ -75,11 +75,13 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 	}
 	else if (structGameState->enumGameState == EGameState::WaitingPlayerOrders) 
 	{
-		FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
+		if (inEventType == UStructType::FStructTurnOrders) {
+			FStructTurnOrders* turnStruct = (FStructTurnOrders*)inDataStruct;
 
-		playersManager->GetDataStructPlayer(inPlayer)->turnOrders=turnStruct;
-		playersManager->GetDataStructPlayer(inPlayer)->playerSendOrder = true; 
-		UpdateState();
+			playersManager->GetDataStructPlayer(inPlayer)->turnOrders = turnStruct;
+			playersManager->GetDataStructPlayer(inPlayer)->playerSendOrder = true;
+			UpdateState();
+		}
 	}
 	
 	//if(playerManager->AllPlayersSendOrders())
