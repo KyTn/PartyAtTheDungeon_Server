@@ -2,7 +2,7 @@
 
 #include "PATD_Server.h"
 #include "PD_NW_TimerActor.h"
-
+#include "NW_Networking/PD_NW_NetworkManager.h"
 //Includes of forward declaration
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
 
@@ -35,8 +35,11 @@ void APD_NW_TimerActor::Tick(float DeltaTime)
 void APD_NW_TimerActor::InitTimerActor()
 {
 	GetWorldTimerManager().SetTimer(TimerHandleActor, this, &APD_NW_TimerActor::CheckForReceivedData, 0.01f, true);
+	
 
-	//Timers de prueba
+	//Mandar un ping cada 10 s (tiempo configurable) 
+	FTimerHandle handleForPing;
+	GetWorldTimerManager().SetTimer(handleForPing, this, &APD_NW_TimerActor::PingFunctionCallbyNetworkManager, 2.00f, true);
 
 
 }
@@ -57,9 +60,24 @@ bool APD_NW_TimerActor::isTimerActive() {
 	return GetWorldTimerManager().IsTimerActive(TimerHandleActor);
 }
 
+void APD_NW_TimerActor::CheckForClientsPong()
+{
+	FTimerHandle handleForPong;
+	GetWorldTimerManager().SetTimer(handleForPong, this, &APD_NW_TimerActor::PongFunctionCallbyNetworkManager, 0.50f, false);
+
+}
 
 
+void APD_NW_TimerActor::PongFunctionCallbyNetworkManager()
+{
+	//A los dos segundos se ejecutara esta funcion del NetWorkManager para la comprobacion de los pong
+	SocketManager->GetNetworkManager()->CheckForPongAllClients();
+}
 
+void APD_NW_TimerActor::PingFunctionCallbyNetworkManager()
+{
+	SocketManager->GetNetworkManager()->SendBroadCastPingAllClients();
+}
 
 //Funciones de prueba
 

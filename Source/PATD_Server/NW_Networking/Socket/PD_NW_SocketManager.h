@@ -125,5 +125,4 @@ public:
 	//Envio
 	bool SendInfoTo(int indexSocket, TArray<uint8>* data);
 
-
 };

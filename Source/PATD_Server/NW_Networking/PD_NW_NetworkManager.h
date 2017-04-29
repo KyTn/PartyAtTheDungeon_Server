@@ -84,4 +84,9 @@ public:
 	void HandleNewSocketData(TArray<uint8>* data, int socketIndex);
 	void HandleNewConnectionSocketListener(int player);
 
+
+	//Comprobar la conexion de los clientes - Ver la desconexion
+	void SendBroadCastPingAllClients(); //Manda un ping a todos los clientes
+	bool CheckForPongAllClients(); //comprueba que todos los clientes han recibido el ping - enviado el pong
+
 };

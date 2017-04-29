@@ -92,6 +92,8 @@ public:
 	void HandleEvent_ConfigMatchDone(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
 	void HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType);
 	void HandleEvent_LoadPlayerInfo(FStructGeneric* inDataStruct, int inPlayer);
+	void HandleEvent_PongReceive(FStructGeneric* inDataStruct, int inPlayer);
+	void HandleEvent_PingReceive(FStructGeneric* inDataStruct, int inPlayer);
 
 
 	//Carga de mapa

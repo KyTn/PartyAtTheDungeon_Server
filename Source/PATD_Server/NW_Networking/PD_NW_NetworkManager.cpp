@@ -1,12 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PATD_Server.h"
+#include "Structs/PD_ServerStructs.h"
 #include "PD_NW_NetworkManager.h"
+#include "../PD_ServerGameInstance.h"
+#include "PD_NW_TimerActor.h"
+#include "PD_PlayersManager.h"
 
 //Includes of forward declaration
 #include "NW_NetWorking/Socket/PD_NW_SocketManager.h"
 #include "NW_NetWorking/EventLayer/PD_NW_EventManager.h"
 #include "SR_Serializer/PD_SR_SerializerManager.h"
+
 
 
 PD_NW_NetworkManager::PD_NW_NetworkManager()
@@ -288,4 +293,54 @@ bool PD_NW_NetworkManager::RegisterObserver(PD_NW_iEventObserver* observer) {
 
 bool PD_NW_NetworkManager::UnregisterObserver(PD_NW_iEventObserver* observer) {
 	return eventManager->UnregisterObserver(observer);
+}
+
+void PD_NW_NetworkManager::SendBroadCastPingAllClients() //Manda un ping a todos los clientes
+{
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(socketManager->GetTimerActor()->GetGameInstance());
+	if (SGI)
+	{
+		//Seteamos las variables pingPong de cada cliente a 1
+		for (int i = 0; i < SGI->playersManager->GetNumPlayers(); i++)
+		{
+			SGI->playersManager->GetDataPlayers()[i]->pingPong = 1;
+		}
+	
+		//Enviamos el Ping a todos los clientes
+		FStructPing* ping = new FStructPing();
+		SendNow(ping, -1);
+
+		//Llamamos al Timer para que en 2 segundos compruebe que todos han enviado el pong de vuelta (tiempo configurable)
+		socketManager->GetTimerActor()->CheckForClientsPong();
+	}
+}
+
+bool PD_NW_NetworkManager::CheckForPongAllClients() //comprueba que todos los clientes han recibido el ping - enviado el pong
+{
+	bool allClientsConnected = true;
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(socketManager->GetTimerActor()->GetGameInstance());
+	if (SGI)
+	{
+		//Seteamos las variables pingPong de cada cliente a 1
+		for (int i = 0; i < SGI->playersManager->GetNumPlayers(); i++)
+		{
+			if (SGI->playersManager->GetDataPlayers()[i]->pingPong == 1) //No ha recibido el pong que lo cambia a 2 --> mirar HandlePong_Event
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Desconectado"), i));
+				SGI->playersManager->GetDataPlayers()[i]->isConnected = false;
+				allClientsConnected = false;
+			}
+
+			if (SGI->playersManager->GetDataPlayers()[i]->pingPong == 2) // SI ha recibido el pong que lo cambia a 2 --> mirar HandlePong_Event
+			{
+				if (!SGI->playersManager->GetDataPlayers()[i]->isConnected)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Conectado"), i));
+				}
+				SGI->playersManager->GetDataPlayers()[i]->isConnected = true;
+			}
+		}
+	}
+
+	return allClientsConnected;
 }

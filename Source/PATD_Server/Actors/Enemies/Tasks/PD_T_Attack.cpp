@@ -50,13 +50,13 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 		else {
 			//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin player near - finalizando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
-			return EBTNodeResult::Failed;
+			return EBTNodeResult::Succeeded;
 		}
 			
 	}
 	else {
 		//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin ap - finalizando  .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
-		return EBTNodeResult::Failed;
+		return EBTNodeResult::Succeeded;
 	}
 		
 }
