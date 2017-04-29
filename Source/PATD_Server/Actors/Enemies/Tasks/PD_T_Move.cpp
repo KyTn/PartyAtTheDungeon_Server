@@ -42,9 +42,10 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 			}
 		}
 		minim.RemoveAt(minim.Num()-1);
+		FStructTurnOrders* turnStruct = AIController->GetTurnOrders();
 		if (ap > minim.Num()&& minim.Num()>0) {
 			//UE_LOG(LogTemp, Log, TEXT("PD_T_Move::ExecuteTask: Enemigo va a moverse con pathfinder .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
-			FStructTurnOrders* turnStruct = AIController->GetTurnOrders();
+			
 
 			for (PD_MG_LogicPosition logicPos : minim)
 			{
@@ -59,6 +60,7 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 		}
 		else {
 			//UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Enemigo no se mueve por que esta lejos .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
+			///Movimiento aleatorio
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("AP", 0);
 			//aleatorio
 		}
@@ -68,5 +70,5 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 	}
 	else
 		//UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Terminando por no .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
-		return EBTNodeResult::Failed;
+		return EBTNodeResult::Succeeded;
 }

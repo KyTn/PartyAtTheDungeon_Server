@@ -16,6 +16,7 @@
 APD_AIController::APD_AIController(){
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
 	BehaviorTreeComp = CreateDefaultSubobject<UBehaviorTreeComponent>("BehaviorTreeComp");
+	actions = FStructTurnOrders();
 }
 
 void APD_AIController::Possess(APawn* charac)
@@ -47,7 +48,7 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_Log
 	BlackboardComp->SetValueAsInt("AP", 5);
 
 	APD_E_Character* ch = Cast<APD_E_Character>(GetPawn());
-	BehaviorTreeComp->StartTree(*ch->behaviorTree, EBTExecutionMode::Looped);
+	BehaviorTreeComp->StartTree(*ch->behaviorTree, EBTExecutionMode::SingleRun);
 }
 
 

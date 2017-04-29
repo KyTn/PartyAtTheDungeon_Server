@@ -170,7 +170,7 @@ struct MapProceduralInfo {
 		R.ID = ID;
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];
-			//PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
+			PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
 
 			/*if (bb_t_l.GetX() > mapPosition.GetX() &&
 				bb_t_l.GetY() > mapPosition.GetY()) {
