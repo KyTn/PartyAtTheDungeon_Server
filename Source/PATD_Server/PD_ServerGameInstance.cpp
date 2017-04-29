@@ -109,8 +109,6 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 
 			// Cuando un jugador envía READY, marcarlo como preparado. 
 			HandleEvent_PlayerReady(inDataStruct, inPlayer, inEventType);
-
-
 			//FStructOrderMenu* menuOrder = (FStructOrderMenu*)inDataStruct;
 			//if (MenuOrderType(menuOrder->orderType) == MenuOrderType::ClientReady) {
 			//	playersManager->getDataStructPlayer(inPlayer)->readyMenu = !playersManager->getDataStructPlayer(inPlayer)->readyMenu;
@@ -167,6 +165,8 @@ void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStr
 ///Cuando el Cliente envia su IDCliente al Servidor
 void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient"));
+
 	FStructClientID* ID_Client = (FStructClientID*)inDataStruct;
 	StructPlayer* aux_theClient = playersManager->GetStructPlayerByIDClient(ID_Client->ID_Client);
 	if (aux_theClient) //Existe el Cliente ya en el Server - Reconexión
@@ -175,6 +175,7 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 
 		if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
 		{
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - WaitingGameConfiguration"));
 			FStructWelcome clientResponse;
 			clientResponse.GameState = static_cast<uint8>(GameState::ConfigureMatch);
 			clientResponse.playerIndex = aux_theClient->ID_PLAYER;
@@ -182,6 +183,7 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
 		}
 		else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - Lobby_Tabern"));
 			FStructWelcome clientResponse;
 			clientResponse.GameState = static_cast<uint8>(GameState::Lobby_Tabern);
 			clientResponse.playerIndex = aux_theClient->ID_PLAYER;
@@ -200,15 +202,20 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 		}
 		else if (structServerState->enumServerState == EServerState::GameInProcess) {
 			//
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - GameInProcess"));
 
 		}else if (structServerState->enumServerState == EServerState::Launch_Match) {
 			//Aqui yo pienso que podemos no dejar entrar al nuevo. Poner algo asi como "el juego esta cargando, por favor intenta reconectarte cuando termine"
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - Launch_Match"));
+
 		}
 	}
 	else //No existe el Cliente en el Server - Nuevo Cliente (SI PROCEDE SEGUN ESTADO)
 	{
 		if (structServerState->enumServerState == EServerState::WaitingMasterClient) //Inicio
 		{
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - WaitingMasterClient - NEW CLIENT"));
+
 			//Registrar en playersManager
 			playersManager->AddNewPlayer(ID_Client->ID_Client, inPlayer);
 
@@ -227,6 +234,8 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 		}
 		else if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
 		{
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - WaitingGameConfiguration - NEW CLIENT"));
+
 			//Registrar en playersManager
 			playersManager->AddNewPlayer(ID_Client->ID_Client, inPlayer);
 
@@ -242,7 +251,8 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 		}
 		else  //EL JUEGO SE ENCUENTRA EN PARTIDA  Y NO ACEPTA NUEVOS CLIENTES
 		{
-			
+			UE_LOG(LogTemp, Warning, TEXT("UPD_ServerGameInstance::HandleEvent_IDClient - CONECTION NOT ALLOWED - NEW CLIENT"));
+
 			FStructWelcome clientResponse;
 			clientResponse.GameState = static_cast<uint8>(GameState::NoConnectionAllowed);
 

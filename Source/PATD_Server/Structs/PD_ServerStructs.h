@@ -20,13 +20,10 @@ struct StructPlayer {
 	// Si el cliente del jugador a instanciado ya el mapa o no. 
 	bool mapAlreadyInstantiated;
 
-	//Si el player ha enviado ordenes
-	bool playerSendOrder;
-
 	bool clientMaster;
 	//Ingame data
 	FStructTurnOrders* turnOrders;
-	//bool playerSendOrder;
+	bool playerSendOrder;
 	//PD_MG_LogicPosition* logicPosition;
 //	PD_GM_GameManager* gameManager;
 	//Puntero a Struct de caracteristicas del jugador.
