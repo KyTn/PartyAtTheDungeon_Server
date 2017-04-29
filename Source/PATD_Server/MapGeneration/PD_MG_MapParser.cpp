@@ -199,7 +199,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 		switch (type) {///En este switch metemos la IA lógica de cada uno
 			case ECharacterType::Archer: {
 			
-				FString id = "Arch" + FString::FromInt(i);
+				FString id = "Arch" + FString::FromInt(i - firstIndex);
 				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Archer %s in pos (%d,%d)"), *id, lp.GetX(),lp.GetY());
 				//enemyMan->AddEnemie(ch);
 				dynamicMapRef->AddNewEnemy(lp, type,id);
@@ -207,7 +207,7 @@ uint32 PD_MG_MapParser::ReadEnemiesMap(TArray<FString> fileReaded, uint32 firstI
 		}
 			case ECharacterType::Zombie: {
 				
-				FString id = "Zomb" + FString::FromInt(i);
+				FString id = "Zomb" + FString::FromInt(i - firstIndex);
 				//enemyMan->AddEnemie(ch);
 				dynamicMapRef->AddNewEnemy(lp, type,id);
 				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapParser::ReadEnemiesMap:Zombie %s in pos (%d,%d)"), *id, lp.GetX(), lp.GetY());
