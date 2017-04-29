@@ -41,7 +41,7 @@ void PD_NW_SocketManager::Init(APD_NW_TimerActor* InmyTimerActor, FString ip, in
 
 	if (isServer)
 	{
-		InitSocketManager_ServerMode(ip,port);
+		InitSocketManager_ServerMode(ip, port);
 	}
 	else
 	{
@@ -57,7 +57,7 @@ void PD_NW_SocketManager::InitSocketManager_ServerMode(FString ip, int port)
 	UE_LOG(LogTemp, Warning, TEXT("Socket MANAGER como SERVIDOR!! "));
 
 	//Inicializacion listener
-	if (InitListener(ip,port))
+	if (InitListener(ip, port))
 	{
 		//Cuando se ha creado el Socket Listener, puedes llamar al Actor para que empiece el Timer de Escuchar.
 		// Se llama en el init para todos.
@@ -77,13 +77,13 @@ void PD_NW_SocketManager::InitSocketManager_ClientMode(FString ip, int port)
 	//1.Crear el Socket que va a comunicar con el Servidor
 	//2.Comprobar que hay comunicacion
 	//3.Cuando hay comunicacion, Guadar dicho socket en el Array de Socket del SocketManager
-	
+
 	//Esto ya no se hace aqui, sino llamando a la funcion de conectar del networkmanager.
 	/*
 	if (ConnectDataSocket(ip, port) == -1) {
-		//ERROR!!
-		UE_LOG(LogTemp, Error, TEXT("No se ha podido crear el Socket Cliente! "));
-		return;
+	//ERROR!!
+	UE_LOG(LogTemp, Error, TEXT("No se ha podido crear el Socket Cliente! "));
+	return;
 	}*/
 
 	//Y si no conecta aqui porque es demasiado pronto y no esta el server up? 
@@ -104,9 +104,9 @@ bool PD_NW_SocketManager::InitListener(FString ip, int port) {
 	//deletear
 	delete listenerSocket;
 	}*/
-	
+
 	listenerSocket = new PD_NW_Socket();
-	listenerSocket->InitAsListener(ip,port);
+	listenerSocket->InitAsListener(ip, port);
 
 	return true;
 
@@ -141,20 +141,22 @@ int PD_NW_SocketManager::ConnectDataSocket(FString ip, int port) {
 }
 
 bool PD_NW_SocketManager::SendInfoTo(int indexSocket, TArray<uint8>* data) {
-	
+
 	if (indexSocket == -1) { //support to broadcast
 		bool ok = true;
 		for (int i = 0; i < socketArray.Num(); i++)
 		{
-			ok=ok && SendInfoTo(i, data);
+			ok = ok && SendInfoTo(i, data);
 		}
 		return ok;
-	}else {
+	}
+	else {
 		if (socketArray.IsValidIndex(indexSocket) && socketArray[indexSocket] != nullptr) { //Comprobamos que el indice es valido
 			return socketArray[indexSocket]->SendData(data);
-		}else return false;
+		}
+		else return false;
 	}
-	
+
 }
 
 
@@ -199,12 +201,12 @@ void PD_NW_SocketManager::TimerRefreshFunction() {
 	for (int iSocket = 0; iSocket < socketArray.Num(); iSocket++) {
 		//UE_LOG(LogTemp, Warning, TEXT(">>>> Comprobando sockets lista abiertos ! "));
 		//Preguntar si hay data y en caso de haberla llamar a la funcion void socketHasReceivedData(TArray<uint8> data, int socketIndex);
-		TArray<TArray<uint8>*> listPackages= socketArray[iSocket]->ReceiveData();
-		for (int iPackages = 0; iPackages < listPackages.Num(); iPackages++) {
-			
-			HandleNewSocketData(listPackages[iPackages], iSocket);
-			
+		TArray<uint8>* package = socketArray[iSocket]->ReceiveData();
+		//for (int iPackages = 0; iPackages < listPackages.Num(); iPackages++) {
+		if (package && package->Num() > 0) {
+			HandleNewSocketData(package, iSocket);
 		}
+		//}
 
 	}
 }
@@ -289,7 +291,7 @@ void PD_NW_SocketManager::ReconnectSockets(int oldSocket, int newSocket)
 	delete socketArray[oldSocket];
 
 	socketArray[oldSocket] = socketArray[newSocket];
-	
+
 	socketArray[newSocket] = nullptr;
 	socketArray.RemoveAt(newSocket);
 }
