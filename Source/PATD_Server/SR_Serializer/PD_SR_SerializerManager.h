@@ -124,6 +124,19 @@ public:
 
 		}break;
 
+		case UStructType::FStructPing: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructPing"));
+			FStructPing* structSpecialization = (FStructPing*)structGeneric;
+			return SerializeDataTemplate<FStructPing>(structSpecialization);
+
+		}break;
+		case UStructType::FStructPong: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructPong"));
+			FStructPong* structSpecialization = (FStructPong*)structGeneric;
+			return SerializeDataTemplate<FStructPong>(structSpecialization);
+
+		}break;
+
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
 
@@ -225,6 +238,17 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 
 	}break;
 
+	case UStructType::FStructPing: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructPing"));
+		return DeserializeDataTemplate<FStructPing>(data);
+
+	}break;
+
+	case UStructType::FStructPong: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructPong"));
+		return DeserializeDataTemplate<FStructPong>(data);
+
+	}break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
 		break;

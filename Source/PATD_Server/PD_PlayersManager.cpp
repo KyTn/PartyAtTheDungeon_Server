@@ -26,6 +26,7 @@ void PD_PlayersManager::AddNewPlayer(FString newID_Client, int player) {
 	StructPlayer* structPlayer = new StructPlayer();
 	structPlayer->ID_Client = newID_Client;
 	structPlayer->ID_PLAYER = player;
+	structPlayer->isConnected = true;
 	dataPlayers.Add(structPlayer);
 }
 

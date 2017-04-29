@@ -49,5 +49,11 @@ public:
 
 	//Declaraciones de prueba
 
+	//funcion para mandar la comprobacion de los pong
+	void CheckForClientsPong();
+
+	void PongFunctionCallbyNetworkManager();
+
+	void PingFunctionCallbyNetworkManager();
 
 };

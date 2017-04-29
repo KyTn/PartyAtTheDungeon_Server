@@ -64,6 +64,15 @@ void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPla
 		HandleEvent_IDClient(inDataStruct, inPlayer, inEventType);
 	}
 
+	if (inEventType == UStructType::FStructPing) {
+		//Cuando el Servidor pide el ID Client 
+		HandleEvent_PingReceive(inDataStruct, inPlayer);
+	}
+
+	if (inEventType == UStructType::FStructPong) {
+		//Cuando el Servidor pide el ID Client 
+		HandleEvent_PongReceive(inDataStruct, inPlayer);
+	}
 
 	///A partir de AQUI empiezan los IF de cada ESTADO
 	if (structServerState->enumServerState == EServerState::StartApp) {
@@ -162,6 +171,21 @@ void UPD_ServerGameInstance::HandleEvent_NewConnection(FStructGeneric* inDataStr
 	*/
 }
 
+///Eventos para Ping y Pong structs -- Tema de la conexion
+void UPD_ServerGameInstance::HandleEvent_PingReceive(FStructGeneric* inDataStruct, int inPlayer)
+{
+	FStructPong* pong = new FStructPong();
+	networkManager->SendNow(pong, inPlayer);
+}
+
+void UPD_ServerGameInstance::HandleEvent_PongReceive(FStructGeneric* inDataStruct, int inPlayer) //Desde el client inPlayer le envian un pong (por envio del ping desde el servidor)
+{
+	playersManager->GetDataPlayers()[inPlayer]->pingPong = 2;
+}
+
+
+
+
 ///Cuando el Cliente envia su IDCliente al Servidor
 void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType)
 {
@@ -172,6 +196,10 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 	if (aux_theClient) //Existe el Cliente ya en el Server - Reconexión
 	{
 		networkManager->GetSocketManager()->ReconnectSockets(aux_theClient->ID_PLAYER, inPlayer);
+
+		playersManager->GetDataPlayers()[aux_theClient->ID_PLAYER]->isConnected = true; //Seteamos la variable connected a true para el jugador reconectado
+		playersManager->GetDataPlayers()[aux_theClient->ID_PLAYER]->pingPong = 2; //se pone a 2 para indicar que esta conectado (luego volvera a 1 cuando se vuelva a lanzar el broadcast de ping
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Conectado"), aux_theClient->ID_PLAYER));
 
 		if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
 		{
