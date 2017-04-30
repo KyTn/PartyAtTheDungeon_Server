@@ -35,6 +35,8 @@ void APD_GenericController::Tick(float DeltaTime)
 	if (isMoving)
 	{
 		
+		//FTimerHandle handleForPong;
+		//GetWorldTimerManager().SetTimer(handleForPong, this, &APD_GenericController::MoveWithSpline, 2.00f, false);
 		MoveWithSpline();
 		
 
@@ -163,13 +165,20 @@ void APD_GenericController::MoveWithSpline()
 	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
 	FVector currentPosition = GetPawn()->GetActorLocation();
 
-	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
-	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
 
 	//Se comparan las posiciones entre la actual del Character y su posicion final para ver si ha llegado a su destino y tiene que dejar de moverse
 
-	if (!lastPosition.Equals(currentPosition, 50.0)) //Compara con un offset de error
+	if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 	{
+		//Simulamos la fisica para que se mueva solo la CABESA!
+		FName boneName = "cabesa";
+		bool newSimulate = true;
+		bool includeSelf = true;
+		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
+		GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
+
 		GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
 
 		GetPawn()->AddMovementInput(GetActorForwardVector(), 0.0, false); //add entrada de movimiento
@@ -178,11 +187,15 @@ void APD_GenericController::MoveWithSpline()
 
 		GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
 
-		distance = distance + 10; //actualizamos el variable
+		distance = distance + 2; //actualizamos el variable
 
 	}
 	else
 	{
+		FName boneName = "cabesa";
+		bool newSimulate = false;
+		bool includeSelf = true;
+		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
 		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
 		GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
 		isMoving = false;
