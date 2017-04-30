@@ -534,7 +534,7 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 	   4) Una vez recorridas todas las salas, recorremos el array de las posiciones de enemigos y guardamos uno al azar en cada una de ellas.
 	*/
 
-	int TilesPerEnemy = 15, enemy;
+	int TilesPerEnemy = 60, enemy;
 	int totalEnemies;
 	TArray <PD_MG_LogicPosition> keys;
 	TArray <PD_MG_LogicPosition> enemies;

@@ -159,8 +159,6 @@ void PD_GM_GameManager::UpdateState() {
 }
 
 void PD_GM_GameManager::OnBeginState() {
-
-
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Instantiate_Map"));
 		//Update de los enemigos a traves del dinamic map
@@ -442,14 +440,6 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 
 					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
 
-
-					/*
-					//listMove = playersManager->GetDataStructPlayer(i)->turnOrders->listMove;
-					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
-					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-					FStructOrderAction* order = &listMove[tick];
-					logicCharacter->MoveToLogicPosition(order);
-					*/
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
@@ -463,15 +453,6 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 					enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
 
 				}
-				/*
-				logicCharacter = enemyManager->GetEnemies()[i];
-				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-				FStructOrderAction* order = &listMove[tick];
-
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
-
-				logicCharacter->MoveToLogicPosition(order);
-				*/
 			}
 	
 			
@@ -783,6 +764,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
 			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
 			positionsToMove.Add(v);
+			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
 		}
 
 		logicCharacter->MoveToPhysicalPosition(positionsToMove);

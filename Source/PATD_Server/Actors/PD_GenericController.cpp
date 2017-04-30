@@ -83,6 +83,10 @@ bool APD_GenericController::IsAtAnimation() {
 	}
 	else {
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation: ERROR: No hay AnimInstance para este character"));
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+		if (SGI->gameManager->structGamePhase->enumGamePhase == EServerPhase::MoveTick) { //Si esta en la fase de movimiento, devuelve si esta movimiendo o no
+			return isMoving;
+		}
 		return false; //si no tiene animInst no deberia poder estar haciendo animaciones
 	}
 	//return true;
@@ -177,9 +181,9 @@ void APD_GenericController::MoveWithSpline()
 		bool newSimulate = true;
 		bool includeSelf = true;
 		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
-		GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
+		//GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
 
-		GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
+		//GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
 
 		GetPawn()->AddMovementInput(GetActorForwardVector(), 0.0, false); //add entrada de movimiento
 
@@ -194,10 +198,10 @@ void APD_GenericController::MoveWithSpline()
 	{
 		FName boneName = "cabesa";
 		bool newSimulate = false;
-		bool includeSelf = false;
+		bool includeSelf = true;
 		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
 		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
-		GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
+		//GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
 		isMoving = false;
 		distance = 0;
 		OnAnimationEnd();

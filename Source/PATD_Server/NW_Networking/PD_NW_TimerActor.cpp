@@ -39,7 +39,7 @@ void APD_NW_TimerActor::InitTimerActor()
 
 	//Mandar un ping cada 10 s (tiempo configurable) 
 	FTimerHandle handleForPing;
-	GetWorldTimerManager().SetTimer(handleForPing, this, &APD_NW_TimerActor::PingFunctionCallbyNetworkManager, 10.00f, true);
+	GetWorldTimerManager().SetTimer(handleForPing, this, &APD_NW_TimerActor::PingFunctionCallbyNetworkManager, 60.00f, true);
 
 
 }
@@ -63,7 +63,7 @@ bool APD_NW_TimerActor::isTimerActive() {
 void APD_NW_TimerActor::CheckForClientsPong()
 {
 	FTimerHandle handleForPong;
-	GetWorldTimerManager().SetTimer(handleForPong, this, &APD_NW_TimerActor::PongFunctionCallbyNetworkManager, 2.00f, false);
+	GetWorldTimerManager().SetTimer(handleForPong, this, &APD_NW_TimerActor::PongFunctionCallbyNetworkManager, 10.00f, false);
 
 }
 
