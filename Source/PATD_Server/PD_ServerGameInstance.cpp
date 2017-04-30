@@ -219,13 +219,9 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 			networkManager->SendNow(&clientResponse, aux_theClient->ID_PLAYER);
 			/*  */
 
-			//Esto no deberia no ir en el staticmapref?
+			
 			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
-			FString mapString = mapManager->StaticMapRef->GetMapString();
-			//Enviar mapa al cliente
-			FStructMap structMap;
-			structMap.stringMap = mapString;
-			networkManager->SendNow(&structMap, -1);
+			BroadcastMapString();
 			//Con esto ya va a la taberna.
 		}
 		else if (structServerState->enumServerState == EServerState::GameInProcess) {
@@ -239,13 +235,9 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 			//Con esto iria al ReconnectingInGame state
 
 
-			//Esto no deberia no ir en el staticmapref?
+			
 			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
-			FString mapString = mapManager->StaticMapRef->GetMapString();
-			//Enviar mapa al cliente
-			FStructMap structMap;
-			structMap.stringMap = mapString;
-			networkManager->SendNow(&structMap, -1);
+			BroadcastMapString();
 		
 			//Habria que pasarle un struct con su propio personaje, ya que no lo va a poder crear porque no pasa por el lobby
 
@@ -254,30 +246,7 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 			networkManager->SendNow(&launchMatch, -1);
 
 
-			//Enviar lista de players al cliente
-			FStructInstatiatePlayers listInstantiatePlayers;
-			for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
-				if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
-					UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::OnBeginState(): EServerState::Launch_Match:  Launch_Match: id_player e indice de players manager no coincide"));
-				}
-				FStructPlayerInfoAtClient infoPlayer;
-				infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
-				infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
-				infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
-				PD_MG_LogicPosition pos = playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition();
-
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: player %d at (%d,%d)"), i, pos.GetX(), pos.GetY());
-
-				infoPlayer.logicPosition.positionX = pos.GetX();
-				infoPlayer.logicPosition.positionY = pos.GetY();
-				listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
-			}
-
-			//No hacemos broadcast porque enviamos un paquete a cada uno indicando cual es el ID de su propio personaje
-			for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
-				listInstantiatePlayers.idClientCharacter = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
-				networkManager->SendNow(&listInstantiatePlayers, i);
-			}
+			BroadcastInstantiatePlayers();
 
 
 		}else if (structServerState->enumServerState == EServerState::Launch_Match) {
@@ -408,6 +377,42 @@ void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruc
 
 #pragma endregion
 
+
+void UPD_ServerGameInstance::BroadcastMapString() {
+	FString mapString = mapManager->StaticMapRef->GetMapString();
+	//Enviar mapa al cliente
+	FStructMap structMap;
+	structMap.stringMap = mapString;
+	networkManager->SendNow(&structMap, -1);
+}
+
+void UPD_ServerGameInstance::BroadcastInstantiatePlayers() {
+
+	//Enviar lista de players al cliente
+	FStructInstatiatePlayers listInstantiatePlayers;
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+		if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
+			UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::OnBeginState(): EServerState::Launch_Match:  Launch_Match: id_player e indice de players manager no coincide"));
+		}
+		FStructPlayerInfoAtClient infoPlayer;
+		infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
+		infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+		infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
+		PD_MG_LogicPosition pos = playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition();
+
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: player %d at (%d,%d)"), i, pos.GetX(), pos.GetY());
+
+		infoPlayer.logicPosition.positionX = pos.GetX();
+		infoPlayer.logicPosition.positionY = pos.GetY();
+		listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
+	}
+
+	//No hacemos broadcast porque enviamos un paquete a cada uno indicando cual es el ID de su propio personaje
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
+		listInstantiatePlayers.idClientCharacter = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
+		networkManager->SendNow(&listInstantiatePlayers, i);
+	}
+}
 #pragma endregion
 
 #pragma region ONBEGIN & UPDATE STATES
@@ -556,41 +561,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 
 
 		//Enviar lista de players al cliente
-		FStructInstatiatePlayers listInstantiatePlayers;
-		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
-			if (i != playersManager->GetDataStructPlayer(i)->ID_PLAYER) {
-				UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::OnBeginState(): EServerState::Launch_Match:  Launch_Match: id_player e indice de players manager no coincide"));
-			}
-			FStructPlayerInfoAtClient infoPlayer;
-			infoPlayer.playerNum = playersManager->GetDataStructPlayer(i)->ID_PLAYER;
-			infoPlayer.ID_character = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
-			infoPlayer.structSkin = *playersManager->GetDataStructPlayer(i)->logic_Character->GetSkin();
-			PD_MG_LogicPosition pos = playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition();
-
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: Start_Match: player %d at (%d,%d)"), i, pos.GetX(), pos.GetY());
-
-			infoPlayer.logicPosition.positionX = pos.GetX();
-			infoPlayer.logicPosition.positionY = pos.GetY();
-			listInstantiatePlayers.listInfoPlayerAtClient.Add(infoPlayer);
-		}
-
-		//CODIGO PROVISIONAL PARA ESPERAR. HAY QUE ARREGLAR EL NETMANAGER
-		/*
-		int i = 0;
-		float f = 1;
-		while (i < 10000) {
-			UE_LOG(LogTemp, Warning, TEXT("wait cutrisimo %d"), i);
-			i++;
-			f = f*f;
-		}
-		*/
-		//FIN CODIGO PROVISIONAL
-
-		//No hacemos broadcast porque enviamos un paquete a cada uno indicando cual es el ID de su propio personaje
-		for (int i = 0; i < playersManager->GetNumPlayers(); i++) {
-			listInstantiatePlayers.idClientCharacter= playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
-			networkManager->SendNow(&listInstantiatePlayers, i);
-		}
+		BroadcastInstantiatePlayers();
 
 		//Broadcast del listInstantiatePlayers
 	//	networkManager->SendNow(&listInstantiatePlayers, -1);
@@ -668,11 +639,7 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 													   
 
 		/*  */
-		FString mapString = staticMapRef->GetMapString();
-		//Enviar mapa al cliente
-		FStructMap structMap;
-		structMap.stringMap = mapString;
-		networkManager->SendNow(&structMap, -1);
+		BroadcastMapString();
 		/*  */
 	}
 	else if (structServerState->enumServerState == EServerState::Launch_Match) {

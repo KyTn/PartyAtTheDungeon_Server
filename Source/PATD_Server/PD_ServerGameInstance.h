@@ -95,6 +95,9 @@ public:
 	void HandleEvent_PongReceive(FStructGeneric* inDataStruct, int inPlayer);
 	void HandleEvent_PingReceive(FStructGeneric* inDataStruct, int inPlayer);
 
+	//Funciones para generar y enviar paquetes
+	void BroadcastMapString();
+	void BroadcastInstantiatePlayers();
 
 	//Carga de mapa
 	void LoadMap(FString mapName);
