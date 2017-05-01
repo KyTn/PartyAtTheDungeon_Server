@@ -52,3 +52,24 @@ EnumParser<ECharacterType>::EnumParser()
 enum class EAnimationType {Iddle,Move,Attack};
 
 enum class StaticMapElement { EMPTY= 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', SPAWN_POINT = 's'};
+
+
+#pragma region MATCH CONFIG
+
+UENUM(BlueprintType)        //"BlueprintType" is essential to include
+enum class MATCHCONFIG_MISSIONTYPE : uint8
+{
+	DefeatBoss     UMETA(DisplayName = "DefeatBoss"),
+	DefeatAll    UMETA(DisplayName = "DefeatAll"),
+	RecoverTreasure     UMETA(DisplayName = "RecoverTreasure")
+};
+
+enum class MATCHCONFIG_MAPSIZE {
+	SMALL_SIZE, NORMAL_SIZE, LARGE_SIZE
+};
+
+enum class MATCHCONFIG_DIFFICULTY {
+	EASY_DIFFICULTY, NORMAL_DIFFICULTY, DIFFICULT_DIFFICULTY
+};
+
+#pragma endregion
