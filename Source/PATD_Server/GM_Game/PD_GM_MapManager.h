@@ -62,6 +62,8 @@ public:
 
 	TArray<PD_MG_LogicPosition> Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition logPos);
 
+	TArray<PD_MG_LogicPosition> Get_LogicPosition_Diagonals_And_Adyacents_To(PD_MG_LogicPosition logPos);
+
 #pragma endregion
 
 
