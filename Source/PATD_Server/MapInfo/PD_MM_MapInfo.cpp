@@ -20,7 +20,7 @@ PD_MM_MapInfo::PD_MM_MapInfo(PD_GM_MapManager* mM)
 	rooms = TArray<PD_MM_Room>();
 	roomByLogPos = TMap<PD_MG_LogicPosition, PD_MM_Room>();
 
-	CalculateRooms();
+	CalculateRooms_v2();
 }
 
 PD_MM_MapInfo::~PD_MM_MapInfo()
@@ -29,19 +29,24 @@ PD_MM_MapInfo::~PD_MM_MapInfo()
 
 PD_MM_Room* PD_MM_MapInfo::RoomOf(PD_MG_LogicPosition logpos) {
 	//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d"), roomByLogPos[logpos].walls.Num());
-	TArray<PD_MG_LogicPosition> positions = TArray<PD_MG_LogicPosition>();
-	roomByLogPos.GenerateKeyArray(positions);
+	//TArray<PD_MG_LogicPosition> positions = TArray<PD_MG_LogicPosition>();
+	//roomByLogPos.GenerateKeyArray(positions);
 
 	for (int i = 0; i < rooms.Num(); i++) {
-		for (int j = 0; j < rooms[i].LogicPosInRoom.Num(); j++) {
-			if (rooms[i].LogicPosInRoom[j] == logpos) {
+
+		if (rooms[i].LogicPosInRoom.Contains(logpos)) {
+			return &(rooms[i]);
+		}
+
+		//for (int j = 0; j < rooms[i].LogicPosInRoom.Num(); j++) {
+			//if (rooms[i].LogicPosInRoom[j] == logpos) {
 				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d %d"), rooms[i].LogicPosInRoom[j].GetX(), rooms[i].LogicPosInRoom[j].GetY());
 
 				//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::RoomO %d"), rooms[i].walls.Num());
 				
-				return  &(rooms[i]);
-			}
-		}
+				//return  &(rooms[i]);
+			//}
+		//}
 	}
 	return nullptr;
 }
@@ -150,9 +155,10 @@ void PD_MM_MapInfo::CalculateRooms()
 
 		allLogicPos.Add(p);
 
-		// Si p es un tile o un door
+		// Si p es un tile
 		if (mapManager->StaticMapRef->GetXYMap()[p] == '.' ||
-			mapManager->StaticMapRef->GetXYMap()[p] == 's'  )
+			mapManager->StaticMapRef->GetXYMap()[p] == ',' ||
+			mapManager->StaticMapRef->GetXYMap()[p] == 's')
 			{
 
 			// Tener una referencia a una habitacion r
@@ -173,9 +179,11 @@ void PD_MM_MapInfo::CalculateRooms()
 					// Añadir la lista de posiciones p_a(p) adyacentes de p a r1
 					TArray<PD_MG_LogicPosition> a = mapManager->Get_LogicPosition_Adyacents_To(p);
 					for (int k = 0; k < a.Num(); k++) {
-						if (mapManager->StaticMapRef->GetXYMap()[a[k]] == '.' ||
-							mapManager->StaticMapRef->GetXYMap()[a[k]] == 's' ) {
-						
+						// Si p es un tile
+						if (mapManager->StaticMapRef->GetXYMap()[p] == '.' ||
+							mapManager->StaticMapRef->GetXYMap()[p] == ',' ||
+							mapManager->StaticMapRef->GetXYMap()[p] == 's')
+						{
 							rooms[j].AddLogicPos(a[k]);
 							//UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - adding to Room created at (%d,%d) <- (%d,%d) adjacents ... "), p.GetX(), p.GetY(), a[k].GetX(), a[k].GetY());
 
@@ -246,6 +254,103 @@ void PD_MM_MapInfo::CalculateRooms()
 	
 	UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - Total Tiles on rooms: %d"), TotalTilesOnRooms);
 	UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms() - Total Tiles process: %d"), tilesProcess); ;
+
+}
+
+
+void PD_MM_MapInfo::CalculateRooms_v2() {
+
+	TArray<PD_MG_LogicPosition> pos;
+	for (int i = 0; i < mapManager->StaticMapRef->GetLogicPositions().Num(); i++) {
+		pos.Add(mapManager->StaticMapRef->GetLogicPositions()[i]);
+	}
+
+	while (pos.Num() > 0) {
+		TArray<PD_MG_LogicPosition> *tiles = new TArray<PD_MG_LogicPosition>(), *walls = new TArray<PD_MG_LogicPosition>();
+		//pos.RemoveAt(0);
+		while (!mapManager->IsLogicPositionATile(pos[0])) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms_v2() - Removing NOT A TILE from pos at (%d, %d)"), pos[0].GetX(), pos[0].GetY());
+			pos.RemoveAt(0);
+
+			if (pos.Num() == 0) break;
+		}
+
+		if (pos.Num() == 0) break;
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms_v2() - searching tiles by flowing at (%d, %d) on a poblation of %d elements"), pos[0].GetX(), pos[0].GetY(), pos.Num());
+		FindTilesOnRoomByFlowdingAt(pos[0], mapManager->StaticMapRef->GetLogicPositions(), tiles, walls);
+		UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::CalculateRooms_v2() - %d tiles found, %d walls found"), tiles->Num(), walls->Num());
+
+		PD_MM_Room r = PD_MM_Room(rooms.Num());
+
+		for (int i = 0; i < tiles->Num(); i++) {
+			r.AddLogicPos((*tiles)[i]);
+			pos.Remove((*tiles)[i]);
+
+			// si la posicion lógica es un punto de spawn, marcamos la habitacion como de spawn
+			if (mapManager->IsLogicPositionASpawn((*tiles)[i])) {
+				r.IsSpawnRoom = true;
+			}
+		}
+
+		for (int i = 0; i < walls->Num(); i++) {
+			r.AddLogicWallPos((*walls)[i]);
+		}
+
+
+
+		// añadimos la habitacion a la lista de habitaciones una vez está totalmente completa. Si es de spawn, guardamos una referencia desde el array
+		rooms.Add(r);
+		if (r.IsSpawnRoom) {
+			SpawnRoom = &rooms[rooms.Num() - 1];
+			SpawnRoomIndex = rooms.Num() - 1;
+		}
+
+		// añadimos las logicpos de las tiles para busquedas inversas 
+		for (int i = 0; i < tiles->Num(); i++) {
+			if (!roomByLogPos.Contains((*tiles)[i])) {
+				roomByLogPos.Add((*tiles)[i], r);
+			}
+		}
+
+
+	}
+}
+
+void PD_MM_MapInfo::FindTilesOnRoomByFlowdingAt(PD_MG_LogicPosition initial, TArray<PD_MG_LogicPosition> PoblationSearch, TArray<PD_MG_LogicPosition>* tilesOnRoom, TArray<PD_MG_LogicPosition>* wallsOnRoom) {
+
+	// Si el conjunto de salida no contiene al initial, se añade como parte del conjunto final. 
+	if(!(*tilesOnRoom).Contains(initial)) (*tilesOnRoom).Add(initial);
+
+	// Generamos los adjacentes a initial que puedan serlo segun el conjunto de busqueda.
+	TArray<PD_MG_LogicPosition> adjacents = initial.GetAdjacentsFromList(PoblationSearch);
+
+	// por cada posible adjacente que pueda serlo, añadirlo al conjunto de salida y continuar el flowding desde el adjacent
+	for (int i = 0; i < adjacents.Num(); i++) {
+		PD_MG_LogicPosition adj = adjacents[i];
+
+		
+		
+
+		// Si es un tile, abrimos el flow por aqui. 
+		if (mapManager->IsLogicPositionATile(adj) || mapManager->IsLogicPositionASpawn(adj))
+		{
+
+			// Si el adjacente ya está en el conjunto final, es que he pasado por ahi antes, por lo que cierra esta rama del flow
+			if ((*tilesOnRoom).Contains(adj)) continue;
+
+			FindTilesOnRoomByFlowdingAt(adj, PoblationSearch, tilesOnRoom, wallsOnRoom);
+		}
+
+		// Si es un wall, lo añadimos como puerta, pero no abrimos el flow por aqui
+
+		if (mapManager->IsLogicPositionAWall(adj))
+		{
+
+		}
+
+	}
+
 
 }
 

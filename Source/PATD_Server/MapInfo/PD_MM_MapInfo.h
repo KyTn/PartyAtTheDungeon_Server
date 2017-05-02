@@ -75,6 +75,10 @@ public:
 	// Inicializa el vector de rooms dado un staticMap
 	void CalculateRooms();
 
+	void CalculateRooms_v2();
+
+	void FindTilesOnRoomByFlowdingAt(PD_MG_LogicPosition initial, TArray<PD_MG_LogicPosition> PoblationSearch, TArray<PD_MG_LogicPosition>* tilesOnRoom, TArray<PD_MG_LogicPosition>* wallsOnRoom);
+
 
 
 	bool AddWall(PD_MG_LogicPosition logpos, AActor* wall);

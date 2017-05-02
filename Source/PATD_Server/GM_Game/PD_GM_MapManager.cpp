@@ -37,6 +37,66 @@ void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
 	MapInfo = new PD_MM_MapInfo(this);
 }
 
+bool PD_GM_MapManager::IsLogicPositionAWall(PD_MG_LogicPosition logpos)
+{
+
+	if (StaticMapRef->GetXYMap().Contains(logpos)) {
+
+		return StaticMapRef->GetXYMap()[logpos] == 'w' || StaticMapRef->GetXYMap()[logpos] == 'W';
+	}
+
+	
+
+	return false;
+}
+
+#pragma region GET RAW INFO FROM STATIC
+
+
+bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
+{
+	if (StaticMapRef->GetXYMap().Contains(logpos)) {
+
+		return StaticMapRef->GetXYMap()[logpos] == '.' || StaticMapRef->GetXYMap()[logpos] == ',';
+			//|| StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	}
+	return false;
+}
+
+
+bool PD_GM_MapManager::IsLogicPositionAProp(PD_MG_LogicPosition logpos)
+{
+	if (StaticMapRef->GetXYMap().Contains(logpos)) {
+
+		return StaticMapRef->GetXYMap()[logpos] == 'C';
+			//|| StaticMapRef->GetXYMap()[logpos] == 'X' || StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	}
+	return false;
+}
+
+bool PD_GM_MapManager::IsLogicPositionADoor(PD_MG_LogicPosition logpos)
+{
+	if (StaticMapRef->GetXYMap().Contains(logpos)) {
+
+		return StaticMapRef->GetXYMap()[logpos] == 'd' || StaticMapRef->GetXYMap()[logpos] == 'D';
+		//|| StaticMapRef->GetXYMap()[logpos] == 'X' || StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	}
+	return false;
+}
+
+bool PD_GM_MapManager::IsLogicPositionASpawn(PD_MG_LogicPosition logpos)
+{
+	if (StaticMapRef->GetXYMap().Contains(logpos)) {
+
+		return StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	}
+	return false;
+}
+
+#pragma endregion
+
+
+
 #pragma region GET INFO OF THE MAP
 
 /*
