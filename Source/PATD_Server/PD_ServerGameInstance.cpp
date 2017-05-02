@@ -330,13 +330,13 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 
 	switch (StructMatchConfig->id) {
 	case 0:
-		MatchConfigManager->Set_MissionType(static_cast<MATCHCONFIG_MISSIONTYPE>(StructMatchConfig->id));
+		MatchConfigManager->Set_MissionType(static_cast<MATCHCONFIG_MISSIONTYPE>(StructMatchConfig->intvalue));
 		break;
 	case 1:
-		MatchConfigManager->Set_MapSize(static_cast<MATCHCONFIG_MAPSIZE>(StructMatchConfig->id));
+		MatchConfigManager->Set_MapSize(static_cast<MATCHCONFIG_MAPSIZE>(StructMatchConfig->intvalue));
 		break;
 	case 2:
-		MatchConfigManager->Set_Difficulty(static_cast<MATCHCONFIG_DIFFICULTY>(StructMatchConfig->id));
+		MatchConfigManager->Set_Difficulty(static_cast<MATCHCONFIG_DIFFICULTY>(StructMatchConfig->intvalue));
 		break;
 	}
 	// Enviar la información confirmada a los clientes ... 
@@ -424,6 +424,43 @@ void UPD_ServerGameInstance::BroadcastInstantiatePlayers() {
 		listInstantiatePlayers.idClientCharacter = playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter();
 		networkManager->SendNow(&listInstantiatePlayers, i);
 	}
+}
+void UPD_ServerGameInstance::BroadcastMatchConfigUpdate(int id, int intvalue, FString FStringvalue)
+{
+	FStructMatchConfig msg = FStructMatchConfig();
+
+	msg.id = id;
+	msg.intvalue = intvalue;
+	msg.FStringvalue = FStringvalue;
+
+	networkManager->SendNow(&msg, -1);
+}
+void UPD_ServerGameInstance::BroadcastMatchConfigFullUpdate()
+{
+	FStructMatchConfig msg = FStructMatchConfig();
+
+	// Se manda el tipo de mission
+	msg.id = 0;
+	msg.intvalue = (int)MatchConfigManager->Get_MissionType();
+	//msg.FStringvalue = FStringvalue;
+
+	networkManager->SendNow(&msg, -1);
+
+	// Se manda el tamaño del mapa
+	msg.id = 1;
+	msg.intvalue = (int)MatchConfigManager->Get_MapSize();
+	//msg.FStringvalue = FStringvalue;
+
+	networkManager->SendNow(&msg, -1);
+
+	// Se manda el tipo de difficulty
+	msg.id = 2;
+	msg.intvalue = (int)MatchConfigManager->Get_Difficulty();
+	//msg.FStringvalue = FStringvalue;
+
+	networkManager->SendNow(&msg, -1);
+
+
 }
 #pragma endregion
 

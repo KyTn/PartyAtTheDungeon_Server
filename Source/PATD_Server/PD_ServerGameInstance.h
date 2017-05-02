@@ -98,6 +98,9 @@ public:
 	//Funciones para generar y enviar paquetes
 	void BroadcastMapString();
 	void BroadcastInstantiatePlayers();
+	void BroadcastMatchConfigUpdate(int id, int intvalue, FString FStringvalue);
+	void BroadcastMatchConfigFullUpdate();
+
 
 	//Carga de mapa
 	void LoadMap(FString mapName);
