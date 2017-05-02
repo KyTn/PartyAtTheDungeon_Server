@@ -25,6 +25,7 @@
 #include "GM_Game/PD_GM_MapManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
+#include "PD_MatchConfigManager.h"
 //Includes de prueba
 
 
@@ -327,6 +328,17 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 	// StructMatchConfig.id		: id del campo a cambiar
 	// StructMatchConfig.value	: nuevo valor del campo id
 
+	switch (StructMatchConfig->id) {
+	case 0:
+		MatchConfigManager->Set_MissionType(static_cast<MATCHCONFIG_MISSIONTYPE>(StructMatchConfig->id));
+		break;
+	case 1:
+		MatchConfigManager->Set_MapSize(static_cast<MATCHCONFIG_MAPSIZE>(StructMatchConfig->id));
+		break;
+	case 2:
+		MatchConfigManager->Set_Difficulty(static_cast<MATCHCONFIG_DIFFICULTY>(StructMatchConfig->id));
+		break;
+	}
 	// Enviar la información confirmada a los clientes ... 
 }
 
@@ -687,6 +699,7 @@ void UPD_ServerGameInstance::Init()
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
 	levelsNameDictionary = LevelsNameDictionary(); 
 
+	
 	playersManager = new PD_PlayersManager();
 
 	structServerState = new StructServerState();
@@ -720,6 +733,8 @@ void UPD_ServerGameInstance::Init()
 
 	//en el inicialize networking seteamos el gameinstance como observador.
 	InitializeNetworking();
+
+	MatchConfigManager = new PD_MatchConfigManager();
 
 }
 

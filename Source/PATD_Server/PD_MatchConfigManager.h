@@ -34,7 +34,7 @@ public:
 
 	}
 
-	void Set_MapSize(MATCHCONFIG_MISSIONTYPE newMission) {
+	void Set_MissionType(MATCHCONFIG_MISSIONTYPE newMission) {
 		ActualMatchConfig->SetMissionType(newMission);
 
 		// Llamada a la UI

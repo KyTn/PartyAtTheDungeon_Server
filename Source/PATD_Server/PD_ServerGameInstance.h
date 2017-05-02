@@ -19,7 +19,7 @@ class AMapInstantiatorActor;
 class PD_GM_MapManager;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
-
+class PD_MatchConfigManager;
 
 //Includes de unreal
 #include "Engine/GameInstance.h"
@@ -59,7 +59,7 @@ public:
 	PD_GM_MapManager* mapManager;
 	PD_GM_GameManager* gameManager;
 	// PD_GM_EnemyManager* enemyManager; no tiene sentido un enemymanager en el instance. Está en el GameManager
-
+	PD_MatchConfigManager* MatchConfigManager;
 
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
