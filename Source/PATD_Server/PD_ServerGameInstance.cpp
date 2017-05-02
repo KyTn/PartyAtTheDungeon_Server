@@ -330,13 +330,13 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatch(FStructGeneric* inDataStruc
 
 	switch (StructMatchConfig->id) {
 	case 0:
-		MatchConfigManager->Set_MissionType(static_cast<MATCHCONFIG_MISSIONTYPE>(StructMatchConfig->intvalue));
+		MatchConfigManager->SetAndSend_MissionType(static_cast<MATCHCONFIG_MISSIONTYPE>(StructMatchConfig->intvalue));
 		break;
 	case 1:
-		MatchConfigManager->Set_MapSize(static_cast<MATCHCONFIG_MAPSIZE>(StructMatchConfig->intvalue));
+		MatchConfigManager->SetAndSend_MapSize(static_cast<MATCHCONFIG_MAPSIZE>(StructMatchConfig->intvalue));
 		break;
 	case 2:
-		MatchConfigManager->Set_Difficulty(static_cast<MATCHCONFIG_DIFFICULTY>(StructMatchConfig->intvalue));
+		MatchConfigManager->SetAndSend_Difficulty(static_cast<MATCHCONFIG_DIFFICULTY>(StructMatchConfig->intvalue));
 		break;
 	}
 	// Enviar la información confirmada a los clientes ... 
@@ -771,7 +771,7 @@ void UPD_ServerGameInstance::Init()
 	//en el inicialize networking seteamos el gameinstance como observador.
 	InitializeNetworking();
 
-	MatchConfigManager = new PD_MatchConfigManager();
+	MatchConfigManager = new PD_MatchConfigManager(this);
 
 }
 

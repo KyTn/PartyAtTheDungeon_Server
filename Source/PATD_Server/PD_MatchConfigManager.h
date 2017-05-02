@@ -3,6 +3,8 @@
 #pragma once
 #include "Structs/PD_ServerEnums.h"
 #include "PD_MatchConfig.h"
+#include "PD_ServerGameInstance.h"
+
 /**
  * 
  */
@@ -16,7 +18,7 @@ private:
 	UPD_ServerGameInstance *SGI;
 
 public:
-	PD_MatchConfigManager();
+	PD_MatchConfigManager(UPD_ServerGameInstance * sgi);
 	~PD_MatchConfigManager();
 
 	// estas funciones modifican los valores de la configuracion, Y LOS PROPAGA A LOS CLIENTES
