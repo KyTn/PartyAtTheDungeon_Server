@@ -86,7 +86,7 @@ public:
 		return res;
 	}
 
-	TArray<PD_MG_LogicPosition> GenerateAdjacentst() {
+	TArray<PD_MG_LogicPosition> GenerateAdjacents() {
 
 		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
 

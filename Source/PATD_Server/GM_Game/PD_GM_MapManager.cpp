@@ -37,6 +37,9 @@ void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
 	MapInfo = new PD_MM_MapInfo(this);
 }
 
+
+#pragma region GET RAW INFO FROM STATIC
+
 bool PD_GM_MapManager::IsLogicPositionAWall(PD_MG_LogicPosition logpos)
 {
 
@@ -45,13 +48,10 @@ bool PD_GM_MapManager::IsLogicPositionAWall(PD_MG_LogicPosition logpos)
 		return StaticMapRef->GetXYMap()[logpos] == 'w' || StaticMapRef->GetXYMap()[logpos] == 'W';
 	}
 
-	
+
 
 	return false;
 }
-
-#pragma region GET RAW INFO FROM STATIC
-
 
 bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
 {
