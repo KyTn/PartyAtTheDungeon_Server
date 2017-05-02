@@ -26,7 +26,7 @@
 #include "Structs/PD_NetStructs.h"
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
 {
-	
+	TotalPoints = 0;
 	playersManager = inPlayersManager; 
 	mapManager = inMapManager;
 	splineManager = inSplineManager;
@@ -1098,3 +1098,12 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 
 	return playersLose;
 }
+
+#pragma region POINTSSYSTEM
+
+void PD_GM_GameManager::UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy) {/// valdría con pasarles el id por ejemplo
+	player->SetPoints(player->GetPoints() + enemy->GetPoints());
+	TotalPoints += enemy->GetPoints();
+}
+
+#pragma endregion

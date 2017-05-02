@@ -44,7 +44,7 @@ public:
 
 	APD_GM_SplineManager* splineManager;
 
-
+	int TotalPoints;
 
 	//Tiene que heredar de observer y suscribirse a paquetes de juegos (ordenes).
 	//Tiene un MapManager y un InteractionManager
@@ -134,4 +134,8 @@ public:
 	bool CheckWinGameConditions();
 
 	bool CheckLoseGameConditions();
+
+	//Función del sistema de puntuación
+	void UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy);//Recibe el jugador y el enemigo, de tal manera que ve los puntos que vale el enemigo para sumarselos
+
 };

@@ -107,6 +107,11 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_
 }
 
 
+TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Diagonals_And_Adyacents_To(PD_MG_LogicPosition logPos) {
+
+	return logPos.GetDiagonalsAndAdjacentsFromList(StaticMapRef->GetLogicPositions());
+}
+
 #pragma endregion
 
 
