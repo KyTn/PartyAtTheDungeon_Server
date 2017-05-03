@@ -495,7 +495,7 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 
 
 	M.mapElements[W1] = StaticMapElement::DOOR;
-	TArray<PD_MG_LogicPosition> adjac = W1.GenerateAdjacentst(), wall_adjac = TArray<PD_MG_LogicPosition>();
+	TArray<PD_MG_LogicPosition> adjac = W1.GenerateAdjacents(), wall_adjac = TArray<PD_MG_LogicPosition>();
 	for (int i = 0; i < adjac.Num(); i++) {
 		if (M.mapElements[adjac[i]] == StaticMapElement::WALL_OR_DOOR) {
 			wall_adjac.Add(adjac[i]);

@@ -41,6 +41,19 @@ public:
 	PD_MG_DynamicMap* DynamicMapRef;
 
 
+#pragma region GET RAW INFO FROM STATIC
+
+	bool IsLogicPositionAWall(PD_MG_LogicPosition logpos);
+	bool IsLogicPositionATile(PD_MG_LogicPosition logpos);
+	bool IsLogicPositionAProp(PD_MG_LogicPosition logpos);
+	bool IsLogicPositionADoor(PD_MG_LogicPosition logpos);
+	bool IsLogicPositionASpawn(PD_MG_LogicPosition logpos);
+
+
+#pragma endregion
+
+
+
 #pragma region GET INFO OF THE MAP
 
 
@@ -77,3 +90,4 @@ public:
 #pragma endregion
 
 };
+
