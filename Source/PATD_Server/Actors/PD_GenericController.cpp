@@ -180,7 +180,7 @@ void APD_GenericController::MoveWithSpline()
 		FName boneName = "cabesa";
 		bool newSimulate = true;
 		bool includeSelf = true;
-		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
+		//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
 		//GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
 
 		//GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
@@ -199,7 +199,7 @@ void APD_GenericController::MoveWithSpline()
 		FName boneName = "cabesa";
 		bool newSimulate = false;
 		bool includeSelf = true;
-		GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
+		//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
 		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
 		//GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
 		isMoving = false;

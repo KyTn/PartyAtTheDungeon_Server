@@ -68,11 +68,24 @@ void APD_E_Character::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Norma
 	*/
 }
 
-/* Por si acaso hay que usar el metodo de recibir hit
-void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//Por si acaso hay que usar el metodo de recibir hit
+/*void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 FColor DisplayColor = FColor::Green;
 const FString DebugMessage(OtherActor->GetName());
 GEngine->AddOnScreenDebugMessage(-1, 5.0f, DisplayColor, DebugMessage);
+
+APD_E_Character* other = Cast<APD_E_Character>(OtherActor);
+if (other != nullptr) //Los dos son characters
+{
+	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
+	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
+
+	if (logic_character->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
+	{
+		//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+		logic_character->MoveWhenCollisionLost();
+	}
+}
 }
 */

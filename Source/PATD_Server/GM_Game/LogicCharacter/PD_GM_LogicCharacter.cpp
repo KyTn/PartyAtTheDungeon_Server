@@ -8,7 +8,7 @@
 #include <math.h>       /* ceil */
 #include "GM_Game/PD_GM_GameManager.h"
 #include "../../PD_ServerGameInstance.h"
-
+#include "GM_Game/PD_GM_SplineManager.h"
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "MapGeneration/PD_MG_LogicPosition.h"
@@ -337,7 +337,17 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 	else
 	{
 		//Limpiamos los puntos del spline
-		Cast<APD_AIController>(controller)->GetSpline()->RemovePoints();
+		if (!Cast<APD_AIController>(controller)->GetSpline()) 
+		{
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+			if (SGI)
+			{
+				Cast<APD_AIController>(controller)->SetSpline(SGI->gameManager->splineManager->GetSpline());
+			}
+		}
+		else {
+			Cast<APD_AIController>(controller)->GetSpline()->RemovePoints();
+		}
 
 		//Seteamos el spline en la posicion del actor
 		Cast<APD_AIController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
