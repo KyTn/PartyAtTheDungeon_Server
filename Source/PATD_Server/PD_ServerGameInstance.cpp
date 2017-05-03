@@ -349,9 +349,7 @@ void UPD_ServerGameInstance::HandleEvent_ConfigMatchDone(FStructGeneric* inDataS
 		structServerState->gameConfigurationDone = true;
 
 		// mandar el MatchConfigDone a todos los clientes, masterclient incluido, como confirmación.
-		FStructMatchConfigDone configDone = FStructMatchConfigDone();
-		configDone.from = 0;
-		networkManager->SendNow(&configDone, -1);
+		BroadcastEndMatchConfig();
 
 		this->UpdateState();//Cambio de estado
 	}
@@ -460,6 +458,13 @@ void UPD_ServerGameInstance::BroadcastMatchConfigFullUpdate()
 
 	networkManager->SendNow(&msg, -1);
 
+
+}
+void UPD_ServerGameInstance::BroadcastEndMatchConfig()
+{
+	FStructMatchConfigDone msg = FStructMatchConfigDone();
+	msg.from = 0;
+	networkManager->SendNow(&msg, -1);
 
 }
 #pragma endregion

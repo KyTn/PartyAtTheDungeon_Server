@@ -100,7 +100,7 @@ public:
 	void BroadcastInstantiatePlayers();
 	void BroadcastMatchConfigUpdate(int id, int intvalue, FString FStringvalue);
 	void BroadcastMatchConfigFullUpdate();
-
+	void BroadcastEndMatchConfig();
 
 	//Carga de mapa
 	void LoadMap(FString mapName);
