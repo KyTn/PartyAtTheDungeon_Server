@@ -27,3 +27,11 @@ void APD_E_Door::Tick(float DeltaTime)
 
 }
 
+void APD_E_Door::InteractToActivate(AActor * interactor, bool overwriteState)
+{
+}
+
+void APD_E_Door::InteractToDeactivate(AActor * interactor, bool overwriteState)
+{
+}
+
