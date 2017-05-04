@@ -172,4 +172,13 @@ public:
 
 	//Configura la posicion inicial de la camara
 	//void SetStartPositionAndSize();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		int  GetConfigMatchMission();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		int  GetConfigMatchSizeMap();
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		int  GetConfigMatchDifficult();
 };

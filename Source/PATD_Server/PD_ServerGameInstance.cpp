@@ -1060,6 +1060,19 @@ int  UPD_ServerGameInstance::GetConditionsOfGame()
 	// 1 - Jugadores pierden
 	// 2 - Jugadores Ganan
 }
+
+int UPD_ServerGameInstance::GetConfigMatchMission() {
+	return (int)MatchConfigManager->Get_MissionType();
+}
+
+int UPD_ServerGameInstance::GetConfigMatchSizeMap() {
+	return (int)MatchConfigManager->Get_MapSize();
+}
+
+int UPD_ServerGameInstance::GetConfigMatchDifficult() {
+	return (int)MatchConfigManager->Get_Difficulty();
+}
+
 #pragma endregion
 
 
