@@ -3,7 +3,12 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "MapGeneration/PD_MG_LogicPosition.h"
+
 #include "PD_E_ElementActor.generated.h"
+
+
+
 
 UCLASS()
 class PATD_SERVER_API APD_E_ElementActor : public AActor
@@ -13,6 +18,9 @@ class PATD_SERVER_API APD_E_ElementActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	APD_E_ElementActor();
+
+	PD_MG_LogicPosition ActualLogicPosition;
+
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
