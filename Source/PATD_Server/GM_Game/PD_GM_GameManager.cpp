@@ -758,7 +758,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
-		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 		{
 			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
