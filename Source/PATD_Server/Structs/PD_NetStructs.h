@@ -134,19 +134,56 @@ struct FStructInitBaseStats
 	}
 };
 
+USTRUCT()
+struct FStructSkill
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	uint8 ID_Skill;
+	UPROPERTY()
+	uint8 typeSkill; // 0 activa , 1 pasiva
+
+	//Localizacion?
+	UPROPERTY()
+	FString name_Skill;
+	UPROPERTY()
+	FString description;
+
+	UPROPERTY()
+	uint8 weaponRequired;
+	UPROPERTY()
+	uint8 AP;
+	UPROPERTY()
+	uint8 CD;
+	UPROPERTY()
+	uint8 currentCD;
+	UPROPERTY()
+	uint8 range; //0 el propio personaje, -1 toda la sala
+	UPROPERTY()
+	uint8 target; //0 jugador, 1 aliado, 2 enemigos
+
+	FStructSkill() {
+
+	}
+};
 //Habilidades - Activas y Pasivas
 USTRUCT()
-struct FStructSkills
+struct FStructCharacterSkills
 {
 	GENERATED_BODY()
 
 		UPROPERTY()
-		TArray<uint8> listActiveSkills;
-
-	UPROPERTY()
-		TArray<uint8> listPasiveSkills;
+		uint8 max_ActSkills; 
+		UPROPERTY()
+		TArray<FStructSkill> listActiveSkills;
+	
+		UPROPERTY()
+		uint8 max_PasSkills;
+		UPROPERTY()
+		TArray<FStructSkill> listPasiveSkills;
 	//Constructor
-	FStructSkills()
+	FStructCharacterSkills()
 	{
 
 	}
@@ -465,7 +502,7 @@ struct FStructCharacter : public  FStructGeneric
 	UPROPERTY()
 		FStructInitBaseStats initBaseStats;
 	UPROPERTY()
-		FStructSkills skills;
+		FStructCharacterSkills skills;
 	UPROPERTY()
 		FStructWeapon weapon;
 	UPROPERTY()
