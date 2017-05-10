@@ -57,10 +57,11 @@ public:
 	//Variables - Stats del personaje , arma y habilidades
 	FStructBasicStats* basicStats;
 	FStructInitBaseStats* initBaseStats;
-	FStructSkills* skills;
+	FStructCharacterSkills* skills;
 	FStructWeapon* weapon;
 	FStructSkin* skin;
 	FStructTotalStats* totalStats;
+	FStructCharacterState* characterState;
 
 	/*
 	//Metodo para encontrar el camino adecuado para ir a la posicion deseada
@@ -162,10 +163,11 @@ public:
 	//Metodos GET para cada Struct
 	FStructBasicStats* GetBasicStats();
 	FStructInitBaseStats* GetInitBaseStats();
-	FStructSkills* GetSkills();
+	FStructCharacterSkills* GetSkills();
 	FStructWeapon* GetWeapon();
 	FStructSkin* GetSkin();
 	FStructTotalStats* GetTotalStats();
+	FStructCharacterState* GetCharacterState();
 
 	//Metodos GET para variables globales de la clase
 	bool GetIsPlayer();
@@ -182,7 +184,7 @@ public:
 	//Métodos SET para cada Struct
 	void SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL);
 	void SetInitBaseStats(int nHP, int nDMG, int nAP);
-	void SetSkills(TArray<uint8> nActSkills, TArray<uint8> nPasSkills);
+	void SetSkills(TArray<FStructSkill> nActSkills, TArray<FStructSkill> nPasSkills);
 	void SetWapon();
 	void SetSkin();
 	void SetTotalStats();

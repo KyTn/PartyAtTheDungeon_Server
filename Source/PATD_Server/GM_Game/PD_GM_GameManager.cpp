@@ -929,7 +929,7 @@ void PD_GM_GameManager::OnAnimationEnd() {
 #pragma region GM PHASE MACHINE 
 
 void PD_GM_GameManager::InitPhase() {
-	ChangePhase(EServerPhase::MoveIni);
+	ChangePhase(EServerPhase::StartPhases);
 
 }
 
@@ -942,7 +942,23 @@ void PD_GM_GameManager::ChangePhase(EServerPhase newPhase)
 
 void PD_GM_GameManager::UpdatePhase()
 {
-	if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
+	if (structGamePhase->enumGamePhase == EServerPhase::StartPhases)
+	{
+		ChangePhase(EServerPhase::ConsumableIni);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
+	{
+		ChangePhase(EServerPhase::ConsumableCamera);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
+	{
+		ChangePhase(EServerPhase::ConsumableTick);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)
+	{
+		ChangePhase(EServerPhase::MoveIni);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
 		//Distincion para players o enemigos
 		int maxLengthAction = 0;
@@ -954,12 +970,16 @@ void PD_GM_GameManager::UpdatePhase()
 		}
 
 		if (maxLengthAction != 0) {
-			ChangePhase(EServerPhase::MoveTick); //Hay acciones por lo que volvemos a repetir el tick.
+			ChangePhase(EServerPhase::MoveCamera); //Hay acciones por lo que volvemos a repetir el tick.
 		}
 		else {
-			ChangePhase(EServerPhase::AttackIni);
+			ChangePhase(EServerPhase::InteractionIni);
 		}
 
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
+	{
+		ChangePhase(EServerPhase::MoveTick);
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -976,8 +996,20 @@ void PD_GM_GameManager::UpdatePhase()
 			ChangePhase(EServerPhase::MoveTick); //Hay acciones por lo que volvemos a repetir el tick.
 		}
 		else {*/
-			ChangePhase(EServerPhase::AttackIni);
+			ChangePhase(EServerPhase::InteractionIni);
 	//	}
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
+	{
+		ChangePhase(EServerPhase::InteractionCamera);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
+	{
+		ChangePhase(EServerPhase::InteractionTick);
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
+	{
+		ChangePhase(EServerPhase::AttackIni);
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
@@ -991,13 +1023,17 @@ void PD_GM_GameManager::UpdatePhase()
 		}
 
 		if (maxLengthAction != 0) {
-			ChangePhase(EServerPhase::AttackTick); //Hay acciones por lo que volvemos a repetir el tick.
+			ChangePhase(EServerPhase::AttackCamera); //Hay acciones por lo que volvemos a repetir el tick.
 		}
 		else {
 			ChangePhase(EServerPhase::EndAllPhases);
 		}
 
 		
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackCamera)
+	{
+		ChangePhase(EServerPhase::AttackTick);
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
 	{
@@ -1027,7 +1063,27 @@ void PD_GM_GameManager::UpdatePhase()
 
 void PD_GM_GameManager::OnBeginPhase()
 {
-	if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
+	if (structGamePhase->enumGamePhase == EServerPhase::StartPhases)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: StartPhases"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableCamera"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableTick"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveIni"));
 		//Limpiar todos los splines del splineManager para que todos los instanciados esten disponibles
@@ -1040,11 +1096,31 @@ void PD_GM_GameManager::OnBeginPhase()
 		PlayersLogicTurn();
 		UpdatePhase();
 	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveCamera"));
+		UpdatePhase();
+	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveTick"));
 		VisualMoveTick();
 
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionCamera"));
+		UpdatePhase();
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
+		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
@@ -1052,6 +1128,11 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del ataque logico
 		UpdatePhase();
 
+	}
+	else if (structGamePhase->enumGamePhase == EServerPhase::AttackCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackCamera"));
+		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
 	{

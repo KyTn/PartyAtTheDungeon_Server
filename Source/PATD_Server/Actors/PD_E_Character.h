@@ -34,7 +34,20 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "behavior")
 		UBehaviorTree* behaviorTree;
+
+	#pragma region Stats
 	
+	UPROPERTY(EditAnywhere, Category = "Base Stats")
+		int baseAP;
+	
+	UPROPERTY(EditAnywhere, Category = "Base Stats")
+		int baseDamage;
+	
+	UPROPERTY(EditAnywhere, Category = "Base Stats")
+		int baseHP;
+	
+	#pragma endregion
+
 	UFUNCTION()
 	void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 	
