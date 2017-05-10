@@ -61,6 +61,7 @@ public:
 	FStructWeapon* weapon;
 	FStructSkin* skin;
 	FStructTotalStats* totalStats;
+	FStructCharacterState* characterState;
 
 	/*
 	//Metodo para encontrar el camino adecuado para ir a la posicion deseada
@@ -166,6 +167,7 @@ public:
 	FStructWeapon* GetWeapon();
 	FStructSkin* GetSkin();
 	FStructTotalStats* GetTotalStats();
+	FStructCharacterState* GetCharacterState();
 
 	//Metodos GET para variables globales de la clase
 	bool GetIsPlayer();
