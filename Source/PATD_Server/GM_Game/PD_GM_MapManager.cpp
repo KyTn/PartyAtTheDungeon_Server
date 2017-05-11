@@ -2,16 +2,16 @@
 
 #include "PATD_Server.h"
 #include "PD_GM_MapManager.h"
-#include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
-#include "PATD_Server/MapGeneration/Dynamic/PD_MG_DynamicMap.h"
-#include "PATD_Server/MapInfo/MapInstantiation/MapInstantiatorActor.h"
-#include "PATD_Server/Structs/PD_ServerEnums.h"
-#include "PATD_Server/GM_Game/PD_GM_EnemyManager.h"
-#include "PATD_Server/GM_Game/PD_GM_GameManager.h"
+#include "MapGeneration/Static/PD_MG_StaticMap.h"
+#include "MapGeneration/Dynamic/PD_MG_DynamicMap.h"
+#include "MapInfo/MapInstantiation/MapInstantiatorActor.h"
+#include "Structs/PD_ServerEnums.h"
+#include "GM_Game/PD_GM_EnemyManager.h"
+#include "GM_Game/PD_GM_GameManager.h"
 #include "PD_PlayersManager.h"
-#include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
-#include "PATD_Server/Actors/PD_E_Character.h"
-#include "PATD_Server/Actors/PD_SplineActors.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "Actors/PD_E_Character.h"
+#include "Actors/PD_SplineActors.h"
 #include "GM_Game/PD_GM_SplineManager.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
@@ -139,7 +139,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	
 	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  IDSPAN   %d"), MapInfo->SpawnRoomIndex);
 
-	return MapInfo->rooms[MapInfo->SpawnRoomIndex].LogicPosInRoom;
+	return MapInfo->rooms[MapInfo->SpawnRoomIndex]->LogicPosInRoom;
 
 }
 
