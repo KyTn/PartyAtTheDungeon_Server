@@ -259,43 +259,53 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 
 		enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
 
+		APD_E_Character* charac=nullptr;
+		PD_GM_LogicCharacter* logicCha=nullptr;
+		bool enemyInstantiated = false;
 		switch (enemyType)
 		{
 			case ECharacterType::Archer: 
 			{
-				APD_E_Character* charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
-				PD_GM_LogicCharacter* logicCha = new PD_GM_LogicCharacter();
-				logicCha->SetIsPlayer(false);
-				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
-				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
-				logicCha->SetCharacterBP(charac);
-				logicCha->SetController( Cast<APD_GenericController>(charac->GetController()) );
-				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
-				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
-				charac->SetLogicCharacter(logicCha);
-				_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
+				charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+				
 				break;
 			}
 			case ECharacterType::Zombie: 
 			{
-				APD_E_Character* charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
-				PD_GM_LogicCharacter* logicCha = new PD_GM_LogicCharacter();
-				logicCha->SetIsPlayer(false);
-				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
-				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
-				logicCha->SetCharacterBP(charac);
-				logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
-				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
-
-				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
-				charac->SetLogicCharacter(logicCha);
-
-				_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
+				charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+				
 				break;
 			}
 		}
+
+		//Inicializacion de enemigo independientemente de que enemigo sea.
+		if (enemyInstantiated) {
+			logicCha = new PD_GM_LogicCharacter();
+			logicCha->SetIsPlayer(false);
+			logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
+			logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
+			logicCha->SetCharacterBP(charac);
+			logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
+			logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+
+			///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
+
+
+			logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
+			logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+
+			logicCha->SetTotalStats();
+
+			charac->SetLogicCharacter(logicCha);
+
+			_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
+		}
+
+
 	}
 }
 
