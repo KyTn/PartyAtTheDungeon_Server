@@ -4,7 +4,9 @@
 
 #include "GameFramework/Character.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
+#include "Structs/PD_ServerStructs.h"
 #include "PD_E_Character.generated.h"
+
 
 class PD_GM_LogicCharacter;
 
@@ -46,6 +48,32 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Base Stats")
 		int baseHP;
 	
+	//FStructBasicStats
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 POD;
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 AGI;
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 DES;
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 CON;
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 PER;
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		uint8 MAL;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		TArray<TEnumAsByte<ActiveSkills>> activeSkillList;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		TArray<TEnumAsByte<PasiveSkills>> pasiveSkillList;
+
+	UPROPERTY(EditAnywhere, Category = "Basic Stats")
+		TEnumAsByte<TypeWeapons> weapon;
+
+
+	UPROPERTY(EditAnywhere, Category = "Base Stats")
+		FStructTotalStats structtotal;
 	#pragma endregion
 
 	UFUNCTION()
@@ -54,5 +82,27 @@ public:
 	//UFUNCTION()
 	//void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+
+
+	//FStructBasicStats
+	uint8 GetPOD() { return POD; };
+
+	uint8 GetAGI() { return AGI; };
+
+	uint8 GetDES() { return DES; };
+
+	uint8 GetCON() { return CON; };
+
+	uint8 GetPER() { return PER; };
+
+	uint8 GetMAL() { return MAL; };
+
+	int GetBaseAP() { return baseAP; };
+
+	int GetBaseDamage() { return baseDamage; };
+
+	int  GetBaseHP() { return baseHP; };
+
+	
 
 };

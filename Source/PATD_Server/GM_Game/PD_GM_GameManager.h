@@ -127,6 +127,10 @@ public:
 	//Esto lo llamara la parte visual (controller o actor) cuando finalize su animacion, para cambiar de estado o hacer lo que coresponda
 	void OnAnimationEnd();
 
+	void OnCameraEndMove();
+
+	void OnTimerEnd();
+
 	void VisualTickControl();
 	void VisualMoveTick();
 	void VisualAttackTick();
