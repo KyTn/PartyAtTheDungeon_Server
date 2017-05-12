@@ -925,7 +925,15 @@ void PD_GM_GameManager::OnAnimationEnd() {
 
 }
 
+void PD_GM_GameManager::OnCameraEndMove() {
+	structGamePhase->cameraMoving = false;
+	UpdatePhase();
+}
 
+void PD_GM_GameManager::OnTimerEnd() {
+	structGamePhase->waitingTime = false;
+	UpdatePhase();
+}
 #pragma region GM PHASE MACHINE 
 
 void PD_GM_GameManager::InitPhase() {
@@ -944,15 +952,21 @@ void PD_GM_GameManager::UpdatePhase()
 {
 	if (structGamePhase->enumGamePhase == EServerPhase::StartPhases)
 	{
-		ChangePhase(EServerPhase::ConsumableIni);
+		
+			ChangePhase(EServerPhase::ConsumableIni);
+		
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
 	{
-		ChangePhase(EServerPhase::ConsumableCamera);
+		if (!structGamePhase->waitingTime) {
+			ChangePhase(EServerPhase::ConsumableCamera);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
 	{
-		ChangePhase(EServerPhase::ConsumableTick);
+		if (!structGamePhase->cameraMoving) {
+			ChangePhase(EServerPhase::ConsumableTick);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)
 	{
@@ -960,26 +974,30 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
-		//Distincion para players o enemigos
-		int maxLengthAction = 0;
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Move);
-		}
-		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
-		}
+		if (!structGamePhase->waitingTime) {
+			//Distincion para players o enemigos
+			int maxLengthAction = 0;
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+				maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Move);
+			}
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+				maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Move);
+			}
 
-		if (maxLengthAction != 0) {
-			ChangePhase(EServerPhase::MoveCamera); //Hay acciones por lo que volvemos a repetir el tick.
-		}
-		else {
-			ChangePhase(EServerPhase::InteractionIni);
+			if (maxLengthAction != 0) {
+				ChangePhase(EServerPhase::MoveCamera); //Hay acciones por lo que volvemos a repetir el tick.
+			}
+			else {
+				ChangePhase(EServerPhase::InteractionIni);
+			}
 		}
 
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
-		ChangePhase(EServerPhase::MoveTick);
+		if (!structGamePhase->cameraMoving) {
+			ChangePhase(EServerPhase::MoveTick);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -1001,11 +1019,15 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
-		ChangePhase(EServerPhase::InteractionCamera);
+		if (!structGamePhase->waitingTime) {
+			ChangePhase(EServerPhase::InteractionCamera);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
 	{
-		ChangePhase(EServerPhase::InteractionTick);
+		if (!structGamePhase->cameraMoving) {
+			ChangePhase(EServerPhase::InteractionTick);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
 	{
@@ -1013,27 +1035,31 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
-		//Distincion para players o enemigos
-		int maxLengthAction = 0;
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-			maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
-		}
-		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-			maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
-		}
+		if (!structGamePhase->waitingTime) {
+			//Distincion para players o enemigos
+			int maxLengthAction = 0;
+			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+				maxLengthAction = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
+			}
+			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+				maxLengthAction = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
+			}
 
-		if (maxLengthAction != 0) {
-			ChangePhase(EServerPhase::AttackCamera); //Hay acciones por lo que volvemos a repetir el tick.
-		}
-		else {
-			ChangePhase(EServerPhase::EndAllPhases);
+			if (maxLengthAction != 0) {
+				ChangePhase(EServerPhase::AttackCamera); //Hay acciones por lo que volvemos a repetir el tick.
+			}
+			else {
+				ChangePhase(EServerPhase::EndAllPhases);
+			}
 		}
 
 		
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackCamera)
 	{
-		ChangePhase(EServerPhase::AttackTick);
+		if (!structGamePhase->cameraMoving) {
+			ChangePhase(EServerPhase::AttackTick);
+		}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
 	{
@@ -1076,6 +1102,7 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableCamera"));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)

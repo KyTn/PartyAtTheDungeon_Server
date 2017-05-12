@@ -77,4 +77,6 @@ struct StructServerState {
 //Usado por: GameManager - Para maquina de estados de las Fases del Juego
 struct StructGamePhase {
 	EServerPhase enumGamePhase;
+	bool cameraMoving=false;
+	bool waitingTime=false;
 };
