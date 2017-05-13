@@ -7,7 +7,7 @@
 
 /// FORWARD DECLARATIONS
 class PD_MG_StaticMap;
-
+class PD_MatchConfigManager;
 
 struct RoomTemplateInfo {
 
@@ -136,9 +136,10 @@ struct MapProceduralInfo {
 	uint32 Total_Height, Total_Width;
 
 	TMap<PD_MG_LogicPosition, StaticMapElement> mapElements;
-	TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
+	//TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
+	TArray<RoomTemplateInfo> mapRooms; 
+	TArray<TArray<int>> Ady;
 	uint32 SPAWN_ID;
-	int NUM_ROOMS;
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
 
@@ -150,7 +151,7 @@ struct MapProceduralInfo {
 		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
 
 		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
-		mapRooms = TMap<PD_MG_LogicPosition, RoomTemplateInfo>();
+		mapRooms = TArray<RoomTemplateInfo>();
 	}
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
@@ -168,16 +169,10 @@ struct MapProceduralInfo {
 		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(start, C, R_pivot);
 		R.UpdateBoundingBoxes(bb_t_l);
 		R.ID = ID;
+		mapRooms.Add(R);
 		for (int i = 0; i < R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(); i++) {
 			PD_MG_LogicPosition localPos = R.LOCAL_LOGIC_POSITIONS_ON_ROOM[i];
 			PD_MG_LogicPosition mapPosition = Translate_LocalPosInRoom_To_MapPosition(localPos, C, R_pivot);
-
-			/*if (bb_t_l.GetX() > mapPosition.GetX() &&
-				bb_t_l.GetY() > mapPosition.GetY()) {
-				bb_t_l.SetX(mapPosition.GetX());
-				bb_t_l.SetY(mapPosition.GetY());
-				R.UpdateBoundingBoxes(bb_t_l);
-			}*/
 
 
 			/// AÑADIMOS EL ELEMENTO AL MAPA DE ELEMENTOS
@@ -192,14 +187,14 @@ struct MapProceduralInfo {
 			}
 
 			///AÑADIMOS LA ROOM AL MAPA QUE LOS ALMACENA EN FUNCION DE LA LOGPOS
-			if (mapRooms.Contains(mapPosition)) {
+			/*if (mapRooms.Contains(mapPosition)) {
 				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
 				mapRooms[mapPosition] = R;
 			}
 			else {
 				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - creando"));
 				mapRooms.Emplace(mapPosition, R);
-			}
+			}*/
 
 			UpdateBoundingBoxes(mapPosition);
 		}
@@ -281,9 +276,9 @@ struct MapProceduralInfo {
 
 	void TrimBoundingBoxOfRoomsInMap() {
 		TArray <PD_MG_LogicPosition> keys;
-		mapRooms.GenerateKeyArray(keys);
+		//mapRooms.GenerateKeyArray(keys);
 		for (int i = 0; i < mapRooms.Num(); i++) {
-			mapRooms[keys[i]].UpdateBoundingBoxes(mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT - BOUNDING_BOX_TOP_LEFT);
+			mapRooms[i].UpdateBoundingBoxes(mapRooms[i].BOUNDING_BOX_TOP_LEFT - BOUNDING_BOX_TOP_LEFT);
 		}
 	}
 
@@ -359,7 +354,7 @@ public:
 	bool GetPreloadedData(TArray<RoomTemplateInfo> &roomTemplates);
 
 
-	bool GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width);
+	bool GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
 
 	bool Hard_Check_CanBeColocated(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
@@ -367,7 +362,7 @@ public:
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1);
 
-	void MarkARoomAsSpawingRoom(MapProceduralInfo &M);
+	void MarkARoomAsSpawingRoom(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType);
 
 	FString EnemiesGeneration(MapProceduralInfo &M);
 

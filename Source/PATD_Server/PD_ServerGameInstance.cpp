@@ -581,7 +581,7 @@ void UPD_ServerGameInstance::OnBeginState() {
 		networkManager->SendNow(&clientBroadcast, -1);
 		/*  */
 
-		mapPath = mapGenerator->GenerateProceduralMap();
+		mapPath = mapGenerator->GenerateProceduralMap(MatchConfigManager, playersManager->GetDataPlayers().Num());
 
 		this->LoadMap(levelsNameDictionary.GetMapName(3));
 

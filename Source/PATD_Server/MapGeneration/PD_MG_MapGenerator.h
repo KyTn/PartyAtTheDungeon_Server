@@ -5,6 +5,8 @@
 /**
  * 
  */
+class PD_MatchConfigManager;
+
 class PATD_SERVER_API PD_MG_MapGenerator
 {
 public:
@@ -17,6 +19,6 @@ public:
 
 	void Init();
 
-	FString GenerateProceduralMap();
+	FString GenerateProceduralMap(PD_MatchConfigManager * MapManConfig, int numPlayers);
 
 };

@@ -2,6 +2,8 @@
 
 #include "PATD_Server.h"
 #include "PD_MG_MapGenerationUtils.h"
+#include "PATD_Server/PD_MatchConfigManager.h"
+#include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 
 PD_MG_MapGenerationUtils::PD_MG_MapGenerationUtils()
@@ -302,7 +304,7 @@ Dado un mapa M de W de ancho por H de alto y una lista de habitaciones LR.
 */
 
 
-bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width) {
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) {
 
 	M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
 	//M.Total_Height = _Total_Height;
@@ -323,6 +325,25 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	PD_MG_LogicPosition R_pivot; // pivote aleatorio de la habitacion R
 
 	PD_MG_LogicPosition W1, W2; //W1, W2 - current Walls
+	int totalRomm;//Habitaciones totales
+
+	switch (MATCHCONFIG_MAPSIZE(MatchConfigMan->Get_MapSize())) {
+		case MATCHCONFIG_MAPSIZE::SMALL_SIZE: {
+			totalRomm = 1 * numPlayers + 2;
+			break;
+		}
+		case MATCHCONFIG_MAPSIZE::NORMAL_SIZE: {
+			totalRomm = 1.5 * numPlayers + 2;
+			break;
+		}
+		case MATCHCONFIG_MAPSIZE::LARGE_SIZE: {
+			totalRomm = 2 * numPlayers + 2;
+			break;
+		}
+	}
+
+	//MatchConfigMan->Get_MapSize();
+
 
 	LW.Empty();
 	LWC.Empty();
@@ -386,9 +407,23 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	LCT.Empty();
 
 	int roomPlaced = 1;
-	while (roomPlaced < 10) {
+	while (roomPlaced < totalRomm) {
 		// Elegimos un wall de la lista de posibles
-		W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+		switch (MATCHCONFIG_MISSIONTYPE(MatchConfigMan->Get_MissionType())) {
+			case MATCHCONFIG_MISSIONTYPE::DefeatAll: {
+				W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+				break;
+			}
+			case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+				W1 = M.mapRooms[roomPlaced - 1].OPEN_WALLS[FMath::RandRange(0, M.mapRooms[roomPlaced - 1].OPEN_WALLS.Num() - 1)] + M.mapRooms[roomPlaced - 1].BOUNDING_BOX_TOP_LEFT;
+				break;
+			}
+			case MATCHCONFIG_MISSIONTYPE::RecoverTreasure: {
+				W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+				break;
+			}
+		}
+
 		// Elegimos una habitacion
 		R = LR[FMath::RandRange(0, LR.Num() - 1)];
 		LRT.Add(R);
@@ -432,9 +467,8 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 			//M.ShowMap();
 		}
 	}
-	M.NUM_ROOMS = roomPlaced;
 
-	MarkARoomAsSpawingRoom(M);
+	MarkARoomAsSpawingRoom(M, MatchConfigMan->Get_MissionType());
 
 	//M.ShowMapOnBoundingBox();
 	M.TrimBoundingBoxOfRoomsInMap();
@@ -509,12 +543,11 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 	return false;
 }
 
-void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {
 
-	PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
-	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetX() - M.BOUNDING_BOX_TOP_LEFT.GetX()), FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetY() - M.BOUNDING_BOX_TOP_LEFT.GetY()));
-
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
+	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
+	
+	/*UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 
 
 	while (!(M.mapElements.Contains(p) && M.mapElements[p] == StaticMapElement::NORMAL_TILE)) {
@@ -522,9 +555,47 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
 		p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
 		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 	}
-	M.SPAWN_ID = M.mapRooms[p].ID;
-	M.mapElements[p] = StaticMapElement::SPAWN_POINT;
+	UE_LOG(LogTemp, Log, TEXT("posicion de spawn %i,%i"), p.GetX(), p.GetY());
+	/*for (int i = 0; i < M.mapRooms.Num(); i++)
+	{
+		if(M.mapRooms[i].NORMAL_TILES.Contains(p))  // No funciona porque p es global y las de la sala son locales
+			M.SPAWN_ID = M.mapRooms[i].ID;
+	}*/
+	PD_MG_LogicPosition p, worldP;
+	
+	switch (MATCHCONFIG_MISSIONTYPE(missionType)) {
+		case MATCHCONFIG_MISSIONTYPE::DefeatAll: {
+			int i = FMath::RandRange(0, M.mapRooms.Num() - 1);
+			M.SPAWN_ID = M.mapRooms[i].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[i].NORMAL_TILES[j];
 
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+			M.SPAWN_ID = M.mapRooms[0].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[0].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[0].NORMAL_TILES[j];
+
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[0].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::RecoverTreasure: {
+			int i = FMath::RandRange(0, M.mapRooms.Num() - 1);
+			M.SPAWN_ID = M.mapRooms[i].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[i].NORMAL_TILES[j];
+
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+	}
+	
+	M.mapElements[worldP] = StaticMapElement::SPAWN_POINT;
 }
 
 FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
@@ -536,28 +607,24 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 
 	int TilesPerEnemy = 60, enemy;
 	int totalEnemies;
-	TArray <PD_MG_LogicPosition> keys;
 	TArray <PD_MG_LogicPosition> enemies;
-	TArray <uint32> visited;
-	M.mapRooms.GenerateKeyArray(keys);
 	UE_LOG(LogTemp, Log, TEXT("Generacion de enemigos"));
-	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.NUM_ROOMS);
 	UE_LOG(LogTemp, Log, TEXT("Sala de spawn %i"), M.SPAWN_ID);
 	for (int i = 0; i < M.mapRooms.Num(); i++)
 	{
-		if (M.mapRooms[keys[i]].ID!= M.SPAWN_ID && !visited.Contains(M.mapRooms[keys[i]].ID)) {
-			visited.Add(M.mapRooms[keys[i]].ID);
-			totalEnemies = M.mapRooms[keys[i]].NORMAL_TILES.Num();
+		if (M.mapRooms[i].ID!= M.SPAWN_ID) {
+
+			totalEnemies = M.mapRooms[i].NORMAL_TILES.Num();
 			totalEnemies /= TilesPerEnemy;
 			int j = 0;
-			UE_LOG(LogTemp, Log, TEXT("Sala %d visitada, tiene %i enemigos, con un total de tiles disponibles %i"), M.mapRooms[keys[i]].ID, totalEnemies, M.mapRooms[keys[i]].NORMAL_TILES.Num());
+			UE_LOG(LogTemp, Log, TEXT("Sala %d visitada, tiene %i enemigos, con un total de tiles disponibles %i"), M.mapRooms[i].ID, totalEnemies, M.mapRooms[i].NORMAL_TILES.Num());
 			while (j < totalEnemies)
 			{
-				int pos = FMath::RandRange(0, M.mapRooms[keys[i]].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
-				if (!enemies.Contains(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
-					UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[keys[i]].ID);
+				int pos = FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
+				if (!enemies.Contains(M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + M.mapRooms[i].NORMAL_TILES[pos])) {
+					UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[i].ID);
 					//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
-					enemies.Add(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
+					enemies.Add(M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + M.mapRooms[i].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
 					j++;
 				}
 			}

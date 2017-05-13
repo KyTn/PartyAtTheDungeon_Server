@@ -38,9 +38,9 @@ void PD_MG_MapGenerator::Init()
 
 
 
-FString PD_MG_MapGenerator::GenerateProceduralMap(/* OPTIONS */) {
+FString PD_MG_MapGenerator::GenerateProceduralMap(PD_MatchConfigManager * MapManConfig, int numPlayers) {
 	MapProceduralInfo map = MapProceduralInfo(100,100);
-	mgUtils.GenerateRandomStaticMap(map, roomTemplateArray, 100, 100);
+	mgUtils.GenerateRandomStaticMap(map, roomTemplateArray, 100, 100, MapManConfig, numPlayers);
 	FString s = map.ToString();
 	s.Append(mgUtils.EnemiesGeneration(map));
 	s.Append("\n0");
