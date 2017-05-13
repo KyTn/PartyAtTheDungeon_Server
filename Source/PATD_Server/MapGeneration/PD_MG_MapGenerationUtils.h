@@ -13,7 +13,7 @@ struct RoomTemplateInfo {
 
 	FString NAME;
 	uint32 ID;
-	TArray<FString> TAGS;
+	TArray<MapSkinType> TAGS;
 	uint32 WIDTH;
 	uint32 HEIGHT;
 
@@ -33,7 +33,7 @@ struct RoomTemplateInfo {
 	RoomTemplateInfo() {}
 
 
-	RoomTemplateInfo(FString Name, uint32 id, TArray<FString> tags, int h, int w) {
+	RoomTemplateInfo(FString Name, uint32 id, TArray<MapSkinType> tags, int h, int w) {
 		NAME = Name;
 		ID = id;
 		TAGS = tags;
@@ -136,6 +136,7 @@ struct MapProceduralInfo {
 	uint32 Total_Height, Total_Width;
 
 	TMap<PD_MG_LogicPosition, StaticMapElement> mapElements;
+	TMap<PD_MG_LogicPosition, MapSkinType> mapSkinByLogicalPosition;
 	//TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
 	TArray<RoomTemplateInfo> mapRooms; 
 	TArray<TArray<int>> Ady;
@@ -151,6 +152,7 @@ struct MapProceduralInfo {
 		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
 
 		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
+		mapSkinByLogicalPosition = TMap<PD_MG_LogicPosition, MapSkinType>();
 		mapRooms = TArray<RoomTemplateInfo>();
 	}
 
@@ -366,9 +368,14 @@ public:
 
 	FString EnemiesGeneration(MapProceduralInfo &M);
 
+
+
+
+
 private:
 	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);
-	void ParseTags(TArray<FString>& tags, FString braquets);
+	void ParseTags(TArray<MapSkinType>& tags, FString braquets);
 
+	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);
 
 };

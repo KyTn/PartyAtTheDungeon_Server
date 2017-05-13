@@ -74,7 +74,7 @@ RoomTemplateInfo PD_MG_MapGenerationUtils::FillRoomTemplateInfoWith(FString read
 	FString name = roomInfoSplitted[1];
 
 	/// GET TAGS
-	TArray<FString> TAGS;
+	TArray<MapSkinType> TAGS;
 	ParseTags(TAGS, roomInfoSplitted[2]);
 	
 
@@ -108,32 +108,51 @@ RoomTemplateInfo PD_MG_MapGenerationUtils::FillRoomTemplateInfoWith(FString read
 }
 
 ///Dado un array de tags y un string con los tags, rellena el array con el contenido del string
-void PD_MG_MapGenerationUtils::ParseTags(TArray<FString> &tags, FString braquets) {
+void PD_MG_MapGenerationUtils::ParseTags(TArray<MapSkinType> &tags, FString braquets) {
 	tags.Empty();
 
 	TArray<FString> s;
+
 	braquets.ParseIntoArray(s, TEXT(","), true);
 
 	if (s.Num() == 0) {
-		tags.Add("None");
+		tags.Add(MapSkinType::DUNGEON_NORMAL);
 		return;
 	}
 
 	for (int i = 0; i < s.Num(); i++) {
-		tags.Add(s[i]);
+		tags.Add(MapSkinType(FCString::Atoi( *(s[i]) )));
 	}
 
 }
 
+int PD_MG_MapGenerationUtils::NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers)
+{
+	switch (matchConfig_MATCHCONFIG_MAPSIZE) {
+		case MATCHCONFIG_MAPSIZE::SMALL_SIZE: {
+			return  1 * numberOfPlayers + 2;
+		}
+		case MATCHCONFIG_MAPSIZE::NORMAL_SIZE: {
+			return 1.5f * numberOfPlayers + 2;
+		}
+		case MATCHCONFIG_MAPSIZE::LARGE_SIZE: {
+			return 2 * numberOfPlayers + 2;
+		}
+		default :
+			return 4;
+	}
+}
+
 #pragma endregion
+
 
 #pragma region PRELOADED ROOMS
 
 /// Si la lectura del fichero falla, llamamos a esta funcion que nos da algunas habitaciones para que no pete el tema 
 bool PD_MG_MapGenerationUtils::GetPreloadedData(TArray<RoomTemplateInfo> &roomTemplates) {
 
-	TArray<FString> tags = TArray<FString>();
-	tags.Add("NORMAL");
+	TArray<MapSkinType> tags = TArray<MapSkinType>();
+	tags.Add(MapSkinType::DUNGEON_NORMAL);
 	RoomTemplateInfo r = RoomTemplateInfo("simple_Cuadrada", 0, tags, 8, 8);
 
 	//FString s = "WWwwwwWW";
@@ -325,22 +344,9 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	PD_MG_LogicPosition R_pivot; // pivote aleatorio de la habitacion R
 
 	PD_MG_LogicPosition W1, W2; //W1, W2 - current Walls
-	int totalRomm;//Habitaciones totales
+	int totalRooms = NumberOfRoomsOnMatchConfig(MatchConfigMan->Get_MapSize(), numPlayers); //Habitaciones totales
 
-	switch (MATCHCONFIG_MAPSIZE(MatchConfigMan->Get_MapSize())) {
-		case MATCHCONFIG_MAPSIZE::SMALL_SIZE: {
-			totalRomm = 1 * numPlayers + 2;
-			break;
-		}
-		case MATCHCONFIG_MAPSIZE::NORMAL_SIZE: {
-			totalRomm = 1.5 * numPlayers + 2;
-			break;
-		}
-		case MATCHCONFIG_MAPSIZE::LARGE_SIZE: {
-			totalRomm = 2 * numPlayers + 2;
-			break;
-		}
-	}
+	
 
 	//MatchConfigMan->Get_MapSize();
 
@@ -407,7 +413,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	LCT.Empty();
 
 	int roomPlaced = 1;
-	while (roomPlaced < totalRomm) {
+	while (roomPlaced < totalRooms) {
 		// Elegimos un wall de la lista de posibles
 		switch (MATCHCONFIG_MISSIONTYPE(MatchConfigMan->Get_MissionType())) {
 			case MATCHCONFIG_MISSIONTYPE::DefeatAll: {
@@ -642,3 +648,4 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 }
 
 #pragma endregion
+

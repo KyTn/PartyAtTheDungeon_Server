@@ -1,6 +1,6 @@
 START_ROOM
 Name: simple_Cuadrada
-tags: NORMAL
+tags: 0
 size_x: 8
 size_y: 8
 WWwwwwWW
@@ -13,7 +13,7 @@ W......W
 WWwwwwWW
 START_ROOM
 Name: Cuadrada_1
-tags: NORMAL
+tags: 0
 size_x: 8
 size_y: 9
 WWWWWWWW
@@ -27,7 +27,7 @@ W......W
 WWwwwwWW
 START_ROOM
 Name: Cuadrada_2
-tags: NORMAL
+tags: 0
 size_x: 9
 size_y: 9
 WWwwwwwWW
@@ -41,7 +41,7 @@ W.......W
 WWwwwwwWW
 START_ROOM
 Name: Boss_simple_Cuadrada_2
-tags: NORMAL
+tags: 0
 size_X: 16
 size_Y: 16
 WWwwwwwwwwwwwwWW
@@ -62,7 +62,7 @@ W..............W
 WWwwwwwwwwwwwwWW
 START_ROOM
 Name: Rectangular_1
-tags: NORMAL
+tags: 0
 size_X: 20
 size_Y: 10
 WWwwwwwWWWWwwwwwwwWW
@@ -77,7 +77,7 @@ W.......WW.........W
 WWwwwwwWWWWwwwwwwwWW
 START_ROOM
 Name: forma_L_Cuadrada
-tags: NORMAL
+tags: 0
 size_X: 12
 size_Y: 11
 WWwwwwwwwwWW
@@ -93,7 +93,7 @@ WWwwwWW....w
       WWwwWW
 START_ROOM
 Name: forma_Cruz
-tags: NORMAL
+tags: 0
 size_X: 16
 size_Y: 16
      WWwwWW     
