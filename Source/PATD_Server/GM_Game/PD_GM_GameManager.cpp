@@ -219,6 +219,8 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		
+
+		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
 			structPlayer->turnOrders->positionsToMove.Empty();
 			structPlayer->turnOrders->actions.Empty();
@@ -228,49 +230,53 @@ void PD_GM_GameManager::OnBeginState() {
 
 		}
 
+		//Enviar a cliente actualizacion del mapa
+		FStructUpdateTurn structUpdateTurn;
+		//Jugadores
+		for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
+			PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
+			FStructUpdateCharacter structUpdateCharacter;
+			//Conversion de Struct a LogicPosition
+			FStructLogicPosition logicPosition;
+			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+
+			structUpdateCharacter.currentCharacterPosition = logicPosition;
+			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+			structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+		}
+		//Enemigos
+		for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
+			PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
+			FStructUpdateCharacter structUpdateCharacter;
+			//Conversion de Struct a LogicPosition
+			FStructLogicPosition logicPosition = FStructLogicPosition();
+			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+
+			structUpdateCharacter.currentCharacterPosition = logicPosition;
+			//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
+			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
+		}
+
+		//Envio a todos los clientes con el update del turno
+		networkManager->SendNow(&structUpdateTurn);
+
+
+
 		if (CheckWinGameConditions()) //Jugadores Ganan la partida
 		{
-			
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: GANAN PLAYERS"));
 		}
 		else if (CheckLoseGameConditions()) //Jugadores pierden la partida
 		{
-
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: PIERDEN PLAYERS"));
 		}
 		else
 		{
-			//Enviar a cliente actualizacion del mapa
-			FStructUpdateTurn structUpdateTurn;
-			//Jugadores
-			for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
-				PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
-				FStructUpdateCharacter structUpdateCharacter;
-				//Conversion de Struct a LogicPosition
-				FStructLogicPosition logicPosition;
-				logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-				logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
 
-				structUpdateCharacter.currentCharacterPosition = logicPosition;
-				structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-				structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
-			}
-			//Enemigos
-			for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
-				PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
-				FStructUpdateCharacter structUpdateCharacter;
-				//Conversion de Struct a LogicPosition
-				FStructLogicPosition logicPosition = FStructLogicPosition();
-				logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-				logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
-
-				structUpdateCharacter.currentCharacterPosition = logicPosition;
-				//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
-				structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-				structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
-			}
-
-			//Envio a todos los clientes con el update del turno
-			networkManager->SendNow(&structUpdateTurn);
-			//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
+			
 			UpdateState();//transicion inmediata
 		}
 
