@@ -43,6 +43,25 @@ public:
 		return (logpos._x << 16) + logpos._y;
 	}
 
+
+	const friend uint16 GetIn16bits(const PD_MG_LogicPosition& logpos)
+	{
+		return ((uint16)(logpos._x) << 8) + (uint16)(logpos._y);
+	}
+
+	const friend uint16 GetIn16bits()
+	{
+		return ((uint16)(this->_x) << 8) + (uint16)(this->_y);
+	}
+
+	friend void SetIn16bits(uint16 num) {
+		//uint32 x = num & 0x0011;
+		//uint32 y = (num >> 8) & 0x0011;
+
+		this->SetX(num & 0x0011);
+		this->SetY((num >> 8) & 0x0011);
+	}
+
 /*
 	static FVector* LogicToWorldPosition(PD_MG_LogicPosition pos) {
 		return new FVector(-1.0f * pos.GetX()*100.0f, pos.GetY() * 100.0f, 0.f);
@@ -98,13 +117,13 @@ public:
 	}
 
 
-	int ManhattanDistance(PD_MG_LogicPosition other) {
+	const int ManhattanDistance(PD_MG_LogicPosition other) {
 		int deltaX = other.GetX() - this->GetX();
 		int deltaY = other.GetY() - this->GetY();
 		return  abs(deltaX) + abs(deltaY);
 	}
 
-	float EuclideanDistance(PD_MG_LogicPosition other) {
+	const float EuclideanDistance(PD_MG_LogicPosition other) {
 		int deltaX = this->GetX()*this->GetX() + other.GetX()*other.GetX() - (2 * this->GetX()*other.GetX());
 		int deltaY = this->GetY()*this->GetY() + other.GetY()*other.GetY() - (2 * this->GetY()*other.GetY());
 		int result = deltaX + deltaY;
