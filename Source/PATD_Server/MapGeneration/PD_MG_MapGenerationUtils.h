@@ -150,9 +150,30 @@ struct MapProceduralInfo {
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
 
-	MapProceduralInfo(uint32 _Total_Height, uint32 _Total_Width) {
+
+	FStructMapData * NETMAPDATA;
+
+
+	MapProceduralInfo( uint32 _Total_Height, uint32 _Total_Width) {
 		Total_Height = _Total_Height;
 		Total_Width = _Total_Width;
+		NETMAPDATA = nullptr;
+
+		BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition((int)_Total_Height, (int)_Total_Width);
+		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
+
+		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
+		mapSkinByLogicalPosition = TMap<PD_MG_LogicPosition, MapSkinType>();
+		mapRooms = TArray<RoomTemplateInfo>();
+
+		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
+
+	}
+	
+	MapProceduralInfo(FStructMapData * mapData, uint32 _Total_Height, uint32 _Total_Width) {
+		Total_Height = _Total_Height;
+		Total_Width = _Total_Width;
+		NETMAPDATA = mapData;
 
 		BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition((int)_Total_Height, (int)_Total_Width);
 		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
@@ -368,14 +389,39 @@ public:
 	PD_MG_MapGenerationUtils();
 	~PD_MG_MapGenerationUtils();
 
+#pragma region READ ROOMS FROM FILE AND FROM CHORIZO
+
 	bool ReadAndPrepareRoomTemplateInfosFromFile(FString filepath, TArray<RoomTemplateInfo> &roomTemplates);
 	bool ReadAndPrepareRoomTemplateInfosFromChorizo(FString chorizo, TArray<RoomTemplateInfo> &roomTemplates);
+	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);
+	void ParseTags(TArray<MapSkinType>& tags, FString braquets);
 
+#pragma endregion
+
+
+#pragma region PRELOADED ROOMS
 
 	bool GetPreloadedData(TArray<RoomTemplateInfo> &roomTemplates);
 
+#pragma endregion
 
-	bool GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+
+#pragma region PROCEDURAL GENERATION v0.1
+
+	bool GenerateRandomStaticMap_v01(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+
+	void MarkARoomAsSpawingRoom_v01(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType);
+
+	FString EnemiesGeneration_v01(MapProceduralInfo &M);
+
+#pragma endregion
+
+
+
+
+private:
+
+#pragma region PROCEDURAL GENERATION UTILS 
 
 	bool Hard_Check_CanBeColocated(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
@@ -383,18 +429,7 @@ public:
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1);
 
-	void MarkARoomAsSpawingRoom(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType);
-
-	FString EnemiesGeneration(MapProceduralInfo &M);
-
-
-
-
-
-private:
-	RoomTemplateInfo FillRoomTemplateInfoWith(FString readedString, int id);
-	void ParseTags(TArray<MapSkinType>& tags, FString braquets);
-
+	// devuelve el numero de habitaciones en funcion de la configuracion del mapa 
 	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);
 
 	// Dado una skin y una coleccion de posibles skins, te devuelve, en funcion de las reglas, el indice de esa coleccion que es la skin elegida
@@ -402,4 +437,5 @@ private:
 
 	// Funcion que contiene las reglas de generacion de las skins 
 	bool MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB);
+#pragma endregion
 };

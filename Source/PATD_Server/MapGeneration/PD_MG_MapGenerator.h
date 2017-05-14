@@ -2,6 +2,10 @@
 
 #pragma once
 #include "PD_MG_MapGenerationUtils.h"
+#include "Structs/PD_NetStructs.h"
+
+
+
 /**
  * 
  */
@@ -19,6 +23,7 @@ public:
 
 	void Init();
 
-	FString GenerateProceduralMap(PD_MatchConfigManager * MapManConfig, int numPlayers);
+	FString GenerateProceduralMap_v01(PD_MatchConfigManager * MapManConfig, int numPlayers);
+	FStructMapData* GenerateProcedural_FStructMapData_v02(PD_MatchConfigManager * MapManConfig, int numPlayers);
 
 };

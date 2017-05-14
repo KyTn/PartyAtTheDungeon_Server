@@ -44,22 +44,22 @@ public:
 	}
 
 
-	const friend uint16 GetIn16bits(const PD_MG_LogicPosition& logpos)
+	uint16 GetIn16bits(const PD_MG_LogicPosition& logpos)
 	{
 		return ((uint16)(logpos._x) << 8) + (uint16)(logpos._y);
 	}
 
-	const friend uint16 GetIn16bits()
+	uint16 GetIn16bits()
 	{
 		return ((uint16)(this->_x) << 8) + (uint16)(this->_y);
 	}
 
-	friend void SetIn16bits(uint16 num) {
+	void SetIn16bits(uint16 num) {
 		//uint32 x = num & 0x0011;
 		//uint32 y = (num >> 8) & 0x0011;
 
-		this->SetX(num & 0x0011);
-		this->SetY((num >> 8) & 0x0011);
+		this->SetX((uint32)(num & 0x0011));
+		this->SetY((uint32)((num >> 8) & 0x0011));
 	}
 
 /*
@@ -71,14 +71,14 @@ public:
 		Se pone el bool isCharacter para determina si hay que subir su Z en 100 unidades, y que asi no caiga cuando empiece el mapa
 		en tiempo de ejecucion.
 	*/
-	const FVector ToWorldPosition(bool isCharacter) {
+	FVector ToWorldPosition(bool isCharacter) {
 		if (isCharacter)
 			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 40.f);
 		else
 			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}
 
-	const FVector ToWorldPosition() {
+	FVector ToWorldPosition() {
 		return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}
 
@@ -117,13 +117,13 @@ public:
 	}
 
 
-	const int ManhattanDistance(PD_MG_LogicPosition other) {
+	int ManhattanDistance(PD_MG_LogicPosition other) {
 		int deltaX = other.GetX() - this->GetX();
 		int deltaY = other.GetY() - this->GetY();
 		return  abs(deltaX) + abs(deltaY);
 	}
 
-	const float EuclideanDistance(PD_MG_LogicPosition other) {
+	float EuclideanDistance(PD_MG_LogicPosition other) {
 		int deltaX = this->GetX()*this->GetX() + other.GetX()*other.GetX() - (2 * this->GetX()*other.GetX());
 		int deltaY = this->GetY()*this->GetY() + other.GetY()*other.GetY() - (2 * this->GetY()*other.GetY());
 		int result = deltaX + deltaY;

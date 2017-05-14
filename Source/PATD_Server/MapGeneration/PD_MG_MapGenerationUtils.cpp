@@ -357,7 +357,7 @@ bool PD_MG_MapGenerationUtils::GetPreloadedData(TArray<RoomTemplateInfo> &roomTe
 
 
 
-#pragma region PROCEDURAL GENERATION
+#pragma region PROCEDURAL GENERATION v0.1
 
 
 /*
@@ -431,9 +431,9 @@ Dado un mapa M de W de ancho por H de alto y una lista de habitaciones LR.
 */
 
 
-bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) {
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v01(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) {
 
-	M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
+	//M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
 	//M.Total_Height = _Total_Height;
 	//M.Total_Width = _Total_Width;
 	//M.BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition(_Total_Height, _Total_Width);
@@ -582,7 +582,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 		}
 	}
 
-	MarkARoomAsSpawingRoom(M, MatchConfigMan->Get_MissionType());
+	MarkARoomAsSpawingRoom_v01(M, MatchConfigMan->Get_MissionType());
 
 	//M.ShowMapOnBoundingBox();
 	M.TrimBoundingBoxOfRoomsInMap();
@@ -636,7 +636,6 @@ PD_MG_LogicPosition PD_MG_MapGenerationUtils::Translate_LocalPosInRoom_To_MapPos
 	return localPos - R_pivot + C;
 }
 
-
 bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1) {
 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at testing from /\\(%d,%d) to \\/(%d,%d)"), W.GetX(), W.GetY(), Waux.GetX(), Waux.GetY());
@@ -657,7 +656,7 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 	return false;
 }
 
-void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v01(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {
 
 	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
 	
@@ -712,7 +711,7 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M, MATC
 	M.mapElements[worldP] = StaticMapElement::SPAWN_POINT;
 }
 
-FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
+FString PD_MG_MapGenerationUtils::EnemiesGeneration_v01(MapProceduralInfo &M) {
 	/* 1) Primero definimos el número de tiles por enemigo, despues cogemos las keys del tMap de las salas.
 	   2) Las recorremos, descartando la de spawn, contamos los tiles normales que tiene.
 	   3) Dentro de cada sala elegimos una posición al azar y la seleccionamos, si es válida( si no hay otro) para poner un enemigo en ella.

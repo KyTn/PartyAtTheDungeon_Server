@@ -3,6 +3,7 @@
 #include "PATD_Server.h"
 #include "PD_MG_MapGenerator.h"
 #include "PD_MG_MapGenerationUtils.h"
+#include "Structs/PD_NetStructs.h"
 
 
 PD_MG_MapGenerator::PD_MG_MapGenerator()
@@ -38,11 +39,25 @@ void PD_MG_MapGenerator::Init()
 
 
 
-FString PD_MG_MapGenerator::GenerateProceduralMap(PD_MatchConfigManager * MapManConfig, int numPlayers) {
+FString PD_MG_MapGenerator::GenerateProceduralMap_v01(PD_MatchConfigManager * MapManConfig, int numPlayers) {
+
 	MapProceduralInfo map = MapProceduralInfo(250,250);
-	mgUtils.GenerateRandomStaticMap(map, roomTemplateArray, 250, 250, MapManConfig, numPlayers);
+	mgUtils.GenerateRandomStaticMap_v01(map, roomTemplateArray, 250, 250, MapManConfig, numPlayers);
 	FString s = map.ToString();
-	s.Append(mgUtils.EnemiesGeneration(map));
+	s.Append(mgUtils.EnemiesGeneration_v01(map));
 	s.Append("\n0");
 	return s;
+}
+
+
+
+FStructMapData * PD_MG_MapGenerator::GenerateProcedural_FStructMapData_v02(PD_MatchConfigManager * MapManConfig, int numPlayers) {
+	FStructMapData * mapData = new FStructMapData();
+
+	MapProceduralInfo map = MapProceduralInfo(mapData, 250, 250);
+	mgUtils.GenerateRandomStaticMap_v01(map, roomTemplateArray, 250, 250, MapManConfig, numPlayers);
+	FString s = map.ToString();
+	s.Append(mgUtils.EnemiesGeneration_v01(map));
+	
+	return mapData;
 }
