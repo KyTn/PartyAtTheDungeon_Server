@@ -417,6 +417,17 @@ public:
 #pragma endregion
 
 
+#pragma region PROCEDURAL GENERATION v0.2
+
+	bool GenerateRandomStaticMap_v02(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+
+	void MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType);
+
+	bool EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+
+#pragma endregion
+
+
 
 
 private:
