@@ -371,7 +371,7 @@ Por claridad es mejor que el nombre del struct coincida con el del enumerado. (a
 */
 
 enum class UStructType {
-	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructRequestIDClient = 3, FStructClientID = 4 , FStructWelcome = 5, FStructPing = 6, FStructPong = 7, FStructLostConnection=8, FStructMap = 10, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
+	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructRequestIDClient = 3, FStructClientID = 4 , FStructWelcome = 5, FStructPing = 6, FStructPong = 7, FStructLostConnection=8, FStructMap = 10, FStructMapData = 11, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
 	FStructCharacter = 40, FStructUpdateTurn = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52,
 	FStructInstatiatePlayers = 60
 };
@@ -747,5 +747,51 @@ struct FStructUpdateTurn : public  FStructGeneric
 	FStructUpdateTurn()
 	{
 		structType = static_cast<uint8>(UStructType::FStructUpdateTurn);
+	}
+};
+
+
+
+USTRUCT()
+struct FStructMapData : public  FStructGeneric
+{
+	GENERATED_BODY()
+
+
+		
+	UPROPERTY()
+		FString PARSER_VERSION;
+
+	UPROPERTY()
+		uint8 MISSION_TYPE;
+
+
+	UPROPERTY()
+		TArray<uint16> skinByRoom;
+
+	UPROPERTY()
+		TArray<uint32> roomComposition;
+
+	UPROPERTY()
+		TArray<uint32> wallComposition;
+
+	UPROPERTY()
+		TArray<uint32> doorComposition;
+
+	UPROPERTY()
+		TArray<uint32> interactuableId;
+
+	UPROPERTY()
+		TArray<uint16> interactuableComposition;
+
+	UPROPERTY()
+		TArray<uint32> enemyComposition;
+
+
+
+	//Constructor
+	FStructMapData()
+	{
+		structType = static_cast<uint8>(UStructType::FStructMapData);
 	}
 };
