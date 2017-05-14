@@ -758,10 +758,13 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration_v01(MapProceduralInfo &M) {
 
 #pragma region PROCEDURAL GENERATION v0.2
 
-bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) 
+{
+	return false;
+}
 
-void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType);
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {}
 
-bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
+bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { return false; }
 
 #pragma endregion
