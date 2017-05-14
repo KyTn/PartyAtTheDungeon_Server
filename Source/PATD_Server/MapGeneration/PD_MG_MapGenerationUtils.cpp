@@ -143,6 +143,114 @@ int PD_MG_MapGenerationUtils::NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE mat
 	}
 }
 
+int PD_MG_MapGenerationUtils::ChoosesSkinRules(MapSkinType RoomMapSkin, TArray<MapSkinType> & ChoosableMapSkins)
+{
+	TArray<int> choosableIndexes = TArray<int>();
+
+	for (int i = 0; i < ChoosableMapSkins.Num(); i++) {
+		if (MatchSkins(RoomMapSkin, ChoosableMapSkins[i])) {
+			choosableIndexes.Add(i);
+		}
+	}
+
+	return choosableIndexes[FMath::RandRange(0, choosableIndexes.Num())];
+}
+
+
+bool PD_MG_MapGenerationUtils::MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB) 
+{
+	switch (RoomMapSkinA) {
+		case MapSkinType::DUNGEON_NORMAL:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::GARDEN:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::LIBRARY:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::SACRIFICE:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::BOSS:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+	}
+
+	return true;
+}
+
+
 #pragma endregion
 
 

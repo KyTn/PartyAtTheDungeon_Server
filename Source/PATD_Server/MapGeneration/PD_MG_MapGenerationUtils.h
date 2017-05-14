@@ -21,6 +21,8 @@ struct RoomTemplateInfo {
 	TArray<PD_MG_LogicPosition> LOCAL_LOGIC_POSITIONS_ON_ROOM;
 	TMap<PD_MG_LogicPosition, StaticMapElement> MAP_DATA;
 
+	MapSkinType ChoosedTag;
+
 	TArray<PD_MG_LogicPosition> OPEN_WALLS;
 	TArray<PD_MG_LogicPosition> CLOSED_WALLS;
 	TArray<PD_MG_LogicPosition> NORMAL_TILES;
@@ -54,7 +56,8 @@ struct RoomTemplateInfo {
 		SPECIAL_TILES = TArray<PD_MG_LogicPosition>();
 		EMPTY_TILES = 	TArray<PD_MG_LogicPosition>();
 
-
+		if(tags.Num() > 0) ChoosedTag = tags[0];
+		else ChoosedTag = MapSkinType::DUNGEON_NORMAL;
 
 		for (uint32 i = 0; i < HEIGHT; i++) {
 			RAW_DATA.Add(TArray<TCHAR>());
@@ -139,6 +142,9 @@ struct MapProceduralInfo {
 	TMap<PD_MG_LogicPosition, MapSkinType> mapSkinByLogicalPosition;
 	//TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
 	TArray<RoomTemplateInfo> mapRooms; 
+
+	TMap<MapSkinType, TArray<RoomTemplateInfo*>> mapRoomsBySkin;
+
 	TArray<TArray<int>> Ady;
 	uint32 SPAWN_ID;
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
@@ -154,6 +160,9 @@ struct MapProceduralInfo {
 		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
 		mapSkinByLogicalPosition = TMap<PD_MG_LogicPosition, MapSkinType>();
 		mapRooms = TArray<RoomTemplateInfo>();
+
+		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
+
 	}
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
@@ -186,6 +195,16 @@ struct MapProceduralInfo {
 			else {
 				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - creando"));
 				mapElements.Emplace(mapPosition, v);
+			}
+
+			/// Y AÑADIMOS AL MAPA DE MAPSKINS
+			if (mapSkinByLogicalPosition.Contains(mapPosition)) {
+				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
+				mapSkinByLogicalPosition[mapPosition] = R.ChoosedTag;
+			}
+			else {
+				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - creando"));
+				mapSkinByLogicalPosition.Emplace(mapPosition, R.ChoosedTag);
 			}
 
 			///AÑADIMOS LA ROOM AL MAPA QUE LOS ALMACENA EN FUNCION DE LA LOGPOS
@@ -378,4 +397,9 @@ private:
 
 	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);
 
+	// Dado una skin y una coleccion de posibles skins, te devuelve, en funcion de las reglas, el indice de esa coleccion que es la skin elegida
+	int ChoosesSkinRules(MapSkinType RoomMapSkin, TArray<MapSkinType> & ChoosableMapSkins);
+
+	// Funcion que contiene las reglas de generacion de las skins 
+	bool MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB);
 };
