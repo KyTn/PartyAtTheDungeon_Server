@@ -12,6 +12,7 @@
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_SplineManager.h"
+#include "Actors/PD_TimerGame.h"
 #include "math.h"
 #include "MapInfo/PD_MM_MapInfo.h"
 
@@ -713,8 +714,10 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 		//Aqui cedemos el control al GameManager.
 		APD_GM_SplineManager* splineManager = (APD_GM_SplineManager*)GetWorld()->SpawnActor(APD_GM_SplineManager::StaticClass());
+		APD_TimerGame* timer= (APD_TimerGame*)GetWorld()->SpawnActor(APD_TimerGame::StaticClass());
 
-		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager, splineManager);
+
+		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager, splineManager, timer);
 
 
 	}

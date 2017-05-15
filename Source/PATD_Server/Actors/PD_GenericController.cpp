@@ -164,10 +164,21 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 //Funcion para mover al Character mediante Splines
 void APD_GenericController::MoveWithSpline()
 {
-	
 
-	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
-	FVector currentPosition = GetPawn()->GetActorLocation();
+
+
+
+	FVector lastPosition;
+	FVector currentPosition;
+	if (spline->GetSplineComponent()->GetNumberOfSplinePoints() != 0) {
+	
+		lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
+		currentPosition = GetPawn()->GetActorLocation();
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s"),*this->GetName());
+		return;
+	}
 
 	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
 	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());

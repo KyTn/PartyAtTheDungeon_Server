@@ -78,5 +78,4 @@ struct StructServerState {
 struct StructGamePhase {
 	EServerPhase enumGamePhase;
 	bool cameraMoving=false;
-	bool waitingTime=false;
 };

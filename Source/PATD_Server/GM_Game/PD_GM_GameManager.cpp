@@ -20,11 +20,12 @@
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_GM_SplineManager.h"
 
+#include "Actors/PD_TimerGame.h"
 #include "Actors/Enemies/PD_AIController.h"
 #include "Actors/PD_GenericController.h"
 
 #include "Structs/PD_NetStructs.h"
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer)
 {
 	TotalPoints = 0;
 	playersManager = inPlayersManager; 
@@ -36,6 +37,8 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	networkManager->RegisterObserver(this);
 	structGameState = new StructGameState();
 	structGamePhase = new StructGamePhase();
+	timer = inTimer;
+	timer->setGameManager(this);
 	InitState();
 
 }
@@ -937,9 +940,11 @@ void PD_GM_GameManager::OnCameraEndMove() {
 }
 
 void PD_GM_GameManager::OnTimerEnd() {
-	structGamePhase->waitingTime = false;
 	UpdatePhase();
 }
+
+
+
 #pragma region GM PHASE MACHINE 
 
 void PD_GM_GameManager::InitPhase() {
@@ -964,7 +969,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			ChangePhase(EServerPhase::ConsumableCamera);
 		}
 	}
@@ -980,7 +985,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			//Distincion para players o enemigos
 			int maxLengthAction = 0;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -1025,7 +1030,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			ChangePhase(EServerPhase::InteractionCamera);
 		}
 	}
@@ -1041,7 +1046,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			//Distincion para players o enemigos
 			int maxLengthAction = 0;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -1103,6 +1108,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
+		
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
@@ -1127,6 +1136,10 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		//Llamar al procceso del movimiento logico
 		PlayersLogicTurn();
+
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
@@ -1143,6 +1156,9 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
@@ -1159,6 +1175,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
+
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+
 		UpdatePhase();
 
 	}
