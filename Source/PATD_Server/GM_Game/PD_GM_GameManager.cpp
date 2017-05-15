@@ -675,18 +675,18 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 					//listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
 					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-					FStructOrderAction order = listAttack[tick];
+					//FStructOrderAction order = listAttack[tick];
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-					logicCharacter->ActionTo(order);
+					//logicCharacter->ActionTo(order);
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				//listAttack = enemyManager->GetTurnOrders(i)->listAttack;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-				FStructOrderAction order = listAttack[tick];
+				//FStructOrderAction order = listAttack[tick];
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-				logicCharacter->ActionTo(order);
+				//logicCharacter->ActionTo(order);
 			}
 
 
@@ -856,7 +856,7 @@ void PD_GM_GameManager::VisualAttackTick() {
 			// de momento vamos a hacerlo de forma secuencial sin ordenar...
 			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick players"));
-				playersManager->GetDataStructPlayer(i)->logic_Character->GetController()->ActionTo(listAttack[index_action]);
+				playersManager->GetDataStructPlayer(i)->logic_Character->ActionTo(listAttack[index_action]);
 			}
 		}
 
