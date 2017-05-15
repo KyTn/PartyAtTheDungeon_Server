@@ -124,7 +124,7 @@ EnumParser<ECharacterType>::EnumParser()
 enum class EAnimationType {Iddle,Move,Attack};
 
 enum class StaticMapElement { EMPTY= 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', SPAWN_POINT = 's'};
-
+enum class MapSkinType{DUNGEON_NORMAL = 0, GARDEN = 10, LIBRARY = 20, SACRIFICE = 30, BOSS = 100};
 
 #pragma region MATCH CONFIG
 

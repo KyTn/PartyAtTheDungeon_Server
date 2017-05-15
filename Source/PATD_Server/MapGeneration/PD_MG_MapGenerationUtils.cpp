@@ -2,6 +2,8 @@
 
 #include "PATD_Server.h"
 #include "PD_MG_MapGenerationUtils.h"
+#include "PATD_Server/PD_MatchConfigManager.h"
+#include "PATD_Server/Structs/PD_ServerEnums.h"
 #include "PATD_Server/MapGeneration/Static/PD_MG_StaticMap.h"
 
 PD_MG_MapGenerationUtils::PD_MG_MapGenerationUtils()
@@ -72,7 +74,7 @@ RoomTemplateInfo PD_MG_MapGenerationUtils::FillRoomTemplateInfoWith(FString read
 	FString name = roomInfoSplitted[1];
 
 	/// GET TAGS
-	TArray<FString> TAGS;
+	TArray<MapSkinType> TAGS;
 	ParseTags(TAGS, roomInfoSplitted[2]);
 	
 
@@ -106,32 +108,159 @@ RoomTemplateInfo PD_MG_MapGenerationUtils::FillRoomTemplateInfoWith(FString read
 }
 
 ///Dado un array de tags y un string con los tags, rellena el array con el contenido del string
-void PD_MG_MapGenerationUtils::ParseTags(TArray<FString> &tags, FString braquets) {
+void PD_MG_MapGenerationUtils::ParseTags(TArray<MapSkinType> &tags, FString braquets) {
 	tags.Empty();
 
 	TArray<FString> s;
+
 	braquets.ParseIntoArray(s, TEXT(","), true);
 
 	if (s.Num() == 0) {
-		tags.Add("None");
+		tags.Add(MapSkinType::DUNGEON_NORMAL);
 		return;
 	}
 
 	for (int i = 0; i < s.Num(); i++) {
-		tags.Add(s[i]);
+		tags.Add(MapSkinType(FCString::Atoi( *(s[i]) )));
 	}
 
 }
 
+int PD_MG_MapGenerationUtils::NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers)
+{
+	switch (matchConfig_MATCHCONFIG_MAPSIZE) {
+		case MATCHCONFIG_MAPSIZE::SMALL_SIZE: {
+			return  1 * numberOfPlayers + 2;
+		}
+		case MATCHCONFIG_MAPSIZE::NORMAL_SIZE: {
+			return 1.5f * numberOfPlayers + 2;
+		}
+		case MATCHCONFIG_MAPSIZE::LARGE_SIZE: {
+			return 2 * numberOfPlayers + 2;
+		}
+		default :
+			return 4;
+	}
+}
+
+int PD_MG_MapGenerationUtils::ChoosesSkinRules(MapSkinType RoomMapSkin, TArray<MapSkinType> & ChoosableMapSkins)
+{
+	TArray<int> choosableIndexes = TArray<int>();
+
+	for (int i = 0; i < ChoosableMapSkins.Num(); i++) {
+		if (MatchSkins(RoomMapSkin, ChoosableMapSkins[i])) {
+			choosableIndexes.Add(i);
+		}
+	}
+
+	return choosableIndexes[FMath::RandRange(0, choosableIndexes.Num())];
+}
+
+
+bool PD_MG_MapGenerationUtils::MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB) 
+{
+	switch (RoomMapSkinA) {
+		case MapSkinType::DUNGEON_NORMAL:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::GARDEN:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::LIBRARY:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::SACRIFICE:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::BOSS:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+	}
+
+	return true;
+}
+
+
 #pragma endregion
+
 
 #pragma region PRELOADED ROOMS
 
 /// Si la lectura del fichero falla, llamamos a esta funcion que nos da algunas habitaciones para que no pete el tema 
 bool PD_MG_MapGenerationUtils::GetPreloadedData(TArray<RoomTemplateInfo> &roomTemplates) {
 
-	TArray<FString> tags = TArray<FString>();
-	tags.Add("NORMAL");
+	TArray<MapSkinType> tags = TArray<MapSkinType>();
+	tags.Add(MapSkinType::DUNGEON_NORMAL);
 	RoomTemplateInfo r = RoomTemplateInfo("simple_Cuadrada", 0, tags, 8, 8);
 
 	//FString s = "WWwwwwWW";
@@ -228,7 +357,7 @@ bool PD_MG_MapGenerationUtils::GetPreloadedData(TArray<RoomTemplateInfo> &roomTe
 
 
 
-#pragma region PROCEDURAL GENERATION
+#pragma region PROCEDURAL GENERATION v0.1
 
 
 /*
@@ -302,9 +431,9 @@ Dado un mapa M de W de ancho por H de alto y una lista de habitaciones LR.
 */
 
 
-bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width) {
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v01(MapProceduralInfo &M, TArray<RoomTemplateInfo> & LR, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) {
 
-	M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
+	//M = MapProceduralInfo(_Total_Height, _Total_Width); //M - mapa
 	//M.Total_Height = _Total_Height;
 	//M.Total_Width = _Total_Width;
 	//M.BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition(_Total_Height, _Total_Width);
@@ -323,6 +452,12 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	PD_MG_LogicPosition R_pivot; // pivote aleatorio de la habitacion R
 
 	PD_MG_LogicPosition W1, W2; //W1, W2 - current Walls
+	int totalRooms = NumberOfRoomsOnMatchConfig(MatchConfigMan->Get_MapSize(), numPlayers); //Habitaciones totales
+
+	
+
+	//MatchConfigMan->Get_MapSize();
+
 
 	LW.Empty();
 	LWC.Empty();
@@ -386,9 +521,23 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 	LCT.Empty();
 
 	int roomPlaced = 1;
-	while (roomPlaced < 10) {
+	while (roomPlaced < totalRooms) {
 		// Elegimos un wall de la lista de posibles
-		W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+		switch (MATCHCONFIG_MISSIONTYPE(MatchConfigMan->Get_MissionType())) {
+			case MATCHCONFIG_MISSIONTYPE::DefeatAll: {
+				W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+				break;
+			}
+			case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+				W1 = M.mapRooms[roomPlaced - 1].OPEN_WALLS[FMath::RandRange(0, M.mapRooms[roomPlaced - 1].OPEN_WALLS.Num() - 1)] + M.mapRooms[roomPlaced - 1].BOUNDING_BOX_TOP_LEFT;
+				break;
+			}
+			case MATCHCONFIG_MISSIONTYPE::RecoverTreasure: {
+				W1 = LWC[FMath::RandRange(0, LWC.Num() - 1)];
+				break;
+			}
+		}
+
 		// Elegimos una habitacion
 		R = LR[FMath::RandRange(0, LR.Num() - 1)];
 		LRT.Add(R);
@@ -432,9 +581,8 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap(MapProceduralInfo &M, TAr
 			//M.ShowMap();
 		}
 	}
-	M.NUM_ROOMS = roomPlaced;
 
-	MarkARoomAsSpawingRoom(M);
+	MarkARoomAsSpawingRoom_v01(M, MatchConfigMan->Get_MissionType());
 
 	//M.ShowMapOnBoundingBox();
 	M.TrimBoundingBoxOfRoomsInMap();
@@ -488,7 +636,6 @@ PD_MG_LogicPosition PD_MG_MapGenerationUtils::Translate_LocalPosInRoom_To_MapPos
 	return localPos - R_pivot + C;
 }
 
-
 bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1) {
 
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at testing from /\\(%d,%d) to \\/(%d,%d)"), W.GetX(), W.GetY(), Waux.GetX(), Waux.GetY());
@@ -509,12 +656,11 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 	return false;
 }
 
-void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v01(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {
 
-	PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
-	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetX() - M.BOUNDING_BOX_TOP_LEFT.GetX()), FMath::RandRange(0, M.BOUNDING_BOX_DOWN_RIGHT.GetY() - M.BOUNDING_BOX_TOP_LEFT.GetY()));
-
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
+	//PD_MG_LogicPosition p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
+	
+	/*UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 
 
 	while (!(M.mapElements.Contains(p) && M.mapElements[p] == StaticMapElement::NORMAL_TILE)) {
@@ -522,12 +668,50 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom(MapProceduralInfo &M) {
 		p = PD_MG_LogicPosition(FMath::RandRange(0, M.Total_Height), FMath::RandRange(0, M.Total_Width));
 		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d)"), p.GetX(), p.GetY());
 	}
-	M.SPAWN_ID = M.mapRooms[p].ID;
-	M.mapElements[p] = StaticMapElement::SPAWN_POINT;
+	UE_LOG(LogTemp, Log, TEXT("posicion de spawn %i,%i"), p.GetX(), p.GetY());
+	/*for (int i = 0; i < M.mapRooms.Num(); i++)
+	{
+		if(M.mapRooms[i].NORMAL_TILES.Contains(p))  // No funciona porque p es global y las de la sala son locales
+			M.SPAWN_ID = M.mapRooms[i].ID;
+	}*/
+	PD_MG_LogicPosition p, worldP;
+	
+	switch (MATCHCONFIG_MISSIONTYPE(missionType)) {
+		case MATCHCONFIG_MISSIONTYPE::DefeatAll: {
+			int i = FMath::RandRange(0, M.mapRooms.Num() - 1);
+			M.SPAWN_ID = M.mapRooms[i].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[i].NORMAL_TILES[j];
 
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+			M.SPAWN_ID = M.mapRooms[0].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[0].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[0].NORMAL_TILES[j];
+
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[0].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::RecoverTreasure: {
+			int i = FMath::RandRange(0, M.mapRooms.Num() - 1);
+			M.SPAWN_ID = M.mapRooms[i].ID;
+			int j = (FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num() - 1));
+			 p = M.mapRooms[i].NORMAL_TILES[j];
+
+			//Transformamos la posición en posición global
+			 worldP = M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + p;
+			break;
+		}
+	}
+	
+	M.mapElements[worldP] = StaticMapElement::SPAWN_POINT;
 }
 
-FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
+FString PD_MG_MapGenerationUtils::EnemiesGeneration_v01(MapProceduralInfo &M) {
 	/* 1) Primero definimos el número de tiles por enemigo, despues cogemos las keys del tMap de las salas.
 	   2) Las recorremos, descartando la de spawn, contamos los tiles normales que tiene.
 	   3) Dentro de cada sala elegimos una posición al azar y la seleccionamos, si es válida( si no hay otro) para poner un enemigo en ella.
@@ -536,28 +720,24 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 
 	int TilesPerEnemy = 60, enemy;
 	int totalEnemies;
-	TArray <PD_MG_LogicPosition> keys;
 	TArray <PD_MG_LogicPosition> enemies;
-	TArray <uint32> visited;
-	M.mapRooms.GenerateKeyArray(keys);
 	UE_LOG(LogTemp, Log, TEXT("Generacion de enemigos"));
-	UE_LOG(LogTemp, Log, TEXT("TotalSalas %i" ), M.NUM_ROOMS);
 	UE_LOG(LogTemp, Log, TEXT("Sala de spawn %i"), M.SPAWN_ID);
 	for (int i = 0; i < M.mapRooms.Num(); i++)
 	{
-		if (M.mapRooms[keys[i]].ID!= M.SPAWN_ID && !visited.Contains(M.mapRooms[keys[i]].ID)) {
-			visited.Add(M.mapRooms[keys[i]].ID);
-			totalEnemies = M.mapRooms[keys[i]].NORMAL_TILES.Num();
+		if (M.mapRooms[i].ID!= M.SPAWN_ID) {
+
+			totalEnemies = M.mapRooms[i].NORMAL_TILES.Num();
 			totalEnemies /= TilesPerEnemy;
 			int j = 0;
-			UE_LOG(LogTemp, Log, TEXT("Sala %d visitada, tiene %i enemigos, con un total de tiles disponibles %i"), M.mapRooms[keys[i]].ID, totalEnemies, M.mapRooms[keys[i]].NORMAL_TILES.Num());
+			UE_LOG(LogTemp, Log, TEXT("Sala %d visitada, tiene %i enemigos, con un total de tiles disponibles %i"), M.mapRooms[i].ID, totalEnemies, M.mapRooms[i].NORMAL_TILES.Num());
 			while (j < totalEnemies)
 			{
-				int pos = FMath::RandRange(0, M.mapRooms[keys[i]].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
-				if (!enemies.Contains(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos])) {
-					UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[keys[i]].ID);
+				int pos = FMath::RandRange(0, M.mapRooms[i].NORMAL_TILES.Num()-1);//Cogemos una posicion aleatoria
+				if (!enemies.Contains(M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + M.mapRooms[i].NORMAL_TILES[pos])) {
+					UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[i].ID);
 					//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
-					enemies.Add(M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT + M.mapRooms[keys[i]].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
+					enemies.Add(M.mapRooms[i].BOUNDING_BOX_TOP_LEFT + M.mapRooms[i].NORMAL_TILES[pos]);///falta pasar de posición local a posicion global en el mapa
 					j++;
 				}
 			}
@@ -573,5 +753,18 @@ FString PD_MG_MapGenerationUtils::EnemiesGeneration(MapProceduralInfo &M) {
 	UE_LOG(LogTemp, Log, TEXT("Enemigos %s"), *enemiesString);
 	return enemiesString;
 }
+
+#pragma endregion
+
+#pragma region PROCEDURAL GENERATION v0.2
+
+bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M, TArray<RoomTemplateInfo> &roomTemplateArray, int _Total_Height, int _Total_Width, PD_MatchConfigManager* MatchConfigMan, int numPlayers) 
+{
+	return false;
+}
+
+void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, MATCHCONFIG_MISSIONTYPE missionType) {}
+
+bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { return false; }
 
 #pragma endregion

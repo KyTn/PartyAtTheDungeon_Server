@@ -2,9 +2,15 @@
 
 #pragma once
 #include "PD_MG_MapGenerationUtils.h"
+#include "Structs/PD_NetStructs.h"
+
+
+
 /**
  * 
  */
+class PD_MatchConfigManager;
+
 class PATD_SERVER_API PD_MG_MapGenerator
 {
 public:
@@ -17,6 +23,7 @@ public:
 
 	void Init();
 
-	FString GenerateProceduralMap();
+	FString GenerateProceduralMap_v01(PD_MatchConfigManager * MapManConfig, int numPlayers);
+	FStructMapData* GenerateProcedural_FStructMapData_v02(PD_MatchConfigManager * MapManConfig, int numPlayers);
 
 };
