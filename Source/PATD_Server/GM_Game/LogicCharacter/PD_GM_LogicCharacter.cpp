@@ -6,9 +6,13 @@
 #include "Actors/Players/PD_CharacterController.h"
 
 #include <math.h>       /* ceil */
+#include "math.h"
 #include "GM_Game/PD_GM_GameManager.h"
 #include "../../PD_ServerGameInstance.h"
 #include "GM_Game/PD_GM_SplineManager.h"
+#include "GM_Game/PD_GM_EnemyManager.h"
+#include "../../PD_PlayersManager.h"
+
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
 #include "MapGeneration/PD_MG_LogicPosition.h"
@@ -133,33 +137,39 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 }
 
 
-bool PD_GM_LogicCharacter::ActionTo(FStructOrderAction order)
+bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 {
-	/*
-	- OBJETIVO: Para realizar una accion sobre una casilla. Las acciones son Ataques, Habilidades o Interactuar con objeto
-	- PROCESO:
-	1. Recibe como parametros la posicion logica de la casilla y un ID de la accion que va a realizar
-	(identifica la habilidad, ataque basico o interaccion)
-	2. Con el MapManager consigue la referencia sobre lo que hay en la posicion logica dada -
-	el actor(Interactuable) o el character(enemigo o personaje) dependiendo de que accion va arealizar.
-	Se comprueba de que efectivamente hay algo en la casilla si no return false;
-	3. Dependiendo del Enum dado, se sabe si es un ataque o una accion
-	3.1 Si es un Accion sobre Jugador o Enemigo
-	3.1.0 Comprobar que el rango a la casilla es el adecuado
-	3.1.1 Consigue la referencia al enemigo (character) - a traves del Enemy/Player Manager
-	3.1.2 Consigue la referencia a su CharacterLogic - a traves del Enemy/Player Manager
-	3.1.4 Ejecutar el método Action() de su propio Controllador- Si la accion fallase return false- Sino continua ejecuion.
-	3.1.3 Haz que ejecute el metodo UpdateHPCurrent() -- del characterLogic
-	3.2 Si es un Accion sobre Interactuable
-	3.2.0 Comprobar que el rango de la casilla es el adecuado
-	3.2.1 Conseguir la referencia a ese interactuable
-	3.2.1 Conseguir el controlador de ese interactuable
-	3.2.2 ejecutar el metodo Interacturar() de ese interactuable
-	- SE LLAMA DESDE: El GameManager durante la Fase de Accion
-	*/
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
+
+	switch (ActiveSkills(action.id_action))
+	{
+		case ActiveSkills::BasicAttack:
+		{
+			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
+			Skill_BasicAttack(this, enemyManager->GetCharacterByID(action.id_character[0]));
+			break;
+		}
+		case ActiveSkills::Defense:
+		{
+			break;
+		}
+		case ActiveSkills::WhenFua:
+		{
+			break;
+		}
+		default:
+		{
+			// ID SKILL --------- NO COINCIDE CON NINGUN ID SKILL
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo ERROR TO ID SKIL -  %d "), action.id_action);
+
+		}
+	}
 
 	return true;
 }
+
+
 void PD_GM_LogicCharacter::ConsumeItem(uint32 idItem)
 {
 	/*
@@ -381,7 +391,70 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 	}
 }
 
+bool PD_GM_LogicCharacter::CheckIfWasACriticalAttack(int* initialDamage, PD_GM_LogicCharacter* character)
+{
+	int damageAfterCheck = *initialDamage;
 
+	//Aqui comprobar el grado de % de criticio, dependiendo de pasias de los personajes
+	if ( (FMath::RandRange(0.0f, 100.0f)) >= (100 - character->GetTotalStats()->MALBonus ) ) //Critical Attack
+	{
+		damageAfterCheck = damageAfterCheck + (damageAfterCheck * character->GetTotalStats()->MALBonus );
+	}
+
+	if (damageAfterCheck > *initialDamage)
+		return true;
+	else
+		return false;
+	
+}
+
+///SKILS
+/* ===============
+FUNCIONES QUE DEFINEN EL COMPORTAMIENTO DE LAS HABILIDADES 
+================ */
+#pragma region Skills Function
+void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+	/*
+	 1. Comprobar si le da o no -> comprobar valores de impacto y evasion
+	 2. Lanzar el ataque
+	*/
+	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
+	{
+		//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
+		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+
+		//Calcular si es critico el ataque
+		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+		{
+			//lanzar animacion de ataque critico
+
+		}
+		else
+		{
+			//lanzar animacion de ataque normal
+			
+		}
+
+		//quitarselo al charWhoRecieveTheAttacks
+		CharWhoReceiveTheAttacks->UpdateHPCurrent(totalDamage);
+
+		//lanzar animacion de defensa
+
+	}
+	else  //Fallo del Ataque
+	{
+
+	}
+
+}
+
+#pragma endregion
+
+
+
+
+///GET Y SET
 /* ===============
 METODOS GET Y SET PARA STRUCTS DE STATS y DATOS
 ================ */

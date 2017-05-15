@@ -33,7 +33,7 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	bool isDead; //cuando su HPcurrent =< 0 -> True, sino False ---> Para acabar el juego
 
 	int points;
-				 //Controlador GenericoPadre. Se Castea a CharacterController o EnemyController dependiendo de la variable isPlayer.
+	//Controlador GenericoPadre. Se Castea a CharacterController o EnemyController dependiendo de la variable isPlayer.
 	APD_GenericController* controller;
 
 	//Character
@@ -98,7 +98,7 @@ public:
 	Devuelve:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
-	bool ActionTo(FStructOrderAction order);
+	bool ActionTo(FStructTargetToAction action);
 
 	/*
 	//Metodo para consumir un item
@@ -155,6 +155,20 @@ public:
 
 	//Moverse cuando se choca con alquien y pierde el choque
 	void MoveWhenCollisionLost();
+
+
+	// Calcular si ha sido CRITICO y su %, devuelve el valor final
+	bool CheckIfWasACriticalAttack(int* initialDamage, PD_GM_LogicCharacter* character);
+
+
+	/* ========================================
+	FUNCIONES DE LAS HABILIDADES / DEFINEN EL COMPORTAMIENTO DE ESTAS
+	============================*/
+
+	//Ataque basico
+	void Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+	//Protegerse hasta el siguiente turno (HAB SIN ESCUDO)
+	void Skill_Defense();
 
 
 	/* ===================
