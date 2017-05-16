@@ -187,7 +187,8 @@ void APD_GenericController::MoveWithSpline()
 		currentPosition = GetPawn()->GetActorLocation();
 	}
 	else {
-		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s"),*this->GetName());
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s. Deteniendo movimiento."),*this->GetName());
+		isMoving = false;
 		return;
 	}
 
