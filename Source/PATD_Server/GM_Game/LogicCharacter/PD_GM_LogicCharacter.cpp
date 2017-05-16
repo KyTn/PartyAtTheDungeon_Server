@@ -146,8 +146,13 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	{
 		case ActiveSkills::BasicAttack:
 		{
+			controller->Animation_CriticalBasicAttack();
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
-			Skill_BasicAttack(this, enemyManager->GetCharacterByID(action.id_character[0]));
+			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
+			if (enemy)
+			{
+				Skill_BasicAttack(this, enemy);
+			}
 			break;
 		}
 		case ActiveSkills::Defense:
@@ -428,12 +433,12 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
 		{
 			//lanzar animacion de ataque critico
-
+			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
 		}
 		else
 		{
 			//lanzar animacion de ataque normal
-			
+			CharWhoAttacks->GetController()->Animation_BasicAttack();
 		}
 
 		//quitarselo al charWhoRecieveTheAttacks
@@ -488,6 +493,67 @@ void PD_GM_LogicCharacter::SetBasicStats(int nPOD, int nAGI, int nDES, int nCON,
 	basicStats->CON = nCON;
 	basicStats->PER = nPER;
 	basicStats->MAL = nMAL;
+
+	for (int i = 0; i < this->skills->listPasiveSkills.Num(); i++)
+	{
+		switch (PasiveSkills(this->skills->listPasiveSkills[i].ID_Skill))
+		{
+		case PasiveSkills::IamTank:
+		{
+			FMath::Clamp(basicStats->CON + 3, 1, 10);
+			FMath::Clamp(basicStats->AGI - 1, 1, 10);
+			FMath::Clamp(basicStats->DES - 1, 1, 10);
+			break;
+		}
+		case PasiveSkills::KingMistery:
+		{
+			FMath::Clamp(basicStats->POD - 1, 1, 10);
+			FMath::Clamp(basicStats->AGI + 3, 1, 10);
+			break;
+		}
+		case PasiveSkills::IamTankInDistance:
+		{
+			FMath::Clamp(basicStats->CON + 2, 1, 10);
+			FMath::Clamp(basicStats->POD + 1, 1, 10);
+			FMath::Clamp(basicStats->AGI - 2, 1, 10);
+			break;
+		}
+		case PasiveSkills::RedBullets:
+		{
+			FMath::Clamp(basicStats->MAL + 4, 1, 10);
+			FMath::Clamp(basicStats->DES + 1, 1, 10);
+			break;
+		}
+		case PasiveSkills::SquabEye:
+		{
+			FMath::Clamp(basicStats->DES + 3, 1, 10);
+			FMath::Clamp(basicStats->PER + 1, 1, 10);
+			FMath::Clamp(basicStats->CON - 1, 1, 10);
+			FMath::Clamp(basicStats->MAL - 1, 1, 10);
+			break;
+		}
+		case PasiveSkills::TwoblackCandles:
+		{
+			FMath::Clamp(basicStats->MAL + 2, 1, 10);
+			break;
+		}
+		case PasiveSkills::AsBull:
+		{
+			FMath::Clamp(basicStats->CON + 2, 1, 10);
+			FMath::Clamp(basicStats->POD + 2, 1, 10);
+			FMath::Clamp(basicStats->AGI - 3, 1, 10);
+			break;
+		}
+		case PasiveSkills::TheSweeper:
+		{
+			FMath::Clamp(basicStats->DES - 1, 1, 10);
+			FMath::Clamp(basicStats->PER + 3, 1, 10);
+			break;
+		}
+		default:
+			break;
+		}
+	}
 }
 void PD_GM_LogicCharacter::SetInitBaseStats(int nHP, int nDMG, int nAP)
 {

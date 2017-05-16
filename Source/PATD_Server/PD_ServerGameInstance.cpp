@@ -14,6 +14,7 @@
 #include "GM_Game/PD_GM_SplineManager.h"
 #include "Actors/PD_TimerGame.h"
 #include "math.h"
+#include "PD_SaveCharacterData.h"
 #include "MapInfo/PD_MM_MapInfo.h"
 
 //Includes of forward declaration
@@ -372,6 +373,7 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skills = &playerStats->skills;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->weapon = &playerStats->weapon;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skin = &playerStats->skin;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->characterState = &playerStats->charState;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->SetIDCharacter("Player_0"+inPlayer);
 }
 
@@ -744,7 +746,7 @@ void UPD_ServerGameInstance::Init()
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
 	levelsNameDictionary = LevelsNameDictionary(); 
 
-	
+
 	playersManager = new PD_PlayersManager();
 
 	structServerState = new StructServerState();
@@ -1075,6 +1077,93 @@ int UPD_ServerGameInstance::GetConfigMatchSizeMap() {
 int UPD_ServerGameInstance::GetConfigMatchDifficult() {
 	return (int)MatchConfigManager->Get_Difficulty();
 }
+
+
+void UPD_ServerGameInstance::LoadSkillSpecificData(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range)
+{
+	//Create an instance of our savegame class
+	UPD_SaveCharacterData* SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::CreateSaveGameObject(UPD_SaveCharacterData::StaticClass()));
+
+	if (UGameplayStatics::DoesSaveGameExist("SkillsData", 0))
+	{
+		SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::LoadGameFromSlot("SkillsData", 0));
+		if (TypeSkill == 0) //ACTIVA
+		{
+			if (SaveGameInstance->activeSkills.Num() > 0)
+			{
+				for (int i = 0; i < SaveGameInstance->activeSkills.Num(); i++)
+				{
+					if (id_skill == SaveGameInstance->activeSkills[i].ID_Skill)
+					{
+						nameSkill = SaveGameInstance->activeSkills[id_skill].name_Skill;
+						effectSkill = SaveGameInstance->activeSkills[id_skill].description;
+						weaponRequired = SaveGameInstance->activeSkills[id_skill].weaponRequired;
+						AP = SaveGameInstance->activeSkills[id_skill].AP;
+						CD = SaveGameInstance->activeSkills[id_skill].CD;
+						target = SaveGameInstance->activeSkills[id_skill].target;
+						range = SaveGameInstance->activeSkills[id_skill].range;
+					}
+				}
+
+
+			}
+		}
+		else if (TypeSkill == 1)
+		{
+			if (SaveGameInstance->pasiveSkills.Num() > 0)
+			{
+				for (int i = 0; i < SaveGameInstance->pasiveSkills.Num(); i++)
+				{
+					if (id_skill == SaveGameInstance->pasiveSkills[i].ID_Skill)
+					{
+						nameSkill = SaveGameInstance->pasiveSkills[id_skill].name_Skill;
+						effectSkill = SaveGameInstance->pasiveSkills[id_skill].description;
+						weaponRequired = SaveGameInstance->pasiveSkills[id_skill].weaponRequired;
+						AP = SaveGameInstance->pasiveSkills[id_skill].AP;
+						CD = SaveGameInstance->pasiveSkills[id_skill].CD;
+						target = SaveGameInstance->pasiveSkills[id_skill].target;
+						range = SaveGameInstance->pasiveSkills[id_skill].range;
+					}
+				}
+
+			}
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("File does not exist."));
+	}
+}
+
+
+void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range)
+{
+	UPD_SaveCharacterData* SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::CreateSaveGameObject(UPD_SaveCharacterData::StaticClass()));
+
+	if (UGameplayStatics::DoesSaveGameExist("WeaponsData", 0))
+	{
+		SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::LoadGameFromSlot("WeaponsData", 0));
+
+		if (SaveGameInstance->weapons.Num() > 0)
+		{
+			for (int i = 0; i < SaveGameInstance->weapons.Num(); i++)
+			{
+				if (indexWeapon == SaveGameInstance->weapons[i].ID_Weapon)
+				{
+					id_weapon = indexWeapon;
+					classWeapon = SaveGameInstance->weapons[i].ClassWeapon;
+					typeWeapon = SaveGameInstance->weapons[i].TypeWeapon;
+					damage = SaveGameInstance->weapons[i].DMWeapon;
+					range = SaveGameInstance->weapons[i].RangeWeapon;
+				}
+			}
+		}
+
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("File does not exist."));
+}
+
 
 #pragma endregion
 

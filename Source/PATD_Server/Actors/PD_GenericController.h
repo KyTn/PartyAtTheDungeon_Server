@@ -21,11 +21,12 @@ UCLASS()
 class PATD_SERVER_API APD_GenericController : public AAIController
 {
 	//Este nombre es el que tienen que tener las maquinas de estados del BP de anim (animInstance)
-	FString animStateMachineName = "animStateMachine";
+	FString animStateMachineName = "BipedoStateMachine";
 	//Este es el nombre que tiene que tener el estado de Idle para reconocerlo como tal
-	FString idleStateName = "Idle";
+	FString idleStateName = "IDLE";
 
 	bool isMoving = false;
+	bool CallbackAnimationEndToGM = false;
 	int maxLengthAnimation = 5;
 	float currentTimeAnimation=0;
 	FVector moveTargetPosition;
@@ -73,6 +74,8 @@ public:
 	*/
 	virtual bool ActionTo(FStructTargetToAction action);
 
+	void Animation_BasicAttack();
+	void Animation_CriticalBasicAttack();
 
 	/*
 	//Sirve para lanzar la animacion determinada del character
