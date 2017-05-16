@@ -181,4 +181,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 		int  GetConfigMatchDifficult();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadData")
+		void LoadSkillSpecificData(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadData")
+		void LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range);
 };

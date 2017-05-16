@@ -31,6 +31,14 @@ void APD_GenericController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime); // Call parent class tick function  
 	
+	if (CallbackAnimationEndToGM)
+	{
+		//Llamar a GameManager para indicar que se ha acabado la funcion
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+		SGI->getGameManager()->OnAnimationEnd();
+		CallbackAnimationEndToGM = false;
+	}
+
 	//Control del final de movimiento (el movimiento es la unica animacion que se controla en el controller y no en la maquina de estados del BP)
 	if (isMoving)
 	{
@@ -62,10 +70,12 @@ void APD_GenericController::Tick(float DeltaTime)
 
 void APD_GenericController::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::OnAnimationEnd"));
-	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-	SGI->getGameManager()->OnAnimationEnd();
+	CallbackAnimationEndToGM = true;
+	//UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+	//SGI->getGameManager()->OnAnimationEnd();
 	
 }
+
 bool APD_GenericController::IsAtAnimation() {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation")); 
 	//Comprobamos el estado de la maquina de estados y si esta isMoving=true
@@ -89,6 +99,7 @@ bool APD_GenericController::IsAtAnimation() {
 		}
 		return false; //si no tiene animInst no deberia poder estar haciendo animaciones
 	}
+	
 	//return true;
 }
 
@@ -164,8 +175,6 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 //Funcion para mover al Character mediante Splines
 void APD_GenericController::MoveWithSpline()
 {
-	
-
 	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
 	FVector currentPosition = GetPawn()->GetActorLocation();
 
@@ -176,6 +185,22 @@ void APD_GenericController::MoveWithSpline()
 
 	if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 	{
+		//Animacion de andar
+		//Activar enableAttack en el BP de anim
+		UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+		if (AnimInst) {
+			UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "MoveChar");
+			if (BoolProperty != NULL) {
+				bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+				enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+
+
 		//Simulamos la fisica para que se mueva solo la CABESA!
 		FName boneName = "cabesa";
 		bool newSimulate = true;
@@ -196,6 +221,19 @@ void APD_GenericController::MoveWithSpline()
 	}
 	else
 	{
+		UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+		if (AnimInst) {
+			UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "BackToIdle");
+			if (BoolProperty != NULL) {
+				bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+				enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+
 		FName boneName = "cabesa";
 		bool newSimulate = false;
 		bool includeSelf = true;
@@ -220,4 +258,36 @@ APD_SplineActors* APD_GenericController::GetSpline()
 void APD_GenericController::SetSpline(APD_SplineActors* newSpline)
 {
 	spline = newSpline;
+}
+
+void APD_GenericController::Animation_BasicAttack()
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "NormalAttack");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+	}
+}
+
+void APD_GenericController::Animation_CriticalBasicAttack()
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "CriticalAttack");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+	}
 }
