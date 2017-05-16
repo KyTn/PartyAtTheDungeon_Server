@@ -189,6 +189,7 @@ void APD_GenericController::MoveWithSpline()
 	else {
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s. Deteniendo movimiento."),*this->GetName());
 		isMoving = false;
+		OnAnimationEnd();
 		return;
 	}
 
