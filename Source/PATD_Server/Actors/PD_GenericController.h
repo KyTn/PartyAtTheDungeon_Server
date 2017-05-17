@@ -50,6 +50,9 @@ public:
 	//Funcion para moverse por el mundo con splines
 	void MoveWithSpline();
 
+	//Funcion para actualizar la rotacion del personaje
+	void UpdateRotationCharacterToEnemy(FVector target);
+
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;
 
@@ -76,7 +79,14 @@ public:
 
 	void Animation_BasicAttack();
 	void Animation_CriticalBasicAttack();
-
+	void Animation_UseConsumable();
+	void Animation_UseInteractable();
+	void Animation_CastSkill();
+	void Animation_GetHurt();
+	void Animation_DeathChar();
+	void Animation_DefenseChar();
+	
+	void SetTypeCharanimation(int typeChar);
 	/*
 	//Sirve para lanzar la animacion determinada del character
 	Recibe:

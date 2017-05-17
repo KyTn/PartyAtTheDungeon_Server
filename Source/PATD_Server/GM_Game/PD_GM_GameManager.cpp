@@ -760,29 +760,33 @@ void PD_GM_GameManager::VisualMoveTick() {
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
-		//Set un spline para dicho character
-		if (!logicCharacter->GetController()->GetSpline()) 
+		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) //Si hay posiciones en este array, quiere decir que se tiene que mover
 		{
-			logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
-		}
+			//Set un spline para dicho character
+			if (!logicCharacter->GetController()->GetSpline())
+			{
+				logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+			}
 
-		TArray<FVector> positionsToMove = TArray<FVector>();
-		//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
-		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
-		{
-			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
-			positionsToMove.Add(v);
-			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
-		}
+			TArray<FVector> positionsToMove = TArray<FVector>();
+			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+			for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
+			{
+				FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
+				v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+				positionsToMove.Add(v);
+				//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
+			}
 
-		logicCharacter->MoveToPhysicalPosition(positionsToMove);
+			logicCharacter->MoveToPhysicalPosition(positionsToMove);
+
+			//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
+			if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
+				logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
+			}
+		}
 		
-		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
-			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
-		}
 	}
 
 	///FUNCION DE CAMARA

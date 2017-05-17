@@ -238,6 +238,17 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetController(Cast<APD_GenericController>(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetSkin()->ID_SkinHead);
+
+		const FString command = FString::Printf(TEXT("ChangeSkin %d"), _GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetSkin()->ID_SkinHead);
+		if (_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap -- EXITO EN LLAMAR A LA FUNCION"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDynamicMap - EEROR EN LLAMATR A LA FUNCION"));
+		}
+
 		//Seteamos el spline de los jugadores.
 		//Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
 			//_GAMEMANAGER->splineManager->GetSpline());

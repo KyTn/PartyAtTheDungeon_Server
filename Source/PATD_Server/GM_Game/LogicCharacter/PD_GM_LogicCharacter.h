@@ -112,7 +112,7 @@ public:
 	Recibe:
 	- Un float que indica la vida que se le quita
 	*/
-	void UpdateHPCurrent(float receivedDamage);
+	void UpdateHPCurrent(float updateLifeIn);
 
 	/*
 	//Metodo para conseguir la tirada de un numero determinado de dados
@@ -164,12 +164,35 @@ public:
 	/* ========================================
 	FUNCIONES DE LAS HABILIDADES / DEFINEN EL COMPORTAMIENTO DE ESTAS
 	============================*/
+	///Comprobar los estados del jugador o los powerUps para ver si se incrementa el ataque o no
+	void CheckCharacterActiveEffects(PD_GM_LogicCharacter* CharWhoAttacks);
 
 	//Ataque basico
 	void Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
 	//Protegerse hasta el siguiente turno (HAB SIN ESCUDO)
 	void Skill_Defense();
 
+	/*MELE*/
+	///Dagas
+	void Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* CharWhoAttacks);
+	///Mandoble
+	void Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToJump);
+	///Melee
+	void Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+
+	/*RANGO*/
+	///Guns
+	void Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+	///Range
+	void Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+
+	/*MAGIA*/
+	///Magic
+	void Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+	void Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToTeleport);
+	void Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* CharWhoAttacks);
+	void Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
+	void Skill_Magic_ShotMana(PD_GM_LogicCharacter* CharWhoAttacks);
 
 	/* ===================
 	METODOS AUXILIARES GET Y SET

@@ -146,6 +146,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	{
 		case ActiveSkills::BasicAttack:
 		{
+			//controller->UpdateRotationCharacterToEnemy(FVector(100, 0, 0)); //Pasarle la direccion del enemigo al que va a atacar
 			controller->Animation_CriticalBasicAttack();
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
 			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
@@ -161,6 +162,74 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::WhenFua:
 		{
+			Skill_Melee_Daggers_WhenFua(this);
+			break;
+		}
+		case ActiveSkills::JumpFatTigger:
+		{
+			PD_MG_LogicPosition positionToJump = PD_MG_LogicPosition(action.positions[0].positionX, action.positions[0].positionY);
+			Skill_Melee_LargeSword_JumpFatTigger(this, positionToJump);
+			break;
+		}
+		case ActiveSkills::Hostion:
+		{
+			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
+			if (enemy)
+			{
+				Skill_Melee_Hostion(this,enemy);
+			}
+			break;
+		}
+		case ActiveSkills::SomeHit:
+		{
+			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
+			if (enemy)
+			{
+				Skill_Range_Guns_SomeHit(this, enemy);
+			}
+			break;
+		}
+		case ActiveSkills::RightInTheAsshole:
+		{
+			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
+			if (enemy)
+			{
+				Skill_Range_RightInTheAsshole(this, enemy);
+			}
+			break;
+		}
+		case ActiveSkills::GiveMeTheFireBlast:
+		{
+			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
+			if (enemy)
+			{
+				Skill_Magic_GiveMeTheFireBlas(this, enemy);
+			}
+			break;
+		}
+		case ActiveSkills::Exclaimchas:
+		{
+			PD_MG_LogicPosition positionToTeleport = PD_MG_LogicPosition(action.positions[0].positionX, action.positions[0].positionY);
+			Skill_Magic_ExclaimChas(this, positionToTeleport);
+			break;
+		}
+		case ActiveSkills::BeInCrossroads:
+		{
+			Skill_Magic_BeInCrossroads(this);
+			break;
+		}
+		case ActiveSkills::WhoHeal:
+		{
+			PD_GM_LogicCharacter* ally = playersManager->GetCharacterByID(action.id_character[0]);
+			if (ally)
+			{
+				Skill_Magic_WhoHeal(this, ally);
+			}
+			break;
+		}
+		case ActiveSkills::ShotMana:
+		{
+			Skill_Magic_ShotMana(this);
 			break;
 		}
 		default:
@@ -190,7 +259,7 @@ void PD_GM_LogicCharacter::ConsumeItem(uint32 idItem)
 	*/
 }
 
-void PD_GM_LogicCharacter::UpdateHPCurrent(float receivedDamage)
+void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 {
 	/*
 	- OBJETIVO: Recibir el daño de un ataque, actualizar la vida actual y comprobar si ha muerto o no.
@@ -201,15 +270,13 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float receivedDamage)
 	3. Comprobar si HPCurrent <= 0. Si es asi, actualizar la variable isDead
 	- SE LLAMA DESDE: Cualquier Actor - Personaje o Enemigo que dañe a otro
 	*/
-	if (receivedDamage > GetTotalStats()->HPCurrent) {
-		GetTotalStats()->HPCurrent = 0;
-	}
-	else {
-		GetTotalStats()->HPCurrent -= receivedDamage;
-	}
-	
 
-	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s  come %d de daño y tiene ahora %d de vida"), *GetIDCharacter(), receivedDamage,GetTotalStats()->HPCurrent);
+	int updateLife = FMath::TruncToInt(updateLifeIn);
+
+	FMath::Clamp(0, (int)GetTotalStats()->HPTotal, (GetTotalStats()->HPCurrent + updateLife));
+
+	
+	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s  come %d de daño y tiene ahora %d de vida"), *GetIDCharacter(), updateLife,GetTotalStats()->HPCurrent);
 	if (GetTotalStats()->HPCurrent <= 0) {
 		GetCharacterBP()->SetActorHiddenInGame(true);
 		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s se murio"),*GetIDCharacter());
@@ -442,17 +509,240 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		}
 
 		//quitarselo al charWhoRecieveTheAttacks
-		CharWhoReceiveTheAttacks->UpdateHPCurrent(totalDamage);
+		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
-		//lanzar animacion de defensa
-
+		//lanzar animacion de pain
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
 	}
 	else  //Fallo del Ataque
 	{
-
+		//lanzar animacion de defensa por parte del atacado
+		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar();
 	}
+}
+
+
+/*MELE*/
+///Dagas
+void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* CharWhoAttacks)
+{
+	/*
+	 - Incrementa el siguiente ataque (basico) en 4 
+	 1. Poner en el TMAP de estados power up esto y ponerlo a 1. 
+	 2. Cuando se realiza un ataque basico comprobar los estados
+	 3. Si esta este, aumentar el ataque en 4 y poner a 0 el CD en el power up
+	*/
+
+	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add(2, 1);
 
 }
+///Mandoble
+void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToJump)
+{
+	/*
+	- Salta 2 tiles y cae haciendo daño a todo lo que hay alrededor
+	1. Iniciar animacion de salto - o ataque critico
+	2. Desplazar a la posicion pasada por parametro al personaje
+	3. Coger los enemigos adyacentes a esa posicion y quitarles el daño calculado
+	*/
+	///NOTA: Comprobar que no se esperen en las animaciones para lanzar las animaciones - si no habria que hacer una animacion de salta y con el SetActorLocation
+	CharWhoAttacks->GetController()->GetSpline()->RemovePoints();
+	FVector posToMove = mapMng->LogicToWorldPosition(PositionToJump);
+	TArray<FVector> positionsToMove = TArray<FVector>();
+	positionsToMove.Add(posToMove);
+	CharWhoAttacks->GetController()->GetSpline()->SetPoints(positionsToMove);
+
+	CharWhoAttacks->GetController()->MoveTo(0, 0);
+	CharWhoAttacks->SetCurrentLogicalPosition(PositionToJump);
+
+	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+
+	//Coger las adyacentes y quitarles el daño calculado
+	//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
+	/*int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+	//Calcular si es critico el ataque
+	if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+	{
+		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+	}
+	else
+	{
+		CharWhoAttacks->GetController()->Animation_BasicAttack();
+	}
+	CharWhoReceiveTheAttacks->UpdateHPCurrent(totalDamage);
+	//lanzar animacion de pain
+	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+	*/
+}
+///Melee
+void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+
+}
+
+/*RANGO*/
+///Guns
+void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+	/*
+	- Hace una ragafa de disparos. El ataque acierta SIEMPRE - Gasta todo el AP
+	1. Bucle for para se hagan las animaciones y se repitan los ataques (basicos)
+	2. Animacionde pain de parte del atacado
+	*/
+	///NOTA: si vemos que va mal lo de la repeticion de las animaciones (que no se repite o da problemas) se quitara y se dejaria un efecto FX
+	//Se pone 2, para que se haga una rafaga de disparos -> pero se puede poner la cifra que se quiera. 
+	for (int i = 0; i < 2; i++)
+	{
+		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+
+		//Calcular si es critico el ataque
+		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+		{
+			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+		}
+		else
+		{
+			CharWhoAttacks->GetController()->Animation_BasicAttack();
+		}
+		//quitarselo al charWhoRecieveTheAttacks
+		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+	}
+	
+	//lanzar animacion de pain - Solo se ha de activar una vez la animacion de daño del atacado, para hacerlo mas rapido
+	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+}
+///Range
+void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+	/*
+	- Hace un ataque critico
+	1. Calcular el daño
+	2. hacerlo critico
+	3. lanzar las respectivas animaciones
+	*/
+	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
+	{
+		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+		totalDamage = totalDamage + (totalDamage * CharWhoAttacks->GetTotalStats()->MALBonus);
+
+		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+
+		//lanzar animacion de pain
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+	}
+	else {
+		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar();
+	}
+}
+
+/*MAGIA*/
+///Magic
+void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+	/*
+	- Lanza una bola de fuego con 6 de daño ( + poder ? )
+	1. Actualizar vida del atacado ?¿?
+	2. Lanzar animacion de casteo de habilidad del personaje que ataca
+	3. Lanzar bola de fuego
+	*/
+	///NOTA: Hay que comprobar el metodo ReceiveHit de los characteres, lo suyo seria que al chocar la bola de fuego es cuando se quita la vida y se ejecuta la animacion de pain y tal
+
+	//Lanzar animacion de casteo de habilidad
+	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
+	{
+		CharWhoAttacks->GetController()->Animation_CastSkill();
+
+	}
+	
+
+}
+void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToTeleport)
+{
+	/*
+	- Teleporta una casilla
+	1. Animacion de Casteo de Habildad
+	2. Lanzar FX de humo? o teletransporte
+	3. SetActorLocation con la nueva posicion
+	4. Actualizar CurrentPosition
+	*/
+	
+	FVector vectorToTeleport = FVector(mapMng->LogicToWorldPosition(PositionToTeleport));
+	
+	//Animacionde Casteo de Habilidad
+	CharWhoAttacks->GetController()->Animation_CastSkill();
+
+	//Lanzar humo ?¿?
+
+	CharWhoAttacks->SetCurrentLogicalPosition(PositionToTeleport);
+	CharWhoAttacks->GetCharacterBP()->SetActorLocation(vectorToTeleport);
+
+}
+void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* CharWhoAttacks)
+{
+	/*
+	- Explosion de hielo que daña 3 puntos de vida a los enemigos adyacentes
+	1. Conseguir a los enemigos adyacentes
+	2. Animacion de casteo de habilidad
+	3. FX de explosion de hielo
+	4. Updatear la vida de los enemigos afectados
+	5. Animacion de pain de los enemigos afectados
+	*/
+
+	//Animacion de casteo de habilidad
+	CharWhoAttacks->GetController()->Animation_CastSkill();
+
+	//FX de explosion de hielo
+
+
+	//Conseguir a los enemigos adyacentes
+	
+	//Conseguir las casillas adyacentes y comprobar que son enemigos para cogerlos
+		//updatear la vida con aquellos que te encuentres
+		//lanzar animacion de pain de estos
+	
+
+}
+void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
+{
+	/*
+	- Cura 20 puntos de vida a un aliado + Los estados alterados del mismo
+	1. Animacion de Casteo de HBabilidad
+	2. FX sobre el afectado de curacion
+	3. updatear su vida
+	4. quitar los estados del afectado
+	*/
+
+	//animacion de casteo de habilidad
+	CharWhoAttacks->GetController()->Animation_CastSkill();
+
+	//FX de la curacion sobre el afectado
+
+	CharWhoReceiveTheAttacks->UpdateHPCurrent(20);
+
+	CharWhoReceiveTheAttacks->GetCharacterState()->alteredCharacterState.Empty();
+
+
+}
+void PD_GM_LogicCharacter::Skill_Magic_ShotMana(PD_GM_LogicCharacter* CharWhoAttacks)
+{
+	/*
+	- Resetaa el CD de todas las habilidades
+	1. Animacion de Casteo
+	2. FX de curacion ?¿?
+	3. Resetar todos los CDCurrent a 0, para que se puedan volver a usar
+	*/
+
+	///NOTA: ! Hay que pasar esta informacion a los clientes para que se actualicen
+	//animacion de cast de habilidad
+
+	//FX de curacion
+
+	for (int i = 0; i < CharWhoAttacks->GetSkills()->listActiveSkills.Num(); i++)
+	{
+		CharWhoAttacks->GetSkills()->listActiveSkills[i].currentCD = 0; //seteando currentCD a 0, lo pones de disponible para que vuelva a ser utilizado
+	}
+}
+
 
 #pragma endregion
 
