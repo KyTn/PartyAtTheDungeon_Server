@@ -24,6 +24,9 @@ private:
 
 	//uint32 ReadInteraciveObjectMap(TArray<FString> fileReaded, uint32 nextIndexRead, PD_MG_DynamicMap* dynamicMapRef);
 
+
+	bool Parsing_v_0_2(FStructMapData* NETMAPDATA, PD_MM_MapInfo* MapInfoRef, PD_MG_DynamicMap* DynamicMapRef);
+
 public:
 	PD_MG_MapParser();
 	~PD_MG_MapParser();
@@ -32,4 +35,8 @@ public:
 	PD_MG_StaticMap* StartParsingFromFile(FString* filepath, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* DynamicMapRef);
 
 	PD_MG_StaticMap* StartParsingFromChorizo(FString* filepath, PD_MG_StaticMap* staticMapRef, PD_MG_DynamicMap* DynamicMapRef);
+
+
+	// parsea un mapa que ha sido enviado desde la red como un paquete de datos, no como un string (file). 
+	bool StartParsingFromFStructMapData(FStructMapData* NETMAPDATA, PD_MM_MapInfo * MapInfoRef, PD_MG_DynamicMap* DynamicMapRef);
 };

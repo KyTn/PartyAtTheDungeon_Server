@@ -79,7 +79,7 @@ bool MapSearchNode::IsSameState(MapSearchNode &rhs)
 
 void MapSearchNode::PrintNodeInfo()
 {
-//	UE_LOG(LogTemp, Log, TEXT("MapSearchNode::PrintNodeInfo: x:%d , y:%d"),this->x,this->y);
+	//	UE_LOG(LogTemp, Log, TEXT("MapSearchNode::PrintNodeInfo: x:%d , y:%d"),this->x,this->y);
 }
 
 // Here's the heuristic function that estimates the distance from a Node
@@ -115,27 +115,27 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSe
 	{
 		parentLogicPosition.SetX(parent_node->x);
 		parentLogicPosition.SetY(parent_node->y);
-	
+
 	}
 
-//	UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
+	//	UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
 
-	TArray<PD_MG_LogicPosition> adyacentsList= mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(x,y));
+	TArray<PD_MG_LogicPosition> adyacentsList = mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(x, y));
 
 	for (PD_MG_LogicPosition adyacentLogicPosition : adyacentsList) {
 		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==%d,%d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY()), !(adyacentLogicPosition == parentLogicPosition));
-		if (!mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY()) 
-		&& !(adyacentLogicPosition== parentLogicPosition)
+		if (!mapManager->IsLogicPositionAWall(adyacentLogicPosition)
+			&& !(adyacentLogicPosition == parentLogicPosition)
 			)
 		{
-		//	UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
+			//	UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
 			MapSearchNode NewNode;
 			NewNode = MapSearchNode(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager);
 			astarsearch->AddSuccessor(NewNode);
 		}
 
 	}
-	
+
 
 
 	return true;
@@ -159,81 +159,81 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 {
 	AStarSearch<MapSearchNode> astarsearch;
 	TArray<PD_MG_LogicPosition> returnList;
-		// Create a start state
-		MapSearchNode nodeStart;
-		nodeStart.x = posFrom.GetX();
-		nodeStart.y = posFrom.GetY();
-		nodeStart.mapManager = mapManager;
+	// Create a start state
+	MapSearchNode nodeStart;
+	nodeStart.x = posFrom.GetX();
+	nodeStart.y = posFrom.GetY();
+	nodeStart.mapManager = mapManager;
 
-		// Define the goal state
-		MapSearchNode nodeEnd;
-		nodeEnd.x = posTo.GetX();
-		nodeEnd.y = posTo.GetY();
-		nodeEnd.mapManager = mapManager;
-		// Set Start and goal states
+	// Define the goal state
+	MapSearchNode nodeEnd;
+	nodeEnd.x = posTo.GetX();
+	nodeEnd.y = posTo.GetY();
+	nodeEnd.mapManager = mapManager;
+	// Set Start and goal states
 
-		astarsearch.SetStartAndGoalStates(nodeStart, nodeEnd);
+	astarsearch.SetStartAndGoalStates(nodeStart, nodeEnd);
 
-		int searchState;
-		int searchSteps = 0;
+	int searchState;
+	int searchSteps = 0;
 
-		UE_LOG(LogTemp, Log, TEXT("Pathfinding de %d,%d a %d,%d"),  posFrom.GetX(), posFrom.GetY(), posTo.GetX(), posTo.GetY());
+	UE_LOG(LogTemp, Log, TEXT("Pathfinding de %d,%d a %d,%d"), posFrom.GetX(), posFrom.GetY(), posTo.GetX(), posTo.GetY());
 
 
-		do
+	do
+	{
+		searchState = astarsearch.SearchStep();
+
+		searchSteps++;
+
+
+
+	} while (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SEARCHING);
+
+	//Aqui la busqueda ha terminado
+
+	if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED)
+	{
+
+		MapSearchNode *node = astarsearch.GetSolutionStart();
+
+		int steps = 0;
+
+		node->PrintNodeInfo();
+		for (;; )
 		{
-			searchState = astarsearch.SearchStep();
+			node = astarsearch.GetSolutionNext();
 
-			searchSteps++;
-
-
-
-		} while (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SEARCHING);
-
-		//Aqui la busqueda ha terminado
-
-		if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED)
-		{
-
-			MapSearchNode *node = astarsearch.GetSolutionStart();
-
-			int steps = 0;
-
-			node->PrintNodeInfo();
-			for (;; )
+			if (!node)
 			{
-				node = astarsearch.GetSolutionNext();
+				break;
+			}
 
-				if (!node)
-				{
-					break;
-				}
+			returnList.Add(PD_MG_LogicPosition(node->x, node->y));
+			node->PrintNodeInfo();
 
-				returnList.Add(PD_MG_LogicPosition(node->x,node->y));
-				node->PrintNodeInfo();
+			steps++;
 
-				steps++;
+		};
 
-			};
-
-			// Once you're done with the solution you can free the nodes up
-			astarsearch.FreeSolutionNodes();
+		// Once you're done with the solution you can free the nodes up
+		astarsearch.FreeSolutionNodes();
 
 
-		}
-		else if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED)
-		{
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_Pathfinder::getPathFromTo: Error: SEARCH_STATE_FAILED"));
+	}
+	else if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED)
+	{
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_Pathfinder::getPathFromTo: Error: SEARCH_STATE_FAILED"));
 
-		}
-
-
-
-		astarsearch.EnsureMemoryFreed();
-
-		return returnList;
 	}
 
-	//return 0;
+
+
+	astarsearch.EnsureMemoryFreed();
+
+	return returnList;
+}
+
+//return 0;
 
 

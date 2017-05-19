@@ -61,12 +61,12 @@ void AMapInstantiatorActor::Tick(float DeltaTime)
 
 
 
-AActor* AMapInstantiatorActor::InstantiateTile(PD_MG_LogicPosition logpos)
+APD_E_ElementActor* AMapInstantiatorActor::InstantiateTile(PD_MG_LogicPosition logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(TileClass, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 
-AActor* AMapInstantiatorActor::InstantiateWall(PD_MG_LogicPosition logpos)
+APD_E_ElementActor* AMapInstantiatorActor::InstantiateWall(PD_MG_LogicPosition logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(WallClass, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
