@@ -12,7 +12,9 @@
 #include "NW_Networking/Socket/PD_NW_SocketManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_SplineManager.h"
+#include "Actors/PD_TimerGame.h"
 #include "math.h"
+#include "PD_SaveCharacterData.h"
 #include "MapInfo/PD_MM_MapInfo.h"
 
 //Includes of forward declaration
@@ -373,6 +375,7 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skills = &playerStats->skills;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->weapon = &playerStats->weapon;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skin = &playerStats->skin;
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->characterState = &playerStats->charState;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->SetIDCharacter("Player_0"+inPlayer);
 }
 
@@ -725,8 +728,10 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 		//Aqui cedemos el control al GameManager.
 		APD_GM_SplineManager* splineManager = (APD_GM_SplineManager*)GetWorld()->SpawnActor(APD_GM_SplineManager::StaticClass());
+		APD_TimerGame* timer= (APD_TimerGame*)GetWorld()->SpawnActor(APD_TimerGame::StaticClass());
 
-		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager, splineManager);
+
+		gameManager = new PD_GM_GameManager(playersManager, mapManager, networkManager, splineManager, timer);
 
 
 	}
@@ -766,9 +771,14 @@ void UPD_ServerGameInstance::Init()
 {
 	Super::Init();
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
+	
+	//Inicializar Arrays de Skills and Weapons
+	LoadSkillActiveDatafromFile();
+	LoadSkillPasiveDatafromFile();
+	LoadWeaponDataFromFile();
+	
 	levelsNameDictionary = LevelsNameDictionary(); 
 
-	
 	playersManager = new PD_PlayersManager();
 
 	structServerState = new StructServerState();
@@ -1100,9 +1110,273 @@ int UPD_ServerGameInstance::GetConfigMatchDifficult() {
 	return (int)MatchConfigManager->Get_Difficulty();
 }
 
+
+void UPD_ServerGameInstance::LoadSkillSpecificData(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range)
+{
+	//Create an instance of our savegame class
+	UPD_SaveCharacterData* SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::CreateSaveGameObject(UPD_SaveCharacterData::StaticClass()));
+
+	if (UGameplayStatics::DoesSaveGameExist("SkillsData", 0))
+	{
+		SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::LoadGameFromSlot("SkillsData", 0));
+		if (TypeSkill == 0) //ACTIVA
+		{
+			if (SaveGameInstance->activeSkills.Num() > 0)
+			{
+				for (int i = 0; i < SaveGameInstance->activeSkills.Num(); i++)
+				{
+					if (id_skill == SaveGameInstance->activeSkills[i].ID_Skill)
+					{
+						nameSkill = SaveGameInstance->activeSkills[id_skill].name_Skill;
+						effectSkill = SaveGameInstance->activeSkills[id_skill].description;
+						weaponRequired = SaveGameInstance->activeSkills[id_skill].weaponRequired;
+						AP = SaveGameInstance->activeSkills[id_skill].AP;
+						CD = SaveGameInstance->activeSkills[id_skill].CD;
+						target = SaveGameInstance->activeSkills[id_skill].target;
+						range = SaveGameInstance->activeSkills[id_skill].range;
+					}
+				}
+
+
+			}
+		}
+		else if (TypeSkill == 1)
+		{
+			if (SaveGameInstance->pasiveSkills.Num() > 0)
+			{
+				for (int i = 0; i < SaveGameInstance->pasiveSkills.Num(); i++)
+				{
+					if (id_skill == SaveGameInstance->pasiveSkills[i].ID_Skill)
+					{
+						nameSkill = SaveGameInstance->pasiveSkills[id_skill].name_Skill;
+						effectSkill = SaveGameInstance->pasiveSkills[id_skill].description;
+						weaponRequired = SaveGameInstance->pasiveSkills[id_skill].weaponRequired;
+						AP = SaveGameInstance->pasiveSkills[id_skill].AP;
+						CD = SaveGameInstance->pasiveSkills[id_skill].CD;
+						target = SaveGameInstance->pasiveSkills[id_skill].target;
+						range = SaveGameInstance->pasiveSkills[id_skill].range;
+					}
+				}
+
+			}
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("File does not exist."));
+	}
+}
+
+
+void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range)
+{
+	UPD_SaveCharacterData* SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::CreateSaveGameObject(UPD_SaveCharacterData::StaticClass()));
+
+	if (UGameplayStatics::DoesSaveGameExist("WeaponsData", 0))
+	{
+		SaveGameInstance = Cast<UPD_SaveCharacterData>(UGameplayStatics::LoadGameFromSlot("WeaponsData", 0));
+
+		if (SaveGameInstance->weapons.Num() > 0)
+		{
+			for (int i = 0; i < SaveGameInstance->weapons.Num(); i++)
+			{
+				if (indexWeapon == SaveGameInstance->weapons[i].ID_Weapon)
+				{
+					id_weapon = indexWeapon;
+					classWeapon = SaveGameInstance->weapons[i].ClassWeapon;
+					typeWeapon = SaveGameInstance->weapons[i].TypeWeapon;
+					damage = SaveGameInstance->weapons[i].DMWeapon;
+					range = SaveGameInstance->weapons[i].RangeWeapon;
+				}
+			}
+		}
+
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("File does not exist."));
+}
+
+
 #pragma endregion
 
+#pragma region LoadDataFromFile
 
+void UPD_ServerGameInstance::LoadSkillActiveDatafromFile()
+{
+	FString filepath = "Content/Data/ActiveSkills.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 habilidad)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Fields of Skill :%d "), columns.Num());
+			FStructSkill newActiveSkill = FStructSkill();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Skill name
+				3 - Effect
+				4 - Type
+				5 - AP
+				6 - CD
+				7 - Range
+				8 - Target
+				9 - Weapon Required
+				*/
+				if (j == 0)
+					newActiveSkill.ID_Skill = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newActiveSkill.name_Skill = columns[j];
+				if (j == 3)
+					newActiveSkill.description = columns[j];
+				if (j == 4)
+					newActiveSkill.typeSkill = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newActiveSkill.AP = FCString::Atoi(*columns[j]);
+				if (j == 6)
+					newActiveSkill.CD = FCString::Atoi(*columns[j]);
+				if (j == 7)
+					newActiveSkill.range = FCString::Atoi(*columns[j]);
+				if (j == 8)
+					newActiveSkill.target = FCString::Atoi(*columns[j]);
+				if (j == 9)
+					newActiveSkill.weaponRequired = FCString::Atoi(*columns[j]);
+			}
+
+			newActiveSkill.currentCD = 0;
+			activeSkills.Add(newActiveSkill);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Error loading Active Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+
+}
+
+void UPD_ServerGameInstance::LoadSkillPasiveDatafromFile()
+{
+	FString filepath = "Content/Data/PasiveSkills.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 habilidad)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Fields of Skill :%d "), columns.Num());
+			FStructSkill newPasiveSkill = FStructSkill();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Skill name
+				3 - Effect
+				4 - Type
+				5 - AP
+				6 - CD
+				7 - Range
+				8 - Target
+				9 - Weapon Required
+				*/
+				if (j == 0)
+					newPasiveSkill.ID_Skill = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newPasiveSkill.name_Skill = columns[j];
+				if (j == 3)
+					newPasiveSkill.description = columns[j];
+				if (j == 4)
+					newPasiveSkill.typeSkill = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newPasiveSkill.AP = FCString::Atoi(*columns[j]);
+				if (j == 6)
+					newPasiveSkill.CD = FCString::Atoi(*columns[j]);
+				if (j == 7)
+					newPasiveSkill.range = FCString::Atoi(*columns[j]);
+				if (j == 8)
+					newPasiveSkill.target = FCString::Atoi(*columns[j]);
+				if (j == 9)
+					newPasiveSkill.weaponRequired = FCString::Atoi(*columns[j]);
+			}
+
+			newPasiveSkill.currentCD = 0;
+			pasiveSkills.Add(newPasiveSkill);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillPasiveDatafromFile::  Error loading Pasive Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+}
+
+void UPD_ServerGameInstance::LoadWeaponDataFromFile()
+{
+	FString filepath = "Content/Data/Weapons.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 arma)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadWeaponDataFromFile::  Fields of weapon :%d "), columns.Num());
+			FStructWeapon newWeapon = FStructWeapon();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Type
+				3 - Class
+				4 - DM
+				5 - Rango
+				*/
+				if (j == 0)
+					newWeapon.ID_Weapon = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newWeapon.TypeWeapon = FCString::Atoi(*columns[j]);
+				if (j == 3)
+					newWeapon.ClassWeapon = FCString::Atoi(*columns[j]);
+				if (j == 4)
+					newWeapon.DMWeapon = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newWeapon.RangeWeapon = FCString::Atoi(*columns[j]);
+			}
+
+			weapons.Add(newWeapon);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Error loading Active Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+}
+
+
+#pragma endregion
 
 
 

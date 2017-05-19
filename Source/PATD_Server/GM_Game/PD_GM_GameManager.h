@@ -15,6 +15,7 @@ class PD_GM_MapManager;
 class PD_GM_EnemyManager;
 class PD_NW_NetworkManager;
 class APD_GM_SplineManager;
+class APD_TimerGame;
 //class PD_GM_InteractionsManager;
 struct StructGameState;
 struct LogicTurnInformation;
@@ -34,7 +35,7 @@ private:
 	LogicTurnInformation* AttackTurnInformation;*/
 	//void IntitializeTurnStates();
 public:
-	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager);
+	PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer);
 	~PD_GM_GameManager();
 
 	PD_NW_NetworkManager* networkManager;
@@ -43,6 +44,10 @@ public:
 	PD_GM_EnemyManager* enemyManager;
 
 	APD_GM_SplineManager* splineManager;
+
+	APD_TimerGame* timer;
+
+	const float timeWaitingPhases = 3;
 
 	int TotalPoints;
 
@@ -130,7 +135,6 @@ public:
 	void OnCameraEndMove();
 
 	void OnTimerEnd();
-
 	void VisualTickControl();
 	void VisualMoveTick();
 	void VisualAttackTick();

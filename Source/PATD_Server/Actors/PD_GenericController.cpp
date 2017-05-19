@@ -10,7 +10,7 @@
 #include "GM_Game/PD_GM_EnemyManager.h"
 #include "PD_PlayersManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
-
+#include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 //Includes Forward
 #include "PD_SplineActors.h"
 
@@ -31,6 +31,15 @@ void APD_GenericController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime); // Call parent class tick function  
 	
+	if (CallbackAnimationEndToGM)
+	{
+		//Llamar a GameManager para indicar que se ha acabado la funcion
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+		SGI->getGameManager()->OnAnimationEnd();
+		CallbackAnimationEndToGM = false;
+	}
+
+
 	//Control del final de movimiento (el movimiento es la unica animacion que se controla en el controller y no en la maquina de estados del BP)
 	if (isMoving)
 	{
@@ -62,8 +71,10 @@ void APD_GenericController::Tick(float DeltaTime)
 
 void APD_GenericController::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::OnAnimationEnd"));
-	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
-	SGI->getGameManager()->OnAnimationEnd();
+	CallbackAnimationEndToGM = true;
+	//UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+	//SGI->getGameManager()->OnAnimationEnd();
+
 	
 }
 bool APD_GenericController::IsAtAnimation() {
@@ -164,50 +175,96 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 //Funcion para mover al Character mediante Splines
 void APD_GenericController::MoveWithSpline()
 {
+	FVector lastPosition;
+	FVector currentPosition;
+	if (spline->GetSplineComponent()->GetNumberOfSplinePoints() != 0) {
 	
+		lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
+		currentPosition = GetPawn()->GetActorLocation();
 
-	FVector lastPosition = spline->GetSplineComponent()->GetLocationAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
-	FVector currentPosition = GetPawn()->GetActorLocation();
+		//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
+		//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
 
-	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() LastPosition - %s"),*lastPosition.ToString());
-	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline() currentPosition - %s"),*currentPosition.ToString());
+		//Se comparan las posiciones entre la actual del Character y su posicion final para ver si ha llegado a su destino y tiene que dejar de moverse
 
-	//Se comparan las posiciones entre la actual del Character y su posicion final para ver si ha llegado a su destino y tiene que dejar de moverse
+		if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
+		{
+			//Animacion de andar
+			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+			if (AnimInst) {
+				UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "MoveChar");
+				if (BoolProperty != NULL) {
+					bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+					BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+					enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				}
+			}
+			else {
+				OnAnimationEnd();
+			}
 
-	if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
-	{
-		//Simulamos la fisica para que se mueva solo la CABESA!
-		FName boneName = "cabesa";
-		bool newSimulate = true;
-		bool includeSelf = true;
-		//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
-		//GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
 
-		//GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
+			//Simulamos la fisica para que se mueva solo la CABESA!
+			FName boneName = "cabesa";
+			bool newSimulate = true;
+			bool includeSelf = true;
+			//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
+			//GetCharacter()->GetMesh()->AddForceToAllBodiesBelow(FVector(100.0f, 0.0f, 0.0f), boneName, false, true);
 
-		GetPawn()->AddMovementInput(GetActorForwardVector(), 0.0, false); //add entrada de movimiento
+			//GetPawn()->GetMovementComponent()->Velocity	= FVector(100.0f, 100.0f, 10.0f);
 
-		GetPawn()->SetActorLocation(spline->GetSplineComponent()->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la posicion del character
+			GetPawn()->AddMovementInput(GetActorForwardVector(), 0.0, false); //add entrada de movimiento
 
-		GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
+			GetPawn()->SetActorLocation(spline->GetSplineComponent()->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la posicion del character
 
-		distance = distance + 2; //actualizamos el variable
+			GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
 
+			distance = distance + 2; //actualizamos el variable
+
+		}
+		else
+		{
+			FName boneName = "cabesa";
+			bool newSimulate = false;
+			bool includeSelf = true;
+			//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
+			//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
+			//GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
+			isMoving = false;
+			distance = 0;
+			OnAnimationEnd();
+
+			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+			if (AnimInst) {
+				UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "BackToIdle");
+				if (BoolProperty != NULL) {
+					bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+					BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+					enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				}
+			}
+			else {
+				OnAnimationEnd();
+			}
+
+		}
 	}
-	else
-	{
-		FName boneName = "cabesa";
-		bool newSimulate = false;
-		bool includeSelf = true;
-		//GetCharacter()->GetMesh()->SetAllBodiesBelowSimulatePhysics(boneName, newSimulate, includeSelf);
-		//Setear la velocidad a 0, para que deje de moverse en la animacion y vuelva al estado IDLE
-		//GetPawn()->GetMovementComponent()->Velocity = FVector(0.0f, 0.0f, 0.0f);
-		isMoving = false;
-		distance = 0;
+	else {
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s"),*this->GetName());
 		OnAnimationEnd();
+		return;
 	}
-
 }
+
+void APD_GenericController::UpdateRotationCharacterToEnemy(FVector target)
+{
+	FVector locationCharacter = GetCharacter()->GetActorLocation();
+	FRotator newRotationTo = UKismetMathLibrary::FindLookAtRotation(locationCharacter, target);
+
+	GetCharacter()->SetActorRotation(newRotationTo);
+}
+
+
 
 APD_SplineActors* APD_GenericController::GetSpline()
 {
@@ -220,4 +277,211 @@ APD_SplineActors* APD_GenericController::GetSpline()
 void APD_GenericController::SetSpline(APD_SplineActors* newSpline)
 {
 	spline = newSpline;
+}
+
+/* ====================
+ANIMACIONES - FUNCIONES
+==================== */
+void APD_GenericController::Animation_BasicAttack(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "NormalAttack");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+	}
+	else {
+		OnAnimationEnd();
+	}
+
+}
+
+void APD_GenericController::Animation_CriticalBasicAttack(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "CriticalAttack");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+
+	}
+}
+
+void APD_GenericController::SetTypeCharanimation(int typeChar)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "TipoChar");
+		if (IntProperty != NULL) {
+			int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			IntProperty->SetPropertyValue_InContainer(AnimInst, typeChar);
+			typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+	}
+}
+
+
+void APD_GenericController::Animation_UseConsumable(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "useConsumable");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+	}
+}
+
+void APD_GenericController::Animation_UseInteractable(int ID_Skill)
+{
+		UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+		if (AnimInst) {
+			UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "useInteractable");
+			if (BoolProperty != NULL) {
+				bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+				enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+				UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+				if (IntProperty != NULL) {
+					int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+					IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+					typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				}
+			}
+			else {
+				OnAnimationEnd();
+			}
+		}
+	}
+
+void APD_GenericController::Animation_CastSkill(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "CastSkill");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+	}
+}
+
+void APD_GenericController::Animation_GetHurt(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "GetHurt");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+
+		}
+		else {
+			OnAnimationEnd();
+		}
+	}
+}
+
+void APD_GenericController::Animation_DeathChar(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "DeathChar");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+	}
+}
+
+void APD_GenericController::Animation_DefenseChar(int ID_Skill)
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "DefenseChar");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+	}
 }

@@ -26,17 +26,17 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	if (WallBlueprint.Object) {
 		WallClass = (UClass*)WallBlueprint.Object->GeneratedClass;
 	}
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ArcherBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Archer.Archer'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ArcherBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Orco_Arco.Orco_Arco'"));
 	if (ArcherBlueprint.Object) {
 		ArcherClass = (UClass*)ArcherBlueprint.Object->GeneratedClass;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ZombieBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Zombie.Zombie'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ZombieBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Orco_Pistola.Orco_Pistola'"));
 	if (ZombieBlueprint.Object) {
 		ZombieClass = (UClass*)ZombieBlueprint.Object->GeneratedClass;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerBlueprint(TEXT("Blueprint'/Game/Blueprints/Players/Legionario.Legionario'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerBlueprint(TEXT("Blueprint'/Game/Blueprints/Players/Player.Player'"));
 	if (PlayerBlueprint.Object) {
 		PlayerClass= (UClass*)PlayerBlueprint.Object->GeneratedClass;
 	}

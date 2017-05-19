@@ -13,6 +13,7 @@
 #include "Actors/PD_E_Character.h"
 #include "Actors/PD_SplineActors.h"
 #include "GM_Game/PD_GM_SplineManager.h"
+#include"PD_ServerGameInstance.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
@@ -446,20 +447,59 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetController(Cast<APD_GenericController>(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController()));
 
-		//Seteamos el spline de los jugadores.
-		//Cast<APD_GenericController>(_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetController())->SetSpline(
-			//_GAMEMANAGER->splineManager->GetSpline());
-		
-		//Set de color of the Character --> Esto se deberia llevar a una fucnion del CharacterLogic para cambiar desde ahi la skin
-		/*const FString command = FString::Printf(TEXT("ChangeMaterial %d"), i);
+		switch (_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetWeapon()->TypeWeapon)
+		{
+		case 11:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 12:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 13:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 21:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 22:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 23:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(1);
+			break;
+		case 31:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 32:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		case 33:
+			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetController()->SetTypeCharanimation(0);
+			break;
+		default:
+			break;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::weapon  - %d "), _GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetSkin()->ID_SkinHead);
+
+		const FString command = FString::Printf(TEXT("ChangeSkin %d"), _GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetSkin()->ID_SkinHead);
 		if (_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->CallFunctionByNameWithArguments(*command, ar, NULL, true))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap -- EXITO EN LLAMAR A LA FUNCION"));
 		}
-		else{
-			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDynamicMap - EEROR EN LLAMATR A LA FUNCION"), _GAMEMANAGER->playersManager->GetNumPlayers());
-		}	
-		*/
+		else {
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDynamicMap - EEROR EN LLAMATR A LA FUNCION"));
+		}
+
+
+		const FString command2 = FString::Printf(TEXT("ChangeWeapon %d"), _GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetWeapon()->TypeWeapon);
+		if (_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->CallFunctionByNameWithArguments(*command2, ar, NULL, true))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap -- EXITO EN LLAMAR A LA FUNCION 2"));
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDynamicMap - EEROR EN LLAMATR A LA FUNCION 2"));
+		}
+		
 		///actualizamos la referencia del BP
 
 	}
@@ -500,10 +540,66 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 			logicCha->SetCharacterBP(charac);
 			logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
 			logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+			switch (enemyType)
+			{
+				case ECharacterType::Archer:
+				{
+					logicCha->GetController()->SetTypeCharanimation(0);
+					break;
+				}
+				case ECharacterType::Zombie:
+				{
+					logicCha->GetController()->SetTypeCharanimation(1);
+					break;
+				}
+			}
 
 			///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
 
+			if (SGI)
+			{
+				//Weapon
+				int id_weapon, classWeapon, typeWeapon, damage, range;
+					SGI->LoadWeaponSpecificData((int)charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
+					logicCha->GetWeapon()->ID_Weapon = id_weapon;
+					logicCha->GetWeapon()->ClassWeapon = classWeapon;
+					logicCha->GetWeapon()->TypeWeapon = typeWeapon;
+					logicCha->GetWeapon()->DMWeapon = damage;
+					logicCha->GetWeapon()->RangeWeapon = range;
 
+				//Skills
+				//PASIVAS
+					for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
+					{
+						FStructSkill skillPasAdded = FStructSkill();
+						int weaponR, APSkill, CDSkill, targetSkill, Range;
+						SGI->LoadSkillSpecificData(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+						skillPasAdded.weaponRequired = weaponR;
+						skillPasAdded.AP = APSkill;
+						skillPasAdded.CD = CDSkill;
+						skillPasAdded.currentCD = CDSkill;
+						skillPasAdded.range = Range;
+						skillPasAdded.target = targetSkill;
+						logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
+					}
+				//ACTIVAS
+					for (int j = 0; j < charac->activeSkillList.Num(); j++)
+					{
+						FStructSkill skillActAdded = FStructSkill();
+						int weaponR, APSkill, CDSkill, targetSkill, Range;
+						SGI->LoadSkillSpecificData(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+						skillActAdded.weaponRequired = weaponR;
+						skillActAdded.AP = APSkill;
+						skillActAdded.CD = CDSkill;
+						skillActAdded.currentCD = CDSkill;
+						skillActAdded.range = Range;
+						skillActAdded.target = targetSkill;
+						logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
+					}
+			}
+
+			//STATS
 			logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
 			logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
 

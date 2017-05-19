@@ -21,11 +21,13 @@ UCLASS()
 class PATD_SERVER_API APD_GenericController : public AAIController
 {
 	//Este nombre es el que tienen que tener las maquinas de estados del BP de anim (animInstance)
-	FString animStateMachineName = "animStateMachine";
+	FString animStateMachineName = "BipedoStateMachine";
+
 	//Este es el nombre que tiene que tener el estado de Idle para reconocerlo como tal
-	FString idleStateName = "Idle";
+	FString idleStateName = "IDLE";
 
 	bool isMoving = false;
+	bool CallbackAnimationEndToGM = false;
 	int maxLengthAnimation = 5;
 	float currentTimeAnimation=0;
 	FVector moveTargetPosition;
@@ -48,6 +50,9 @@ public:
 
 	//Funcion para moverse por el mundo con splines
 	void MoveWithSpline();
+
+	//Funcion para actualizar la rotacion del personaje
+	void UpdateRotationCharacterToEnemy(FVector target);
 
 	//Usado para el control del timing de las animaciones (Decidir cuando ha acabado de moverse por ejemplo)
 	void Tick(float DeltaTime)override;
@@ -73,7 +78,16 @@ public:
 	*/
 	virtual bool ActionTo(FStructTargetToAction action);
 
-
+	void Animation_BasicAttack(int ID_Skill);
+	void Animation_CriticalBasicAttack(int ID_Skill);
+	void Animation_UseConsumable(int ID_Skill);
+	void Animation_UseInteractable(int ID_Skill);
+	void Animation_CastSkill(int ID_Skill);
+	void Animation_GetHurt(int ID_Skill);
+	void Animation_DeathChar(int ID_Skill);
+	void Animation_DefenseChar(int ID_Skill);
+	
+	void SetTypeCharanimation(int typeChar);
 	/*
 	//Sirve para lanzar la animacion determinada del character
 	Recibe:

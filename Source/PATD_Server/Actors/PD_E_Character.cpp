@@ -89,3 +89,21 @@ if (other != nullptr) //Los dos son characters
 }
 }
 */
+
+bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("PlaySkillAnimation %d"), ID_Skill);
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::PlayAnimationSkill -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::PlayAnimationSkill - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
+
+}

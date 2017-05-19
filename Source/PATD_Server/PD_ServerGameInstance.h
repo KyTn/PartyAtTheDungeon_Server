@@ -59,6 +59,20 @@ public:
 	// PD_GM_EnemyManager* enemyManager; no tiene sentido un enemymanager en el instance. Está en el GameManager
 	PD_MatchConfigManager* MatchConfigManager;
 
+
+
+#pragma region LoadDataFromFile
+	TArray<FStructSkill> activeSkills;
+	TArray<FStructSkill> pasiveSkills;
+	TArray<FStructWeapon> weapons;
+
+	void LoadSkillActiveDatafromFile();
+	void LoadSkillPasiveDatafromFile();
+	void LoadWeaponDataFromFile();
+
+#pragma endregion
+
+
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
 	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();
@@ -185,4 +199,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 		int  GetConfigMatchDifficult();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadData")
+		void LoadSkillSpecificData(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveLoadData")
+		void LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range);
 };

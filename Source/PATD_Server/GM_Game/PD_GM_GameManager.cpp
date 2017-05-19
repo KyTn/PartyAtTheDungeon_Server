@@ -20,11 +20,12 @@
 #include "NW_Networking/PD_NW_NetworkManager.h"
 #include "PD_GM_SplineManager.h"
 
+#include "Actors/PD_TimerGame.h"
 #include "Actors/Enemies/PD_AIController.h"
 #include "Actors/PD_GenericController.h"
 
 #include "Structs/PD_NetStructs.h"
-PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager)
+PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer)
 {
 	TotalPoints = 0;
 	playersManager = inPlayersManager; 
@@ -36,6 +37,8 @@ PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_
 	networkManager->RegisterObserver(this);
 	structGameState = new StructGameState();
 	structGamePhase = new StructGamePhase();
+	timer = inTimer;
+	timer->setGameManager(this);
 	InitState();
 
 }
@@ -675,18 +678,18 @@ void PD_GM_GameManager::LogicAttackTick(int tick,int numCharacters) {
 					//listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->listAttack;
 					logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
 					//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-					FStructOrderAction order = listAttack[tick];
+					//FStructOrderAction order = listAttack[tick];
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-					logicCharacter->ActionTo(order);
+					//logicCharacter->ActionTo(order);
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				//listAttack = enemyManager->GetTurnOrders(i)->listAttack;
 				logicCharacter = enemyManager->GetEnemies()[i];
 				//Controlar por si no tiene ordenes (el maximo tick es para la lista mas larga)
-				FStructOrderAction order = listAttack[tick];
+				//FStructOrderAction order = listAttack[tick];
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : atacando logic character"));
-				logicCharacter->ActionTo(order);
+				//logicCharacter->ActionTo(order);
 			}
 
 
@@ -757,29 +760,33 @@ void PD_GM_GameManager::VisualMoveTick() {
 			logicCharacter = enemyManager->GetEnemies()[i];
 		}
 
-		//Set un spline para dicho character
-		if (!logicCharacter->GetController()->GetSpline()) 
+		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) //Si hay posiciones en este array, quiere decir que se tiene que mover
 		{
-			logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
-		}
+			//Set un spline para dicho character
+			if (!logicCharacter->GetController()->GetSpline())
+			{
+				logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+			}
 
-		TArray<FVector> positionsToMove = TArray<FVector>();
-		//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
-		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
-		{
-			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
-			positionsToMove.Add(v);
-			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
-		}
+			TArray<FVector> positionsToMove = TArray<FVector>();
+			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+			for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
+			{
+				FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
+				v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+				positionsToMove.Add(v);
+				//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
+			}
 
-		logicCharacter->MoveToPhysicalPosition(positionsToMove);
+			logicCharacter->MoveToPhysicalPosition(positionsToMove);
+
+			//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
+			if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
+				logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
+			}
+		}
 		
-		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
-			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
-		}
 	}
 
 	///FUNCION DE CAMARA
@@ -856,7 +863,7 @@ void PD_GM_GameManager::VisualAttackTick() {
 			// de momento vamos a hacerlo de forma secuencial sin ordenar...
 			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick players"));
-				playersManager->GetDataStructPlayer(i)->logic_Character->GetController()->ActionTo(listAttack[index_action]);
+				playersManager->GetDataStructPlayer(i)->logic_Character->ActionTo(listAttack[index_action]);
 			}
 		}
 
@@ -937,9 +944,11 @@ void PD_GM_GameManager::OnCameraEndMove() {
 }
 
 void PD_GM_GameManager::OnTimerEnd() {
-	structGamePhase->waitingTime = false;
 	UpdatePhase();
 }
+
+
+
 #pragma region GM PHASE MACHINE 
 
 void PD_GM_GameManager::InitPhase() {
@@ -964,7 +973,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			ChangePhase(EServerPhase::ConsumableCamera);
 		}
 	}
@@ -980,7 +989,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			//Distincion para players o enemigos
 			int maxLengthAction = 0;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -1025,7 +1034,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			ChangePhase(EServerPhase::InteractionCamera);
 		}
 	}
@@ -1041,7 +1050,7 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
-		if (!structGamePhase->waitingTime) {
+		if (!timer->isTimerRunning()) {
 			//Distincion para players o enemigos
 			int maxLengthAction = 0;
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -1103,6 +1112,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
+		
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
@@ -1127,6 +1140,10 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		//Llamar al procceso del movimiento logico
 		PlayersLogicTurn();
+
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
@@ -1143,6 +1160,9 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
@@ -1159,6 +1179,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
+
+		timer->InitTimer(timeWaitingPhases);
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+
 		UpdatePhase();
 
 	}
