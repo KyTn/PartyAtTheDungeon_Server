@@ -282,7 +282,7 @@ void APD_GenericController::SetSpline(APD_SplineActors* newSpline)
 /* ====================
 ANIMACIONES - FUNCIONES
 ==================== */
-void APD_GenericController::Animation_BasicAttack()
+void APD_GenericController::Animation_BasicAttack(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -291,6 +291,13 @@ void APD_GenericController::Animation_BasicAttack()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
 		}
 	}
 	else {
@@ -298,7 +305,8 @@ void APD_GenericController::Animation_BasicAttack()
 	}
 
 }
-void APD_GenericController::Animation_CriticalBasicAttack()
+
+void APD_GenericController::Animation_CriticalBasicAttack(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -307,12 +315,19 @@ void APD_GenericController::Animation_CriticalBasicAttack()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
-		}
-	}
-	else {
-		OnAnimationEnd();
-	}
 
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
+		}
+
+	}
 }
 
 void APD_GenericController::SetTypeCharanimation(int typeChar)
@@ -331,7 +346,8 @@ void APD_GenericController::SetTypeCharanimation(int typeChar)
 	}
 }
 
-void APD_GenericController::Animation_UseConsumable()
+
+void APD_GenericController::Animation_UseConsumable(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -340,28 +356,44 @@ void APD_GenericController::Animation_UseConsumable()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
 		}
 	}
-	else {
-		OnAnimationEnd();
-	}
 }
-void APD_GenericController::Animation_UseInteractable()
+
+void APD_GenericController::Animation_UseInteractable(int ID_Skill)
 {
-	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
-	if (AnimInst) {
-		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "useInteractable");
-		if (BoolProperty != NULL) {
-			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
-			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
-			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+		UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+		if (AnimInst) {
+			UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "useInteractable");
+			if (BoolProperty != NULL) {
+				bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+				BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+				enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+				UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+				if (IntProperty != NULL) {
+					int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+					IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+					typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				}
+			}
+			else {
+				OnAnimationEnd();
+			}
 		}
 	}
-	else {
-		OnAnimationEnd();
-	}
-}
-void APD_GenericController::Animation_CastSkill()
+
+void APD_GenericController::Animation_CastSkill(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -370,13 +402,21 @@ void APD_GenericController::Animation_CastSkill()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
 		}
 	}
-	else {
-		OnAnimationEnd();
-	}
 }
-void APD_GenericController::Animation_GetHurt()
+
+void APD_GenericController::Animation_GetHurt(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -385,13 +425,22 @@ void APD_GenericController::Animation_GetHurt()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+
+		}
+		else {
+			OnAnimationEnd();
 		}
 	}
-	else {
-		OnAnimationEnd();
-	}
 }
-void APD_GenericController::Animation_DeathChar()
+
+void APD_GenericController::Animation_DeathChar(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -400,13 +449,21 @@ void APD_GenericController::Animation_DeathChar()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
+		}
+		else {
+			OnAnimationEnd();
 		}
 	}
-	else {
-		OnAnimationEnd();
-	}
 }
-void APD_GenericController::Animation_DefenseChar()
+
+void APD_GenericController::Animation_DefenseChar(int ID_Skill)
 {
 	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 	if (AnimInst) {
@@ -415,9 +472,16 @@ void APD_GenericController::Animation_DefenseChar()
 			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
 			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
 			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+
+			UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "IDSKill");
+			if (IntProperty != NULL) {
+				int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				IntProperty->SetPropertyValue_InContainer(AnimInst, ID_Skill);
+				typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+			}
 		}
-	}
-	else {
-		OnAnimationEnd();
+		else {
+			OnAnimationEnd();
+		}
 	}
 }

@@ -34,6 +34,9 @@ public:
 	void SetLogicCharacter(PD_GM_LogicCharacter* nlogic_character);
 	PD_GM_LogicCharacter* GetLogicCharacter();
 
+	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
+		bool PlayAnimationSkill(int ID_Skill);
+
 	UPROPERTY(EditAnywhere, Category = "behavior")
 		UBehaviorTree* behaviorTree;
 

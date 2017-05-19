@@ -22,6 +22,7 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 {
 	//Este nombre es el que tienen que tener las maquinas de estados del BP de anim (animInstance)
 	FString animStateMachineName = "BipedoStateMachine";
+
 	//Este es el nombre que tiene que tener el estado de Idle para reconocerlo como tal
 	FString idleStateName = "IDLE";
 
@@ -77,14 +78,14 @@ public:
 	*/
 	virtual bool ActionTo(FStructTargetToAction action);
 
-	void Animation_BasicAttack();
-	void Animation_CriticalBasicAttack();
-	void Animation_UseConsumable();
-	void Animation_UseInteractable();
-	void Animation_CastSkill();
-	void Animation_GetHurt();
-	void Animation_DeathChar();
-	void Animation_DefenseChar();
+	void Animation_BasicAttack(int ID_Skill);
+	void Animation_CriticalBasicAttack(int ID_Skill);
+	void Animation_UseConsumable(int ID_Skill);
+	void Animation_UseInteractable(int ID_Skill);
+	void Animation_CastSkill(int ID_Skill);
+	void Animation_GetHurt(int ID_Skill);
+	void Animation_DeathChar(int ID_Skill);
+	void Animation_DefenseChar(int ID_Skill);
 	
 	void SetTypeCharanimation(int typeChar);
 	/*

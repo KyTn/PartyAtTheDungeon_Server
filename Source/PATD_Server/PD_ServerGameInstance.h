@@ -61,6 +61,20 @@ public:
 	// PD_GM_EnemyManager* enemyManager; no tiene sentido un enemymanager en el instance. Está en el GameManager
 	PD_MatchConfigManager* MatchConfigManager;
 
+
+
+#pragma region LoadDataFromFile
+	TArray<FStructSkill> activeSkills;
+	TArray<FStructSkill> pasiveSkills;
+	TArray<FStructWeapon> weapons;
+
+	void LoadSkillActiveDatafromFile();
+	void LoadSkillPasiveDatafromFile();
+	void LoadWeaponDataFromFile();
+
+#pragma endregion
+
+
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
 	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();

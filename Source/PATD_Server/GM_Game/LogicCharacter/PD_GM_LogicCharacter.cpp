@@ -12,6 +12,7 @@
 #include "GM_Game/PD_GM_SplineManager.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
 #include "../../PD_PlayersManager.h"
+#include"Actors/PD_E_Character.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -147,12 +148,16 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		case ActiveSkills::BasicAttack:
 		{
 			//controller->UpdateRotationCharacterToEnemy(FVector(100, 0, 0)); //Pasarle la direccion del enemigo al que va a atacar
-			controller->Animation_CriticalBasicAttack();
+			controller->Animation_CriticalBasicAttack((int)ActiveSkills::BeInCrossroads);
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
-			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
-			if (enemy)
+			PD_GM_LogicCharacter* characterToAttack = nullptr;
+			if (isPlayer)
+				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToAttack = playersManager->GetCharacterByID(action.id_character[0]);
+			if (characterToAttack)
 			{
-				Skill_BasicAttack(this, enemy);
+				Skill_BasicAttack(this, characterToAttack);
 			}
 			break;
 		}
@@ -173,37 +178,57 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::Hostion:
 		{
-			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
-			if (enemy)
+			PD_GM_LogicCharacter* characterToAttack = nullptr;
+			if (isPlayer)
+				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToAttack = playersManager->GetCharacterByID(action.id_character[0]);
+
+			if (characterToAttack)
 			{
-				Skill_Melee_Hostion(this,enemy);
+				Skill_Melee_Hostion(this, characterToAttack);
 			}
 			break;
 		}
 		case ActiveSkills::SomeHit:
 		{
-			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
-			if (enemy)
+			PD_GM_LogicCharacter* characterToAttack = nullptr;
+			if (isPlayer)
+				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToAttack = playersManager->GetCharacterByID(action.id_character[0]);
+
+			if (characterToAttack)
 			{
-				Skill_Range_Guns_SomeHit(this, enemy);
+				Skill_Range_Guns_SomeHit(this, characterToAttack);
 			}
 			break;
 		}
 		case ActiveSkills::RightInTheAsshole:
 		{
-			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
-			if (enemy)
+			PD_GM_LogicCharacter* characterToAttack = nullptr;
+			if (isPlayer)
+				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToAttack = playersManager->GetCharacterByID(action.id_character[0]);
+
+			if (characterToAttack)
 			{
-				Skill_Range_RightInTheAsshole(this, enemy);
+				Skill_Range_RightInTheAsshole(this, characterToAttack);
 			}
 			break;
 		}
 		case ActiveSkills::GiveMeTheFireBlast:
 		{
-			PD_GM_LogicCharacter* enemy = enemyManager->GetCharacterByID(action.id_character[0]);
-			if (enemy)
+			PD_GM_LogicCharacter* characterToAttack = nullptr;
+			if (isPlayer)
+				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToAttack = playersManager->GetCharacterByID(action.id_character[0]);
+
+			if (characterToAttack)
 			{
-				Skill_Magic_GiveMeTheFireBlas(this, enemy);
+				Skill_Magic_GiveMeTheFireBlas(this, characterToAttack);
 			}
 			break;
 		}
@@ -220,10 +245,15 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::WhoHeal:
 		{
-			PD_GM_LogicCharacter* ally = playersManager->GetCharacterByID(action.id_character[0]);
-			if (ally)
+			PD_GM_LogicCharacter* characterToHeal = nullptr;
+			if (isPlayer)
+				characterToHeal = playersManager->GetCharacterByID(action.id_character[0]);
+			else
+				characterToHeal = enemyManager->GetCharacterByID(action.id_character[0]);
+
+			if (characterToHeal)
 			{
-				Skill_Magic_WhoHeal(this, ally);
+				Skill_Magic_WhoHeal(this, characterToHeal);
 			}
 			break;
 		}
@@ -500,24 +530,24 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
 		{
 			//lanzar animacion de ataque critico
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 		}
 		else
 		{
 			//lanzar animacion de ataque normal
-			CharWhoAttacks->GetController()->Animation_BasicAttack();
+			CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
 		}
 
 		//quitarselo al charWhoRecieveTheAttacks
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
 		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::Defense);
 	}
 	else  //Fallo del Ataque
 	{
 		//lanzar animacion de defensa por parte del atacado
-		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar();
+		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
 }
 
@@ -555,7 +585,7 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 	CharWhoAttacks->GetController()->MoveTo(0, 0);
 	CharWhoAttacks->SetCurrentLogicalPosition(PositionToJump);
 
-	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 
 	//Coger las adyacentes y quitarles el daño calculado
 	//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
@@ -598,18 +628,18 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 		//Calcular si es critico el ataque
 		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
 		{
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 		}
 		else
 		{
-			CharWhoAttacks->GetController()->Animation_BasicAttack();
+			CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
 		}
 		//quitarselo al charWhoRecieveTheAttacks
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 	}
 	
 	//lanzar animacion de pain - Solo se ha de activar una vez la animacion de daño del atacado, para hacerlo mas rapido
-	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::Defense);
 }
 ///Range
 void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
@@ -625,13 +655,13 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 		totalDamage = totalDamage + (totalDamage * CharWhoAttacks->GetTotalStats()->MALBonus);
 
-		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 
 		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::BasicAttack);
 	}
 	else {
-		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar();
+		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
 }
 
@@ -650,7 +680,7 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	//Lanzar animacion de casteo de habilidad
 	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
 	{
-		CharWhoAttacks->GetController()->Animation_CastSkill();
+		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::GiveMeTheFireBlast);
 
 	}
 	
@@ -669,9 +699,10 @@ void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWho
 	FVector vectorToTeleport = FVector(mapMng->LogicToWorldPosition(PositionToTeleport));
 	
 	//Animacionde Casteo de Habilidad
-	CharWhoAttacks->GetController()->Animation_CastSkill();
+	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::Exclaimchas);
 
 	//Lanzar humo ?¿?
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::Exclaimchas);
 
 	CharWhoAttacks->SetCurrentLogicalPosition(PositionToTeleport);
 	CharWhoAttacks->GetCharacterBP()->SetActorLocation(vectorToTeleport);
@@ -688,10 +719,13 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 	5. Animacion de pain de los enemigos afectados
 	*/
 
-	//Animacion de casteo de habilidad
-	CharWhoAttacks->GetController()->Animation_CastSkill();
-
+	
 	//FX de explosion de hielo
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::BeInCrossroads);
+
+	//Animacion de casteo de habilidad
+	//CharWhoAttacks->GetController()->Animation_CastSkill();
+	CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BeInCrossroads);
 
 
 	//Conseguir a los enemigos adyacentes
@@ -713,9 +747,10 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 	*/
 
 	//animacion de casteo de habilidad
-	CharWhoAttacks->GetController()->Animation_CastSkill();
+	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
 
 	//FX de la curacion sobre el afectado
+	Cast<APD_E_Character>(CharWhoReceiveTheAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
 
 	CharWhoReceiveTheAttacks->UpdateHPCurrent(20);
 
@@ -736,6 +771,7 @@ void PD_GM_LogicCharacter::Skill_Magic_ShotMana(PD_GM_LogicCharacter* CharWhoAtt
 	//animacion de cast de habilidad
 
 	//FX de curacion
+	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
 
 	for (int i = 0; i < CharWhoAttacks->GetSkills()->listActiveSkills.Num(); i++)
 	{

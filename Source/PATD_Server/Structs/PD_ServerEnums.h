@@ -60,8 +60,8 @@ UENUM(BlueprintType)
 enum class TypeWeapons
 {
 	SwordAndShield = 11,
-	TwoHandSword = 12,
-	Daggers = 13,
+	Daggers = 12,
+	TwoHandSword = 13,
 	CrossbowAndShield = 21,
 	TwoGuns = 22,
 	Bow = 23,

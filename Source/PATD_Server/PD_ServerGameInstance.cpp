@@ -744,8 +744,13 @@ void UPD_ServerGameInstance::Init()
 {
 	Super::Init();
 	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
+	
+	//Inicializar Arrays de Skills and Weapons
+	LoadSkillActiveDatafromFile();
+	LoadSkillPasiveDatafromFile();
+	LoadWeaponDataFromFile();
+	
 	levelsNameDictionary = LevelsNameDictionary(); 
-
 
 	playersManager = new PD_PlayersManager();
 
@@ -1167,7 +1172,184 @@ void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_wea
 
 #pragma endregion
 
+#pragma region LoadDataFromFile
 
+void UPD_ServerGameInstance::LoadSkillActiveDatafromFile()
+{
+	FString filepath = "Content/Data/ActiveSkills.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 habilidad)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Fields of Skill :%d "), columns.Num());
+			FStructSkill newActiveSkill = FStructSkill();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Skill name
+				3 - Effect
+				4 - Type
+				5 - AP
+				6 - CD
+				7 - Range
+				8 - Target
+				9 - Weapon Required
+				*/
+				if (j == 0)
+					newActiveSkill.ID_Skill = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newActiveSkill.name_Skill = columns[j];
+				if (j == 3)
+					newActiveSkill.description = columns[j];
+				if (j == 4)
+					newActiveSkill.typeSkill = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newActiveSkill.AP = FCString::Atoi(*columns[j]);
+				if (j == 6)
+					newActiveSkill.CD = FCString::Atoi(*columns[j]);
+				if (j == 7)
+					newActiveSkill.range = FCString::Atoi(*columns[j]);
+				if (j == 8)
+					newActiveSkill.target = FCString::Atoi(*columns[j]);
+				if (j == 9)
+					newActiveSkill.weaponRequired = FCString::Atoi(*columns[j]);
+			}
+
+			newActiveSkill.currentCD = 0;
+			activeSkills.Add(newActiveSkill);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Error loading Active Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+
+}
+
+void UPD_ServerGameInstance::LoadSkillPasiveDatafromFile()
+{
+	FString filepath = "Content/Data/PasiveSkills.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 habilidad)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Fields of Skill :%d "), columns.Num());
+			FStructSkill newPasiveSkill = FStructSkill();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Skill name
+				3 - Effect
+				4 - Type
+				5 - AP
+				6 - CD
+				7 - Range
+				8 - Target
+				9 - Weapon Required
+				*/
+				if (j == 0)
+					newPasiveSkill.ID_Skill = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newPasiveSkill.name_Skill = columns[j];
+				if (j == 3)
+					newPasiveSkill.description = columns[j];
+				if (j == 4)
+					newPasiveSkill.typeSkill = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newPasiveSkill.AP = FCString::Atoi(*columns[j]);
+				if (j == 6)
+					newPasiveSkill.CD = FCString::Atoi(*columns[j]);
+				if (j == 7)
+					newPasiveSkill.range = FCString::Atoi(*columns[j]);
+				if (j == 8)
+					newPasiveSkill.target = FCString::Atoi(*columns[j]);
+				if (j == 9)
+					newPasiveSkill.weaponRequired = FCString::Atoi(*columns[j]);
+			}
+
+			newPasiveSkill.currentCD = 0;
+			pasiveSkills.Add(newPasiveSkill);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillPasiveDatafromFile::  Error loading Pasive Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+}
+
+void UPD_ServerGameInstance::LoadWeaponDataFromFile()
+{
+	FString filepath = "Content/Data/Weapons.csv";
+	FString FilePath = FPaths::GameDir() + *filepath;
+	FString FileData = "";
+
+	if (FFileHelper::LoadFileToString(FileData, *FilePath))
+	{
+		TArray<FString> raws;
+		FileData.ParseIntoArray(raws, TEXT("\n"), true); //Consigo cada linea del CSV (1 arma)
+
+		for (int i = 0; i < raws.Num(); i++)
+		{
+			TArray<FString> columns;
+			raws[i].ParseIntoArray(columns, TEXT(";"), true); //Consigo los campos de cada linea
+
+															  //UE_LOG(LogTemp, Warning, TEXT("UPD_ClientGameInstance::LoadWeaponDataFromFile::  Fields of weapon :%d "), columns.Num());
+			FStructWeapon newWeapon = FStructWeapon();
+			for (int j = 0; j < columns.Num(); j++)
+			{
+				/*
+				0 - ID
+				1 - Name_ID
+				2 - Type
+				3 - Class
+				4 - DM
+				5 - Rango
+				*/
+				if (j == 0)
+					newWeapon.ID_Weapon = FCString::Atoi(*columns[j]);
+				if (j == 2)
+					newWeapon.TypeWeapon = FCString::Atoi(*columns[j]);
+				if (j == 3)
+					newWeapon.ClassWeapon = FCString::Atoi(*columns[j]);
+				if (j == 4)
+					newWeapon.DMWeapon = FCString::Atoi(*columns[j]);
+				if (j == 5)
+					newWeapon.RangeWeapon = FCString::Atoi(*columns[j]);
+			}
+
+			weapons.Add(newWeapon);
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("UPD_ClientGameInstance::LoadSkillActiveDatafromFile::  Error loading Active Skills! Failed to load file!. Path :%s"), *FilePath));
+	}
+}
+
+
+#pragma endregion
 
 
 
