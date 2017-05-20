@@ -49,8 +49,8 @@ public:
 #pragma endregion 
 
 
-	AActor* InstantiateTile(PD_MG_LogicPosition logpos);
-	AActor* InstantiateWall(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* InstantiateTile(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* InstantiateWall(PD_MG_LogicPosition logpos);
 
 	APD_E_Character* InstantiateArcher(PD_MG_LogicPosition logpos);
 	APD_E_Character* InstantiateZombie(PD_MG_LogicPosition logpos);

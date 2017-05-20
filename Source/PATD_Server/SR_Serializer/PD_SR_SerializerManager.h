@@ -142,6 +142,12 @@ public:
 			return SerializeDataTemplate<FStructLostConnection>(structSpecialization);
 
 		}break;
+		case UStructType::FStructMapData: {
+			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Serializando FStructMapData"));
+			FStructMapData* structSpecialization = (FStructMapData*)structGeneric;
+			return SerializeDataTemplate<FStructMapData>(structSpecialization);
+
+		}break;
 			
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("SerializerManager::SerializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
@@ -260,6 +266,12 @@ FStructGeneric*  DeserializeData(TArray<uint8>* data, UStructType type) {
 		return DeserializeDataTemplate<FStructLostConnection>(data);
 
 	}break;
+	case UStructType::FStructMapData: {
+		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Deserializando FStructMapData"));
+		return DeserializeDataTemplate<FStructMapData>(data);
+
+	}break;
+
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("SerializerManager::DeserializeData:: Tipo de ustruct (%d) no reconocido"), static_cast<uint8>(type));
 		break;

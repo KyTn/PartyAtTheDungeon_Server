@@ -765,9 +765,18 @@ struct FStructMapData : public  FStructGeneric
 	UPROPERTY()
 		uint8 MISSION_TYPE;
 
+	UPROPERTY()
+		uint16 MAP_SIZE_IN_LOGIC_POSITIONS;
+
 
 	UPROPERTY()
 		TArray<uint16> skinByRoom;
+
+	UPROPERTY()
+		uint8 IDRoomSpawn;
+
+	UPROPERTY()
+		TArray<uint16> roomsAdj;
 
 	UPROPERTY()
 		TArray<uint32> roomComposition;

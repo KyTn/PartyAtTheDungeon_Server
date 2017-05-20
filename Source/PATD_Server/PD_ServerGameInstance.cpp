@@ -28,6 +28,7 @@
 #include "GM_Game/PD_GM_GameManager.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
 #include "PD_MatchConfigManager.h"
+#include "Actors/PD_E_ElementActor.h"
 //Includes de prueba
 
 
@@ -224,7 +225,8 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 
 			
 			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
-			BroadcastMapString();
+			//BroadcastMapString();
+			BroadcastFStructMapData(mapManager->MapInfo->NETMAPDATA);
 			//Con esto ya va a la taberna.
 		}
 		else if (structServerState->enumServerState == EServerState::GameInProcess) {
@@ -240,8 +242,8 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 
 			
 			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
-			BroadcastMapString();
-		
+			//BroadcastMapString();
+			BroadcastFStructMapData(mapManager->MapInfo->NETMAPDATA);
 			//Habria que pasarle un struct con su propio personaje, ya que no lo va a poder crear porque no pasa por el lobby
 
 			//Con esto hacemos que haga launchMatch como cuando todos dan ready en el lobby
@@ -392,11 +394,14 @@ void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruc
 
 
 void UPD_ServerGameInstance::BroadcastMapString() {
-	FString mapString = mapManager->StaticMapRef->GetMapString();
+	FStructMapData * map = mapManager->MapInfo->NETMAPDATA;
 	//Enviar mapa al cliente
-	FStructMap structMap;
-	structMap.stringMap = mapString;
-	networkManager->SendNow(&structMap, -1);
+	networkManager->SendNow(map, -1);
+}
+
+void UPD_ServerGameInstance::BroadcastFStructMapData(FStructMapData * NetMapData)
+{
+	networkManager->SendNow(NetMapData, -1);
 }
 
 void UPD_ServerGameInstance::BroadcastInstantiatePlayers() {
@@ -584,7 +589,9 @@ void UPD_ServerGameInstance::OnBeginState() {
 		networkManager->SendNow(&clientBroadcast, -1);
 		/*  */
 
-		mapPath = mapGenerator->GenerateProceduralMap_v01(MatchConfigManager, playersManager->GetDataPlayers().Num());
+		//mapPath = mapGenerator->GenerateProceduralMap_v01(MatchConfigManager, playersManager->GetDataPlayers().Num());
+
+		//NETMAPDATA = mapGenerator->GenerateProcedural_FStructMapData_v02(MatchConfigManager, playersManager->GetDataPlayers().Num());
 
 		this->LoadMap(levelsNameDictionary.GetMapName(3));
 
@@ -672,6 +679,7 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 	else if (structServerState->enumServerState == EServerState::Lobby_Tabern) {
 		
 		// Mientras están en el lobby, se genera el mapa y se envía a los jugadores (cuando respondan que están en el lobby). 
+		NETMAPDATA = mapGenerator->GenerateProcedural_FStructMapData_v02(MatchConfigManager, playersManager->GetDataPlayers().Num());
 
 		mapParser = new PD_MG_MapParser();
 
@@ -680,23 +688,27 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 		// Parsea el chorizo
 		//mapParser->StartParsingFromFile(&mapPath, staticMapRef, dynamicMapRef);
-		mapParser->StartParsingFromChorizo(&mapPath, staticMapRef, dynamicMapRef);
+		//mapParser->StartParsingFromChorizo(&mapPath, staticMapRef, dynamicMapRef);
 
+		mapManager = new PD_GM_MapManager();
+		mapManager->Init();
 
-
+		mapParser->StartParsingFromFStructMapData(NETMAPDATA, mapManager->MapInfo, mapManager->DynamicMapRef);
+		mapManager->MapInfo->NETMAPDATA = NETMAPDATA;
 
 		// GENERAR EL USTRUC / Static&Dynamic Map
 
 
 
-
-		mapManager = new PD_GM_MapManager();
-		mapManager->Init(staticMapRef, dynamicMapRef); // inicializa las estructuras internas del mapManager (MapInfo)
-	
-													   
+		//mapManager = new PD_GM_MapManager();
+		//mapManager->Init(staticMapRef, dynamicMapRef); // inicializa las estructuras internas del mapManager (MapInfo)
+		
+		mapManager->MapInfo->ShowMapData();
+		ShowMapInfo(mapManager->MapInfo);
 
 		/*  */
-		BroadcastMapString();
+		//BroadcastMapString();
+		BroadcastFStructMapData(mapManager->MapInfo->NETMAPDATA);
 		/*  */
 	}
 	else if (structServerState->enumServerState == EServerState::Launch_Match) {
@@ -734,6 +746,21 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 	}
 }
+
+
+void UPD_ServerGameInstance::ShowMapInfo(PD_MM_MapInfo* mapInfo) {
+
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - Num allLogicPos %d "), mapInfo->allLogicPos.Num());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - Num mapAdj %d "), mapInfo->mapAdj.Num());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - MAP_SIZE_IN_LOGIC_POSITIONS (%d, %d)"), mapInfo->MAP_SIZE_IN_LOGIC_POSITIONS.GetX(), mapInfo->MAP_SIZE_IN_LOGIC_POSITIONS.GetY());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - Num roomByIDRoom %d"), mapInfo->roomByIDRoom.Num());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - Num roomByLogPos %d"), mapInfo->roomByLogPos.Num());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - Num rooms %d"), mapInfo->rooms.Num());
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ShowMapInfo - SpawnRoom ID %d"), mapInfo->SpawnRoom->IDRoom);
+
+
+}
+
 
 #pragma endregion
 
@@ -1020,7 +1047,7 @@ TArray<FVector> UPD_ServerGameInstance::getTargetPositions()
 	return targetPositionsToCenterCamera;
 }
 
-TArray<AActor*> UPD_ServerGameInstance::HiddenActorsBlockPlayers(FVector PositionPlayer)
+TArray<APD_E_ElementActor*> UPD_ServerGameInstance::HiddenActorsBlockPlayers(FVector PositionPlayer)
 {
 	//reiniciamos todos los muros para que se vean
 

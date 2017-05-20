@@ -31,13 +31,12 @@ public:
 	~PD_GM_MapManager();
 
 
-	void Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm);
+	void Init();
 
 	AMapInstantiatorActor* instantiator;
 	PD_GM_GameManager* _GAMEMANAGER;
 
 	PD_MM_MapInfo* MapInfo;
-	PD_MG_StaticMap* StaticMapRef;
 	PD_MG_DynamicMap* DynamicMapRef;
 
 
@@ -47,7 +46,7 @@ public:
 	bool IsLogicPositionATile(PD_MG_LogicPosition logpos);
 	bool IsLogicPositionAProp(PD_MG_LogicPosition logpos);
 	bool IsLogicPositionADoor(PD_MG_LogicPosition logpos);
-	bool IsLogicPositionASpawn(PD_MG_LogicPosition logpos);
+	//bool IsLogicPositionASpawn(PD_MG_LogicPosition logpos);
 
 
 #pragma endregion
@@ -59,7 +58,6 @@ public:
 
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Player. 0 si no hay ninguno. 
 	 bool IsTherePlayer(uint32 x, uint32 y);
-	 bool IsThereWall(uint32 x, uint32 y);
 	// Dada una posición lógica, devuelve el GenericCharacter que está en esa posición, que además es un Enemy. 0 si no hay ninguno. 
 	//bool getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter);
 	TArray<PD_MG_LogicPosition> GetSpawnPoints();
@@ -82,8 +80,10 @@ public:
 
 #pragma region INSTANTIATE MAP
 
-	void PD_GM_MapManager::InstantiateMap();
-	void InstantiateStaticMap();
+	void InstantiateMap();
+	void InstantiateRoomAndAdj(uint8 id);
+	void InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMapElement element, PD_MG_LogicPosition lp);
+	void InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp);
 	void InstantiateDynamicMap();
 
 

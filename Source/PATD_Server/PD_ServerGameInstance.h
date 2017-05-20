@@ -20,6 +20,7 @@ class PD_GM_MapManager;
 class PD_GM_GameManager;
 class PD_GM_EnemyManager;
 class PD_MatchConfigManager;
+class PD_MM_MapInfo;
 
 //Includes de unreal
 #include "Engine/GameInstance.h"
@@ -35,9 +36,6 @@ class PD_MatchConfigManager;
 	
 UCLASS() //Interfaz observer para reaccionar a eventos del netmanager
 class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_NW_iEventObserver
-	
-
-
 {
 	GENERATED_BODY()
 	void InitializeNetworking();
@@ -78,12 +76,13 @@ public:
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
 	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();
-	TArray<AActor*> actorsToHide = TArray<AActor*>();
+	TArray<APD_E_ElementActor*> actorsToHide = TArray<APD_E_ElementActor*>();
 
 	///CONSTANTES
 	const int32 defaultServerPort = 8890;
 
 	FString mapPath=  /*FPaths::GameDir() +*/ "Content/DungeonTestingMaps/test5.dungeon";
+	FStructMapData* NETMAPDATA;
 	int mapX = 0; //Ancho del mapa
 	int mapY = 0; // Largo del mapa
 
@@ -109,8 +108,13 @@ public:
 	void HandleEvent_PongReceive(FStructGeneric* inDataStruct, int inPlayer);
 	void HandleEvent_PingReceive(FStructGeneric* inDataStruct, int inPlayer);
 
+
+
+	void ShowMapInfo(PD_MM_MapInfo* mapInfo);
+
 	//Funciones para generar y enviar paquetes
 	void BroadcastMapString();
+	void BroadcastFStructMapData(FStructMapData* NetMapData);
 	void BroadcastInstantiatePlayers();
 	void BroadcastMatchConfigUpdate(int id, int intvalue, FString FStringvalue);
 	void BroadcastMatchConfigFullUpdate();
@@ -179,7 +183,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-	TArray<AActor*> HiddenActorsBlockPlayers(FVector PositionPlayer);
+	TArray<APD_E_ElementActor*> HiddenActorsBlockPlayers(FVector PositionPlayer);
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 	int  GetConditionsOfGame();
