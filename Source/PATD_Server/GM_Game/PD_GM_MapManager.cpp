@@ -226,27 +226,28 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					MapInfo->AddTile(lp, actorElement);
+					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-
+					break;
 				}
 				case StaticMapElement::EMPTY: {
-
+					break;
 				}
 				case StaticMapElement::SMALL_CHEST: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-
+					break;
 				}
-
 			}
+			break;
 		}
 		case MapSkinType::GARDEN: {
 			switch (element) {
@@ -254,26 +255,28 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->SetMaterialSkin(MapSkinType::GARDEN);
 					MapInfo->AddTile(lp, actorElement);
+					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-
+					break;
 				}
 				case StaticMapElement::EMPTY: {
-
+					break;
 				}
 				case StaticMapElement::SMALL_CHEST: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-
+					break;
 				}
 			}
+			break;
 		}
 		case MapSkinType::SACRIFICE: {
 			switch (element) {
@@ -281,26 +284,28 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->SetMaterialSkin(MapSkinType::SACRIFICE);
 					MapInfo->AddTile(lp, actorElement);
+					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-
+					break;
 				}
 				case StaticMapElement::EMPTY: {
-
+					break;
 				}
 				case StaticMapElement::SMALL_CHEST: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-
+					break;
 				}
 			}
+			break;
 		}
 		case MapSkinType::BOSS: {
 			switch (element) {
@@ -308,26 +313,28 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->SetMaterialSkin(MapSkinType::BOSS);
 					MapInfo->AddTile(lp, actorElement);
+					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-
+					break;
 				}
 				case StaticMapElement::EMPTY: {
-
+					break;
 				}
 				case StaticMapElement::SMALL_CHEST: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-
+					break;
 				}
 			}
+			break;
 		}
 		case MapSkinType::LIBRARY: {
 			switch (element) {
@@ -335,26 +342,28 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
 					MapInfo->AddTile(lp, actorElement);
+					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-
+					break;
 				}
 				case StaticMapElement::EMPTY: {
-
+					break;
 				}
 				case StaticMapElement::SMALL_CHEST: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-
+					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-
+					break;
 				}
 			}
+			break;
 		}
 	}
 }
@@ -364,7 +373,6 @@ void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPos
 	APD_E_ElementActor* actorElement;
 	switch (mapSkin) {
 		case MapSkinType::DUNGEON_NORMAL: {
-			UE_LOG(LogTemp, Log, TEXT("posiciiiiiiion x = %i, y = %i"), lp.GetX(), lp.GetY());
 			actorElement = instantiator->InstantiateWall(lp);
 			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
 			MapInfo->AddWall(lp, actorElement);
