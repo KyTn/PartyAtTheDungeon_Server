@@ -877,12 +877,79 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, 
 	}
 }
 
-bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { return false; }
+bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { 
+
+	/*	1 - Calculamos cuantos enemigos tiene la mazmorra en función del número de jugaores, número de salas, y dificultad.
+		2 - Determinamos el tipo de misión.
+		3 - Hacemos el calculo del reparto de enemigos por habitación.
+		4 - Recorremos las salas, generando a los enemigos y guardandolos en la estructura NETMAPDATA.	
+	*/
+	int difficulty = DifficultyDungeon(MatchConfigMan->Get_Difficulty());
+	int totalEnemies = (numPlayers * difficulty * M.mapRooms.Num())/2;///Esto hay que ir balanceandolo
+	int enemy;
+	MATCHCONFIG_MISSIONTYPE matchConfig_MATCHCONFIG_MISSIONTYPE = MatchConfigMan->Get_MissionType();
+	TArray <uint8> EnemiesPerRoom;
+	TMap <PD_MG_LogicPosition, uint8> enemies = TMap <PD_MG_LogicPosition, uint8>();///TMap que registra los enemigos instanciados por posicion y tipo
+	switch (matchConfig_MATCHCONFIG_MISSIONTYPE)
+	{
+		case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+			for (int i = 1; i < M.mapRooms.Num(); i++)
+			{
+				int enemiesIn = totalEnemies / (M.mapRooms.Num() - 1);
+				enemiesIn = enemiesIn - (enemiesIn*(1 / (M.mapRooms.Num()-1))*((M.mapRooms.Num() - 1) / 2 - i));
+				EnemiesPerRoom.Add(enemiesIn);
+			}
+			for (int i = 0; i < EnemiesPerRoom.Num(); i++)
+			{
+				int j = 0;//enemigos generados en esta sala
+				int k = i + 1;//sala en la que nos encontramos
+				while (j < EnemiesPerRoom[i])
+				{
+					int pos = FMath::RandRange(0, M.mapRooms[k].NORMAL_TILES.Num() - 1);//Cogemos una posicion aleatoria
+					if (!enemies.Contains(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos])) {
+						UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[k].ID);
+						//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
+						enemy = rand() % 2 + 2;///Con esto conseguimos un enemigo aleatorio de la lista de enemigos
+						enemies.Add(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos], enemy);///falta pasar de posición local a posicion global en el mapa
+						j++;
+					}
+				}
+			}
+
+			return true;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::DefeatAll:
+			return true;
+			break;
+		case MATCHCONFIG_MISSIONTYPE::RecoverTreasure:
+			return true;
+			break;
+		default:
+			return false;
+			break;
+	}
+}
 
 #pragma endregion
 
 
 #pragma region PROCEDURAL GENERATION UTILS 
+
+int PD_MG_MapGenerationUtils::DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY) {
+	switch (matchConfig_MATCHCONFIG_MAPDIFFICULTY)
+		{
+		case MATCHCONFIG_DIFFICULTY::EASY_DIFFICULTY:
+			return 1;
+		case MATCHCONFIG_DIFFICULTY::NORMAL_DIFFICULTY:
+			return 2;
+		case MATCHCONFIG_DIFFICULTY::DIFFICULT_DIFFICULTY:
+			return 3;
+		default:
+			return 1;
+		}
+}
+
 
 int PD_MG_MapGenerationUtils::NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers)
 {
