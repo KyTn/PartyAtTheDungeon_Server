@@ -129,9 +129,11 @@ UENUM(BlueprintType)
 enum class MapSkinType { DUNGEON_NORMAL = 0, GARDEN = 10, LIBRARY = 20, SACRIFICE = 30, BOSS = 100 };
 
 // elementos que puedes encontrar en el fichero de roomtemplates 
-enum class StaticMapElementInRoomTemplate { EMPTY = 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', /*SPAWN_POINT = 's',*/ COLUMN = 'c' };
+enum class StaticMapElementInRoomTemplate { EMPTY = 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', /*SPAWN_POINT = 's',*/ COLUMN = 'c', PROP_CHEST = 't' };
 
 // id de cada tipo diferente de prop (dependiente del mapskintype)
+
+UENUM(BlueprintType)
 enum class StaticMapElement {
 	// del 0 al 9, elementos empty default
 	EMPTY = 0,
@@ -139,7 +141,7 @@ enum class StaticMapElement {
 	NORMAL_TILE = 10, SPECIAL_TILE = 11,
 
 	// del 20 al 149, props
-	TREE_OR_COLUMN_00 = 20, TREE_OR_COLUMN_01 = 21, TREE_OR_COLUMN_02 = 22,
+	TREE_OR_COLUMN_00 = 20, TREE_OR_COLUMN_01 = 21, TREE_OR_COLUMN_02 = 22, PROP_CHEST = 23,
 
 	// a partir del 150, interactuables 
 	DOOR = 150, LEVEL = 151, PRESURE_PLATE = 152, LARGE_CHEST = 153, SMALL_CHEST = 154,

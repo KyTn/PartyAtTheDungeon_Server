@@ -132,6 +132,9 @@ struct RoomTemplateInfo {
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			OPEN_WALLS.Add(p);
 			break;
+		case 't':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_CHEST);
+			break;
 		default:
 			break;
 		}

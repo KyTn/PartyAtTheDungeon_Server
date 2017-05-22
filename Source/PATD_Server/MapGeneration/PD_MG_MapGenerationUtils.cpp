@@ -1047,12 +1047,17 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			return StaticMapElement::SPECIAL_TILE;
 
 		case StaticMapElementInRoomTemplate::COLUMN:
+		{
 			TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
 
 			return posibles[FMath::RandRange(0, posibles.Num())];
+		}
+		case StaticMapElementInRoomTemplate::PROP_CHEST:
+			return StaticMapElement::PROP_CHEST;
+
 		}
 	}
 

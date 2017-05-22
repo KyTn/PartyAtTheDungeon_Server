@@ -234,7 +234,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::EMPTY: {
 					break;
 				}
-				case StaticMapElement::SMALL_CHEST: {
+				case StaticMapElement::PROP_CHEST: {
+					instantiator->Instantiate_Dungeon_Prop_Treasure_01(lp);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
