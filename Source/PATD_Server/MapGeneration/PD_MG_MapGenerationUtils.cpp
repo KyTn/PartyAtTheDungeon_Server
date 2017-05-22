@@ -839,7 +839,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 
 	MarkARoomAsSpawingRoom_v02(M, MatchConfigMan->Get_MissionType());
 
-
+	EnemiesGeneration_v02(M, MatchConfigMan, numPlayers);
 #pragma endregion 
 
 	////////////////////////////
@@ -877,12 +877,80 @@ void PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom_v02(MapProceduralInfo &M, 
 	}
 }
 
-bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { return false; }
+bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers) { 
+
+	/*	1 - Calculamos cuantos enemigos tiene la mazmorra en función del número de jugaores, número de salas, y dificultad.
+		2 - Determinamos el tipo de misión.
+		3 - Hacemos el calculo del reparto de enemigos por habitación.
+		4 - Recorremos las salas, generando a los enemigos y guardandolos en la estructura NETMAPDATA.	
+	*/
+	int difficulty = DifficultyDungeon(MatchConfigMan->Get_Difficulty());
+	int totalEnemies = (numPlayers * difficulty * M.mapRooms.Num())/2;///Esto hay que ir balanceandolo
+	int enemy;
+	MATCHCONFIG_MISSIONTYPE matchConfig_MATCHCONFIG_MISSIONTYPE = MatchConfigMan->Get_MissionType();
+	TArray <uint8> EnemiesPerRoom;
+	
+	switch (matchConfig_MATCHCONFIG_MISSIONTYPE)
+	{
+		case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+			UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo"));
+			for (int i = 1; i < M.mapRooms.Num(); i++)
+			{
+				int enemiesIn = totalEnemies / (M.mapRooms.Num() - 1);
+				enemiesIn = enemiesIn - (enemiesIn*(1 / (M.mapRooms.Num()-1))*((M.mapRooms.Num() - 1) / 2 - i));
+				EnemiesPerRoom.Add(enemiesIn);
+			}
+			for (int i = 0; i < EnemiesPerRoom.Num(); i++)
+			{
+				int j = 0;//enemigos generados en esta sala
+				int k = i + 1;//sala en la que nos encontramos
+				while (j < EnemiesPerRoom[i])
+				{
+					int pos = FMath::RandRange(0, M.mapRooms[k].NORMAL_TILES.Num() - 1);//Cogemos una posicion aleatoria
+					if (!M.enemies.Contains(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos])) {
+						UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[k].ID);
+						//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
+						enemy = rand() % 3 + 2;///Con esto conseguimos un enemigo aleatorio de la lista de enemigos
+						M.enemies.Add(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos], enemy);///falta pasar de posición local a posicion global en el mapa
+						j++;
+					}
+				}
+			}
+
+			return true;
+			break;
+		}
+		case MATCHCONFIG_MISSIONTYPE::DefeatAll:
+			return true;
+			break;
+		case MATCHCONFIG_MISSIONTYPE::RecoverTreasure:
+			return true;
+			break;
+		default:
+			return false;
+			break;
+	}
+}
 
 #pragma endregion
 
 
 #pragma region PROCEDURAL GENERATION UTILS 
+
+int PD_MG_MapGenerationUtils::DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY) {
+	switch (matchConfig_MATCHCONFIG_MAPDIFFICULTY)
+		{
+		case MATCHCONFIG_DIFFICULTY::EASY_DIFFICULTY:
+			return 1;
+		case MATCHCONFIG_DIFFICULTY::NORMAL_DIFFICULTY:
+			return 2;
+		case MATCHCONFIG_DIFFICULTY::DIFFICULT_DIFFICULTY:
+			return 3;
+		default:
+			return 1;
+		}
+}
+
 
 int PD_MG_MapGenerationUtils::NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers)
 {
@@ -1047,12 +1115,17 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			return StaticMapElement::SPECIAL_TILE;
 
 		case StaticMapElementInRoomTemplate::COLUMN:
+		{
 			TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
 			posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
 
 			return posibles[FMath::RandRange(0, posibles.Num())];
+		}
+		case StaticMapElementInRoomTemplate::PROP_CHEST:
+			return StaticMapElement::PROP_CHEST;
+
 		}
 	}
 
@@ -1116,7 +1189,7 @@ uint16 PD_MG_MapGenerationUtils::InteractuableComposition(int IdInteractuable, i
 
 uint32 PD_MG_MapGenerationUtils::EnemyCompositionOf(PD_MG_LogicPosition logpos, int IdEnemy, int TypeEnemy)
 {
-	return  WallCompositionOf(logpos, IdEnemy, TypeEnemy);
+	return ((uint32)(logpos.GetIn16bits()) << 16) | ((uint32)((IdEnemy)& 0xFF) << 8) | ((uint32)((TypeEnemy)& 0xFF));
 }
 
 
@@ -1230,7 +1303,13 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 		M.NETMAPDATA->doorComposition.Add(DoorCompositionOf(doors[i].logicPosition, doors[i].info[0], doors[i].info[1]));
 	}
 
-
+	TArray<PD_MG_LogicPosition> lp;
+	M.enemies.GenerateKeyArray(lp);
+	for (int i = 0; i <lp.Num() ; i++)
+	{
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Tipo de enemigo %d"), M.enemies[lp[i]]);
+		M.NETMAPDATA->enemyComposition.Add(EnemyCompositionOf(lp[i], i, M.enemies[lp[i]]));
+	}
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from fin"));
 }
 

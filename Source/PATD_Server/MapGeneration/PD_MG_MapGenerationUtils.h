@@ -132,6 +132,9 @@ struct RoomTemplateInfo {
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			OPEN_WALLS.Add(p);
 			break;
+		case 't':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_CHEST);
+			break;
 		default:
 			break;
 		}
@@ -282,6 +285,8 @@ struct MapProceduralInfo {
 
 	TMap<MapSkinType, TArray<RoomTemplateInfo*>> mapRoomsBySkin;
 
+	TMap <PD_MG_LogicPosition, uint8> enemies; ///TMap que registra los enemigos instanciados por posicion y tipo
+
 	uint8 SPAWN_ID; // indica el idroom de la sala de spawn de jugadores
 	uint8 BOSS_ID; // indica el idroom de la sala del boss (solo para cuando el tipo de mision sea con boss)
 
@@ -311,6 +316,7 @@ struct MapProceduralInfo {
 
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+		 enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 	
 	MapProceduralInfo(FStructMapData * mapData, uint32 _Total_Height, uint32 _Total_Width) {
@@ -329,6 +335,7 @@ struct MapProceduralInfo {
 
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+	   enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 
 #pragma endregion 
@@ -590,6 +597,9 @@ private:
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD);
+
+	//devuelve la dificultad del dungeon
+	int DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY);
 
 	// devuelve el numero de habitaciones en funcion de la configuracion del mapa 
 	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);

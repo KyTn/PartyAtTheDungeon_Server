@@ -85,7 +85,7 @@ public:
 	void InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMapElement element, PD_MG_LogicPosition lp);
 	void InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp);
 	void InstantiateDynamicMap();
-
+	void InstantiateEnemies();
 
 #pragma endregion
 

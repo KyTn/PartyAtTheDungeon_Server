@@ -58,7 +58,7 @@ FStructMapData * PD_MG_MapGenerator::GenerateProcedural_FStructMapData_v02(PD_Ma
 	FStructMapData * mapData = new FStructMapData();
 	MapProceduralInfo map = MapProceduralInfo(mapData, 250, 250);
 	mgUtils.GenerateRandomStaticMap_v02(map, roomTemplateArray, 250, 250, MapManConfig, numPlayers);
-	mgUtils.EnemiesGeneration_v02(map, MapManConfig, numPlayers);
+	
 	
 	return mapData;
 }
