@@ -439,8 +439,7 @@ void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPos
 
 
 void PD_GM_MapManager::InstantiateDynamicMap() {
-	ECharacterType enemyType;
-
+	
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Players Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
 
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
@@ -512,64 +511,83 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		///actualizamos la referencia del BP
 
 	}
+	InstantiateEnemies();
+}
 
+void PD_GM_MapManager::InstantiateEnemies() {
+	ECharacterType enemyType;
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
-
-		enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
-
-		APD_E_Character* charac=nullptr;
-		PD_GM_LogicCharacter* logicCha=nullptr;
-		bool enemyInstantiated = false;
-		switch (enemyType)
-		{
-			case ECharacterType::Archer: 
-			{
-				charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-
-				
-				break;
-			}
-			case ECharacterType::Zombie: 
-			{
-				charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-				
-				break;
-			}
-		}
-
-		//Inicializacion de enemigo independientemente de que enemigo sea.
-		if (enemyInstantiated) {
-			logicCha = new PD_GM_LogicCharacter();
-			logicCha->SetIsPlayer(false);
-			logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
-			logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
-			logicCha->SetCharacterBP(charac);
-			logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
-			logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+		if (MapInfo->roomByLogPos[DynamicMapRef->GetLogicPositions()[i]]->IsInstantiated && !DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Instanciando enemigos %d"), i);
+			DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated = true;
+			enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
+			APD_E_Character* charac = nullptr;
+			PD_GM_LogicCharacter* logicCha = nullptr;
+			bool enemyInstantiated = false;
 			switch (enemyType)
 			{
-				case ECharacterType::Archer:
+			case ECharacterType::OrcBow:
+			{
+				charac = instantiator->InstantiateOrcBow(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+
+				break;
+			}
+			case ECharacterType::OrcGuns:
+			{
+				charac = instantiator->InstantiateOrcGuns(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+
+				break;
+			}
+			case ECharacterType::OrcMelee:
+			{
+				charac = instantiator->InstantiateOrcMelee(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+				break;
+			}
+			}
+
+			//Inicializacion de enemigo independientemente de que enemigo sea.
+			if (enemyInstantiated) {
+				logicCha = new PD_GM_LogicCharacter();
+				logicCha->SetIsPlayer(false);
+				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
+				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
+				logicCha->SetCharacterBP(charac);
+				logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
+				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+				switch (enemyType)
+				{
+				case ECharacterType::OrcBow:
 				{
 					logicCha->GetController()->SetTypeCharanimation(0);
 					break;
 				}
-				case ECharacterType::Zombie:
+				case ECharacterType::OrcGuns:
+				{
+					logicCha->GetController()->SetTypeCharanimation(0);
+					break;
+				}
+				case ECharacterType::OrcMelee:
 				{
 					logicCha->GetController()->SetTypeCharanimation(1);
 					break;
 				}
-			}
+				}
 
-			///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
-			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
+				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
+				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
 
-			if (SGI)
-			{
-				//Weapon
-				int id_weapon, classWeapon, typeWeapon, damage, range;
+				if (SGI)
+				{
+					//Weapon
+					int id_weapon, classWeapon, typeWeapon, damage, range;
 					SGI->LoadWeaponSpecificData((int)charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
 					logicCha->GetWeapon()->ID_Weapon = id_weapon;
 					logicCha->GetWeapon()->ClassWeapon = classWeapon;
@@ -577,8 +595,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 					logicCha->GetWeapon()->DMWeapon = damage;
 					logicCha->GetWeapon()->RangeWeapon = range;
 
-				//Skills
-				//PASIVAS
+					//Skills
+					//PASIVAS
 					for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
 					{
 						FStructSkill skillPasAdded = FStructSkill();
@@ -592,7 +610,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 						skillPasAdded.target = targetSkill;
 						logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
 					}
-				//ACTIVAS
+					//ACTIVAS
 					for (int j = 0; j < charac->activeSkillList.Num(); j++)
 					{
 						FStructSkill skillActAdded = FStructSkill();
@@ -606,23 +624,22 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 						skillActAdded.target = targetSkill;
 						logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
 					}
+				}
+
+				//STATS
+				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
+				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+
+				logicCha->SetTotalStats();
+
+				charac->SetLogicCharacter(logicCha);
+
+				_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
 			}
 
-			//STATS
-			logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
-			logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
-
-			logicCha->SetTotalStats();
-
-			charac->SetLogicCharacter(logicCha);
-
-			_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
 		}
-
-
 	}
+
 }
-
-
 
 #pragma endregion
