@@ -47,6 +47,7 @@ public:
 	void SetSpline(APD_SplineActors* newSpline);
 	APD_SplineActors* GetSpline();
 
+	bool IsCalculatingMovePath = false; //Variable que dice si esta calculando path del camino o no. Sirve para que solo se llame una vez a la funcion de moverse cuando llama  a la funcion ReceiveHit
 
 	//Funcion para moverse por el mundo con splines
 	void MoveWithSpline();
@@ -61,6 +62,8 @@ public:
 	void OnAnimationEnd();
 
 	bool IsAtAnimation();
+
+
 		/*
 		//Para mover al personaje de forma visual por el mapa
 		Recibe:

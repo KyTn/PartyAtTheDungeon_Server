@@ -13,6 +13,8 @@
 #include "GM_Game/PD_GM_EnemyManager.h"
 #include "../../PD_PlayersManager.h"
 #include"Actors/PD_E_Character.h"
+#include "GM_Game/PD_GM_MapManager.h"
+#include "MapInfo/PD_MM_MapInfo.h"
 
 //Includes of forward declaration
 #include "Structs/PD_ServerStructs.h" //Para todos los structs y enums
@@ -143,12 +145,14 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
 
+	controller->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
+
 	switch (ActiveSkills(action.id_action))
 	{
 		case ActiveSkills::BasicAttack:
 		{
 			//controller->UpdateRotationCharacterToEnemy(FVector(100, 0, 0)); //Pasarle la direccion del enemigo al que va a atacar
-			controller->Animation_CriticalBasicAttack((int)ActiveSkills::BeInCrossroads);
+			controller->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
@@ -405,6 +409,8 @@ int8 PD_GM_LogicCharacter::GetEvasionCharacter()
 
 void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 {
+	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: MoveWhenCollisionLost"));
+
 	//Remove the splines point and set the character
 	if (!controller) {
 		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
@@ -413,8 +419,24 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 	if (isPlayer)
 	{
 		//Limpiamos los puntos del spline
-		Cast<APD_CharacterController>(controller)->GetSpline()->RemovePoints();
+		if (Cast<APD_CharacterController>(controller)->GetSpline())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: MoveWhenCollisionLost - Si hay Spline"));
 
+			Cast<APD_CharacterController>(controller)->GetSpline()->RemovePoints();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: MoveWhenCollisionLost - No hay Spline"));
+
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+			if (SGI)
+			{
+				Cast<APD_CharacterController>(controller)->SetSpline(SGI->gameManager->splineManager->GetSpline());
+			}
+		}
+
+		
 		//Seteamos el spline en la posicion del actor
 		Cast<APD_CharacterController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
 
@@ -422,7 +444,9 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 		TArray<FVector> newPositionsToMove = TArray<FVector>();
 		newPositionsToMove.Add(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
 
+		
 		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Adyacents_To(GetCurrentLogicalPosition());
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
 
@@ -439,17 +463,29 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 
 		}
 
+		
 		//Seteamos el Spline Component con los puntos a los que queremos movernos
-		Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
-		//Llamamos al metodo Mover del Controller
-		Cast<APD_CharacterController>(controller)->MoveTo(0, 0);
+		if (newPositionsToMove.Num() > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
 
+			if (Cast<APD_CharacterController>(controller)->GetSpline())
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost - SetPoints"));
+
+				controller->GetSpline()->SetPoints(newPositionsToMove);
+				//Llamamos al metodo Mover del Controller
+				//Cast<APD_CharacterController>(controller)->MoveTo(0, 0);
+			}
+			else{}
+			
+		}
 		
 	}
 	else
 	{
 		//Limpiamos los puntos del spline
-		if (!Cast<APD_AIController>(controller)->GetSpline()) 
+		if (!Cast<APD_AIController>(controller)->GetSpline())
 		{
 			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 			if (SGI)
@@ -491,8 +527,15 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 		Cast<APD_AIController>(controller)->MoveTo(0, 0);
 
 	}
+
+	
+	
 }
 
+/*
+======================================================
+*/
+///FUNCIONES PARA AYUDA DE HABILIDADES
 bool PD_GM_LogicCharacter::CheckIfWasACriticalAttack(int* initialDamage, PD_GM_LogicCharacter* character)
 {
 	int damageAfterCheck = *initialDamage;
@@ -510,6 +553,101 @@ bool PD_GM_LogicCharacter::CheckIfWasACriticalAttack(int* initialDamage, PD_GM_L
 	
 }
 
+int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* CharWhoAttacks)
+{
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
+
+	int APleft = CharWhoAttacks->GetTotalStats()->AP; //AP totales del personaje
+
+	if (CharWhoAttacks->isPlayer)
+	{
+		//Calculamos el AP necesario para su movimiento
+		APleft -= playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->positionsToMove.Num(); 
+		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
+		for (int i = 0; i < playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions.Num(); i++)
+		{
+			if ((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
+				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)))
+			{
+				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
+				{
+					if (Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].ID_Skill ==
+						playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
+					{
+						APleft -= Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
+					}
+				}
+			}
+		}
+	}
+	else 
+	{
+		//Calculamos el AP necesario para su movimiento
+		APleft -= enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->positionsToMove.Num();
+		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
+		for (int i = 0; i < enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions.Num(); i++)
+		{
+			if ((enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action != (int)ActiveSkills::Defense) &&
+				((enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action != (int)ActiveSkills::WhenFua)))
+			{
+				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
+				{
+					if (Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].ID_Skill ==
+						enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
+					{
+						APleft -= Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
+					}
+				}
+			}
+		}
+	}
+	
+	return APleft;
+}
+
+int PD_GM_LogicCharacter::CalculateReductionOfDamage(PD_GM_LogicCharacter* CharWhoDeffense)
+{
+	int reductionOfDamage = 0; 
+	
+
+	if (CharWhoDeffense->GetCharacterState()->activeEffectsOnCharacter.Contains((int)ActiveSkills::Defense)) //Si continene la defensa - Tambien se puede comprobar aqui otros reductores
+	{
+		int APleft = CalculateAPleftInPlayerActions(CharWhoDeffense);
+		if (APleft >= 5)
+			reductionOfDamage = 25;
+		else
+			reductionOfDamage = 5 * APleft;
+	}
+
+	return reductionOfDamage;
+}
+
+int PD_GM_LogicCharacter::CalculateIncreaseOfDamage(PD_GM_LogicCharacter* CharWhoDeffense)
+{
+	int increaseDMG = 0;
+
+
+	if (CharWhoDeffense->GetCharacterState()->activeEffectsOnCharacter.Contains((int)ActiveSkills::WhenFua)) //Si continene la defensa - Tambien se puede comprobar aqui otros reductores
+	{
+		increaseDMG = 10;
+
+		//Si se da este power up, se lo tiene que quitar (solo dura 1 hostia) -> aunque se va hacer de modo generico - primero restando 1 al valor y luego viendo si es 0 para quitarlo.
+		int TimeEffectOnTurn = CharWhoDeffense->GetCharacterState()->activeEffectsOnCharacter[(int)ActiveSkills::WhenFua];
+		TimeEffectOnTurn--;
+		if (TimeEffectOnTurn == 0)
+		{
+			CharWhoDeffense->GetCharacterState()->activeEffectsOnCharacter.Remove((int)ActiveSkills::WhenFua);
+		}
+
+	}
+
+	return increaseDMG;
+}
+
+
+
+
 ///SKILS
 /* ===============
 FUNCIONES QUE DEFINEN EL COMPORTAMIENTO DE LAS HABILIDADES 
@@ -519,12 +657,15 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 {
 	/*
 	 1. Comprobar si le da o no -> comprobar valores de impacto y evasion
+	 1.5 - Comprobar reductores de daño 
 	 2. Lanzar el ataque
 	*/
 	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
 	{
 		//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
 
 		//Calcular si es critico el ataque
 		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
@@ -539,10 +680,12 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		}
 
 		//quitarselo al charWhoRecieveTheAttacks
+		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
 		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::Defense);
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 	}
 	else  //Fallo del Ataque
 	{
@@ -551,6 +694,19 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 	}
 }
 
+void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
+{
+	/*
+	- Gasta tus AP restantes y aumenta tu reduccion de daño en el proximo turno (turno de los enemigos) - luego se va
+	1. Poner en array de ActiveEffects la de defense con 1 turno
+	2. Actualizar eso al final del turno de los enemigos
+	3. Tener en cuenta esto de la defensa en cualquier punto de ataque
+	*/
+
+	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::Defense, 1);
+
+	CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
+}
 
 /*MELE*/
 ///Dagas
@@ -563,12 +719,16 @@ void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* Cha
 	 3. Si esta este, aumentar el ataque en 4 y poner a 0 el CD en el power up
 	*/
 
-	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add(2, 1);
+	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhenFua);
+
+	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::WhenFua, 1);
 
 }
 ///Mandoble
 void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToJump)
 {
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
+
 	/*
 	- Salta 2 tiles y cae haciendo daño a todo lo que hay alrededor
 	1. Iniciar animacion de salto - o ataque critico
@@ -589,25 +749,65 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 
 	//Coger las adyacentes y quitarles el daño calculado
 	//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
-	/*int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-	//Calcular si es critico el ataque
-	if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+	TArray<PD_MG_LogicPosition> nearTiles = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(PositionToJump);
+	for (int i = 0; i < nearTiles.Num(); i++)
 	{
-		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack();
+		for (int j = 0; j < enemyManager->GetEnemies().Num(); j++)
+		{
+			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide el baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
+			{
+				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+				int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+				totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
+
+				//Calcular si es critico el ataque
+				if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+				{
+					CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+				}
+				else
+				{
+					CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+				}
+
+				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
+				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+
+				//lanzar animacion de pain
+				enemyManager->GetEnemies()[j]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+			}
+		}
 	}
-	else
-	{
-		CharWhoAttacks->GetController()->Animation_BasicAttack();
-	}
-	CharWhoReceiveTheAttacks->UpdateHPCurrent(totalDamage);
-	//lanzar animacion de pain
-	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt();
-	*/
 }
+
 ///Melee
 void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
 {
+	/*
+	- Pegas un hostion muy fuerte para intentar acabar con tu enemigo de 1 golpe - Gastas todos tus AP restantes y aumentas tu ataque en ese %
+	1. Calcular el daño
+	2 . Calcular el AP restante
+	3. Volver a calcular el daño correcto
+	4. Quitar la vida a l enemigo
+	5. Animaciones
+	*/
 
+	int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+	int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+	totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
+
+	int APLeftBonus = CalculateAPleftInPlayerActions(CharWhoAttacks);
+
+	totalDamage = (APLeftBonus / 100) * totalDamage;
+
+	int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+	totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+	CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
+
+	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 }
 
 /*RANGO*/
@@ -624,6 +824,8 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 	for (int i = 0; i < 2; i++)
 	{
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
 
 		//Calcular si es critico el ataque
 		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
@@ -635,11 +837,13 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 			CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
 		}
 		//quitarselo al charWhoRecieveTheAttacks
+		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 	}
 	
 	//lanzar animacion de pain - Solo se ha de activar una vez la animacion de daño del atacado, para hacerlo mas rapido
-	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::Defense);
+	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 }
 ///Range
 void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
@@ -650,19 +854,20 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 	2. hacerlo critico
 	3. lanzar las respectivas animaciones
 	*/
-	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
-	{
+	
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
 		totalDamage = totalDamage + (totalDamage * CharWhoAttacks->GetTotalStats()->MALBonus);
 
 		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 
 		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::BasicAttack);
-	}
-	else {
-		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
-	}
+		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+	
+		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 }
 
 /*MAGIA*/
@@ -719,7 +924,8 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 	5. Animacion de pain de los enemigos afectados
 	*/
 
-	
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
+
 	//FX de explosion de hielo
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::BeInCrossroads);
 
@@ -727,13 +933,38 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 	//CharWhoAttacks->GetController()->Animation_CastSkill();
 	CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BeInCrossroads);
 
-
 	//Conseguir a los enemigos adyacentes
 	
 	//Conseguir las casillas adyacentes y comprobar que son enemigos para cogerlos
-		//updatear la vida con aquellos que te encuentres
-		//lanzar animacion de pain de estos
-	
+	//updatear la vida con aquellos que te encuentres
+	//lanzar animacion de pain de estos
+	TArray<PD_MG_LogicPosition> nearTiles = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(GetCurrentLogicalPosition());
+	for (int i = 0; i < nearTiles.Num(); i++)
+	{
+		for (int j = 0; j < enemyManager->GetEnemies().Num(); j++)
+		{
+			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide el baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
+			{
+				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+				//Calcular si es critico el ataque
+				if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+				{
+					CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+				}
+				else
+				{
+					CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+				}
+
+				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
+				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+				enemyManager->GetEnemies()[j]->UpdateHPCurrent(totalDamage);
+
+				//lanzar animacion de pain
+				enemyManager->GetEnemies()[j]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+			}
+		}
+	}
 
 }
 void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)

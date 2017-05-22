@@ -85,7 +85,8 @@ enum class ActiveSkills
 	Exclaimchas = 8,
 	BeInCrossroads = 9,
 	WhoHeal = 10,
-	ShotMana = 11
+	ShotMana = 11,
+	GetHurt = 250,
 };
 
 //Lista que define TODOS las posibles habilidades pasivas
