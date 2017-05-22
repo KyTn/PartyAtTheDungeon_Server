@@ -594,6 +594,9 @@ private:
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD);
 
+	//devuelve la dificultad del dungeon
+	int DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY);
+
 	// devuelve el numero de habitaciones en funcion de la configuracion del mapa 
 	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);
 
