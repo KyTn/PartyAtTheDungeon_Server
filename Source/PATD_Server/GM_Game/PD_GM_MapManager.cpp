@@ -630,6 +630,18 @@ void PD_GM_MapManager::InstantiateEnemies() {
 				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
 				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
 
+				//IA
+				if (charac->generateRandomPersonality) {
+					//hardcodeado porque no admite c++ saber el tamaño de un enum
+					int randPersonality=FMath::RandRange(0, 3);
+					logicCha->SetIAPersonality(EIAPersonality(randPersonality));
+
+				}
+				else {
+					logicCha->SetIAPersonality(charac->IAPersonality.GetValue());
+
+				}
+
 				logicCha->SetTotalStats();
 
 				charac->SetLogicCharacter(logicCha);

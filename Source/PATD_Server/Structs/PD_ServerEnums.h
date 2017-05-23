@@ -124,6 +124,16 @@ enumMap["Zombie"] = Zombie;
 */
 enum class EAnimationType { Iddle, Move, Attack };
 
+//CAMERA
+enum class ECameraMoveState { Moving, EndMoving, Patrol };
+enum class ECameraLookState { Static, LookPoint, LookActor };
+
+//IA
+UENUM(BlueprintType)
+enum class EIABehaviour  { Attack, Defense, Flee, Swindler, Berserker };
+UENUM(BlueprintType)
+enum class EIAPersonality  { Smart, Warlike, Coward, Neutral };
+
 
 // tipo de mapskin
 UENUM(BlueprintType)

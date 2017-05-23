@@ -14,6 +14,7 @@ class PATD_SERVER_API UPD_IA_TaskAttackCreateOrder : public UBTTaskNode
 	GENERATED_BODY()
 	
 	
-	
+		UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		float warlike_minHPDefense;
 	
 };

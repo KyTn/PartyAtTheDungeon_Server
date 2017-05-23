@@ -4,6 +4,7 @@
 
 #include "PATD_Server/Structs/PD_NetStructs.h"
 #include "Actors/PD_GenericController.h"
+#include "MapGeneration/PD_MG_LogicPosition.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 //#include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
 #include "PD_AIController.generated.h"
@@ -11,6 +12,7 @@
 
 class APD_E_Character;
 class PD_GM_LogicCharacter;
+
 class PD_GM_MapManager;
 class PD_GM_Pathfinder;
 /**
@@ -36,7 +38,7 @@ public:
 
 	void Possess(APawn* charac) override;
 
-	void StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
+		void StartAITurnCalcultion(PD_GM_MapManager* refMap, PD_GM_LogicCharacter* logicCharacter);
 	void EndAITurnCalculation();
 
 
@@ -45,11 +47,29 @@ public:
 	PD_GM_LogicCharacter* GetLogicCharacter() { return currentcharac; };
 	PD_GM_Pathfinder* GetPathFinder() { return pathfinder; };
 
+	TArray<PD_GM_LogicCharacter*> GetPlayersInRange();
 	/*
 	virtual bool MoveTo(float x, float y) override;
 	virtual bool ActionTo(float x, float y, uint8 id_action) override;
 	virtual bool Animate(uint8 typeAnimation) override;
 	*/
 
+	//Determina el comportamiento a ejecutar. Puede ser calculado en PD_IA_TaskBehaviourSelector
+	EIABehaviour selectedBehaviour;
+
+	//Determina si la orden de selectedBehaviour es propia o es impuesta
+	bool orderImpossed;
+
+
+	//Cuantos turnos se ha determinado que quedan hasta el goal. Lo calcula en PD_IA_TaskBehaviourSelector? o lo setea quien haga un orderImpossed.
+	int turnsForGoal;
+
+	//las calculamos en el PD_IA_TaskBehaviourSelector? o creamos otra task por cada behaviour
+	PD_MG_LogicPosition goalPosition;
+	PD_GM_LogicCharacter* goalCharacter;
+
+	//Se calculan en el TargetCalc de cada task y alimentan el CreateOrder
+	PD_MG_LogicPosition turnTargetPosition;
+	PD_GM_LogicCharacter* turnTargetCharacter;
 
 };

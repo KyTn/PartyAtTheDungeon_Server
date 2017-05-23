@@ -1038,8 +1038,8 @@ APD_GenericController* PD_GM_LogicCharacter::GetController() { return controller
 ACharacter* PD_GM_LogicCharacter::GetCharacterBP() { return character_Player_BP; }
 PD_MG_LogicPosition PD_GM_LogicCharacter::GetCurrentLogicalPosition() { return currentLogicalPosition; }
 TArray<PD_MG_LogicPosition> PD_GM_LogicCharacter::GetMovingLogicalPosition() { return movingLogicalPosition; }
-
 bool PD_GM_LogicCharacter::GetIsStoppingByCollision() { return isStoppingByCollision; }
+EIAPersonality PD_GM_LogicCharacter::GetIAPersonality() { return IAPersonality; }
 
 //SET
 void PD_GM_LogicCharacter::SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL)
@@ -1209,3 +1209,4 @@ void PD_GM_LogicCharacter::AddMovementLogicalPosition(PD_MG_LogicPosition nnewLo
 void PD_GM_LogicCharacter::ClearMovingLogicalPosition() { movingLogicalPosition.Empty(); }
 void PD_GM_LogicCharacter::SetMapManager(PD_GM_MapManager* nmapManager) { mapMng = nmapManager; }
 void PD_GM_LogicCharacter::SetIsStoppingByCollision(bool nIsStoppingByCollision) { isStoppingByCollision = nIsStoppingByCollision; }
+void PD_GM_LogicCharacter::SetIAPersonality(EIAPersonality inPersonality) { IAPersonality = inPersonality; }

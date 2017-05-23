@@ -49,6 +49,9 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	//PlayerManager* playerMng;
 	//EnemiesManager* EnemiesMng;
 
+	//Solo para IA
+	EIAPersonality IAPersonality;
+
 
 public:
 	PD_GM_LogicCharacter();
@@ -224,6 +227,7 @@ public:
 	PD_MG_LogicPosition GetCurrentLogicalPosition();
 	TArray<PD_MG_LogicPosition> GetMovingLogicalPosition();
 	bool GetIsStoppingByCollision();
+	EIAPersonality GetIAPersonality();
 
 	//Métodos SET para cada Struct
 	void SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL);
@@ -245,6 +249,7 @@ public:
 	void AddMovementLogicalPosition(PD_MG_LogicPosition nnewLogicalPosition);
 	void SetIsStoppingByCollision(bool nIsStoppingByCollision);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
+	void SetIAPersonality(EIAPersonality inPersonality);
 
 	void ClearMovingLogicalPosition();
 };
