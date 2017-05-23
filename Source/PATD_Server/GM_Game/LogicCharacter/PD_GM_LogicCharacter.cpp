@@ -32,6 +32,7 @@ PD_GM_LogicCharacter::PD_GM_LogicCharacter()
 	weapon = new FStructWeapon();
 	skin = new FStructSkin();
 	totalStats = new FStructTotalStats();
+	characterState = new FStructCharacterState();
 
 	//inicializar las variables
 	isDead = false;

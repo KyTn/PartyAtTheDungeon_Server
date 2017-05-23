@@ -67,7 +67,7 @@ if (other != nullptr) //Los dos son characters
 	{
 		//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
 		logic_character->GetController()->IsCalculatingMovePath = true;
-		logic_character->MoveWhenCollisionLost();
+		//logic_character->MoveWhenCollisionLost();
 	}
 }
 }

@@ -329,17 +329,28 @@ void APD_GenericController::Animation_CriticalBasicAttack(int ID_Skill)
 
 void APD_GenericController::SetTypeCharanimation(int typeChar)
 {
-	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
-	if (AnimInst) {
-		UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "TipoChar");
-		if (IntProperty != NULL) {
-			int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
-			IntProperty->SetPropertyValue_InContainer(AnimInst, typeChar);
-			typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::SetTypeCharanimation: - "));
+
+	if (GetCharacter())
+	{
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::SetTypeCharanimation: - SI hay character"));
+
+		if (GetCharacter()->GetMesh()) 
+		{
+			UE_LOG(LogTemp, Log, TEXT("APD_GenericController::SetTypeCharanimation: - SI hay mesh"));
+			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+			if (AnimInst) {
+				UIntProperty* IntProperty = FindField<UIntProperty>(AnimInst->GetClass(), "TipoChar");
+				if (IntProperty != NULL) {
+					int typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+					IntProperty->SetPropertyValue_InContainer(AnimInst, typeChar);
+					typeCharacter = IntProperty->GetPropertyValue_InContainer(AnimInst);
+				}
+			}
+			else {
+				OnAnimationEnd();
+			}
 		}
-	}
-	else {
-		OnAnimationEnd();
 	}
 }
 
