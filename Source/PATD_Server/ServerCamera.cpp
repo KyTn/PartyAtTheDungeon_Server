@@ -3,14 +3,33 @@
 #include "PATD_Server.h"
 #include "ServerCamera.h"
 
+#include "Components/SplineComponent.h"
 #include "PD_ServerGameInstance.h"
+#include "Actors/PD_SplineActors.h"
+#include "Kismet/KismetMathLibrary.h"
 
-
+#include "GM_Game/PD_GM_GameManager.h"
+/*
 AServerCamera::AServerCamera()
 {
+//	FName YourObjectName("Hiiii");
+//	FObjectInitializer::CreateDefaultSubobject<USplineComponent>(this, FName(TEXT("Spline")));
+	//USplineComponent* NewComp = FObjectInitializer::CreConstructObject<USplineComponent>(USplineComponent, this, YourObjectName);
+	//YourSplineComponent=PCIP.CreateDefaultSubobject<USplineComponent>(this, TEXT("Speeds"));
+}*/
+/*
+AServerCamera::AServerCamera(const FObjectInitializer& ObjectInitializer)
+	//: Super(ObjectInitializer)
+{
+	PrimaryActorTick.bCanEverTick = true;
 
-}
-
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
+	//spline = CreateDefaultSubobject<USplineComponent>(TEXT("Path"));
+	//YourSplineComponent->AddPo
+	//YourSplineComponent->AttachTo()
+	//YourSplineComponent->AttachTo(GetRootComponent(), , EAttachLocation::KeepWorldPosition);
+	//YourSplineComponent->AttachParent = RootComponent;
+}*/
 
 void AServerCamera::BeginPlay()
 {
@@ -28,13 +47,63 @@ void AServerCamera::BeginPlay()
 // Called every frame
 void AServerCamera::Tick(float DeltaTime)
 {
+	
+	//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 	Super::Tick(DeltaTime);
+	if (moveState == ECameraMoveState::Moving) {
 
+		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
+		{//continua moviendose
+			
+			FVector incrementPosition = velocity*DeltaTime*targetDirection; //target direction es un vector
+			//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
+			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento:%s"), *incrementPosition.ToString());
+			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento valores:%s"), *targetDirection.ToString());
+			SetActorLocation(GetActorLocation()+incrementPosition);
+
+			
+		}
+		else
+		{//ha llegado
+
+			moveState= ECameraMoveState::EndMoving;
+			OnMoveEnd();
+		}
+
+	}
+	else if (moveState == ECameraMoveState::Patrol) {
+		distance += DeltaTime*patrolVelocity;
+
+		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
+		/*
+		if (patrolRotate) {
+			SetActorRotation(spline->GetSplineComponent()->GetWorldRotationAtDistanceAlongSpline(distance));
+		}
+		*/
+		if (distance > spline->GetSplineComponent()->GetDistanceAlongSplineAtSplinePoint(spline->GetSplineComponent()->GetNumberOfSplinePoints())) {
+			distance = 0;
+		}
+		//if (distance>spline->GetSplineComponent()->Get)
+	//	UE_LOG(LogTemp, Log, TEXT("Move camera Standard. Position:%s"), *GetActorLocation().ToString());
+	}
+
+
+
+	if (lookState == ECameraLookState::LookPoint) {
+		FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		//FRotator newrot = (GetActorLocation() - lookPosition).Rotation();
+		//this->AddActorWorldRotation(newrot);
+		SetActorRotation(PlayerRot);
+	}
+	else if (lookState == ECameraLookState::LookActor) {
+
+	}
+	
 }
 
 
 //Mueve la camara en funcion de la posicion de los players
-FVector AServerCamera::Camera_MoveOnlyPlayers()
+FVector AServerCamera::GetPlayersAveragePosition()
 {
 	TArray<FVector> desiredPositions = TArray<FVector>();
 
@@ -53,9 +122,12 @@ FVector AServerCamera::Camera_MoveOnlyPlayers()
 	return FVector(0, 0, 0);
 }
 
-void AServerCamera::Camera_MoveInMovementPhase(TArray<FVector> targetPositions)
+void AServerCamera::Camera_MoveInMovementPhase(TArray<FVector> targetPointList)
 {
-	SetActorLocation(FindAvaragePosition(targetPositions));
+	moveTargetPosition = FindAvaragePosition(targetPointList);
+
+	
+	//SetActorLocation();
 }
 
 
@@ -93,7 +165,7 @@ bool AServerCamera::IsInCurrentViewPort(FVector2D desiredPosition)
 
 	FVector2D viewport = FVector2D(0, 0);
 	GEngine->GameViewport->GetViewportSize(viewport);
-
+	
 	
 	if ((desiredPosition.X > 0) && (desiredPosition.Y > 0) && (desiredPosition.X < viewport.X) && (desiredPosition.Y && viewport.Y))
 	{
@@ -111,4 +183,35 @@ bool AServerCamera::IsInCurrentViewPort(FVector2D desiredPosition)
 	
 	return false;
 
+}
+
+
+void AServerCamera::MoveTo(FVector targetPosition) {
+	UE_LOG(LogTemp, Log, TEXT("CameraMoveTo targetDirection.Target:%s"), *targetPosition.ToString());
+	moveTargetPosition = targetPosition;
+	targetDirection = (moveTargetPosition - this->GetActorLocation());
+	UE_LOG(LogTemp, Log, TEXT("CameraMoveTo targetDirection.Location:%s"), *this->GetActorLocation().ToString());
+	targetDirection.Normalize();
+	moveState = ECameraMoveState::Moving;
+}
+
+void AServerCamera::InitPatrol(FVector targetPosition) {
+	FVector v=FVector(targetPosition.X, targetPosition.Y, 1000);
+	spline->SetActorLocation(v);
+	moveState = ECameraMoveState::Patrol;
+	
+}
+
+void AServerCamera::OnMoveEnd() {
+	moveState = ECameraMoveState::EndMoving;
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+	SGI->gameManager->OnCameraEndMove();
+}
+
+void AServerCamera::LookAtPoint(FVector inLookPosition) {
+	lookPosition = FVector(inLookPosition.X, inLookPosition.Y,0);
+	lookState = ECameraLookState::LookPoint;
+}
+void AServerCamera::StopLookAt() {
+	lookState = ECameraLookState::Static;
 }

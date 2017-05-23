@@ -13,9 +13,12 @@ class PATD_SERVER_API APD_SplineActors : public AActor
 private:
 	//Variables
 	bool isUsing;
-	USplineComponent*  spline;
+
 
 public:	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USplineComponent*  spline;
+
 	// Sets default values for this actor's properties
 	APD_SplineActors(const FObjectInitializer& ObjectInitializer);
 

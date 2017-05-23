@@ -121,10 +121,18 @@ EnumParser<ECharacterType>::EnumParser()
     enumMap["Zombie"] = Zombie;
 }
 */
+enum class ECameraMoveState {Moving,EndMoving,Patrol};
+enum class ECameraLookState {Static, LookPoint, LookActor };
+
 enum class EAnimationType {Iddle,Move,Attack};
 
 enum class StaticMapElement { EMPTY= 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', SPAWN_POINT = 's'};
 enum class MapSkinType{DUNGEON_NORMAL = 0, GARDEN = 10, LIBRARY = 20, SACRIFICE = 30, BOSS = 100};
+
+UENUM(BlueprintType)
+enum class EIABehaviour : uint8 {Attack, Defense, Flee, Swindler, Berserker};
+UENUM(BlueprintType)
+enum class EIAPersonality : uint8 {Smart,Warlike,Coward,Neutral};
 
 #pragma region MATCH CONFIG
 
