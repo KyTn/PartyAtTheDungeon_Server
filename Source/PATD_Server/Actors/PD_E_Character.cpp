@@ -4,6 +4,7 @@
 #include "PD_E_Character.h"
 
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "PD_GenericController.h"
 
 // Sets default values
 APD_E_Character::APD_E_Character()
@@ -49,46 +50,28 @@ PD_GM_LogicCharacter* APD_E_Character::GetLogicCharacter()
 
 void APD_E_Character::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//APD_E_Character* me = Cast<APD_E_Character>(SelfActor);
 	APD_E_Character* other = Cast<APD_E_Character>(Hit.GetActor());
-
-	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit %s name of actor hited> %s"), *GetName() , *other->GetName());
-	/*
-	if (other != nullptr) //Los dos son characters
-	{
-		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
-		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
-
-		if (logic_character->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
-		{
-			//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
-			logic_character->MoveWhenCollisionLost();
-		}
-	}
-	*/
 }
 
 //Por si acaso hay que usar el metodo de recibir hit
-/*void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-FColor DisplayColor = FColor::Green;
-const FString DebugMessage(OtherActor->GetName());
-GEngine->AddOnScreenDebugMessage(-1, 5.0f, DisplayColor, DebugMessage);
 
 APD_E_Character* other = Cast<APD_E_Character>(OtherActor);
 if (other != nullptr) //Los dos son characters
 {
-	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
-	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
+	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
+//	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
 
-	if (logic_character->GetTotalStats()->CH < other->GetLogicCharacter()->GetTotalStats()->CH)
+	if ((logic_character->GetTotalStats()->CH <= other->GetLogicCharacter()->GetTotalStats()->CH) && (!logic_character->GetController()->IsCalculatingMovePath) )
 	{
 		//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+		logic_character->GetController()->IsCalculatingMovePath = true;
 		logic_character->MoveWhenCollisionLost();
 	}
 }
 }
-*/
+
 
 bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
 {

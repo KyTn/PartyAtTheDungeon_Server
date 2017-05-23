@@ -8,14 +8,15 @@
 /**
  * 
  */
+class APD_SplineActors;
 UCLASS()
 class PATD_SERVER_API AServerCamera : public ACameraActor
 {
 	GENERATED_BODY()
-	
+	//GENERATED_UCLASS_BODY()
 public:
 
-	AServerCamera();
+	//AServerCamera();
 
 	virtual void BeginPlay() override;
 	
@@ -25,11 +26,13 @@ public:
 
 	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-		FVector Camera_MoveOnlyPlayers();
+		FVector GetPlayersAveragePosition();
 
+	UFUNCTION(BlueprintCallable, Category = "CameraControl")
+		void MoveTo(FVector targetPosition);
 	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
-		void Camera_MoveInMovementPhase(TArray<FVector> targetPositions);
+		void Camera_MoveInMovementPhase(TArray<FVector> targetList);
 
 	//Calcula la posicion intermedia entre todos los players  - Para Move()
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
@@ -39,5 +42,36 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 	bool IsInCurrentViewPort(FVector2D desiredPosition);
 
-	
+	//Sistema de movimiento
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	FVector moveTargetPosition;
+
+	//bool IsMoving();
+
+	ECameraMoveState moveState= ECameraMoveState::Patrol;
+	ECameraLookState lookState = ECameraLookState::Static;
+
+	ECameraMoveState GetMoveState() { return moveState; };
+	ECameraLookState GetLookState() { return lookState; };
+
+	//Move
+	void OnMoveEnd();
+	float velocity=1000;
+	FVector targetDirection;
+
+	//Patrol
+	/**Spline component*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	APD_SplineActors* spline;
+	float distance;
+	float patrolVelocity = 100;
+//	bool patrolRotate = true;
+	void InitPatrol(FVector targetPosition);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	FVector lookPosition;
+
+	void LookAtPoint(FVector inLookPosition);
+	void StopLookAt();
+
 };

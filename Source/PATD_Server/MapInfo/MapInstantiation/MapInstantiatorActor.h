@@ -69,8 +69,9 @@ public:
 
 	//Enemies
 	/// seria la class generica
-	TSubclassOf<class APD_E_Character> ArcherClass;
-	TSubclassOf<class APD_E_Character> ZombieClass;
+	TSubclassOf<class APD_E_Character> OrcBowClass;
+	TSubclassOf<class APD_E_Character> OrcGunsClass;
+	TSubclassOf<class APD_E_Character> OrcMeleeClass;
 #pragma endregion 
 
 
@@ -91,7 +92,8 @@ public:
 
 #pragma endregion 
 
-	APD_E_Character* InstantiateArcher(PD_MG_LogicPosition logpos);
-	APD_E_Character* InstantiateZombie(PD_MG_LogicPosition logpos);
+	APD_E_Character* InstantiateOrcBow(PD_MG_LogicPosition logpos);
+	APD_E_Character* InstantiateOrcGuns(PD_MG_LogicPosition logpos);
+	APD_E_Character* InstantiateOrcMelee(PD_MG_LogicPosition logpos);
 	APD_E_Character* InstantiatePlayer(PD_MG_LogicPosition logpos);
 };

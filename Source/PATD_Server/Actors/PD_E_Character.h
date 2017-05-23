@@ -37,9 +37,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
 		bool PlayAnimationSkill(int ID_Skill);
 
-	UPROPERTY(EditAnywhere, Category = "behavior")
+	UPROPERTY(EditAnywhere, Category = "PD_IA")
 		UBehaviorTree* behaviorTree;
 
+	UPROPERTY(EditAnywhere, Category = "PD_IA")
+		bool generateRandomPersonality;
+
+	UPROPERTY(EditAnywhere, Category = "PD_IA")
+		TEnumAsByte<EIAPersonality> IAPersonality;
 	#pragma region Stats
 	
 	UPROPERTY(EditAnywhere, Category = "Base Stats")
@@ -79,11 +84,16 @@ public:
 		FStructTotalStats structtotal;
 	#pragma endregion
 
+
+	
+
+
+
 	UFUNCTION()
 	void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 	
-	//UFUNCTION()
-	//void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 

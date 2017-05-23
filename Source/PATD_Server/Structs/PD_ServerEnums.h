@@ -85,7 +85,8 @@ enum class ActiveSkills
 	Exclaimchas = 8,
 	BeInCrossroads = 9,
 	WhoHeal = 10,
-	ShotMana = 11
+	ShotMana = 11,
+	GetHurt = 250,
 };
 
 //Lista que define TODOS las posibles habilidades pasivas
@@ -111,7 +112,7 @@ enum class PasiveSkills
 	TheSweeper = 16
 };
 
-enum class ECharacterType { NoCharacter, Player, Archer, Zombie };
+enum class ECharacterType { NoCharacter, Player, OrcMelee, OrcBow, OrcGuns };
 /*
 EnumParser<ECharacterType>::EnumParser()
 {
@@ -122,6 +123,16 @@ enumMap["Zombie"] = Zombie;
 }
 */
 enum class EAnimationType { Iddle, Move, Attack };
+
+//CAMERA
+enum class ECameraMoveState { Moving, EndMoving, Patrol };
+enum class ECameraLookState { Static, LookPoint, LookActor };
+
+//IA
+UENUM(BlueprintType)
+enum class EIABehaviour  { Attack, Defense, Flee, Swindler, Berserker };
+UENUM(BlueprintType)
+enum class EIAPersonality  { Smart, Warlike, Coward, Neutral };
 
 
 // tipo de mapskin

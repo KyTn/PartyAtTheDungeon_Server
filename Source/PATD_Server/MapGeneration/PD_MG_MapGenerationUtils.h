@@ -287,6 +287,8 @@ struct MapProceduralInfo {
 
 	TMap<MapSkinType, TArray<RoomTemplateInfo*>> mapRoomsBySkin;
 
+	TMap <PD_MG_LogicPosition, uint8> enemies; ///TMap que registra los enemigos instanciados por posicion y tipo
+
 	uint8 SPAWN_ID; // indica el idroom de la sala de spawn de jugadores
 	uint8 BOSS_ID; // indica el idroom de la sala del boss (solo para cuando el tipo de mision sea con boss)
 
@@ -316,6 +318,7 @@ struct MapProceduralInfo {
 
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+		 enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 	
 	MapProceduralInfo(FStructMapData * mapData, uint32 _Total_Height, uint32 _Total_Width) {
@@ -334,6 +337,7 @@ struct MapProceduralInfo {
 
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+	   enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 
 #pragma endregion 

@@ -849,7 +849,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 
 	MarkARoomAsSpawingRoom_v02(M, MatchConfigMan->Get_MissionType());
 
-
+	EnemiesGeneration_v02(M, MatchConfigMan, numPlayers);
 #pragma endregion 
 
 	////////////////////////////
@@ -899,10 +899,11 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 	int enemy;
 	MATCHCONFIG_MISSIONTYPE matchConfig_MATCHCONFIG_MISSIONTYPE = MatchConfigMan->Get_MissionType();
 	TArray <uint8> EnemiesPerRoom;
-	TMap <PD_MG_LogicPosition, uint8> enemies = TMap <PD_MG_LogicPosition, uint8>();///TMap que registra los enemigos instanciados por posicion y tipo
+	
 	switch (matchConfig_MATCHCONFIG_MISSIONTYPE)
 	{
 		case MATCHCONFIG_MISSIONTYPE::DefeatBoss: {
+			UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo"));
 			for (int i = 1; i < M.mapRooms.Num(); i++)
 			{
 				int enemiesIn = totalEnemies / (M.mapRooms.Num() - 1);
@@ -916,11 +917,11 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 				while (j < EnemiesPerRoom[i])
 				{
 					int pos = FMath::RandRange(0, M.mapRooms[k].NORMAL_TILES.Num() - 1);//Cogemos una posicion aleatoria
-					if (!enemies.Contains(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos])) {
+					if (!M.enemies.Contains(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos])) {
 						UE_LOG(LogTemp, Log, TEXT("Poniendo enemigo %i en sala %d"), j, M.mapRooms[k].ID);
 						//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
-						enemy = rand() % 2 + 2;///Con esto conseguimos un enemigo aleatorio de la lista de enemigos
-						enemies.Add(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos], enemy);///falta pasar de posición local a posicion global en el mapa
+						enemy = rand() % 3 + 2;///Con esto conseguimos un enemigo aleatorio de la lista de enemigos
+						M.enemies.Add(M.mapRooms[k].BOUNDING_BOX_TOP_LEFT + M.mapRooms[k].NORMAL_TILES[pos], enemy);///falta pasar de posición local a posicion global en el mapa
 						j++;
 					}
 				}
@@ -1201,7 +1202,7 @@ uint16 PD_MG_MapGenerationUtils::InteractuableComposition(int IdInteractuable, i
 
 uint32 PD_MG_MapGenerationUtils::EnemyCompositionOf(PD_MG_LogicPosition logpos, int IdEnemy, int TypeEnemy)
 {
-	return  WallCompositionOf(logpos, IdEnemy, TypeEnemy);
+	return ((uint32)(logpos.GetIn16bits()) << 16) | ((uint32)((IdEnemy)& 0xFF) << 8) | ((uint32)((TypeEnemy)& 0xFF));
 }
 
 
@@ -1315,7 +1316,13 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 		M.NETMAPDATA->doorComposition.Add(DoorCompositionOf(doors[i].logicPosition, doors[i].info[0], doors[i].info[1]));
 	}
 
-
+	TArray<PD_MG_LogicPosition> lp;
+	M.enemies.GenerateKeyArray(lp);
+	for (int i = 0; i <lp.Num() ; i++)
+	{
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Tipo de enemigo %d"), M.enemies[lp[i]]);
+		M.NETMAPDATA->enemyComposition.Add(EnemyCompositionOf(lp[i], i, M.enemies[lp[i]]));
+	}
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from fin"));
 }
 

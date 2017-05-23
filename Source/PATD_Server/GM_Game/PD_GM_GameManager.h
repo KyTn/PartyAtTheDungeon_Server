@@ -125,6 +125,15 @@ public:
 	bool  CheckAndManageCollisionWithEnemies(int indexDataPlayers, int tick, int numCharacters);
 	bool  CheckAndManageCollisionWithMapElements(int indexDataPlayers, int tick, int  numCharacters);
 	bool  CheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck);
+	
+#pragma region CHECK ACTIVEEFFECTS AND ALTEREDSTATE
+	//Funciones para comprobar los ActiveEffects y los AlteredState de enemigos y jugadores;
+	void CheckAndUpdate_ActiveEffectsOnPlayers();
+	void CheckAndUpdate_ActiveEffectsOnEnemies();
+
+	void CheckAndUpdate_AlteredStateOnPlayers();
+	void CheckAndUpdate_AlteredStateOnEnemies();
+#pragma endregion
 
 	void CallbackAttack();
 

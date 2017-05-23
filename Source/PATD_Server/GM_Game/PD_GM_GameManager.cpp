@@ -131,6 +131,9 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
+			//Actualizar estados alteadores y de efectos en enemigos --- despues del turno de los players
+			CheckAndUpdate_ActiveEffectsOnEnemies();
+			CheckAndUpdate_AlteredStateOnEnemies();
 			this->ChangeState(EGameState::WaitingEnemiesOrders);
 		}
 		
@@ -146,6 +149,9 @@ void PD_GM_GameManager::UpdateState() {
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
+			//Actualizar activeeffects and alteredState de los jugadores --- justo antes de actualizarlos en el server
+			CheckAndUpdate_ActiveEffectsOnPlayers();
+			CheckAndUpdate_AlteredStateOnPlayers();
 			this->ChangeState(EGameState::EndOfTurn);
 		}
 	
@@ -181,6 +187,12 @@ void PD_GM_GameManager::OnBeginState() {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: WaitingPlayerOrders"));
 		FStructClientCanGenerateOrders clientGenerateOrders = FStructClientCanGenerateOrders();
 		networkManager->SendNow(&clientGenerateOrders, -1);
+
+
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 
 		UpdateState();
 
@@ -565,6 +577,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 					}
 				}
 			}
+			
 		}
 		//Añadir al Array movingLogicalPosition la posicion que se esta comprobando para ver si se mueve ahi u es otra diferente por el choque
 		playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->AddMovementLogicalPosition(LogicPosPlayerToCheck);
@@ -773,7 +786,8 @@ void PD_GM_GameManager::VisualMoveTick() {
 			for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 			{
 				FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-				v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+				//v.Z = 45.0f;
 				positionsToMove.Add(v);
 				//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
 			}
@@ -789,53 +803,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 		
 	}
 
-	///FUNCION DE CAMARA
-	//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
-	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-	if (SGI)
-	{
-		//Pasas todo el Array de posiciones logicas a fisicas para el meotodo MOVER
-		TArray<FVector> targetPositions = TArray<FVector>();
-		for (int k = 0; k < players; k++)
-		{
-			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-				targetPositions.Add(mapManager->LogicToWorldPosition(
-					//playersManager->GetDataPlayers()[k]->logic_Character->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
-					playersManager->GetDataPlayers()[k]->logic_Character->GetCurrentLogicalPosition()));
-
-			}
-			if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-				targetPositions.Add(mapManager->LogicToWorldPosition(
-					//enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
-					enemyManager->GetEnemies()[k]->GetCurrentLogicalPosition()));
-
-
-			}
-		}
-
-		//Añades todas las posiciones de los jugadores del turno anterior al Array
-		for (int z = 0; z < players; z++)
-		{
-			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-				targetPositions.Add(playersManager->GetDataPlayers()[z]->logic_Character->GetCharacterBP()->GetActorLocation());
-			}
-			if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-				targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
-			}
-		}
-
-		SGI->targetPositionsToCenterCamera = targetPositions;
-
-		UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager"));
-		//Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(targetPositions);
-		
-		FOutputDeviceNull ar;
-		const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
-		//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
-	}
-
 	
-
 }
 
 void PD_GM_GameManager::VisualAttackTick() {
@@ -939,8 +907,7 @@ void PD_GM_GameManager::OnAnimationEnd() {
 }
 
 void PD_GM_GameManager::OnCameraEndMove() {
-	structGamePhase->cameraMoving = false;
-	UpdatePhase();
+		UpdatePhase();
 }
 
 void PD_GM_GameManager::OnTimerEnd() {
@@ -1010,7 +977,9 @@ void PD_GM_GameManager::UpdatePhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
-		if (!structGamePhase->cameraMoving) {
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
+
 			ChangePhase(EServerPhase::MoveTick);
 		}
 	}
@@ -1149,7 +1118,69 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: MoveCamera"));
+		///FUNCION DE CAMARA
+		int players = -1;
+		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
+			players = playersManager->GetNumPlayers();
+		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
+			players = enemyManager->GetEnemies().Num();
+		//Se llama a la Camara Server para que actulice su posicion - Se usa el SplineManager que es un actor para coger la referencia del Game Instance
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		if (SGI)
+		{
+			//Pasas todo el Array de posiciones logicas a fisicas para el meotodo MOVER
+			TArray<FVector> targetPositions = TArray<FVector>();
+			for (int k = 0; k < players; k++)
+			{
+				if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+					//targetPositions.Add(mapManager->LogicToWorldPosition(
+						//playersManager->GetDataPlayers()[k]->logic_Character->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+					//	playersManager->GetDataPlayers()[k]->logic_Character->GetCurrentLogicalPosition()));
+					if (playersManager->GetDataPlayers()[k]->turnOrders->positionsToMove.Num() > 0) {
+						FStructLogicPosition pos = playersManager->GetDataPlayers()[k]->turnOrders->positionsToMove[playersManager->GetDataPlayers()[k]->turnOrders->positionsToMove.Num() - 1];
+
+						targetPositions.Add(mapManager->LogicToWorldPosition(PD_MG_LogicPosition(pos.positionX, pos.positionY)));
+						UE_LOG(LogTemp, Log, TEXT("Camera MOve adding logic: %s"), *(mapManager->LogicToWorldPosition(PD_MG_LogicPosition(pos.positionX, pos.positionY)).ToString()));
+
+					}
+				}
+				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+					targetPositions.Add(mapManager->LogicToWorldPosition(
+						//enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
+						enemyManager->GetEnemies()[k]->GetCurrentLogicalPosition()));
+
+
+				}
+			}
+
+			//Añades todas las posiciones de los jugadores del turno anterior al Array
+			for (int z = 0; z < players; z++)
+			{
+				if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+					targetPositions.Add(playersManager->GetDataPlayers()[z]->logic_Character->GetCharacterBP()->GetActorLocation());
+					UE_LOG(LogTemp, Log, TEXT("Camera MOve adding: %s"), *(playersManager->GetDataPlayers()[z]->logic_Character->GetCharacterBP()->GetActorLocation().ToString()));
+
+				}
+				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+					targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+				}
+			}
+
+			//SGI->targetPositionsToCenterCamera = targetPositions;
+
+			UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager %d"), targetPositions.Num());
+			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
+
+			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
+
+			FOutputDeviceNull ar;
+			const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
+																							//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
+		}
+
 		UpdatePhase();
+
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -1242,6 +1273,79 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 void PD_GM_GameManager::UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy) {/// valdría con pasarles el id por ejemplo
 	player->SetPoints(player->GetPoints() + enemy->GetPoints());
 	TotalPoints += enemy->GetPoints();
+}
+
+#pragma endregion
+
+#pragma region CHECK ACTIVEEFFECTS AND ALTEREDSTATE
+
+//Funciones para comprobar los ActiveEffects y los AlteredState de enemigos y jugadores;
+void PD_GM_GameManager::CheckAndUpdate_ActiveEffectsOnPlayers()
+{
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		for (auto& Elem : playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter.Remove(id_af);
+			else
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_ActiveEffectsOnEnemies()
+{
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		for (auto& Elem : enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter.Remove(id_af);
+			else
+				enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_AlteredStateOnPlayers()
+{
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		for (auto& Elem : playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState.Remove(id_af);
+			else
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_AlteredStateOnEnemies()
+{
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		for (auto& Elem : enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState.Remove(id_af);
+			else
+				enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState[id_af] = cd_af;
+		}
+	}
 }
 
 #pragma endregion

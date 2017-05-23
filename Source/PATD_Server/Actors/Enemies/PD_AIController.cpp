@@ -12,6 +12,7 @@
 #include <math.h>
 #include "GM_Game/PD_GM_GameManager.h"
 #include "PATD_Server/GM_Game/Pathfinder/PD_GM_Pathfinder.h"
+#include "Structs/PD_ServerStructs.h"
 
 APD_AIController::APD_AIController(){
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
@@ -92,3 +93,9 @@ bool APD_AIController::Animate(uint8 typeAnimation)
 {
 	return true;
 }*/
+
+
+TArray<PD_GM_LogicCharacter*> APD_AIController::GetPlayersInRange() {
+	TArray<PD_GM_LogicCharacter*> playersInRangeList;
+	return playersInRangeList;
+}

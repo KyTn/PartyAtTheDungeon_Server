@@ -49,6 +49,9 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	//PlayerManager* playerMng;
 	//EnemiesManager* EnemiesMng;
 
+	//Solo para IA
+	EIAPersonality IAPersonality;
+
 
 public:
 	PD_GM_LogicCharacter();
@@ -167,10 +170,17 @@ public:
 	///Comprobar los estados del jugador o los powerUps para ver si se incrementa el ataque o no
 	void CheckCharacterActiveEffects(PD_GM_LogicCharacter* CharWhoAttacks);
 
+	///Calcular el % de defensa que tiene un jugador
+	int CalculateReductionOfDamage(PD_GM_LogicCharacter* CharWhoDeffense);
+	int CalculateIncreaseOfDamage(PD_GM_LogicCharacter* CharWhoAttacks);
+
+	///Calcular los AP restantes de las acciones del jugador - Para habilidad defensa o las que gasten todo el AP
+	int CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* CharWhoAttacks);
+
 	//Ataque basico
 	void Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
 	//Protegerse hasta el siguiente turno (HAB SIN ESCUDO)
-	void Skill_Defense();
+	void Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks);
 
 	/*MELE*/
 	///Dagas
@@ -217,6 +227,7 @@ public:
 	PD_MG_LogicPosition GetCurrentLogicalPosition();
 	TArray<PD_MG_LogicPosition> GetMovingLogicalPosition();
 	bool GetIsStoppingByCollision();
+	EIAPersonality GetIAPersonality();
 
 	//Métodos SET para cada Struct
 	void SetBasicStats(int nPOD, int nAGI, int nDES, int nCON, int nPER, int nMAL);
@@ -238,6 +249,7 @@ public:
 	void AddMovementLogicalPosition(PD_MG_LogicPosition nnewLogicalPosition);
 	void SetIsStoppingByCollision(bool nIsStoppingByCollision);
 	void SetMapManager(PD_GM_MapManager* nmapManager);
+	void SetIAPersonality(EIAPersonality inPersonality);
 
 	void ClearMovingLogicalPosition();
 };
