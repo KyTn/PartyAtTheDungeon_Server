@@ -15,11 +15,13 @@ PD_MG_MapGenerator::~PD_MG_MapGenerator()
 }
 void PD_MG_MapGenerator::Init()
 {
-	mgUtils = PD_MG_MapGenerationUtils();
-
+	mgUtils = PD_MG_MapGenerationUtils(this);
+	roomTemplateArray = TArray<RoomTemplateInfo>();
+	Map_RoomTemplate_By_MapSkinsType = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 	//UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerator::Init - reading room templates from file ..."));
 	if (mgUtils.ReadAndPrepareRoomTemplateInfosFromFile(FPaths::GameDir()+"Content/DungeonTestingMaps/test1.rooms", roomTemplateArray)) {
 		UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerator::Init - %d room templates readed!"), roomTemplateArray.Num());
+		Mapping_RoomTemplateInfo();
 	}
 	else {
 
@@ -56,7 +58,27 @@ FStructMapData * PD_MG_MapGenerator::GenerateProcedural_FStructMapData_v02(PD_Ma
 	FStructMapData * mapData = new FStructMapData();
 	MapProceduralInfo map = MapProceduralInfo(mapData, 250, 250);
 	mgUtils.GenerateRandomStaticMap_v02(map, roomTemplateArray, 250, 250, MapManConfig, numPlayers);
-	mgUtils.EnemiesGeneration_v02(map, MapManConfig, numPlayers);
+	
 	
 	return mapData;
+}
+
+
+void PD_MG_MapGenerator::Mapping_RoomTemplateInfo()
+{
+	for (int i = 0; i < roomTemplateArray.Num(); i++) {
+		for (int j = 0; j < roomTemplateArray[i].TAGS.Num(); j++) {
+
+			if (Map_RoomTemplate_By_MapSkinsType.Contains(roomTemplateArray[i].TAGS[j]))
+			{
+				Map_RoomTemplate_By_MapSkinsType[roomTemplateArray[i].TAGS[j]].Add(&(roomTemplateArray[i]));
+			}
+			else
+			{
+				TArray<RoomTemplateInfo*> t = TArray<RoomTemplateInfo*>();
+				Map_RoomTemplate_By_MapSkinsType.Add(roomTemplateArray[i].TAGS[j], t);
+				Map_RoomTemplate_By_MapSkinsType[roomTemplateArray[i].TAGS[j]].Add(&(roomTemplateArray[i]));
+			}
+		}
+	}
 }

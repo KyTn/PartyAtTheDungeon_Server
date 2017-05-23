@@ -167,10 +167,17 @@ public:
 	///Comprobar los estados del jugador o los powerUps para ver si se incrementa el ataque o no
 	void CheckCharacterActiveEffects(PD_GM_LogicCharacter* CharWhoAttacks);
 
+	///Calcular el % de defensa que tiene un jugador
+	int CalculateReductionOfDamage(PD_GM_LogicCharacter* CharWhoDeffense);
+	int CalculateIncreaseOfDamage(PD_GM_LogicCharacter* CharWhoAttacks);
+
+	///Calcular los AP restantes de las acciones del jugador - Para habilidad defensa o las que gasten todo el AP
+	int CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* CharWhoAttacks);
+
 	//Ataque basico
 	void Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks);
 	//Protegerse hasta el siguiente turno (HAB SIN ESCUDO)
-	void Skill_Defense();
+	void Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks);
 
 	/*MELE*/
 	///Dagas

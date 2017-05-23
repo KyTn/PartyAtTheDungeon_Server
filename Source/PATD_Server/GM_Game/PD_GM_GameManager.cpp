@@ -131,6 +131,9 @@ void PD_GM_GameManager::UpdateState() {
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
+			//Actualizar estados alteadores y de efectos en enemigos --- despues del turno de los players
+			CheckAndUpdate_ActiveEffectsOnEnemies();
+			CheckAndUpdate_AlteredStateOnEnemies();
 			this->ChangeState(EGameState::WaitingEnemiesOrders);
 		}
 		
@@ -146,6 +149,9 @@ void PD_GM_GameManager::UpdateState() {
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
+			//Actualizar activeeffects and alteredState de los jugadores --- justo antes de actualizarlos en el server
+			CheckAndUpdate_ActiveEffectsOnPlayers();
+			CheckAndUpdate_AlteredStateOnPlayers();
 			this->ChangeState(EGameState::EndOfTurn);
 		}
 	
@@ -571,6 +577,7 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 					}
 				}
 			}
+			
 		}
 		//Añadir al Array movingLogicalPosition la posicion que se esta comprobando para ver si se mueve ahi u es otra diferente por el choque
 		playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->AddMovementLogicalPosition(LogicPosPlayerToCheck);
@@ -779,7 +786,8 @@ void PD_GM_GameManager::VisualMoveTick() {
 			for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 			{
 				FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-				v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+				//v.Z = 45.0f;
 				positionsToMove.Add(v);
 				//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
 			}
@@ -1265,6 +1273,79 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 void PD_GM_GameManager::UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy) {/// valdría con pasarles el id por ejemplo
 	player->SetPoints(player->GetPoints() + enemy->GetPoints());
 	TotalPoints += enemy->GetPoints();
+}
+
+#pragma endregion
+
+#pragma region CHECK ACTIVEEFFECTS AND ALTEREDSTATE
+
+//Funciones para comprobar los ActiveEffects y los AlteredState de enemigos y jugadores;
+void PD_GM_GameManager::CheckAndUpdate_ActiveEffectsOnPlayers()
+{
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		for (auto& Elem : playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter.Remove(id_af);
+			else
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->activeEffectsOnCharacter[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_ActiveEffectsOnEnemies()
+{
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		for (auto& Elem : enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter.Remove(id_af);
+			else
+				enemyManager->GetEnemies()[i]->GetCharacterState()->activeEffectsOnCharacter[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_AlteredStateOnPlayers()
+{
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		for (auto& Elem : playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState.Remove(id_af);
+			else
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterState()->alteredCharacterState[id_af] = cd_af;
+		}
+	}
+}
+
+void PD_GM_GameManager::CheckAndUpdate_AlteredStateOnEnemies()
+{
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		for (auto& Elem : enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState)
+		{
+			int id_af = Elem.Key;
+			int cd_af = Elem.Value;
+			cd_af--;
+			if (cd_af <= 0)
+				enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState.Remove(id_af);
+			else
+				enemyManager->GetEnemies()[i]->GetCharacterState()->alteredCharacterState[id_af] = cd_af;
+		}
+	}
 }
 
 #pragma endregion

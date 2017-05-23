@@ -18,6 +18,8 @@
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
 #include "MapInfo/PD_MM_MapInfo.h"
+#include "Actors/PD_E_ElementActor.h"
+
 
 PD_GM_MapManager::PD_GM_MapManager()
 {
@@ -29,10 +31,10 @@ PD_GM_MapManager::~PD_GM_MapManager()
 
 
 
-void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
+void PD_GM_MapManager::Init() {
 
-	StaticMapRef = sm;
-	DynamicMapRef = dm;
+
+	DynamicMapRef = new PD_MG_DynamicMap();
 
 	// Ya tengo la info del mapa cargada por el Struct o por las refs del estatico y dinamico
 	MapInfo = new PD_MM_MapInfo(this);
@@ -43,23 +45,20 @@ void PD_GM_MapManager::Init(PD_MG_StaticMap* sm, PD_MG_DynamicMap* dm) {
 
 bool PD_GM_MapManager::IsLogicPositionAWall(PD_MG_LogicPosition logpos)
 {
-
-	if (StaticMapRef->GetXYMap().Contains(logpos)) {
-
-		return StaticMapRef->GetXYMap()[logpos] == 'w' || StaticMapRef->GetXYMap()[logpos] == 'W';
+	if (MapInfo->roomByLogPos.Contains(logpos)) {
+		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
+		if (r->LogicWallPosInRoom.Contains(logpos))
+			return true;
 	}
-
-
-
 	return false;
 }
 
 bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
 {
-	if (StaticMapRef->GetXYMap().Contains(logpos)) {
-
-		return StaticMapRef->GetXYMap()[logpos] == '.' || StaticMapRef->GetXYMap()[logpos] == ',';
-			//|| StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	if (MapInfo->roomByLogPos.Contains(logpos)) {
+		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+			return true;
 	}
 	return false;
 }
@@ -67,32 +66,32 @@ bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
 
 bool PD_GM_MapManager::IsLogicPositionAProp(PD_MG_LogicPosition logpos)
 {
-	if (StaticMapRef->GetXYMap().Contains(logpos)) {
-
-		return StaticMapRef->GetXYMap()[logpos] == 'C';
-			//|| StaticMapRef->GetXYMap()[logpos] == 'X' || StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	if (MapInfo->roomByLogPos.Contains(logpos)) {
+		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+			return true;
 	}
 	return false;
 }
 
 bool PD_GM_MapManager::IsLogicPositionADoor(PD_MG_LogicPosition logpos)
 {
-	if (StaticMapRef->GetXYMap().Contains(logpos)) {
-
-		return StaticMapRef->GetXYMap()[logpos] == 'd' || StaticMapRef->GetXYMap()[logpos] == 'D';
-		//|| StaticMapRef->GetXYMap()[logpos] == 'X' || StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
+	if (MapInfo->roomByLogPos.Contains(logpos)) {
+		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
+		if (r->LogicDoorPosInRoom.Contains(logpos))
+			return true;
 	}
 	return false;
 }
 
-bool PD_GM_MapManager::IsLogicPositionASpawn(PD_MG_LogicPosition logpos)
+/*bool PD_GM_MapManager::IsLogicPositionASpawn(PD_MG_LogicPosition logpos)
 {
 	if (StaticMapRef->GetXYMap().Contains(logpos)) {
 
 		return StaticMapRef->GetXYMap()[logpos] == 's' || StaticMapRef->GetXYMap()[logpos] == 'S';
 	}
 	return false;
-}
+}*/
 
 #pragma endregion
 
@@ -100,11 +99,6 @@ bool PD_GM_MapManager::IsLogicPositionASpawn(PD_MG_LogicPosition logpos)
 
 #pragma region GET INFO OF THE MAP
 
-/*
-bool PD_GM_MapManager::getGenericCharacterAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
-bool PD_GM_MapManager::getPlayerAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
-bool PD_GM_MapManager::getEnemyAt(PD_MG_LogicPosition* logpos, APD_PLY_GenericCharacter* genCharacter) { return false; }
-*/
 
 bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
 	PD_MG_LogicPosition logpos;
@@ -113,15 +107,6 @@ bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
 	if (DynamicMapRef->getEnemies().Contains(logpos))
 		if (DynamicMapRef->getEnemies()[logpos].type_Character == ECharacterType::Player)
 			return true;
-	return false;
-}
-
-bool PD_GM_MapManager::IsThereWall(uint32 x, uint32 y) {
-	PD_MG_LogicPosition logpos;
-	logpos.SetX(x);
-	logpos.SetY(y);
-	if (StaticMapRef->GetXYMap()[logpos]=='w' || StaticMapRef->GetXYMap()[logpos] == 'W')
-		return true;
 	return false;
 }
 
@@ -140,7 +125,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	
 	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  IDSPAN   %d"), MapInfo->SpawnRoomIndex);
 
-	return MapInfo->rooms[MapInfo->SpawnRoomIndex]->LogicPosInRoom;
+	return MapInfo->SpawnRoom->LogicPosInRoom;
 
 }
 
@@ -164,13 +149,13 @@ PD_MG_LogicPosition PD_GM_MapManager::WorldToLogicPosition(FVector pos) {
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition logPos) {
 
-	return logPos.GetAdjacentsFromList(StaticMapRef->GetLogicPositions());
+	return logPos.GetAdjacentsFromList(MapInfo->allLogicPos);
 }
 
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Diagonals_And_Adyacents_To(PD_MG_LogicPosition logPos) {
 
-	return logPos.GetDiagonalsAndAdjacentsFromList(StaticMapRef->GetLogicPositions());
+	return logPos.GetDiagonalsAndAdjacentsFromList(MapInfo->allLogicPos);
 }
 
 #pragma endregion
@@ -185,17 +170,250 @@ void PD_GM_MapManager::InstantiateMap()
 {
 	UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateMap "));
 
-	InstantiateStaticMap();
+	InstantiateRoomAndAdj(MapInfo->SpawnRoom->IDRoom);
 	InstantiateDynamicMap();
 
 }
 
+void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 
-void PD_GM_MapManager::InstantiateStaticMap() {
+	if (!MapInfo->mapAdj.Contains(id)) {
 
-	for (int i = 0; i < StaticMapRef->GetLogicPositions().Num(); i++) {
+		UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateRoomAndAdj - El mapAdj no contiene el id %d "), id);
+	}
+	PD_MM_Room* room = MapInfo->roomByIDRoom[id];
+	if (!room->IsInstantiated) {
+		TArray<PD_MG_LogicPosition> lp;
+		room->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);
+		for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
+		{
+			InstantiateMapElementBySkin(room->mapSkin, room->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
+		}
+		for (int j = 0; j < room->LogicWallPosInRoom.Num(); j++)///Instanciamos los tiles de una habitacion.
+		{
+			InstantiateWallBySkin(room->mapSkin, room->LogicWallPosInRoom[j]);
+		}
+		room->IsInstantiated = true;
+	}
 
-		/**/
+	TArray<uint8> adj = MapInfo->mapAdj[id];
+	for (int i = 0; i < adj.Num(); i++)//Recorreriamos el grafo de las adyacentes
+	{
+		if (!MapInfo->rooms[adj[i]]->IsInstantiated) {
+			TArray<PD_MG_LogicPosition> lp;
+			MapInfo->rooms[adj[i]]->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);
+			for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
+			{
+				InstantiateMapElementBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
+			}
+			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicWallPosInRoom.Num(); j++)///Instanciamos los tiles de una habitacion.
+			{
+				InstantiateWallBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]);
+			}
+			MapInfo->rooms[adj[i]]->IsInstantiated = true;
+		}
+	}
+
+}
+
+
+void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMapElement element, PD_MG_LogicPosition lp) {
+	APD_E_ElementActor* actorElement;
+	switch (mapSkin) {
+		case MapSkinType::DUNGEON_NORMAL: {
+			switch (element) {
+				case StaticMapElement::NORMAL_TILE: {
+					actorElement = instantiator->InstantiateTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
+					MapInfo->AddTile(lp, actorElement);
+					break;
+				}
+				case StaticMapElement::SPECIAL_TILE: {
+					break;
+				}
+				case StaticMapElement::EMPTY: {
+					break;
+				}
+				case StaticMapElement::PROP_CHEST: {
+					instantiator->Instantiate_Dungeon_Prop_Treasure_01(lp);
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_00: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_01: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_02: {
+					break;
+				}
+			}
+			break;
+		}
+		case MapSkinType::GARDEN: {
+			switch (element) {
+				case StaticMapElement::NORMAL_TILE: {
+					actorElement = instantiator->InstantiateTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::GARDEN);
+					MapInfo->AddTile(lp, actorElement);
+					break;
+				}
+				case StaticMapElement::SPECIAL_TILE: {
+					break;
+				}
+				case StaticMapElement::EMPTY: {
+					break;
+				}
+				case StaticMapElement::SMALL_CHEST: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_00: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_01: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_02: {
+					break;
+				}
+			}
+			break;
+		}
+		case MapSkinType::SACRIFICE: {
+			switch (element) {
+				case StaticMapElement::NORMAL_TILE: {
+					actorElement = instantiator->InstantiateTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::SACRIFICE);
+					MapInfo->AddTile(lp, actorElement);
+					break;
+				}
+				case StaticMapElement::SPECIAL_TILE: {
+					break;
+				}
+				case StaticMapElement::EMPTY: {
+					break;
+				}
+				case StaticMapElement::SMALL_CHEST: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_00: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_01: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_02: {
+					break;
+				}
+			}
+			break;
+		}
+		case MapSkinType::BOSS: {
+			switch (element) {
+				case StaticMapElement::NORMAL_TILE: {
+					actorElement = instantiator->InstantiateTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::BOSS);
+					MapInfo->AddTile(lp, actorElement);
+					break;
+				}
+				case StaticMapElement::SPECIAL_TILE: {
+					break;
+				}
+				case StaticMapElement::EMPTY: {
+					break;
+				}
+				case StaticMapElement::SMALL_CHEST: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_00: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_01: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_02: {
+					break;
+				}
+			}
+			break;
+		}
+		case MapSkinType::LIBRARY: {
+			switch (element) {
+				case StaticMapElement::NORMAL_TILE: {
+					actorElement = instantiator->InstantiateTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+					MapInfo->AddTile(lp, actorElement);
+					break;
+				}
+				case StaticMapElement::SPECIAL_TILE: {
+					break;
+				}
+				case StaticMapElement::EMPTY: {
+					break;
+				}
+				case StaticMapElement::SMALL_CHEST: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_00: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_01: {
+					break;
+				}
+				case StaticMapElement::TREE_OR_COLUMN_02: {
+					break;
+				}
+			}
+			break;
+		}
+	}
+}
+
+
+void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp) {
+	APD_E_ElementActor* actorElement;
+	switch (mapSkin) {
+		case MapSkinType::DUNGEON_NORMAL: {
+			actorElement = instantiator->InstantiateWall(lp);
+			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+			MapInfo->AddWall(lp, actorElement);
+			break;
+		}
+		case MapSkinType::GARDEN: {
+			actorElement = instantiator->InstantiateWall(lp);
+			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+			MapInfo->AddWall(lp, actorElement);
+			break;
+		}
+		case MapSkinType::LIBRARY: {
+			actorElement = instantiator->InstantiateWall(lp);
+			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+			MapInfo->AddWall(lp, actorElement);
+			break;
+		}
+		case MapSkinType::SACRIFICE: {
+			actorElement = instantiator->InstantiateWall(lp);
+			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+			MapInfo->AddWall(lp, actorElement);
+			break;
+		}
+		case MapSkinType::BOSS: {
+			actorElement = instantiator->InstantiateWall(lp);
+			actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+			MapInfo->AddWall(lp, actorElement);
+			break;
+		}
+	}
+
+
+}
+
+
+
+
+/*	for (int i = 0; i < StaticMapRef->GetLogicPositions().Num(); i++) {
+
+		/*
 		switch (StaticMapRef->GetXYMap()[StaticMapRef->GetLogicPositions()[i]]) {
 		case 'w':
 		case 'W':
@@ -214,15 +432,14 @@ void PD_GM_MapManager::InstantiateStaticMap() {
 
 			parserActor->InstantiateTile(staticMap->GetLogicPositions()[i]);
 			break;
-			*/
+			
 		}
 	}
-}
+}*/
 
 
 void PD_GM_MapManager::InstantiateDynamicMap() {
-	ECharacterType enemyType;
-
+	
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Players Num %d"), _GAMEMANAGER->playersManager->GetNumPlayers());
 
 	for (int i = 0; i < _GAMEMANAGER->playersManager->GetNumPlayers(); i++)
@@ -294,64 +511,83 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 		///actualizamos la referencia del BP
 
 	}
+	InstantiateEnemies();
+}
 
+void PD_GM_MapManager::InstantiateEnemies() {
+	ECharacterType enemyType;
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
-
-		enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
-
-		APD_E_Character* charac=nullptr;
-		PD_GM_LogicCharacter* logicCha=nullptr;
-		bool enemyInstantiated = false;
-		switch (enemyType)
-		{
-			case ECharacterType::Archer: 
-			{
-				charac = instantiator->InstantiateArcher(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-
-				
-				break;
-			}
-			case ECharacterType::Zombie: 
-			{
-				charac = instantiator->InstantiateZombie(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-				
-				break;
-			}
-		}
-
-		//Inicializacion de enemigo independientemente de que enemigo sea.
-		if (enemyInstantiated) {
-			logicCha = new PD_GM_LogicCharacter();
-			logicCha->SetIsPlayer(false);
-			logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
-			logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
-			logicCha->SetCharacterBP(charac);
-			logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
-			logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+		if (MapInfo->roomByLogPos[DynamicMapRef->GetLogicPositions()[i]]->IsInstantiated && !DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Instanciando enemigos %d"), i);
+			DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated = true;
+			enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
+			APD_E_Character* charac = nullptr;
+			PD_GM_LogicCharacter* logicCha = nullptr;
+			bool enemyInstantiated = false;
 			switch (enemyType)
 			{
-				case ECharacterType::Archer:
+			case ECharacterType::OrcBow:
+			{
+				charac = instantiator->InstantiateOrcBow(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+
+				break;
+			}
+			case ECharacterType::OrcGuns:
+			{
+				charac = instantiator->InstantiateOrcGuns(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+
+				break;
+			}
+			case ECharacterType::OrcMelee:
+			{
+				charac = instantiator->InstantiateOrcMelee(DynamicMapRef->GetLogicPositions()[i]);
+				enemyInstantiated = true;
+
+				break;
+			}
+			}
+
+			//Inicializacion de enemigo independientemente de que enemigo sea.
+			if (enemyInstantiated) {
+				logicCha = new PD_GM_LogicCharacter();
+				logicCha->SetIsPlayer(false);
+				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
+				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
+				logicCha->SetCharacterBP(charac);
+				logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
+				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+				switch (enemyType)
+				{
+				case ECharacterType::OrcBow:
 				{
 					logicCha->GetController()->SetTypeCharanimation(0);
 					break;
 				}
-				case ECharacterType::Zombie:
+				case ECharacterType::OrcGuns:
+				{
+					logicCha->GetController()->SetTypeCharanimation(0);
+					break;
+				}
+				case ECharacterType::OrcMelee:
 				{
 					logicCha->GetController()->SetTypeCharanimation(1);
 					break;
 				}
-			}
+				}
 
-			///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
-			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
+				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
+				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
 
-			if (SGI)
-			{
-				//Weapon
-				int id_weapon, classWeapon, typeWeapon, damage, range;
+				if (SGI)
+				{
+					//Weapon
+					int id_weapon, classWeapon, typeWeapon, damage, range;
 					SGI->LoadWeaponSpecificData((int)charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
 					logicCha->GetWeapon()->ID_Weapon = id_weapon;
 					logicCha->GetWeapon()->ClassWeapon = classWeapon;
@@ -359,8 +595,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 					logicCha->GetWeapon()->DMWeapon = damage;
 					logicCha->GetWeapon()->RangeWeapon = range;
 
-				//Skills
-				//PASIVAS
+					//Skills
+					//PASIVAS
 					for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
 					{
 						FStructSkill skillPasAdded = FStructSkill();
@@ -374,7 +610,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 						skillPasAdded.target = targetSkill;
 						logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
 					}
-				//ACTIVAS
+					//ACTIVAS
 					for (int j = 0; j < charac->activeSkillList.Num(); j++)
 					{
 						FStructSkill skillActAdded = FStructSkill();
@@ -388,21 +624,22 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 						skillActAdded.target = targetSkill;
 						logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
 					}
+				}
+
+				//STATS
+				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
+				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+
+				logicCha->SetTotalStats();
+
+				charac->SetLogicCharacter(logicCha);
+
+				_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
 			}
 
-			//STATS
-			logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
-			logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
-
-			logicCha->SetTotalStats();
-
-			charac->SetLogicCharacter(logicCha);
-
-			_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
 		}
-
-
 	}
+
 }
 
 #pragma endregion

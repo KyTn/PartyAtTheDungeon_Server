@@ -85,6 +85,11 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 		*/
 
 
+		if (UStructType(type) == UStructType::FStructMapData) {
+			for (int i = 0; i < dataaux.Num(); i++) {
+				UE_LOG(LogTemp, Warning, TEXT("PD_NW_NetworkManager::HandleNewSocketData:: %d"), dataaux[i]);
+			}
+		}
 
 		FStructGeneric* genericStruct = serializerManager->DeserializeData(&dataaux, UStructType(type)); //Otra copia?
 																										 //genericStruct->structType = type;
@@ -158,6 +163,11 @@ bool PD_NW_NetworkManager::SendNow(FStructGeneric* structGeneric, int player) {
 	*/
 	UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: Enviando data a player %d. Struct de tipo %d - tamaño precabecera: %d"), player, structGeneric->structType, dataIn->Num());
 
+	if (UStructType(structGeneric->structType) == UStructType::FStructMapData) {
+		for (int i = 0; i < dataIn->Num(); i++) {
+			UE_LOG(LogTemp, Warning, TEXT("PD_NW_NetworkManager::HandleNewSocketData:: %d"), (*dataIn)[i]);
+		}
+	}
 
 	// size + dataIn 
 

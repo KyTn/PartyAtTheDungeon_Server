@@ -8,6 +8,23 @@
 /// FORWARD DECLARATIONS
 class PD_MG_StaticMap;
 class PD_MatchConfigManager;
+class PD_MG_MapGenerator;
+
+struct LogicPositionAmplified {
+
+	PD_MG_LogicPosition logicPosition;
+
+	TArray<uint32> info;
+
+	LogicPositionAmplified() {}
+	LogicPositionAmplified(PD_MG_LogicPosition logpos) {
+		logicPosition = logpos;
+		info = TArray<uint32>();
+	}
+
+	void AddInfo(uint32 newInfo) { info.Add(newInfo); }
+};
+
 
 struct RoomTemplateInfo {
 
@@ -18,19 +35,25 @@ struct RoomTemplateInfo {
 	uint32 HEIGHT;
 
 	TArray<TArray<TCHAR>> RAW_DATA;
-	TArray<PD_MG_LogicPosition> LOCAL_LOGIC_POSITIONS_ON_ROOM;
-	TMap<PD_MG_LogicPosition, StaticMapElement> MAP_DATA;
+	TArray<PD_MG_LogicPosition> LOCAL_LOGIC_POSITIONS_ON_ROOM; // posiciones en local 
+	TMap<PD_MG_LogicPosition, StaticMapElementInRoomTemplate> MAP_DATA; // posiciones en local 
 
 	MapSkinType ChoosedTag;
 
-	TArray<PD_MG_LogicPosition> OPEN_WALLS;
-	TArray<PD_MG_LogicPosition> CLOSED_WALLS;
-	TArray<PD_MG_LogicPosition> NORMAL_TILES;
-	TArray<PD_MG_LogicPosition> SPECIAL_TILES;
-	TArray<PD_MG_LogicPosition> EMPTY_TILES;
+	TArray<PD_MG_LogicPosition> OPEN_WALLS;// posiciones en local 
+	TArray<PD_MG_LogicPosition> CLOSED_WALLS;// posiciones en local 
+	TArray<PD_MG_LogicPosition> NORMAL_TILES;// posiciones en local 
+	TArray<PD_MG_LogicPosition> SPECIAL_TILES;// posiciones en local 
+	TArray<PD_MG_LogicPosition> EMPTY_TILES;// posiciones en local 
 
-	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT; // son globales (al mapa) no locales de la sala
-	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT; // son globales (al mapa) no locales de la sala
+	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT; // son globales (al mapa) no locales de la sala (si el mapa ha sido trimeado, esta info ESTA ACTUALIZADA)
+	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT; // son globales (al mapa) no locales de la sala (si el mapa ha sido trimeado, esta info ESTA ACTUALIZADA)
+
+
+
+#pragma region FUNCTIONS
+
+#pragma region Constructors
 
 	RoomTemplateInfo() {}
 
@@ -48,7 +71,7 @@ struct RoomTemplateInfo {
 
 		LOCAL_LOGIC_POSITIONS_ON_ROOM = TArray <PD_MG_LogicPosition>();
 		RAW_DATA = TArray<TArray<TCHAR>>();
-		MAP_DATA = TMap<PD_MG_LogicPosition, StaticMapElement>();
+		MAP_DATA = TMap<PD_MG_LogicPosition, StaticMapElementInRoomTemplate>();
 
 		OPEN_WALLS = 	TArray<PD_MG_LogicPosition>();
 		CLOSED_WALLS = 	TArray<PD_MG_LogicPosition>();
@@ -69,11 +92,14 @@ struct RoomTemplateInfo {
 		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::RoomTemplateInfo - RAW_DATA  (%d,%d)"), RAW_DATA.Num(), RAW_DATA[0].Num());
 	}
 
+#pragma endregion 
 
+
+	// Añade al MAP_DATA la posicion y el tipo de StaticMapElementInRoomTemplate asociado al char que está leyendo
+	// - x es la posicion local en el eje X
+	// - y es la posicion local en el eje Y
+	// - c es el caracter leido del fichero de .rooms
 	void AddNewLogicPosition(int x, int y, TCHAR c) {
-
-		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddNewLogicPosition - Adding (%d,%d) - %c - RAW_DATA  (%d,%d)"),x,y,c, RAW_DATA.Num(), RAW_DATA[x].Num());
-
 
 		RAW_DATA[x][y] = c;
 		PD_MG_LogicPosition p = PD_MG_LogicPosition(x, y);
@@ -81,30 +107,33 @@ struct RoomTemplateInfo {
 		switch (c)
 		{
 		case 'O':
-			MAP_DATA.Add(p, StaticMapElement::EMPTY);
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::EMPTY);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			EMPTY_TILES.Add(p);
 			break;
 		case '.':
-			MAP_DATA.Add(p, StaticMapElement::NORMAL_TILE);
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::NORMAL_TILE);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			NORMAL_TILES.Add(p);
 			break;
 		case ',':
-			MAP_DATA.Add(p, StaticMapElement::SPECIAL_TILE);
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::SPECIAL_TILE);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			SPECIAL_TILES.Add(p);
 			NORMAL_TILES.Add(p);
 			break;
 		case 'W':
-			MAP_DATA.Add(p, StaticMapElement::WALL_ONLY);
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_ONLY);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			CLOSED_WALLS.Add(p);
 			break;
 		case 'w':
-			MAP_DATA.Add(p, StaticMapElement::WALL_OR_DOOR);
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_OR_DOOR);
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			OPEN_WALLS.Add(p);
+			break;
+		case 't':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_CHEST);
 			break;
 		default:
 			break;
@@ -115,6 +144,9 @@ struct RoomTemplateInfo {
 
 	}
 
+
+	// Actualiza el bounding box de la habitacion para que esté en POSICION DE MUNDO
+	// - BB_TOP_LEFT_IN_MAP es la posicion del (0,0) local en el mundo
 	void UpdateBoundingBoxes(PD_MG_LogicPosition BB_TOP_LEFT_IN_MAP) {
 		BOUNDING_BOX_TOP_LEFT.SetX(BB_TOP_LEFT_IN_MAP.GetX());
 		BOUNDING_BOX_TOP_LEFT.SetY(BB_TOP_LEFT_IN_MAP.GetY());
@@ -123,6 +155,7 @@ struct RoomTemplateInfo {
 		//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes - New BB_TL(%d,%d) of room %s"),	BOUNDING_BOX_TOP_LEFT.GetX(),	BOUNDING_BOX_TOP_LEFT.GetY(), *NAME);
 	}
 
+	// dado una posicion local, te la devuelve en posicion de mundo (en funcion del bounding box que tuviera)
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos) {
 		return BOUNDING_BOX_TOP_LEFT + localPos;
 	}
@@ -133,26 +166,139 @@ struct RoomTemplateInfo {
 	{
 		return this->NAME == other.NAME;
 	}
+
+	// devuelve un MapSkin aleatorio de entre los que puede ser, sin tener en cuenta las habitaciones adyacentes 
+	MapSkinType ChooseOneMapSkin() {
+		return TAGS[FMath::RandRange(0, TAGS.Num() -1)];
+	}
+
+	// Funcion que contiene las reglas de generacion de las skins 
+	bool MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB)
+	{
+		switch (RoomMapSkinA) {
+		case MapSkinType::DUNGEON_NORMAL:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::GARDEN:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::LIBRARY:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::SACRIFICE:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		case MapSkinType::BOSS:
+			switch (RoomMapSkinB)
+			{
+			case MapSkinType::DUNGEON_NORMAL:
+				return true;
+			case MapSkinType::GARDEN:
+				return true;
+			case MapSkinType::LIBRARY:
+				return true;
+			case MapSkinType::SACRIFICE:
+				return true;
+			case MapSkinType::BOSS:
+				return true;
+			default:
+				break;
+			}
+
+		}
+
+		return true;
+	}
+
+
+
+
+#pragma endregion 
+
 };
 
 struct MapProceduralInfo {
 	uint32 Total_Height, Total_Width;
 
-	TMap<PD_MG_LogicPosition, StaticMapElement> mapElements;
+	TMap<PD_MG_LogicPosition, StaticMapElementInRoomTemplate> mapElements;
 	TMap<PD_MG_LogicPosition, MapSkinType> mapSkinByLogicalPosition;
 	//TMap<PD_MG_LogicPosition, RoomTemplateInfo> mapRooms;
 	TArray<RoomTemplateInfo> mapRooms; 
 
+	TMap<uint8, TArray<uint8>> mapAdj;
+
 	TMap<MapSkinType, TArray<RoomTemplateInfo*>> mapRoomsBySkin;
 
-	TArray<TArray<int>> Ady;
-	uint32 SPAWN_ID;
+	TMap <PD_MG_LogicPosition, uint8> enemies; ///TMap que registra los enemigos instanciados por posicion y tipo
+
+	uint8 SPAWN_ID; // indica el idroom de la sala de spawn de jugadores
+	uint8 BOSS_ID; // indica el idroom de la sala del boss (solo para cuando el tipo de mision sea con boss)
+
 	PD_MG_LogicPosition BOUNDING_BOX_TOP_LEFT;
 	PD_MG_LogicPosition BOUNDING_BOX_DOWN_RIGHT;
 
 
 	FStructMapData * NETMAPDATA;
 
+#pragma region FUNCTIONS
+
+#pragma region Constructores
 
 	MapProceduralInfo( uint32 _Total_Height, uint32 _Total_Width) {
 		Total_Height = _Total_Height;
@@ -162,12 +308,15 @@ struct MapProceduralInfo {
 		BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition((int)_Total_Height, (int)_Total_Width);
 		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
 
-		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
+		mapElements = TMap<PD_MG_LogicPosition, StaticMapElementInRoomTemplate>();
 		mapSkinByLogicalPosition = TMap<PD_MG_LogicPosition, MapSkinType>();
 		mapRooms = TArray<RoomTemplateInfo>();
 
+		mapAdj = TMap<uint8, TArray<uint8>>();
+
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+		 enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 	
 	MapProceduralInfo(FStructMapData * mapData, uint32 _Total_Height, uint32 _Total_Width) {
@@ -178,24 +327,37 @@ struct MapProceduralInfo {
 		BOUNDING_BOX_TOP_LEFT = PD_MG_LogicPosition((int)_Total_Height, (int)_Total_Width);
 		BOUNDING_BOX_DOWN_RIGHT = PD_MG_LogicPosition(0, 0);
 
-		mapElements = TMap<PD_MG_LogicPosition, StaticMapElement>();
+		mapElements = TMap<PD_MG_LogicPosition, StaticMapElementInRoomTemplate>();
 		mapSkinByLogicalPosition = TMap<PD_MG_LogicPosition, MapSkinType>();
 		mapRooms = TArray<RoomTemplateInfo>();
 
+		mapAdj = TMap<uint8, TArray<uint8>>();
+
 		mapRoomsBySkin = TMap<MapSkinType, TArray<RoomTemplateInfo*>>();
 
+	   enemies = TMap <PD_MG_LogicPosition, uint8>();
 	}
 
-	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
-		return localPos - R_pivot + C;
+#pragma endregion 
+
+
+	// pasa de coordenadas locales a coordenadas de mundo
+	// - localPos es la posicion local de la que quieres obtener la posicion global
+	// - worldPositionOfPivot es la posicion del pivote en posicion de mundo 
+	// - localPositionOfPivot es la posicion del pivote en posicion local 
+	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition worldPositionOfPivot, PD_MG_LogicPosition localPositionOfPivot) {
+		return localPos - localPositionOfPivot + worldPositionOfPivot;
 	}
-
-
+	
+	// Añade la informacion de un RoomTemplate al mapa 
+	// Actualiza las variables del MapProceduralInfo
+	// y actualiza el FStructMapData que se enviará
+	// - R la info de la habitacion
+	// - C es la posicion del pivote en posicion de mundo
+	// - R_pivot es la posicion del pivote en posicion local 
+	// - ID es el IDRoom que tendrá esa habitacion 
 	void AddRoomToMapAtLocation(RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot, uint32 ID) {
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - Adding %d logicpositions C(%d,%d) R_p(%d,%d) of room %s"), 
-			R.LOCAL_LOGIC_POSITIONS_ON_ROOM.Num(),
-			C.GetX(), C.GetY(),
-			R_pivot.GetX(), R_pivot.GetY(), *(R.NAME));
+		
 		PD_MG_LogicPosition start;
 		start.SetX(0); start.SetY(0);///Se deberia coger la (0,0) porque sino da problemas de desplazamiento
 		PD_MG_LogicPosition bb_t_l = Translate_LocalPosInRoom_To_MapPosition(start, C, R_pivot);
@@ -208,9 +370,9 @@ struct MapProceduralInfo {
 
 
 			/// AÑADIMOS EL ELEMENTO AL MAPA DE ELEMENTOS
-			StaticMapElement v = R.MAP_DATA[localPos];
+			StaticMapElementInRoomTemplate v = R.MAP_DATA[localPos];
+
 			if (mapElements.Contains(mapPosition)) {
-				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
 				mapElements[mapPosition] = v;
 			}
 			else {
@@ -228,15 +390,7 @@ struct MapProceduralInfo {
 				mapSkinByLogicalPosition.Emplace(mapPosition, R.ChoosedTag);
 			}
 
-			///AÑADIMOS LA ROOM AL MAPA QUE LOS ALMACENA EN FUNCION DE LA LOGPOS
-			/*if (mapRooms.Contains(mapPosition)) {
-				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - machacando"));
-				mapRooms[mapPosition] = R;
-			}
-			else {
-				//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation - creando"));
-				mapRooms.Emplace(mapPosition, R);
-			}*/
+			
 
 			UpdateBoundingBoxes(mapPosition);
 		}
@@ -244,25 +398,10 @@ struct MapProceduralInfo {
 		//ShowMap();
 	}
 
-	void UpdateBoundingBoxes(PD_MG_LogicPosition pos) {
-		if (pos.GetX() < BOUNDING_BOX_TOP_LEFT.GetX()) {
-			BOUNDING_BOX_TOP_LEFT.SetX(pos.GetX());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
-		}
-		if (pos.GetY() < BOUNDING_BOX_TOP_LEFT.GetY()) {
-			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
-		}
-		if (pos.GetX() > BOUNDING_BOX_DOWN_RIGHT.GetX()) {
-			BOUNDING_BOX_DOWN_RIGHT.SetX(pos.GetX());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
-		}
-		if (pos.GetY() > BOUNDING_BOX_DOWN_RIGHT.GetY()) {
-			BOUNDING_BOX_DOWN_RIGHT.SetY(pos.GetY());
-			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
-		}
-	}
+	
 
+
+	/*
 	void ShowMap() {
 		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::AddRoomToMapAtLocation MAP: "));
 		for (uint32 i = 0; i < Total_Height; i++) {
@@ -310,17 +449,35 @@ struct MapProceduralInfo {
 		}
 
 	}
+	*/
 
-	void ShowMapOnBoundingBox() {
-		UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::ShowMapOnBoundingBox FROM(%d,%d) TO(%d,%d) MAP: \n%s"), BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY(), BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY(), *ToString());
 
-	}
-
+	// Reduce el tamaño del mapa al minimo posible 
 	void TrimBoundingBoxOfRoomsInMap() {
 		TArray <PD_MG_LogicPosition> keys;
 		//mapRooms.GenerateKeyArray(keys);
 		for (int i = 0; i < mapRooms.Num(); i++) {
 			mapRooms[i].UpdateBoundingBoxes(mapRooms[i].BOUNDING_BOX_TOP_LEFT - BOUNDING_BOX_TOP_LEFT);
+		}
+	}
+
+	// Actualiza los bounding boxes del mapa 
+	void UpdateBoundingBoxes(PD_MG_LogicPosition pos) {
+		if (pos.GetX() < BOUNDING_BOX_TOP_LEFT.GetX()) {
+			BOUNDING_BOX_TOP_LEFT.SetX(pos.GetX());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
+		}
+		if (pos.GetY() < BOUNDING_BOX_TOP_LEFT.GetY()) {
+			BOUNDING_BOX_TOP_LEFT.SetY(pos.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -X New BOUNDING_BOX_TOP_LEFT at /\\ (%d,%d)"),BOUNDING_BOX_TOP_LEFT.GetX(), BOUNDING_BOX_TOP_LEFT.GetY());
+		}
+		if (pos.GetX() > BOUNDING_BOX_DOWN_RIGHT.GetX()) {
+			BOUNDING_BOX_DOWN_RIGHT.SetX(pos.GetX());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
+		}
+		if (pos.GetY() > BOUNDING_BOX_DOWN_RIGHT.GetY()) {
+			BOUNDING_BOX_DOWN_RIGHT.SetY(pos.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("MapProceduralInfo::UpdateBoundingBoxes -Y New BOUNDING_BOX_DOWN_RIGHT at \\/ (%d,%d)"),BOUNDING_BOX_DOWN_RIGHT.GetX(), BOUNDING_BOX_DOWN_RIGHT.GetY());
 		}
 	}
 
@@ -337,32 +494,28 @@ struct MapProceduralInfo {
 				if (mapElements.Contains(p)) {
 					switch (mapElements[p])
 					{
-					case StaticMapElement::EMPTY:
+					case StaticMapElementInRoomTemplate::EMPTY:
 						s.AppendChar('O');
 						break;
 
-					case StaticMapElement::DOOR:
+					case StaticMapElementInRoomTemplate::DOOR:
 						s.AppendChar('d');
 						break;
 
-					case StaticMapElement::NORMAL_TILE:
+					case StaticMapElementInRoomTemplate::NORMAL_TILE:
 						s.AppendChar('.');
 						break;
 
-					case StaticMapElement::SPECIAL_TILE:
+					case StaticMapElementInRoomTemplate::SPECIAL_TILE:
 						s.AppendChar(',');
 						break;
 
-					case StaticMapElement::WALL_ONLY:
+					case StaticMapElementInRoomTemplate::WALL_ONLY:
 						s.AppendChar('w');
 						break;
 
-					case StaticMapElement::WALL_OR_DOOR:
+					case StaticMapElementInRoomTemplate::WALL_OR_DOOR:
 						s.AppendChar('w');
-						break;
-
-					case StaticMapElement::SPAWN_POINT:
-						s.AppendChar('s');
 						break;
 					default:
 						break;
@@ -379,6 +532,8 @@ struct MapProceduralInfo {
 		return s;
 	}
 
+#pragma endregion
+
 };
 
 
@@ -386,7 +541,10 @@ class PATD_SERVER_API PD_MG_MapGenerationUtils
 {
 
 public:
+	PD_MG_MapGenerator* mapGenerator;
+
 	PD_MG_MapGenerationUtils();
+	PD_MG_MapGenerationUtils(PD_MG_MapGenerator* mapGenerator);
 	~PD_MG_MapGenerationUtils();
 
 #pragma region READ ROOMS FROM FILE AND FROM CHORIZO
@@ -438,15 +596,33 @@ private:
 	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
-	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1);
+	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD);
+
+	//devuelve la dificultad del dungeon
+	int DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY);
 
 	// devuelve el numero de habitaciones en funcion de la configuracion del mapa 
 	int NumberOfRoomsOnMatchConfig(MATCHCONFIG_MAPSIZE matchConfig_MATCHCONFIG_MAPSIZE, int numberOfPlayers);
 
 	// Dado una skin y una coleccion de posibles skins, te devuelve, en funcion de las reglas, el indice de esa coleccion que es la skin elegida
-	int ChoosesSkinRules(MapSkinType RoomMapSkin, TArray<MapSkinType> & ChoosableMapSkins);
+	MapSkinType ChoosesSkinRules(RoomTemplateInfo &R, TArray<MapSkinType> & ChoosableMapSkins);
 
-	// Funcion que contiene las reglas de generacion de las skins 
-	bool MatchSkins(MapSkinType RoomMapSkinA, MapSkinType RoomMapSkinB);
+	// Te devuelve el StaticMapElement que puede tener en funcion del tipo de mapskin y del caracter que haya en el StaticMapElementInRoomTemplate
+	StaticMapElement GetStaticMapElementFrom(MapSkinType mst, StaticMapElementInRoomTemplate melem);
+
+
+#pragma region COMPOSITIONS
+	uint16 MapSkinByRoomOf(int IdRoom, MapSkinType mapskintype);
+	uint32 RoomCompositionOf(PD_MG_LogicPosition logpos, StaticMapElement, int IdRoom);
+	uint32 WallCompositionOf(PD_MG_LogicPosition logpos, int IdRoomA, int IdRoomB);
+	uint32 DoorCompositionOf(PD_MG_LogicPosition logpos, int IdRoomA, int IdRoomB);
+	uint32 InteractuableIDOf(PD_MG_LogicPosition logpos, int IdInteractuable, int TypeInteractuable);
+	uint16 InteractuableComposition(int IdInteractuable, int IdReactuable);
+	uint32 EnemyCompositionOf(PD_MG_LogicPosition logpos, int IdEnemy, int TypeEnemy);
+
+#pragma endregion
+
+	void Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray<LogicPositionAmplified> walls, TArray<LogicPositionAmplified> doors);
+
 #pragma endregion
 };

@@ -15,7 +15,8 @@ private:
 public:
 
 	PD_MG_LogicPosition();
-	PD_MG_LogicPosition(int32 x, int32 y);
+	PD_MG_LogicPosition(uint32 x, uint32 y);
+	PD_MG_LogicPosition(uint16 pos);
 	~PD_MG_LogicPosition();
 
 	int32 GetX() { return _x; }
@@ -55,11 +56,8 @@ public:
 	}
 
 	void SetIn16bits(uint16 num) {
-		//uint32 x = num & 0x0011;
-		//uint32 y = (num >> 8) & 0x0011;
-
-		this->SetX((uint32)(num & 0x0011));
-		this->SetY((uint32)((num >> 8) & 0x0011));
+		this->SetX((uint32)(num & 0x00FF));
+		this->SetY((uint32)((num >> 8) & 0x00FF));
 	}
 
 /*
@@ -73,7 +71,7 @@ public:
 	*/
 	FVector ToWorldPosition(bool isCharacter) {
 		if (isCharacter)
-			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 40.f);
+			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 		else
 			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}

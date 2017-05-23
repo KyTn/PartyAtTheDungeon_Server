@@ -11,6 +11,8 @@
 #include "PD_PlayersManager.h"
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+#include "GM_Game/PD_GM_GameManager.h"
+#include "GM_Game/PD_GM_SplineManager.h"
 //Includes Forward
 #include "PD_SplineActors.h"
 
@@ -48,23 +50,6 @@ void APD_GenericController::Tick(float DeltaTime)
 		//GetWorldTimerManager().SetTimer(handleForPong, this, &APD_GenericController::MoveWithSpline, 2.00f, false);
 		MoveWithSpline();
 		
-
-			/*if (FVector::PointsAreNear(moveTargetPosition, GetPawn()->GetActorLocation(), toleranceMove)) {
-				UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Tick: Finalizando animacion de movimiento correctamente."));
-				isMoving = false;
-				OnAnimationEnd();
-			}
-		
-			currentTimeAnimation += DeltaTime;
-			if (currentTimeAnimation > maxLengthAnimation) {
-				//currentTimeAnimation -= maxLengthAnimation;
-				currentTimeAnimation = 0;
-				UE_LOG(LogTemp, Warning, TEXT("APD_GenericController::Tick: Finalizando animacion de movimiento. El character no logro llegar a su destino!"));
-				isMoving = false;
-				OnAnimationEnd();
-
-			}
-			*/
 	}
 	
 }
@@ -189,6 +174,7 @@ void APD_GenericController::MoveWithSpline()
 
 		if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{
+			IsCalculatingMovePath = true;
 			//Animacion de andar
 			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 			if (AnimInst) {
@@ -233,7 +219,7 @@ void APD_GenericController::MoveWithSpline()
 			isMoving = false;
 			distance = 0;
 			OnAnimationEnd();
-
+			IsCalculatingMovePath = false;
 			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 			if (AnimInst) {
 				UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "BackToIdle");
@@ -269,9 +255,20 @@ void APD_GenericController::UpdateRotationCharacterToEnemy(FVector target)
 APD_SplineActors* APD_GenericController::GetSpline()
 {
 	if (spline)
+	{
 		return spline;
-	else
-		return nullptr;
+	}
+	else //Si no existe, pide uno al Spline Manager ->  devuelve ese
+	{
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacter()->GetGameInstance());
+		if (SGI)
+		{
+			SetSpline(SGI->gameManager->splineManager->GetSpline());
+			return spline;
+		}
+		else
+			return nullptr;
+	}
 }
 
 void APD_GenericController::SetSpline(APD_SplineActors* newSpline)
