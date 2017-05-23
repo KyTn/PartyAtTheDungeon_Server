@@ -7,7 +7,7 @@
 #include "Structs/PD_ServerEnums.h"
 #include "PD_E_ElementActor.generated.h"
 
-
+class UPD_ServerGameInstance;
 
 
 UCLASS()
@@ -20,6 +20,11 @@ public:
 	APD_E_ElementActor();
 
 	PD_MG_LogicPosition ActualLogicPosition;
+	UPD_ServerGameInstance* SGI; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
+	MapSkinType mapSkin;
+
 
 
 	// Called when the game starts or when spawned
@@ -28,12 +33,13 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	//UPROPERTY(EditAnywhere, Category = "Material Type")
-		MapSkinType mapSkin;
 
 	UFUNCTION(BlueprintCallable, Category = "Element Actor")
 	MapSkinType GetMaterialSkin() { return mapSkin; };
 
 	UFUNCTION(BlueprintCallable, Category = "Element Actor")
-	void SetMaterialSkin(MapSkinType inMaterialSkin) { mapSkin = inMaterialSkin; };
+	void SetMaterialSkin(MapSkinType inMaterialSkin);
+
+	private:
+		void ChangeMaterialProperties_MapSkin();
 };

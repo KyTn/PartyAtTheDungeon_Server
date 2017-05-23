@@ -169,7 +169,9 @@ struct RoomTemplateInfo {
 
 	// devuelve un MapSkin aleatorio de entre los que puede ser, sin tener en cuenta las habitaciones adyacentes 
 	MapSkinType ChooseOneMapSkin() {
-		return TAGS[FMath::RandRange(0, TAGS.Num() -1)];
+		MapSkinType m = TAGS[FMath::RandRange(0, TAGS.Num() - 1)];
+		UE_LOG(LogTemp, Error, TEXT("RoomTemplateInfo::ChooseOneMapSkin -> choosed: %d"), (int)m);
+		return m;
 	}
 
 	// Funcion que contiene las reglas de generacion de las skins 

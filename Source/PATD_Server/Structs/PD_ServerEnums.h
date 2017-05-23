@@ -126,7 +126,13 @@ enum class EAnimationType { Iddle, Move, Attack };
 
 // tipo de mapskin
 UENUM(BlueprintType)
-enum class MapSkinType { DUNGEON_NORMAL = 0, GARDEN = 10, LIBRARY = 20, SACRIFICE = 30, BOSS = 100 };
+enum class MapSkinType : uint8{ 
+	DUNGEON_NORMAL = 0 UMETA(DisplayName = "DUNGEON_NORMAL"), 
+	GARDEN = 10 UMETA(DisplayName = "GARDEN"), 
+	LIBRARY = 20 UMETA(DisplayName = "LIBRARY"), 
+	SACRIFICE = 30 UMETA(DisplayName = "SACRIFICE"), 
+	BOSS = 100 UMETA(DisplayName = "BOSS")
+};
 
 // elementos que puedes encontrar en el fichero de roomtemplates 
 enum class StaticMapElementInRoomTemplate { EMPTY = 'O', NORMAL_TILE = '.', SPECIAL_TILE = ',', WALL_ONLY = 'W', WALL_OR_DOOR = 'w', DOOR = 'd', /*SPAWN_POINT = 's',*/ COLUMN = 'c', PROP_CHEST = 't' };
@@ -134,7 +140,7 @@ enum class StaticMapElementInRoomTemplate { EMPTY = 'O', NORMAL_TILE = '.', SPEC
 // id de cada tipo diferente de prop (dependiente del mapskintype)
 
 UENUM(BlueprintType)
-enum class StaticMapElement {
+enum class StaticMapElement : uint8 {
 	// del 0 al 9, elementos empty default
 	EMPTY = 0,
 	// del 10 al 19 elementos default

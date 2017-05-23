@@ -117,17 +117,25 @@ RoomTemplateInfo PD_MG_MapGenerationUtils::FillRoomTemplateInfoWith(FString read
 void PD_MG_MapGenerationUtils::ParseTags(TArray<MapSkinType> &tags, FString braquets) {
 	tags.Empty();
 
-	TArray<FString> s;
+	TArray<FString> s1 = TArray<FString>(), s = TArray<FString>();
+	braquets.ParseIntoArray(s1, TEXT(":"), true);
+	for (int i = 0; i < s1.Num(); i++) {
+		UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::ParseTags s[%d] -> MapSkinType %s"), i, *(s1[i]));
+	}
+	s1[1].ParseIntoArray(s, TEXT(","), true);
 
-	braquets.ParseIntoArray(s, TEXT(","), true);
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::ParseTags - brackets-%s-"), *braquets);
 
 	if (s.Num() == 0) {
+		UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::ParseTags s == 0 -> aplicando MapSkinType::DUNGEON_NORMAL"));
 		tags.Add(MapSkinType::DUNGEON_NORMAL);
 		return;
 	}
 
 	for (int i = 0; i < s.Num(); i++) {
-		tags.Add(MapSkinType(FCString::Atoi( *(s[i]) )));
+		MapSkinType m = MapSkinType(FCString::Atoi(*(s[i])));
+		UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::ParseTags s == 0 -> aplicando MapSkinType::%d"), (int)m);
+		tags.Add(m);
 	}
 
 }
@@ -634,6 +642,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	// INIT NETMAPDATA //
 	/////////////////////
 
+#pragma region INIT MAP DATA
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02 init net map data"));
 
 	M.NETMAPDATA->MISSION_TYPE = (int)MatchConfigMan->Get_MissionType();
@@ -649,7 +658,8 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	M.NETMAPDATA->interactuableId = TArray<uint32>();
 	M.NETMAPDATA->interactuableComposition = TArray<uint16>();
 	M.NETMAPDATA->enemyComposition = TArray<uint32>();
-
+	
+#pragma endregion
 
 	////////////////////////////////
 	//  ELEGIR HABITACION INICIAL //
@@ -974,12 +984,15 @@ MapSkinType PD_MG_MapGenerationUtils::ChoosesSkinRules(RoomTemplateInfo &R, TArr
 	TArray<MapSkinType> choosables = TArray<MapSkinType>();
 
 	for (int i = 0; i < ChoosableMapSkins.Num(); i++) {
+		UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::ChoosesSkinRules -> ChoosableMapSkins %d"), (int)ChoosableMapSkins[i]);
+
 		if (R.MatchSkins(R.ChoosedTag, ChoosableMapSkins[i])) {
 			choosables.Add(ChoosableMapSkins[i]);
 		}
 	}
-
-	return choosables[FMath::RandRange(0, choosables.Num() - 1)];
+	MapSkinType m = choosables[FMath::RandRange(0, choosables.Num() - 1)];
+	UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::ChoosesSkinRules -> choosed %d"), (int)m);
+	return m;
 }
 
 

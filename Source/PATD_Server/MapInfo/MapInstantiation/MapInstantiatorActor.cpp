@@ -41,7 +41,8 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 
 
 #pragma region MAPSKIN DUNGEON
-static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/MapElements/MapSkins/DUNGEON/BP_Dungeon_SpecialTile_01.BP_Dungeon_SpecialTile_01'"));
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/MapElements/ESCENARIOS/SKIN_DUNGEON/BP_Dungeon_SpecialTile_01.BP_Dungeon_SpecialTile_01'"));
 	if (Dungeon_SpecialTile_Blueprint.Object) {
 		Dungeon_SpecialTile_Class = (UClass*)TileBlueprint.Object->GeneratedClass;
 	}
@@ -50,9 +51,6 @@ static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_SpecialTile_Bluepri
 	if (Dungeon_Prop_Treasure_01_Blueprint.Object) {
 		Dungeon_Prop_Treasure_01_Class = (UClass*)Dungeon_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
 	}
-
-
-
 	
 #pragma endregion 
 
