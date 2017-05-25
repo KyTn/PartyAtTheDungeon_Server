@@ -46,6 +46,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	FVector moveTargetPosition;
 
+
+	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
+		bool SetCameraOnView();
+
 	//bool IsMoving();
 
 	ECameraMoveState moveState= ECameraMoveState::Patrol;
