@@ -13,6 +13,7 @@ EBTNodeResult::Type UPD_IA_TaskBehaviourSelector::ExecuteTask(UBehaviorTreeCompo
 
 	SelectBehaviour(OwnerComp);
 	SelectGoals(OwnerComp);
+	
 /*
 	switch (logicCharacter->GetIAPersonality())
 	{
@@ -40,7 +41,7 @@ void UPD_IA_TaskBehaviourSelector::SelectBehaviour(UBehaviorTreeComponent & Owne
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 	float percentHP = (logicCharacter->GetTotalStats()->HPCurrent / logicCharacter->GetTotalStats()->HPTotal) * 100;
 
-
+	TArray<EIABehaviour> validBehaviours;
 	//mele 
 	if (logicCharacter->GetTypeCharacter() == ECharacterType::OrcMelee) {
 
@@ -61,7 +62,7 @@ void UPD_IA_TaskBehaviourSelector::SelectBehaviour(UBehaviorTreeComponent & Owne
 			minHPBerserkerCalc = warlike_minHPBerserker;
 		}*/
 
-		TArray<EIABehaviour> validBehaviours;
+		
 
 		//Aqui se comprueba el porcentaje de vida real y se elige el comportamiento
 		if (percentHP > minHPHalfLife) { // Set de comportamientos a full vida
@@ -100,6 +101,9 @@ void UPD_IA_TaskBehaviourSelector::SelectBehaviour(UBehaviorTreeComponent & Owne
 
 
 	}
+
+
+	SelectInSetBehaviour(OwnerComp, validBehaviours);
 }
 
 void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent & OwnerComp,TArray<EIABehaviour> validBehaviours) {
