@@ -105,9 +105,11 @@ int PD_PlayersManager::GetIndexClientMaster() {
 
 StructPlayer* PD_PlayersManager::GetStructPlayerByIDClient(FString ID_ClientToSearch)
 {
+	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : buscando a %s"), *ID_ClientToSearch);
+
 	for (int i = 0; i < dataPlayers.Num(); i++) {
-		if (dataPlayers[i]->ID_Client == ID_ClientToSearch) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->ID_Client);
+		if (dataPlayers[i]->logic_Character->GetIDCharacter() == ID_ClientToSearch) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
 			return dataPlayers[i];
 		}
 	}

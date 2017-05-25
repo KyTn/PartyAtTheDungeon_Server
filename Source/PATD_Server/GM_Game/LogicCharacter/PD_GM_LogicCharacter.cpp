@@ -153,8 +153,9 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	{
 		case ActiveSkills::BasicAttack:
 		{
-			//controller->UpdateRotationCharacterToEnemy(FVector(100, 0, 0)); //Pasarle la direccion del enemigo al que va a atacar
-			controller->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: BasicAttack "));
+			
+			//controller->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
@@ -169,22 +170,30 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::Defense:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: Defense "));
+
 			Skill_Defense(this);
 			break;
 		}
 		case ActiveSkills::WhenFua:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: WhenFua "));
+
 			Skill_Melee_Daggers_WhenFua(this);
 			break;
 		}
 		case ActiveSkills::JumpFatTigger:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: JumpFatTigger "));
+
 			PD_MG_LogicPosition positionToJump = PD_MG_LogicPosition(action.positions[0].positionX, action.positions[0].positionY);
 			Skill_Melee_LargeSword_JumpFatTigger(this, positionToJump);
 			break;
 		}
 		case ActiveSkills::Hostion:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: Hostion "));
+
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
@@ -199,6 +208,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::SomeHit:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: SomeHit "));
+
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
@@ -213,6 +224,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::RightInTheAsshole:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: RightInTheAsshole "));
+
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
@@ -227,6 +240,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::GiveMeTheFireBlast:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: GiveMeTheFireBlast "));
+
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
@@ -241,17 +256,23 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::Exclaimchas:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: Exclaimchas "));
+
 			PD_MG_LogicPosition positionToTeleport = PD_MG_LogicPosition(action.positions[0].positionX, action.positions[0].positionY);
 			Skill_Magic_ExclaimChas(this, positionToTeleport);
 			break;
 		}
 		case ActiveSkills::BeInCrossroads:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: BeInCrossroads "));
+
 			Skill_Magic_BeInCrossroads(this);
 			break;
 		}
 		case ActiveSkills::WhoHeal:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: WhoHeal "));
+
 			PD_GM_LogicCharacter* characterToHeal = nullptr;
 			if (isPlayer)
 				characterToHeal = playersManager->GetCharacterByID(action.id_character[0]);
@@ -266,6 +287,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::ShotMana:
 		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: ShotMana "));
+
 			Skill_Magic_ShotMana(this);
 			break;
 		}
@@ -317,13 +340,20 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 	
 	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s  come %d de daño y tiene ahora %d de vida"), *GetIDCharacter(), updateLife,GetTotalStats()->HPCurrent);
 	if (GetTotalStats()->HPCurrent <= 0) {
-		GetCharacterBP()->SetActorHiddenInGame(true);
+		//GetCharacterBP()->SetActorHiddenInGame(true);
 		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s se murio"),*GetIDCharacter());
 		if (isPlayer) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "HAS PERDIDO PRINGAO!");
 	}
 
-	
-	
+	if (updateLife < 0.0f) {
+		//lanzar animacion de pain
+		this->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+	}
+	else {
+
+		//FX de la curacion sobre el afectado
+		Cast<APD_E_Character>(this->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
+	}
 }
 
 //Devuelve la tirada que le pidan para resolver los conflictos
@@ -665,6 +695,10 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 	 1.5 - Comprobar reductores de daño 
 	 2. Lanzar el ataque
 	*/
+
+	//Rotar al character hacia la direccion donde esta su enemigo
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
 	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
 	{
 		//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
@@ -689,8 +723,7 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
-		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+		
 	}
 	else  //Fallo del Ataque
 	{
@@ -778,9 +811,6 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
 				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
-
-				//lanzar animacion de pain
-				enemyManager->GetEnemies()[j]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 			}
 		}
 	}
@@ -797,6 +827,7 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 	4. Quitar la vida a l enemigo
 	5. Animaciones
 	*/
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 	int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 	int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
@@ -812,7 +843,6 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 
 	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
 
-	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 }
 
 /*RANGO*/
@@ -826,6 +856,9 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 	*/
 	///NOTA: si vemos que va mal lo de la repeticion de las animaciones (que no se repite o da problemas) se quitara y se dejaria un efecto FX
 	//Se pone 2, para que se haga una rafaga de disparos -> pero se puede poner la cifra que se quiera. 
+
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
 	for (int i = 0; i < 2; i++)
 	{
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
@@ -846,10 +879,8 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 	}
-	
-	//lanzar animacion de pain - Solo se ha de activar una vez la animacion de daño del atacado, para hacerlo mas rapido
-	CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 }
+
 ///Range
 void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* CharWhoAttacks, PD_GM_LogicCharacter* CharWhoReceiveTheAttacks)
 {
@@ -860,6 +891,8 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 	3. lanzar las respectivas animaciones
 	*/
 	
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
 		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
@@ -867,9 +900,6 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 
 		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 
-		//lanzar animacion de pain
-		CharWhoReceiveTheAttacks->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
-	
 		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
 		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
@@ -964,9 +994,6 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
 				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 				enemyManager->GetEnemies()[j]->UpdateHPCurrent(totalDamage);
-
-				//lanzar animacion de pain
-				enemyManager->GetEnemies()[j]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 			}
 		}
 	}
@@ -982,11 +1009,10 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 	4. quitar los estados del afectado
 	*/
 
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
 	//animacion de casteo de habilidad
 	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
-
-	//FX de la curacion sobre el afectado
-	Cast<APD_E_Character>(CharWhoReceiveTheAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
 
 	CharWhoReceiveTheAttacks->UpdateHPCurrent(20);
 
