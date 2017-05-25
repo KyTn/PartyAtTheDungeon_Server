@@ -41,6 +41,8 @@ PD_GM_LogicCharacter::PD_GM_LogicCharacter()
 
 PD_GM_LogicCharacter::~PD_GM_LogicCharacter()
 {
+	delete character_Player_BP;
+	delete controller;
 }
 
 /* ==============
