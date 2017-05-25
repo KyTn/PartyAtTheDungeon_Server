@@ -15,7 +15,7 @@ class PATD_SERVER_API UPD_IA_TaskDefenseTargetCalc : public UBTTaskNode
 	
 		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	void CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp);
+	bool CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp);
 	
 	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
 		float APDefense = 3;

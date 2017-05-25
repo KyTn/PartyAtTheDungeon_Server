@@ -51,15 +51,18 @@ void AServerCamera::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 	Super::Tick(DeltaTime);
 	if (moveState == ECameraMoveState::Moving) {
+		
 
 		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{//continua moviendose
-			
+			UE_LOG(LogTemp, Warning, TEXT("AServerCamera::Tick:: Objetivo:%d "), *moveTargetPosition.ToString());
+
 			FVector incrementPosition = velocity*DeltaTime*targetDirection; //target direction es un vector
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento:%s"), *incrementPosition.ToString());
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento valores:%s"), *targetDirection.ToString());
-			SetActorLocation(GetActorLocation()+incrementPosition);
+			FVector newLocation=GetActorLocation() + incrementPosition;
+			SetActorLocation(newLocation);
 
 			
 		}

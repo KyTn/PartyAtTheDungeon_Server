@@ -2,22 +2,20 @@
 
 #pragma once
 
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "PD_IA_TaskAttackTargetCalc.generated.h"
+#include "BehaviorTree/BTTaskNode.h"
+#include "PD_IA_TaskFleeTargetCalc.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PATD_SERVER_API UPD_IA_TaskAttackTargetCalc : public UBTTaskNode
+class PATD_SERVER_API UPD_IA_TaskFleeTargetCalc : public UBTTaskNode
 {
-	GENERATED_BODY()
-	
+		GENERATED_BODY()
 	
 		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	bool CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp);
-
-
+	
 	
 };

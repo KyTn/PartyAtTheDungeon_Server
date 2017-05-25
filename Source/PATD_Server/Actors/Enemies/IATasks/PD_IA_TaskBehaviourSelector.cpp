@@ -9,8 +9,11 @@
 
 EBTNodeResult::Type UPD_IA_TaskBehaviourSelector::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
-	
+	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
+
+	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: Id:%s  PeronalityCode:%d  EnemyType:%d"), *logicCharacter->GetIDCharacter(), (int)logicCharacter->GetIAPersonality(), (int)logicCharacter->GetTypeCharacter());
 	SelectBehaviour(OwnerComp);
 	SelectGoals(OwnerComp);
 	
@@ -41,9 +44,9 @@ void UPD_IA_TaskBehaviourSelector::SelectBehaviour(UBehaviorTreeComponent & Owne
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 	float percentHP = (logicCharacter->GetTotalStats()->HPCurrent / logicCharacter->GetTotalStats()->HPTotal) * 100;
 
-	TArray<EIABehaviour> validBehaviours;
+	TArray<TEnumAsByte<EIABehaviour>> validBehaviours;
 	//mele 
-	if (logicCharacter->GetTypeCharacter() == ECharacterType::OrcMelee) {
+//	if (logicCharacter->GetTypeCharacter() == ECharacterType::OrcMelee) {
 
 		//Se elige entre atacar, defender, huir y berserker por porcentaje de vida parametizable inicialmente
 
@@ -68,45 +71,51 @@ void UPD_IA_TaskBehaviourSelector::SelectBehaviour(UBehaviorTreeComponent & Owne
 		if (percentHP > minHPHalfLife) { // Set de comportamientos a full vida
 
 		//	
+			validBehaviours = behaviourSetFullHP;
+			/*validBehaviours.Add(EIABehaviour::Flee);
 			validBehaviours.Add(EIABehaviour::Attack);
 			validBehaviours.Add(EIABehaviour::Defense);
-			validBehaviours.Add(EIABehaviour::Swindler);
+			validBehaviours.Add(EIABehaviour::Swindler);*/
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectedBehaviour: bloque FULL_LIFE"));
 			
 		}
 		else if (percentHP < minHPHalfLife && percentHP>minHPAlmostDead) { //Set de comportamientos a media vida
 
-			validBehaviours.Add(EIABehaviour::Attack);
+			validBehaviours = behaviourSetHalfLife;
+
+			/*validBehaviours.Add(EIABehaviour::Attack);
 			validBehaviours.Add(EIABehaviour::Defense);
 			validBehaviours.Add(EIABehaviour::Swindler);
-			validBehaviours.Add(EIABehaviour::Flee);
+			validBehaviours.Add(EIABehaviour::Flee);*/
 			
 			
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectedBehaviour: bloque HALF_LIFE"));
 		}
 		else if (percentHP < minHPAlmostDead) { //Set de comportamientos casi muerto
 
-			validBehaviours.Add(EIABehaviour::Defense);
+			validBehaviours = behaviourSetAlmostDead;
+
+			/*validBehaviours.Add(EIABehaviour::Defense);
 			validBehaviours.Add(EIABehaviour::Flee);
-			validBehaviours.Add(EIABehaviour::Berserker);
+			validBehaviours.Add(EIABehaviour::Berserker);*/
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectedBehaviour: bloque ALMOST_DEAD"));
 		}
 
 		//Casos especiales
 
-	}
+	//}
 	//Rango
-	else if (logicCharacter->GetTypeCharacter() == ECharacterType::OrcBow
+/*	else if (logicCharacter->GetTypeCharacter() == ECharacterType::OrcBow
 		|| logicCharacter->GetTypeCharacter() == ECharacterType::OrcGuns) {
 
 
 	}
-
+	*/
 
 	SelectInSetBehaviour(OwnerComp, validBehaviours);
 }
 
-void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent & OwnerComp,TArray<EIABehaviour> validBehaviours) {
+void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent & OwnerComp, TArray<TEnumAsByte<EIABehaviour>> validBehaviours) {
 	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
@@ -116,9 +125,10 @@ void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent &
 		if (behaviourSelected) break;
 
 		int roll= logicCharacter->GetARoll(1, 100);
-		switch (validBehaviours[iBehaviours]) {
+		switch (validBehaviours[iBehaviours].GetValue()) {
 		case EIABehaviour::Attack: 
 		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectInSetBehaviour: probando con Attack"));
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) {
 				roll += 10;
 			}
@@ -132,6 +142,7 @@ void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent &
 		}
 		case EIABehaviour::Defense:
 		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectInSetBehaviour: probando con Defense"));
 
 			if (roll < defenseProb) {
 				AIController->selectedBehaviour = EIABehaviour::Defense;
@@ -141,6 +152,7 @@ void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent &
 		}
 		case EIABehaviour::Flee:
 		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectInSetBehaviour: probando con Flee"));
 
 			if (roll < fleeProb) {
 				AIController->selectedBehaviour = EIABehaviour::Flee;
@@ -150,6 +162,8 @@ void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent &
 		}
 		case EIABehaviour::Swindler:
 		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectInSetBehaviour: probando con Swindler"));
+
 			if (roll < swindlerProb) {
 				AIController->selectedBehaviour = EIABehaviour::Swindler;
 				behaviourSelected = true;
@@ -158,6 +172,8 @@ void UPD_IA_TaskBehaviourSelector::SelectInSetBehaviour(UBehaviorTreeComponent &
 		}
 		case EIABehaviour::Berserker:
 		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectInSetBehaviour: probando con Berserker"));
+
 			if (roll < berserkerProb) {
 				AIController->selectedBehaviour = EIABehaviour::Berserker;
 				behaviourSelected = true;
@@ -224,13 +240,23 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		case EIABehaviour::Flee:
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Flee"));
-			PD_MG_LogicPosition positionToFlee = AIController->GetClosestDoorPosition();
-			AIController->goalPosition = positionToFlee;
+			//PD_MG_LogicPosition positionToFlee = AIController->GetClosestDoorPosition();
+			if (AIController->GetMostHPEnemy()->GetIDCharacter()!= logicCharacter->GetIDCharacter()){
+				PD_MG_LogicPosition positionToFlee = AIController->GetMostHPEnemy()->GetCurrentLogicalPosition();
+				AIController->goalPosition = positionToFlee;
+			}
+			else {
+				//Si no hay nadie con mas vida pasa a modo berserker
+				AIController->selectedBehaviour = EIABehaviour::Defense;
+				SelectGoals( OwnerComp);
+			}
 
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Coward) {
 				//Falta que puedan elegir otras posiciones, como el inteligente. o aleatoria el cobarde
 			}
+			AIController->turnsForGoal = 1;
 			break;
+			
 		}
 		case EIABehaviour::Berserker:
 		{
@@ -244,10 +270,10 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 				AIController->goalCharacter = AIController->GetLeastHPPlayer();
 
 			}else if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) {
-				AIController->turnsForGoal = 1000; //Ponemos esto para que nunca deje de perseguir a ese mismo objetivo
+				//AIController->turnsForGoal = 1000; //Ponemos esto para que nunca deje de perseguir a ese mismo objetivo
 			}	
 			else if (logicCharacter->GetIAPersonality() == EIAPersonality::Coward) {
-				AIController->turnsForGoal = 2; //Este comportamiento tiene 2 fases, una en la que ataca y otra en el que huye
+				//AIController->turnsForGoal = 2; //Este comportamiento tiene 2 fases, una en la que ataca y otra en el que huye
 			}
 			break;
 		}

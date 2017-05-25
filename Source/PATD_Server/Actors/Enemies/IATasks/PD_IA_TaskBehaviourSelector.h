@@ -46,6 +46,12 @@ class PATD_SERVER_API UPD_IA_TaskBehaviourSelector : public UBTTaskNode
 	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
 		int berserkerProb = 60;
 
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		TArray<TEnumAsByte<EIABehaviour>> behaviourSetFullHP;
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		TArray<TEnumAsByte<EIABehaviour>> behaviourSetHalfLife;
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		TArray<TEnumAsByte<EIABehaviour>> behaviourSetAlmostDead;
 
 	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
 		TEnumAsByte<EIABehaviour> warlikeDefaultBehaviour ;
@@ -59,7 +65,7 @@ class PATD_SERVER_API UPD_IA_TaskBehaviourSelector : public UBTTaskNode
 		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
 		void SelectBehaviour(UBehaviorTreeComponent & OwnerComp);
-		void SelectInSetBehaviour(UBehaviorTreeComponent & OwnerComp, TArray<EIABehaviour> validBehaviours);
+		void SelectInSetBehaviour(UBehaviorTreeComponent & OwnerComp, TArray<TEnumAsByte<EIABehaviour>> validBehaviours);
 
 		void SelectGoals(UBehaviorTreeComponent & OwnerComp);
 		//UPD_IA_TaskBehaviourSelector(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer);

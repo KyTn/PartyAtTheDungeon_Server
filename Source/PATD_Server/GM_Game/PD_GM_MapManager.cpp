@@ -515,12 +515,11 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	InstantiateEnemies();
 
 
+
 }
 
 void PD_GM_MapManager::InstantiateEnemies() {
 	ECharacterType enemyType;
-
-	bool unaVez = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
@@ -532,12 +531,7 @@ void PD_GM_MapManager::InstantiateEnemies() {
 			PD_GM_LogicCharacter* logicCha = nullptr;
 			bool enemyInstantiated = false;
 
-			if (!unaVez) {
-				UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Instanciando forzado"));
-
-				enemyType = ECharacterType::OrcMelee;
-				unaVez = true;
-			}
+	
 
 			switch (enemyType)
 			{

@@ -50,6 +50,7 @@ public:
 //	TArray<PD_GM_LogicCharacter*> GetPlayersInRange();
 	PD_GM_LogicCharacter* GetClosestPlayer();
 	PD_GM_LogicCharacter* GetLeastHPPlayer();
+	PD_GM_LogicCharacter* GetMostHPEnemy();
 	PD_MG_LogicPosition GetClosestDoorPosition();
 	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character);
 	/*

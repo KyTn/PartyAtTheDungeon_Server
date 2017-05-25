@@ -9,12 +9,16 @@
 
 EBTNodeResult::Type UPD_IA_TaskDefenseTargetCalc::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
-	CalculateTurnTarget(OwnerComp);
-	return EBTNodeResult::Succeeded;
+	if (CalculateTurnTarget(OwnerComp)) {
+		return EBTNodeResult::Succeeded;
+	}
+	else {
+		return EBTNodeResult::Failed;
+	}
 }
 
 
-void UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp) {
+bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp) {
 	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
@@ -25,6 +29,7 @@ void UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 	listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
 	if (listPathPosition.Num() == 0) {
 		//ERROR, mirar como lo tratamos
+		return false;
 	}
 
 	int AP = logicCharacter->GetTotalStats()->APTotal;
@@ -63,6 +68,12 @@ void UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 		AIController->turnNumAttacks = AP;
 	}
 
-
+	if (AIController->turnNumAttacks > 0 && logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) {
+		//Si llega a atacar, despues se le olvida defender.
+		AIController->turnNumAttacks += APDefense;
+		AIController->turnTargetCharacter = AIController->goalCharacter;
+	}
+		
+	return true;
 
 }

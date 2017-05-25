@@ -109,6 +109,12 @@ PD_GM_LogicCharacter* PD_GM_EnemyManager::GetCharacterByID(FString id) {
 	return nullptr;
 }
 
+PD_GM_LogicCharacter* PD_GM_EnemyManager::GetCharacterByIndex(int iEnemy) {
+	return enemies[iEnemy];
+	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_EnemyManager:: GetCharacterByIndex ERROR: No se ha encontrado character con indice %d"), *iEnemy);
+	//return nullptr;
+}
+
 int PD_GM_EnemyManager::GetIndexByID(FString id) {
 	for (int i = 0; i < enemies.Num(); i++) {
 		if (enemies[i]->GetIDCharacter() == id) {

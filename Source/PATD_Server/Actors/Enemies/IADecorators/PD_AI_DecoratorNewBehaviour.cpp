@@ -9,6 +9,7 @@
 bool UPD_AI_DecoratorNewBehaviour::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+	UE_LOG(LogTemp, Log, TEXT("UPD_AI_DecoratorNewBehaviour:: Entrando a NewBehaviour: turnForGoal%d"), AIController->turnsForGoal);
 
-	return AIController->turnsForGoal==0;
+	return AIController->turnsForGoal<=0;
 }
