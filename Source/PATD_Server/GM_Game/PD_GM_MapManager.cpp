@@ -532,13 +532,6 @@ void PD_GM_MapManager::InstantiateEnemies() {
 			PD_GM_LogicCharacter* logicCha = nullptr;
 			bool enemyInstantiated = false;
 
-			if (!unaVez) {
-				UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Instanciando forzado"));
-
-				enemyType = ECharacterType::OrcMelee;
-				unaVez = true;
-			}
-
 			switch (enemyType)
 			{
 			case ECharacterType::OrcBow:
@@ -658,7 +651,7 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 				//STATS
 				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
-				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+				logicCha->SetInitBaseStats(charac->GetBaseHP(), charac->GetBaseDamage(), charac->GetBaseAP());
 
 				//IA
 				if (charac->generateRandomPersonality) {
