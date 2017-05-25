@@ -21,6 +21,12 @@ void PD_GM_EnemyManager::AddEnemy(PD_GM_LogicCharacter* enemy) {
 	
 }
 
+void PD_GM_EnemyManager::DeleteEnemy(PD_GM_LogicCharacter* enemy) {
+	enemies.Remove(enemy);
+	enemy->~PD_GM_LogicCharacter();
+	//delete enemy;
+}
+
 TArray<PD_GM_LogicCharacter*> PD_GM_EnemyManager::GetEnemies() {
 	return enemies;
 }

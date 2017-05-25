@@ -515,11 +515,12 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	InstantiateEnemies();
 
 
-
 }
 
 void PD_GM_MapManager::InstantiateEnemies() {
 	ECharacterType enemyType;
+
+	bool unaVez = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
@@ -530,8 +531,6 @@ void PD_GM_MapManager::InstantiateEnemies() {
 			APD_E_Character* charac = nullptr;
 			PD_GM_LogicCharacter* logicCha = nullptr;
 			bool enemyInstantiated = false;
-
-	
 
 			switch (enemyType)
 			{
@@ -652,7 +651,7 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 				//STATS
 				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
-				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+				logicCha->SetInitBaseStats(charac->GetBaseHP(), charac->GetBaseDamage(), charac->GetBaseAP());
 
 				//IA
 				if (charac->generateRandomPersonality) {
