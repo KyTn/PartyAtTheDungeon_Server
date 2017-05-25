@@ -147,7 +147,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
 
-	controller->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
+	//controller->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
 
 	switch (ActiveSkills(action.id_action))
 	{
@@ -169,6 +169,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		}
 		case ActiveSkills::Defense:
 		{
+			Skill_Defense(this);
 			break;
 		}
 		case ActiveSkills::WhenFua:
