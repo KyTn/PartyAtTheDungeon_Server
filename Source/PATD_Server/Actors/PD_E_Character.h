@@ -37,6 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
 		bool PlayAnimationSkill(int ID_Skill);
 
+	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
+		bool SetCharacterCameraOnView();
+
 	UPROPERTY(EditAnywhere, Category = "PD_IA")
 		UBehaviorTree* behaviorTree;
 

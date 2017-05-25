@@ -90,3 +90,21 @@ bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
 	}
 
 }
+
+bool APD_E_Character::SetCharacterCameraOnView()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("PutCameraPlayerOnView"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::SetCharacterCameraOnView -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::SetCharacterCameraOnView - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
+
+}

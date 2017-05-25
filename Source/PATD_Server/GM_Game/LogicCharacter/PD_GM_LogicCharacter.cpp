@@ -387,7 +387,7 @@ float PD_GM_LogicCharacter::ImpactPercentage()
 //Metodo para saber el porcentaje de bonus de la probabilidad de EVADIR
 float PD_GM_LogicCharacter::EvasionPercentage()
 {
-	float totalBonusEvasion = 1;
+	float totalBonusEvasion = 0;
 	/*
 	- OBJETIVO: devuelve el porcentaje de impacto bonus que se añade por pasivas u otras fuentes
 	- PROCESO:
@@ -699,6 +699,9 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 	//Rotar al character hacia la direccion donde esta su enemigo
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
+
 	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
 	{
 		//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
@@ -727,6 +730,8 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 	}
 	else  //Fallo del Ataque
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FALLO DE ATAQUE DEL CHARACTER !");
+
 		//lanzar animacion de defensa por parte del atacado
 		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
@@ -740,6 +745,7 @@ void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
 	2. Actualizar eso al final del turno de los enemigos
 	3. Tener en cuenta esto de la defensa en cualquier punto de ataque
 	*/
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::Defense, 1);
 
@@ -757,6 +763,8 @@ void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* Cha
 	 3. Si esta este, aumentar el ataque en 4 y poner a 0 el CD en el power up
 	*/
 
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhenFua);
 
 	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::WhenFua, 1);
@@ -773,6 +781,8 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 	2. Desplazar a la posicion pasada por parametro al personaje
 	3. Coger los enemigos adyacentes a esa posicion y quitarles el daño calculado
 	*/
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 	///NOTA: Comprobar que no se esperen en las animaciones para lanzar las animaciones - si no habria que hacer una animacion de salta y con el SetActorLocation
 	CharWhoAttacks->GetController()->GetSpline()->RemovePoints();
 	FVector posToMove = mapMng->LogicToWorldPosition(PositionToJump);
@@ -827,7 +837,11 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 	4. Quitar la vida a l enemigo
 	5. Animaciones
 	*/
+
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 
 	int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 	int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
@@ -857,7 +871,10 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 	///NOTA: si vemos que va mal lo de la repeticion de las animaciones (que no se repite o da problemas) se quitara y se dejaria un efecto FX
 	//Se pone 2, para que se haga una rafaga de disparos -> pero se puede poner la cifra que se quiera. 
 
+
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -890,7 +907,8 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 	2. hacerlo critico
 	3. lanzar las respectivas animaciones
 	*/
-	
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
@@ -916,6 +934,8 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	3. Lanzar bola de fuego
 	*/
 	///NOTA: Hay que comprobar el metodo ReceiveHit de los characteres, lo suyo seria que al chocar la bola de fuego es cuando se quita la vida y se ejecuta la animacion de pain y tal
+	
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	//Lanzar animacion de casteo de habilidad
 	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
@@ -935,7 +955,9 @@ void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWho
 	3. SetActorLocation con la nueva posicion
 	4. Actualizar CurrentPosition
 	*/
-	
+
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 	FVector vectorToTeleport = FVector(mapMng->LogicToWorldPosition(PositionToTeleport));
 	
 	//Animacionde Casteo de Habilidad
@@ -958,6 +980,8 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 	4. Updatear la vida de los enemigos afectados
 	5. Animacion de pain de los enemigos afectados
 	*/
+
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 
@@ -1011,6 +1035,8 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+
 	//animacion de casteo de habilidad
 	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
 
@@ -1031,6 +1057,8 @@ void PD_GM_LogicCharacter::Skill_Magic_ShotMana(PD_GM_LogicCharacter* CharWhoAtt
 
 	///NOTA: ! Hay que pasar esta informacion a los clientes para que se actualicen
 	//animacion de cast de habilidad
+
+	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	//FX de curacion
 	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);

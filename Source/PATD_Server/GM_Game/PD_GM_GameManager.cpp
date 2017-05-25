@@ -23,8 +23,10 @@
 #include "Actors/PD_TimerGame.h"
 #include "Actors/Enemies/PD_AIController.h"
 #include "Actors/PD_GenericController.h"
-
+#include "Actors/PD_E_Character.h"
+#include "ServerCamera.h"
 #include "Structs/PD_NetStructs.h"
+
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer)
 {
 	TotalPoints = 0;
@@ -215,6 +217,13 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/
 	else if (structGameState->enumGameState == EGameState::WaitingEnemiesOrders) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: WaitingEnemiesOrders"));
+
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		if (SGI)
+		{
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
+		}
+
 		enemyManager->newTurn();
 		CreateEnemyOrders();
 		UpdateState();
@@ -879,6 +888,8 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 				{
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick - Si hay acciones que hacer"));
 
+					Cast<APD_E_Character>(logic_char->GetCharacterBP())->SetCharacterCameraOnView();
+
 					FStructTargetToAction action = playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions[index_action];
 					logic_char->ActionTo(action);
 				}
@@ -892,7 +903,11 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
 	{
+
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick enemigos"));
+
+
+		Cast<APD_E_Character>(enemyManager->GetCharacterByID(id_char)->GetCharacterBP())->SetCharacterCameraOnView();
 
 		int index_enemy = enemyManager->GetIndexByID(id_char);
 

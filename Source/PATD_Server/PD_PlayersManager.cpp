@@ -24,6 +24,7 @@ PD_PlayersManager::~PD_PlayersManager()
 void PD_PlayersManager::AddNewPlayer(FString newID_Client, int player) {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AddNewPlayer"));
 	StructPlayer* structPlayer = new StructPlayer();
+	structPlayer->logic_Character = new PD_GM_LogicCharacter();
 	structPlayer->ID_Client = newID_Client;
 	structPlayer->ID_PLAYER = player;
 	structPlayer->isConnected = true;
