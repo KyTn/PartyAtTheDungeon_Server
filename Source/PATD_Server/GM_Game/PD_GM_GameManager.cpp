@@ -343,7 +343,6 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 
 void PD_GM_GameManager::CreateEnemyOrders() {
-	UE_LOG(LogTemp, Log, TEXT("Enemigos totales: %d"), enemyManager->GetEnemies().Num());
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
@@ -1340,14 +1339,12 @@ void PD_GM_GameManager::OnBeginPhase()
 bool PD_GM_GameManager::CheckWinGameConditions()
 {
 	int enemiesDied = 0;
-	UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: Enemigos totales: %d"), enemyManager->GetEnemies().Num());
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 	{
 		if (enemyManager->GetEnemies()[i]->GetTotalStats()->HPCurrent <= 0)
 		{
 			enemiesDied++;
 			enemyManager->DeleteEnemy(enemyManager->GetEnemies()[i]);
-			//enemyManager->GetEnemies()[i]->GetCharacterBP()->SetActorHiddenInGame(true);
 		}
 		
 	}

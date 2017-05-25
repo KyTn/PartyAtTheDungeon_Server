@@ -22,7 +22,6 @@ void PD_GM_EnemyManager::AddEnemy(PD_GM_LogicCharacter* enemy) {
 }
 
 void PD_GM_EnemyManager::DeleteEnemy(PD_GM_LogicCharacter* enemy) {
-	UE_LOG(LogTemp, Log, TEXT("MUEREEEEE PUTA:%s"), *enemy->GetIDCharacter());
 	enemies.Remove(enemy);
 	enemy->~PD_GM_LogicCharacter();
 	//delete enemy;
