@@ -143,6 +143,7 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 
 bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 {
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: Iniciando ActionTo: "));
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
 
@@ -305,10 +306,12 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 	3. Comprobar si HPCurrent <= 0. Si es asi, actualizar la variable isDead
 	- SE LLAMA DESDE: Cualquier Actor - Personaje o Enemigo que dañe a otro
 	*/
-
+	
 	int updateLife = FMath::TruncToInt(updateLifeIn);
-
-	FMath::Clamp(0, (int)GetTotalStats()->HPTotal, (GetTotalStats()->HPCurrent + updateLife));
+	//int aa = (GetTotalStats()->HPCurrent + updateLife); //FMath::Clamp(0, (int)GetTotalStats()->HPTotal, (GetTotalStats()->HPCurrent + updateLife));
+	//UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:UpdateHPCurrent Vida actual: %d Vida futura: %d"),  GetTotalStats()->HPCurrent , aa);
+	
+	GetTotalStats()->HPCurrent=FMath::Clamp((GetTotalStats()->HPCurrent + updateLife),0, (int)GetTotalStats()->HPTotal );
 
 	
 	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter:%s  come %d de daño y tiene ahora %d de vida"), *GetIDCharacter(), updateLife,GetTotalStats()->HPCurrent);

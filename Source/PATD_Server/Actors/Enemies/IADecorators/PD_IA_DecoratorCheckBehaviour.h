@@ -18,7 +18,7 @@ class PATD_SERVER_API UPD_IA_DecoratorCheckBehaviour : public UBTDecorator
 
 public:
 	UPROPERTY(EditAnywhere, Category = Condition)
-		TEnumAsByte<EIABehaviour> AcceptableRadius;
+		TEnumAsByte<EIABehaviour> behaviour;
 	
 
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;

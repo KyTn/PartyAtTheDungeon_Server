@@ -15,7 +15,7 @@
 #include "Structs/PD_ServerStructs.h"
 
 EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory) {
-	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+/*	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
 	
@@ -71,4 +71,6 @@ EBTNodeResult::Type UPD_T_Move::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 	else
 		//UE_LOG(LogTemp, Log, TEXT("PD_T_Move:: Terminando por no .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		return EBTNodeResult::Succeeded;
+		*/
+	return EBTNodeResult::Succeeded;
 }

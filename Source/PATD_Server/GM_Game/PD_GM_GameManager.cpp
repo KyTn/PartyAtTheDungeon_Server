@@ -336,7 +336,7 @@ void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
-		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
+		controller->StartAITurnCalcultion(mapManager);
 	}
 }
 
@@ -858,7 +858,8 @@ void PD_GM_GameManager::VisualAttackTick() {
 
 			// de momento vamos a hacerlo de forma secuencial sin ordenar...
 			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
-				enemyManager->GetEnemies()[i]->GetController()->ActionTo(listAttack[index_action]);
+				//enemyManager->GetEnemies()[i]->GetController()->ActionTo(listAttack[index_action]);
+				enemyManager->GetEnemies()[i]->ActionTo(listAttack[index_action]);
 			}
 		}
 

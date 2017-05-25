@@ -15,7 +15,7 @@
 
 EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
-	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+/*	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 
 	int ap = OwnerComp.GetBlackboardComponent()->GetValueAsInt("AP");
 	UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack empezando .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
@@ -58,5 +58,6 @@ EBTNodeResult::Type UPD_T_Attack::ExecuteTask(UBehaviorTreeComponent & OwnerComp
 		//UE_LOG(LogTemp, Log, TEXT("PD_T_Attack:: task attack sin ap - finalizando  .ap:%d idEnemy:%s"), ap, *AIController->GetLogicCharacter()->GetIDCharacter());
 		return EBTNodeResult::Succeeded;
 	}
-		
+		*/
+	return EBTNodeResult::Succeeded;
 }

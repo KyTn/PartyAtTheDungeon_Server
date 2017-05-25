@@ -182,7 +182,7 @@ bool PD_PlayersManager::CheckPlayerIndex(int player) {
 		return true;
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: CheckPlayerState ERROR: El indice de player no es valido"));
+		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: CheckPlayerState ERROR: El indice %d de player no es valido"),player);
 		return false;
 	}
 }
@@ -197,7 +197,14 @@ PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByID(FString id) {
 	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
 	return nullptr;
 }
-
+PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByIndex(int i) {
+	if (CheckPlayerIndex(i)) {
+		return dataPlayers[i]->logic_Character;
+	}else {
+		return nullptr;
+	}
+	
+}
 
 #pragma region Map Already Instantiated FUNCTIONS
 
