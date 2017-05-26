@@ -162,10 +162,26 @@ PD_MG_LogicPosition APD_AIController::GetClosestDoorPosition() {
 }
 bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character) {
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
-	float iDistance = positionFrom.EuclideanDistance(character->GetCurrentLogicalPosition());
+	//float iDistance = positionFrom.EuclideanDistance(character->GetCurrentLogicalPosition());
+	
+	TArray<PD_MG_LogicPosition> listInRange=mapMng->GetAllTilesInRange(logicCharacter->weapon->RangeWeapon, positionFrom);
+	//TArray<PD_MG_LogicPosition> listInRange = mapMng->GetAllTilesInRange(2, positionFrom);
+
+	
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  Rango: %d"),  logicCharacter->weapon->RangeWeapon);
+	/*
 	if (iDistance > logicCharacter->weapon->RangeWeapon) {
 		return false;
+	}*/
+
+	if (!listInRange.Contains(character->GetCurrentLogicalPosition())) {
+		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  NO ESTA EN RANGO"));
+
+		return false;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  esta en rango a falta de raycast"));
+
 	FHitResult hit;
 	FVector iniPos = mapMng->LogicToWorldPosition(positionFrom);
 	iniPos.Z = 50;
@@ -175,7 +191,10 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Visibility);
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
-		return false;
+		
+		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
+
+		//return false;
 	}
 
 	return true;

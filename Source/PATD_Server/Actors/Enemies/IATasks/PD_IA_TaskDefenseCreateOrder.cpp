@@ -20,7 +20,7 @@ EBTNodeResult::Type UPD_IA_TaskDefenseCreateOrder::ExecuteTask(UBehaviorTreeComp
 
 	CreateMoveOrders(OwnerComp);
 	CreateAttackOrders(OwnerComp);
-
+	CreateDefenseOrders(OwnerComp);
 
 
 	return EBTNodeResult::Succeeded;

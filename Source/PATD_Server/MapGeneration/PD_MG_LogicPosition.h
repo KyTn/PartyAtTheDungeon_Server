@@ -94,6 +94,17 @@ public:
 		
 	}
 
+	TArray<PD_MG_LogicPosition> GetAllTilesInRange(float range, TArray<PD_MG_LogicPosition> list) {
+		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
+		for (int i = 0; i < list.Num(); i++) {
+			if (this->EuclideanDistance(list[i]) <= range) {
+				res.Add(list[i]);
+			}
+		}
+		return res;
+
+	}
+
 	TArray<PD_MG_LogicPosition> GetAdjacentsFromList(TArray<PD_MG_LogicPosition> list) {
 
 		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
@@ -130,5 +141,9 @@ public:
 		int result = deltaX + deltaY;
 		return sqrt(result);
 	}
+
+
+
+
 
 };

@@ -205,4 +205,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "SaveLoadData")
 		void LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range);
+
+	void LoadWeaponSpecificDataByType(TypeWeapons indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range);
 };

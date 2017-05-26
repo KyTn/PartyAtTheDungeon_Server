@@ -1197,6 +1197,31 @@ void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_wea
 }
 
 
+void UPD_ServerGameInstance::LoadWeaponSpecificDataByType(TypeWeapons typeWeaponID, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range)
+{
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Weapon num %d"), weapons.Num());
+
+		if (weapons.Num() > 0)
+		{
+			for (int i = 0; i < weapons.Num(); i++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Comparando typeWeaponID %d  con : %d"), (int)typeWeaponID, weapons[i].TypeWeapon);
+
+				if ((int)typeWeaponID == weapons[i].TypeWeapon)
+				{
+					UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Encontrada arma %d  Rango: %d"), (int)typeWeaponID,weapons[i].RangeWeapon);
+					id_weapon = weapons[i].ID_Weapon;
+					classWeapon = weapons[i].ClassWeapon;
+					typeWeapon = weapons[i].TypeWeapon;
+					damage = weapons[i].DMWeapon;
+					range = weapons[i].RangeWeapon;
+				}
+			}
+		}
+
+	
+}
+
 #pragma endregion
 
 #pragma region LoadDataFromFile
