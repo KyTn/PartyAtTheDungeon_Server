@@ -13,7 +13,10 @@ class PATD_SERVER_API UPD_IA_TaskDefenseCreateOrder : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
-	
-	
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	void CreateMoveOrders(UBehaviorTreeComponent& OwnerComp);
+	void CreateAttackOrders(UBehaviorTreeComponent& OwnerComp);
+	void CreateDefenseOrders(UBehaviorTreeComponent& OwnerComp);
 	
 };

@@ -14,6 +14,7 @@
 #include "Actors/PD_SplineActors.h"
 #include "GM_Game/PD_GM_SplineManager.h"
 #include"PD_ServerGameInstance.h"
+#include "Actors/Enemies/PD_AIController.h"
 //include of forward declaration
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "Actors/PD_GenericController.h"
@@ -153,8 +154,16 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_
 
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Diagonals_And_Adyacents_To(PD_MG_LogicPosition logPos) {
-
-	return logPos.GetDiagonalsAndAdjacentsFromList(MapInfo->allLogicPos);
+	if (MapInfo)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager: Get_LogicPosition_Diagonals_And_Adyacents_To hay MapInfo"));
+		return logPos.GetDiagonalsAndAdjacentsFromList(MapInfo->allLogicPos);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager: Get_LogicPosition_Diagonals_And_Adyacents_To NO HAY MapInfo"));
+		return TArray<PD_MG_LogicPosition>();
+	}
 }
 
 #pragma endregion
@@ -448,6 +457,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	{
 		FOutputDeviceNull ar;
 
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetMapManager(this);
+
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
 
@@ -514,10 +525,15 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 
 	}
 	InstantiateEnemies();
+
+
 }
 
 void PD_GM_MapManager::InstantiateEnemies() {
 	ECharacterType enemyType;
+
+	bool unaVez = false;
+
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
 		if (MapInfo->roomByLogPos[DynamicMapRef->GetLogicPositions()[i]]->IsInstantiated && !DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated) {
@@ -527,29 +543,38 @@ void PD_GM_MapManager::InstantiateEnemies() {
 			APD_E_Character* charac = nullptr;
 			PD_GM_LogicCharacter* logicCha = nullptr;
 			bool enemyInstantiated = false;
+
 			switch (enemyType)
 			{
 			case ECharacterType::OrcBow:
 			{
 				charac = instantiator->InstantiateOrcBow(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-
+				if (charac)
+					enemyInstantiated = true;
 
 				break;
 			}
 			case ECharacterType::OrcGuns:
 			{
 				charac = instantiator->InstantiateOrcGuns(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
-
+				if (charac)
+					enemyInstantiated = true;
 
 				break;
 			}
 			case ECharacterType::OrcMelee:
 			{
 				charac = instantiator->InstantiateOrcMelee(DynamicMapRef->GetLogicPositions()[i]);
-				enemyInstantiated = true;
+				if (charac)
+					enemyInstantiated = true;
 
+				break;
+			}
+			default:
+			{
+				charac = instantiator->InstantiateOrcMelee(DynamicMapRef->GetLogicPositions()[i]);
+				if (charac)
+					enemyInstantiated = true;
 				break;
 			}
 			}
@@ -562,75 +587,89 @@ void PD_GM_MapManager::InstantiateEnemies() {
 				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
 				logicCha->SetCharacterBP(charac);
-				logicCha->SetController(Cast<APD_GenericController>(charac->GetController()));
+				logicCha->SetController(Cast<APD_AIController>(charac->GetController()));
 				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+				logicCha->SetMapManager(this);
 				switch (enemyType)
 				{
-				case ECharacterType::OrcBow:
-				{
-					logicCha->GetController()->SetTypeCharanimation(0);
-					break;
-				}
-				case ECharacterType::OrcGuns:
-				{
-					logicCha->GetController()->SetTypeCharanimation(0);
-					break;
-				}
-				case ECharacterType::OrcMelee:
-				{
-					logicCha->GetController()->SetTypeCharanimation(1);
-					break;
-				}
+					case ECharacterType::OrcBow:
+					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: OrcBow"));
+						logicCha->GetController()->SetTypeCharanimation(0);
+						break;
+					}
+					case ECharacterType::OrcGuns:
+					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: OrcGuns"));
+						logicCha->GetController()->SetTypeCharanimation(0);
+						break;
+					}
+					case ECharacterType::OrcMelee:
+					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: OrcMelee"));
+						logicCha->GetController()->SetTypeCharanimation(0);
+						break;
+					}
 				}
 
 				///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
-				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
-
-				if (SGI)
+				if (charac)
 				{
-					//Weapon
-					int id_weapon, classWeapon, typeWeapon, damage, range;
-					SGI->LoadWeaponSpecificData((int)charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
-					logicCha->GetWeapon()->ID_Weapon = id_weapon;
-					logicCha->GetWeapon()->ClassWeapon = classWeapon;
-					logicCha->GetWeapon()->TypeWeapon = typeWeapon;
-					logicCha->GetWeapon()->DMWeapon = damage;
-					logicCha->GetWeapon()->RangeWeapon = range;
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::UPD_ServerGameInstance"));
 
-					//Skills
-					//PASIVAS
-					for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
+					UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
+					if (SGI)
 					{
-						FStructSkill skillPasAdded = FStructSkill();
-						int weaponR, APSkill, CDSkill, targetSkill, Range;
-						SGI->LoadSkillSpecificData(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
-						skillPasAdded.weaponRequired = weaponR;
-						skillPasAdded.AP = APSkill;
-						skillPasAdded.CD = CDSkill;
-						skillPasAdded.currentCD = CDSkill;
-						skillPasAdded.range = Range;
-						skillPasAdded.target = targetSkill;
-						logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager:: hay sgi"));
+
+						//Weapon
+						int id_weapon, classWeapon, typeWeapon, damage, range;
+						SGI->LoadWeaponSpecificDataByType(charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
+						logicCha->GetWeapon()->ID_Weapon = id_weapon;
+						logicCha->GetWeapon()->ClassWeapon = classWeapon;
+						logicCha->GetWeapon()->TypeWeapon = typeWeapon;
+						logicCha->GetWeapon()->DMWeapon = damage;
+						logicCha->GetWeapon()->RangeWeapon = range;
+
+						//Skills
+						//PASIVAS
+						for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
+						{
+							FStructSkill skillPasAdded = FStructSkill();
+							int weaponR, APSkill, CDSkill, targetSkill, Range;
+							SGI->LoadSkillSpecificData(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							skillPasAdded.weaponRequired = weaponR;
+							skillPasAdded.AP = APSkill;
+							skillPasAdded.CD = CDSkill;
+							skillPasAdded.currentCD = CDSkill;
+							skillPasAdded.range = Range;
+							skillPasAdded.target = targetSkill;
+							logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
+						}
+						//ACTIVAS
+						for (int j = 0; j < charac->activeSkillList.Num(); j++)
+						{
+							FStructSkill skillActAdded = FStructSkill();
+							int weaponR, APSkill, CDSkill, targetSkill, Range;
+							SGI->LoadSkillSpecificData(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							skillActAdded.weaponRequired = weaponR;
+							skillActAdded.AP = APSkill;
+							skillActAdded.CD = CDSkill;
+							skillActAdded.currentCD = CDSkill;
+							skillActAdded.range = Range;
+							skillActAdded.target = targetSkill;
+							logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
+						}
 					}
-					//ACTIVAS
-					for (int j = 0; j < charac->activeSkillList.Num(); j++)
-					{
-						FStructSkill skillActAdded = FStructSkill();
-						int weaponR, APSkill, CDSkill, targetSkill, Range;
-						SGI->LoadSkillSpecificData(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
-						skillActAdded.weaponRequired = weaponR;
-						skillActAdded.AP = APSkill;
-						skillActAdded.CD = CDSkill;
-						skillActAdded.currentCD = CDSkill;
-						skillActAdded.range = Range;
-						skillActAdded.target = targetSkill;
-						logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
+					else {
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::NO HAY SGI"));
 					}
 				}
 
+
 				//STATS
 				logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
-				logicCha->SetInitBaseStats(charac->GetBaseAP(), charac->GetBaseDamage(), charac->GetBaseHP());
+				logicCha->SetInitBaseStats(charac->GetBaseHP(), charac->GetBaseDamage(), charac->GetBaseAP());
 
 				//IA
 				if (charac->generateRandomPersonality) {
@@ -656,4 +695,9 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 }
 
+TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetAllTilesInRange(float range, PD_MG_LogicPosition logPos)
+{
+	return logPos.GetAllTilesInRange(range, MapInfo->allLogicPos);
+
+}
 #pragma endregion

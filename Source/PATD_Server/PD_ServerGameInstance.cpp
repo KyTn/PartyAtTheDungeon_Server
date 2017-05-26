@@ -367,7 +367,7 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent_LoadPlayerInfo"));
 	FStructCharacter* playerStats = (FStructCharacter*)inDataStruct;
 
-	playersManager->GetDataStructPlayer(inPlayer)->logic_Character = new PD_GM_LogicCharacter();
+	//playersManager->GetDataStructPlayer(inPlayer)->logic_Character = new PD_GM_LogicCharacter();
 
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->totalStats = &playerStats->totalStats;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->basicStats = &playerStats->basicStats;
@@ -1196,6 +1196,31 @@ void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_wea
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("File does not exist."));
 }
 
+
+void UPD_ServerGameInstance::LoadWeaponSpecificDataByType(TypeWeapons typeWeaponID, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range)
+{
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Weapon num %d"), weapons.Num());
+
+		if (weapons.Num() > 0)
+		{
+			for (int i = 0; i < weapons.Num(); i++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Comparando typeWeaponID %d  con : %d"), (int)typeWeaponID, weapons[i].TypeWeapon);
+
+				if ((int)typeWeaponID == weapons[i].TypeWeapon)
+				{
+					UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::LoadWeaponSpecificDataByType: Encontrada arma %d  Rango: %d"), (int)typeWeaponID,weapons[i].RangeWeapon);
+					id_weapon = weapons[i].ID_Weapon;
+					classWeapon = weapons[i].ClassWeapon;
+					typeWeapon = weapons[i].TypeWeapon;
+					damage = weapons[i].DMWeapon;
+					range = weapons[i].RangeWeapon;
+				}
+			}
+		}
+
+	
+}
 
 #pragma endregion
 

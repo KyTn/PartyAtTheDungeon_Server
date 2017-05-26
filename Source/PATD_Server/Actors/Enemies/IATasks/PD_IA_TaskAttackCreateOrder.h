@@ -14,7 +14,8 @@ class PATD_SERVER_API UPD_IA_TaskAttackCreateOrder : public UBTTaskNode
 	GENERATED_BODY()
 	
 	
-		UPROPERTY(EditAnywhere, Category = "Selection Parameters")
-		float warlike_minHPDefense;
-	
+		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+		void CreateMoveOrders(UBehaviorTreeComponent& OwnerComp);
+		void CreateAttackOrders(UBehaviorTreeComponent& OwnerComp);
 };

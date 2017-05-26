@@ -51,15 +51,18 @@ void AServerCamera::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 	Super::Tick(DeltaTime);
 	if (moveState == ECameraMoveState::Moving) {
+		
 
 		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{//continua moviendose
-			
+			UE_LOG(LogTemp, Warning, TEXT("AServerCamera::Tick:: Objetivo:%s "), *moveTargetPosition.ToString());
+
 			FVector incrementPosition = velocity*DeltaTime*targetDirection; //target direction es un vector
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento:%s"), *incrementPosition.ToString());
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento valores:%s"), *targetDirection.ToString());
-			SetActorLocation(GetActorLocation()+incrementPosition);
+			FVector newLocation=GetActorLocation() + incrementPosition;
+			SetActorLocation(newLocation);
 
 			
 		}
@@ -72,8 +75,8 @@ void AServerCamera::Tick(float DeltaTime)
 
 	}
 	else if (moveState == ECameraMoveState::Patrol) {
-		distance += DeltaTime*patrolVelocity;
-
+		//distance += DeltaTime*patrolVelocity;
+		distance += 0.5;
 		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
 		/*
 		if (patrolRotate) {
@@ -91,6 +94,7 @@ void AServerCamera::Tick(float DeltaTime)
 
 	if (lookState == ECameraLookState::LookPoint) {
 		FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		PlayerRot.Yaw = 0;
 		//FRotator newrot = (GetActorLocation() - lookPosition).Rotation();
 		//this->AddActorWorldRotation(newrot);
 		SetActorRotation(PlayerRot);
@@ -214,4 +218,21 @@ void AServerCamera::LookAtPoint(FVector inLookPosition) {
 }
 void AServerCamera::StopLookAt() {
 	lookState = ECameraLookState::Static;
+}
+
+bool AServerCamera::SetCameraOnView()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("PutCameraPlayerOnView"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::SetCharacterCameraOnView -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::SetCharacterCameraOnView - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
 }

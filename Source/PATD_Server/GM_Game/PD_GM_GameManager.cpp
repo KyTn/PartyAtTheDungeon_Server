@@ -23,8 +23,10 @@
 #include "Actors/PD_TimerGame.h"
 #include "Actors/Enemies/PD_AIController.h"
 #include "Actors/PD_GenericController.h"
-
+#include "Actors/PD_E_Character.h"
+#include "ServerCamera.h"
 #include "Structs/PD_NetStructs.h"
+
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer)
 {
 	TotalPoints = 0;
@@ -134,6 +136,7 @@ void PD_GM_GameManager::UpdateState() {
 			//Actualizar estados alteadores y de efectos en enemigos --- despues del turno de los players
 			CheckAndUpdate_ActiveEffectsOnEnemies();
 			CheckAndUpdate_AlteredStateOnEnemies();
+			CheckWinGameConditions();
 			this->ChangeState(EGameState::WaitingEnemiesOrders);
 		}
 		
@@ -214,6 +217,13 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/
 	else if (structGameState->enumGameState == EGameState::WaitingEnemiesOrders) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: WaitingEnemiesOrders"));
+
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		if (SGI)
+		{
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
+		}
+
 		enemyManager->newTurn();
 		CreateEnemyOrders();
 		UpdateState();
@@ -336,7 +346,7 @@ void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
 		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
-		controller->StartAITurnCalcultion(mapManager, enemyManager->GetEnemies()[i]);
+		controller->StartAITurnCalcultion(mapManager);
 	}
 }
 
@@ -416,9 +426,58 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 	}
 }
 
-void PD_GM_GameManager::LogicTurnAttackPhase(int numCharacters) {
+void PD_GM_GameManager::LogicTurnAttackPhase() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase"));
+	/*
+	- Segun el turno de Players o Enemies, metemos al Tmap de Accions por turno, las acciones de TODOS los que toque, 
+	para que luego en cada llamada de Visual Attack, se interprete solo 1
+	- SI NO HACEMOS ESTO, no se van a poder ver las animaciones de todos los ataques que se hagan, solo el final
+	(Y hombre, eso esta feo - Ahi esa animacion en una cama nido!)
+	*/
 
+
+	// 1) todos los bufos
+	// 2) habilidades que causan estados
+	// 3) habilidades que hacen que te muevas (cargas)
+	// 4) ataques normales y otras habilidades 
+	// 5) habilidades que hacen que muevan a los otros
+
+	// de momento vamos a hacerlo de forma secuencial sin ordenar...
+
+	index_IndividualActionsOnTurns = 0;
+
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
+		{
+			for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->actions.Num(); index_actions++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  players -- adding action %d"), index_actions);
+
+				FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter(); 
+				individualActionOnTurns.Add(id_player, index_actions);
+			}
+		}
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		
+		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
+		{
+			for (int index_actions  = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->actions.Num(); index_actions++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  enemies -- adding action %d"), index_actions);
+
+				FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+				individualActionOnTurns.Add(id_enemy, index_actions);
+			}
+		}
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  TOTAL  -- adding action %d"), individualActionOnTurns.Num());
+
+	
+	//VIEJO CODIGO
+	/*
 	//Distincion para players o enemigos
 	//Calcular el numero de ticks a realizar (el de la lista mas larga)
 	int numTicks = 0;
@@ -429,10 +488,12 @@ void PD_GM_GameManager::LogicTurnAttackPhase(int numCharacters) {
 		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
 	}
 	
+	
 	for (int i = 0; i < numTicks; i++) {
 			LogicAttackTick(i, numCharacters);
 		
 	}
+	*/
 }
 
 
@@ -764,6 +825,42 @@ void PD_GM_GameManager::VisualMoveTick() {
 	//Todos a la vez
 	PD_GM_LogicCharacter* logicCharacter = nullptr;
 
+	TArray<FVector> newTargetPositions = TArray<FVector>();
+	//Setear nuevo punto medio, para mover la camara
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
+	{
+		for (int i = 0; i < players; i++)
+		{
+			int numTilesMoveOnturn = playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Num();
+			if (numTilesMoveOnturn > 0)
+			{
+				newTargetPositions.Add(mapManager->LogicToWorldPosition(
+					playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
+			}
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition()));
+		}
+	}
+
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
+	{
+		for (int i = 0; i < players; i++)
+		{
+			int numTilesMoveOnturn = enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Num();
+			if (numTilesMoveOnturn > 0)
+			{
+				newTargetPositions.Add(mapManager->LogicToWorldPosition(
+					enemyManager->GetEnemies()[i]->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
+			}
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(
+				enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
+		}
+	}
+
+
+	Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
+
 	for (int i = 0; i < players; i++) {
 		//Distincion para players o enemigos
 		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -806,77 +903,56 @@ void PD_GM_GameManager::VisualMoveTick() {
 	
 }
 
-void PD_GM_GameManager::VisualAttackTick() {
+void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
 
 	//Distincion para players o enemigos
-	TArray<FStructTargetToAction> listAttack;
-	int indexCharacter;
-	PD_GM_LogicCharacter* logicCharacter=nullptr;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-		//indexCharacter = playersManager->GetPlayerMaxLenghtActions(EActionPhase::Attack);
-		indexCharacter = playersManager->GetNumPlayers();
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick players"));
+	//	TArray<FStructTargetToAction> listAttack;
+	//int indexCharacter;
+	//PD_GM_LogicCharacter* logicCharacter=nullptr;
 
-		for (int i = 0; i < indexCharacter; i++) {
-			listAttack = playersManager->GetDataStructPlayer(i)->turnOrders->actions;
-			//logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
+	{
+	
+		if (playersManager->GetNumPlayers() > 0 )
+		{
+			PD_GM_LogicCharacter* logic_char = playersManager->GetCharacterByID(id_char);
+	
+			if (playersManager->GetStructPlayerByIDClient(id_char))
+			{
+				if (playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions.Num() > 0)
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick - Si hay acciones que hacer"));
 
-			// 1) todos los bufos
-			// 2) habilidades que causan estados
-			// 3) habilidades que hacen que te muevas (cargas)
-			// 4) ataques normales y otras habilidades 
-			// 5) habilidades que hacen que muevan a los otros
+					Cast<APD_E_Character>(logic_char->GetCharacterBP())->SetCharacterCameraOnView();
 
-			// de momento vamos a hacerlo de forma secuencial sin ordenar...
-			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick players"));
-				playersManager->GetDataStructPlayer(i)->logic_Character->ActionTo(listAttack[index_action]);
+					FStructTargetToAction action = playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions[index_action];
+					logic_char->ActionTo(action);
+				}
 			}
+			
+			
+//			playersManager->GetCharacterByID(id_char)->ActionTo(playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions[index_action]);
 		}
-
-
-
 
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
+	{
+
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick enemigos"));
 
-		//indexCharacter = enemyManager->GetEnemyMaxLenghtActions(EActionPhase::Attack);
-		//listAttack = &enemyManager->GetTurnOrders(indexCharacter)->actions;
-		//logicCharacter = enemyManager->GetEnemies()[indexCharacter];
-		indexCharacter = enemyManager->GetEnemies().Num();
-		for (int i = 0; i < indexCharacter; i++) {
-			listAttack = enemyManager->GetTurnOrders(i)->actions;
-			//logicCharacter = enemyManager->GetEnemies()[indexCharacter];
 
-			// 1) todos los bufos
-			// 2) habilidades que causan estados
-			// 3) habilidades que hacen que te muevas (cargas)
-			// 4) ataques normales y otras habilidades 
-			// 5) habilidades que hacen que muevan a los otros
+		Cast<APD_E_Character>(enemyManager->GetCharacterByID(id_char)->GetCharacterBP())->SetCharacterCameraOnView();
 
-			// de momento vamos a hacerlo de forma secuencial sin ordenar...
-			for (int index_action = 0; index_action < listAttack.Num(); index_action++) {
-				enemyManager->GetEnemies()[i]->GetController()->ActionTo(listAttack[index_action]);
-			}
-		}
+		int index_enemy = enemyManager->GetIndexByID(id_char);
+
+		enemyManager->GetCharacterByID(id_char)->ActionTo(
+			enemyManager->GetTurnOrders(index_enemy)->actions[index_action]);
 
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick despues de players/enemigos"));
-
-	//Uno a uno
-	
-	//FStructTargetToAction visualAction = listAttack->Pop();
-	//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 0"));
-	//PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(visualAction.targetLogicPosition.positionX, visualAction.targetLogicPosition.positionY);
-	//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 1"));
-	//FVector physicPosition=mapManager->LogicToWorldPosition(logicPosition);
-	//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 2"));
-	//Peta al no tener actor ni controller
-    //Cast<APD_CharacterController>(logicCharacter->GetController())->ActionTo(physicPosition.X, physicPosition.Y, visualAction.orderType);
-	//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick 3"));
 
 }	
 
@@ -901,7 +977,44 @@ void PD_GM_GameManager::OnAnimationEnd() {
 		if (playersManager->AllAnimationEnd() && enemyManager->AllAnimationEnd()) {
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd: TRUE"));
 			//Aqui deberia estar en un estado de fase que sea tick (no INI)
-			UpdatePhase();
+
+			
+			if ((structGamePhase->enumGamePhase == EServerPhase::AttackTick))
+			{
+				index_IndividualActionsOnTurns++;
+
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: index - %d"), index_IndividualActionsOnTurns);
+
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: totalindex - %d"), individualActionOnTurns.Num());
+
+				if (index_IndividualActionsOnTurns < individualActionOnTurns.Num())
+				{
+					TArray<FString> id_charactersOnArray;
+					individualActionOnTurns.GenerateKeyArray(id_charactersOnArray);
+
+					TArray<int> index_totalActions;
+					individualActionOnTurns.GenerateValueArray(index_totalActions);
+
+					FString id_char = id_charactersOnArray[index_IndividualActionsOnTurns];
+					int index_actionOfChar = index_totalActions[index_IndividualActionsOnTurns];
+
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: lanzando accion de caract :%s , index  - %d"),*id_char, index_actionOfChar);
+
+					VisualAttackTick(id_char, index_actionOfChar);
+				}
+				else
+				{
+					UpdatePhase();
+
+				}
+			}
+			else 
+			{
+				UpdatePhase();
+
+			}
+			
+
 		}
 
 }
@@ -1214,6 +1327,10 @@ void PD_GM_GameManager::OnBeginPhase()
 		timer->InitTimer(timeWaitingPhases);
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
 
+		individualActionOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
+
+		LogicTurnAttackPhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
+
 		UpdatePhase();
 
 	}
@@ -1225,8 +1342,23 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackTick)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackTick"));
-		VisualAttackTick();
+		
+		//el index_IndividualActionsOnTurns es 0
 
+		if (individualActionOnTurns.Num() > 0)
+		{
+			TArray<FString> id_charactersOnArray;
+			individualActionOnTurns.GenerateKeyArray(id_charactersOnArray);
+
+			TArray<int> index_totalActions;
+			individualActionOnTurns.GenerateValueArray(index_totalActions);
+
+			FString id_char = id_charactersOnArray[0]; //siempre el primero
+			int index_actionOfChar = index_totalActions[0]; //siempre el primero
+
+			VisualAttackTick(id_char, index_actionOfChar);
+		}
+		
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases)
 	{
@@ -1243,11 +1375,14 @@ void PD_GM_GameManager::OnBeginPhase()
 bool PD_GM_GameManager::CheckWinGameConditions()
 {
 	int enemiesDied = 0;
-
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 	{
 		if (enemyManager->GetEnemies()[i]->GetTotalStats()->HPCurrent <= 0)
+		{
 			enemiesDied++;
+			enemyManager->DeleteEnemy(enemyManager->GetEnemies()[i]);
+		}
+		
 	}
 	if (enemyManager->GetEnemies().Num() == enemiesDied)
 		return true; //all enemies died

@@ -20,8 +20,10 @@ public:
 	~PD_GM_EnemyManager();
 
 	void AddEnemy(PD_GM_LogicCharacter* enemy);
+	void DeleteEnemy(PD_GM_LogicCharacter* enemy);
 	TArray<PD_GM_LogicCharacter*> GetEnemies();
 	FStructTurnOrders* GetTurnOrders(int indexEnemy);
+
 	void newTurn();
 	void AddActionTurn(FStructTurnOrders* turnOrders, int indexEnemy);
 	int GetEnemyMaxLenghtActions(EActionPhase phase);
@@ -30,6 +32,7 @@ public:
 	bool AllAnimationEnd();
 
 	PD_GM_LogicCharacter* GetCharacterByID(FString id);
+	PD_GM_LogicCharacter* GetCharacterByIndex(int iEnemy);
 	int GetIndexByID(FString id);
 
 	bool AllEnemiesHaveOrders();

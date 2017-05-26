@@ -67,7 +67,7 @@ if (other != nullptr) //Los dos son characters
 	{
 		//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
 		logic_character->GetController()->IsCalculatingMovePath = true;
-		logic_character->MoveWhenCollisionLost();
+		//logic_character->MoveWhenCollisionLost();
 	}
 }
 }
@@ -89,4 +89,27 @@ bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
 		return false;
 	}
 
+}
+
+bool APD_E_Character::SetCharacterCameraOnView()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("PutCameraPlayerOnView"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::SetCharacterCameraOnView -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::SetCharacterCameraOnView - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
+
+}
+
+void APD_E_Character::UpdateCharLife(float damage)
+{
+	logic_character->UpdateHPCurrent(damage);
 }

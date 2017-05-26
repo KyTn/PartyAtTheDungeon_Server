@@ -113,9 +113,14 @@ public:
 
 	void LogicTurnItemPhase();
 	void LogicTurnMovePhase(int numCharacters);
-	void LogicTurnAttackPhase(int numCharacters);
+	void LogicTurnAttackPhase(); //calcula cuantas acciones de enemigos o players en un turno
 
 	//Funciones para procesar cada accion individual
+	///PARA VISUALIZAR LA ACCION DE MANERA INDIVIDUAL
+	//Tmap<Id_Char, index action>
+	TMultiMap<FString,int> individualActionOnTurns = TMultiMap<FString, int>();
+	int index_IndividualActionsOnTurns = 0;
+
 	void LogicMoveTick(int tick, int numCharacters);
 	void LogicAttackTick(int tick, int numCharacters);
 	void LogicItemTick(int tick);
@@ -146,7 +151,7 @@ public:
 	void OnTimerEnd();
 	void VisualTickControl();
 	void VisualMoveTick();
-	void VisualAttackTick();
+	void VisualAttackTick(FString id_char, int index_action);
 
 	bool CheckWinGameConditions();
 

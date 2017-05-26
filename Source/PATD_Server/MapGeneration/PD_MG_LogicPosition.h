@@ -71,7 +71,7 @@ public:
 	*/
 	FVector ToWorldPosition(bool isCharacter) {
 		if (isCharacter)
-			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
+			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 10.f);
 		else
 			return FVector(-1.0f * GetX()*100.0f, GetY() * 100.0f, 0.f);
 	}
@@ -81,6 +81,9 @@ public:
 	}
 
 	TArray<PD_MG_LogicPosition> GetDiagonalsAndAdjacentsFromList(TArray<PD_MG_LogicPosition> list) {
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_MG_LogicPosition: GetDiagonalsAndAdjacentsFromList"));
+
 		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
 		for (int i = 0; i < list.Num(); i++) {
 			if (this->EuclideanDistance(list[i]) <=1.7f) {
@@ -89,6 +92,17 @@ public:
 		}
 		return res;
 		
+	}
+
+	TArray<PD_MG_LogicPosition> GetAllTilesInRange(float range, TArray<PD_MG_LogicPosition> list) {
+		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
+		for (int i = 0; i < list.Num(); i++) {
+			if (this->EuclideanDistance(list[i]) <= range) {
+				res.Add(list[i]);
+			}
+		}
+		return res;
+
 	}
 
 	TArray<PD_MG_LogicPosition> GetAdjacentsFromList(TArray<PD_MG_LogicPosition> list) {
@@ -127,5 +141,9 @@ public:
 		int result = deltaX + deltaY;
 		return sqrt(result);
 	}
+
+
+
+
 
 };

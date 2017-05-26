@@ -24,6 +24,7 @@ PD_PlayersManager::~PD_PlayersManager()
 void PD_PlayersManager::AddNewPlayer(FString newID_Client, int player) {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AddNewPlayer"));
 	StructPlayer* structPlayer = new StructPlayer();
+	structPlayer->logic_Character = new PD_GM_LogicCharacter();
 	structPlayer->ID_Client = newID_Client;
 	structPlayer->ID_PLAYER = player;
 	structPlayer->isConnected = true;
@@ -105,9 +106,11 @@ int PD_PlayersManager::GetIndexClientMaster() {
 
 StructPlayer* PD_PlayersManager::GetStructPlayerByIDClient(FString ID_ClientToSearch)
 {
+	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : buscando a %s"), *ID_ClientToSearch);
+
 	for (int i = 0; i < dataPlayers.Num(); i++) {
-		if (dataPlayers[i]->ID_Client == ID_ClientToSearch) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->ID_Client);
+		if (dataPlayers[i]->logic_Character->GetIDCharacter() == ID_ClientToSearch) {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
 			return dataPlayers[i];
 		}
 	}
@@ -182,7 +185,7 @@ bool PD_PlayersManager::CheckPlayerIndex(int player) {
 		return true;
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: CheckPlayerState ERROR: El indice de player no es valido"));
+		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: CheckPlayerState ERROR: El indice %d de player no es valido"),player);
 		return false;
 	}
 }
@@ -197,7 +200,14 @@ PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByID(FString id) {
 	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetCharacterByID ERROR: No se ha encontrado character con id %s"), *id);
 	return nullptr;
 }
-
+PD_GM_LogicCharacter* PD_PlayersManager::GetCharacterByIndex(int i) {
+	if (CheckPlayerIndex(i)) {
+		return dataPlayers[i]->logic_Character;
+	}else {
+		return nullptr;
+	}
+	
+}
 
 #pragma region Map Already Instantiated FUNCTIONS
 
