@@ -55,7 +55,7 @@ void AServerCamera::Tick(float DeltaTime)
 
 		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{//continua moviendose
-			UE_LOG(LogTemp, Warning, TEXT("AServerCamera::Tick:: Objetivo:%d "), *moveTargetPosition.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("AServerCamera::Tick:: Objetivo:%s "), *moveTargetPosition.ToString());
 
 			FVector incrementPosition = velocity*DeltaTime*targetDirection; //target direction es un vector
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
@@ -75,8 +75,8 @@ void AServerCamera::Tick(float DeltaTime)
 
 	}
 	else if (moveState == ECameraMoveState::Patrol) {
-		distance += DeltaTime*patrolVelocity;
-
+		//distance += DeltaTime*patrolVelocity;
+		distance += 0.5;
 		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
 		/*
 		if (patrolRotate) {

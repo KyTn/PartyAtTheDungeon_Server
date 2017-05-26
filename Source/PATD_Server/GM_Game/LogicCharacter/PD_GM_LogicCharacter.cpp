@@ -768,7 +768,7 @@ void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* Cha
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
-	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhenFua);
+	CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::WhenFua);
 
 	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::WhenFua, 1);
 
