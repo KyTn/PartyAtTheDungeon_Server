@@ -599,19 +599,20 @@ int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* C
 	if (CharWhoAttacks->isPlayer)
 	{
 		//Calculamos el AP necesario para su movimiento
-		APleft -= playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->positionsToMove.Num(); 
+		APleft = APleft - playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->positionsToMove.Num();
 		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
 		for (int i = 0; i < playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions.Num(); i++)
 		{
 			if ((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
-				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)))
+				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
+				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
 			{
 				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
 				{
 					if (Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].ID_Skill ==
 						playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
 					{
-						APleft -= Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
+						APleft = APleft - Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
 					}
 				}
 			}
@@ -620,19 +621,20 @@ int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* C
 	else 
 	{
 		//Calculamos el AP necesario para su movimiento
-		APleft -= enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->positionsToMove.Num();
+		APleft = APleft - enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->positionsToMove.Num();
 		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
 		for (int i = 0; i < enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions.Num(); i++)
 		{
-			if ((enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action != (int)ActiveSkills::Defense) &&
-				((enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action != (int)ActiveSkills::WhenFua)))
+			if ((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
+				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
+				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
 			{
 				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
 				{
 					if (Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].ID_Skill ==
 						enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
 					{
-						APleft -= Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
+						APleft = APleft - Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
 					}
 				}
 			}
@@ -850,7 +852,7 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 
 	int APLeftBonus = CalculateAPleftInPlayerActions(CharWhoAttacks);
 
-	totalDamage = (APLeftBonus / 100) * totalDamage;
+	totalDamage = totalDamage + ((APLeftBonus / 100) * totalDamage);
 
 	int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
 	totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
@@ -939,11 +941,10 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	//Lanzar animacion de casteo de habilidad
-	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
-	{
-		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::GiveMeTheFireBlast);
 
-	}
+	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+
+	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
 	
 
 }
@@ -973,6 +974,7 @@ void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWho
 }
 void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* CharWhoAttacks)
 {
+
 	/*
 	- Explosion de hielo que daña 3 puntos de vida a los enemigos adyacentes
 	1. Conseguir a los enemigos adyacentes
@@ -998,7 +1000,14 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 	//Conseguir las casillas adyacentes y comprobar que son enemigos para cogerlos
 	//updatear la vida con aquellos que te encuentres
 	//lanzar animacion de pain de estos
-	TArray<PD_MG_LogicPosition> nearTiles = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(GetCurrentLogicalPosition());
+	TArray<PD_MG_LogicPosition> nearTiles = TArray<PD_MG_LogicPosition>();
+
+	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: Skill_Magic_BeInCrossroads"));
+	if (mapMng) {
+		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: hay map manager ref"));
+
+		nearTiles = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(GetCurrentLogicalPosition());
+	}
 	for (int i = 0; i < nearTiles.Num(); i++)
 	{
 		for (int j = 0; j < enemyManager->GetEnemies().Num(); j++)
@@ -1006,19 +1015,10 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide el baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
 			{
 				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-				//Calcular si es critico el ataque
-				if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
-				{
-					CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
-				}
-				else
-				{
-					CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
-				}
-
+				
 				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
 				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-				enemyManager->GetEnemies()[j]->UpdateHPCurrent(totalDamage);
+				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
 			}
 		}
 	}

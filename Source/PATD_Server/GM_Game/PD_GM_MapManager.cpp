@@ -155,8 +155,16 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Adyacents_To(PD_
 
 
 TArray<PD_MG_LogicPosition> PD_GM_MapManager::Get_LogicPosition_Diagonals_And_Adyacents_To(PD_MG_LogicPosition logPos) {
-
-	return logPos.GetDiagonalsAndAdjacentsFromList(MapInfo->allLogicPos);
+	if (MapInfo)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager: Get_LogicPosition_Diagonals_And_Adyacents_To hay MapInfo"));
+		return logPos.GetDiagonalsAndAdjacentsFromList(MapInfo->allLogicPos);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager: Get_LogicPosition_Diagonals_And_Adyacents_To NO HAY MapInfo"));
+		return TArray<PD_MG_LogicPosition>();
+	}
 }
 
 #pragma endregion
@@ -447,6 +455,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	{
 		FOutputDeviceNull ar;
 
+		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetMapManager(this);
+
 		_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->SetCharacterBP(instantiator->InstantiatePlayer(
 			_GAMEMANAGER->playersManager->GetDataPlayers()[i]->logic_Character->GetCurrentLogicalPosition()));
 
@@ -577,6 +587,7 @@ void PD_GM_MapManager::InstantiateEnemies() {
 				logicCha->SetCharacterBP(charac);
 				logicCha->SetController(Cast<APD_AIController>(charac->GetController()));
 				logicCha->SetCurrentLogicalPosition(DynamicMapRef->GetLogicPositions()[i]);
+				logicCha->SetMapManager(this);
 				switch (enemyType)
 				{
 					case ECharacterType::OrcBow:
