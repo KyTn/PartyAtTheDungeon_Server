@@ -7,6 +7,7 @@
 // Sets default values
 APD_E_ElementActor::APD_E_ElementActor()
 {
+	//SGI = Cast<UPD_ServerGameInstance>(GetWorld()->GetGameInstance());
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 

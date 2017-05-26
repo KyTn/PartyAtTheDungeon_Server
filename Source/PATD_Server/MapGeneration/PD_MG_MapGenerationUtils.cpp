@@ -622,7 +622,9 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	PD_MG_LogicPosition W1, W2; //W1, W2 - current Walls
 	
 
-	TArray<LogicPositionAmplified> LD;
+	TArray<LogicPositionAmplified> LDoors;
+	TArray<LogicPositionAmplified> LInteractuables;
+
 	
 	// Indica el numero de habitaciones que se generaran. También indica el numero de vueltas que dará el algoritmo para generar las habitaciones como minimo. 
 	// Nota: puede dar mas vueltas si la habitacion candidata actual no hace matching respecto de las posiciones de mundo y locales elegidas. (es lo común)
@@ -634,8 +636,8 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	LWT.Empty();
 	LRT.Empty();
 	LCT.Empty();
-	LD.Empty();
-
+	LDoors.Empty();
+	LInteractuables.Empty();
 #pragma endregion 
 
 	/////////////////////
@@ -801,7 +803,13 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 
 
 			//meter puerta y si se puede, puerta doble
-			Put_Door_Tryng_doubleDoor_at(M, W1, R.ID, LD);
+			Put_Door_Tryng_doubleDoor_at(M, W1, R.ID, LDoors, LInteractuables);
+			
+			UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02  .... LDoors (%d,%d) - %d - %d"),
+				LDoors[LDoors.Num() - 1].logicPosition.GetX(), LDoors[LDoors.Num() - 1].logicPosition.GetY(), LDoors[LDoors.Num() - 1].info[0], LDoors[LDoors.Num() - 1].info[1]);
+			UE_LOG(LogTemp, Warning, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02  .... LInteractuables (%d,%d) - %d - %d"),
+				LInteractuables[LInteractuables.Num() - 1].logicPosition.GetX(), LInteractuables[LInteractuables.Num() - 1].logicPosition.GetY(), LInteractuables[LInteractuables.Num() - 1].info[0], LInteractuables[LInteractuables.Num() - 1].info[1]);
+
 			//if (Put_Door_Tryng_doubleDoor_at(M, W1)) {
 			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap Double door!"));
 			//}
@@ -850,6 +858,10 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	MarkARoomAsSpawingRoom_v02(M, MatchConfigMan->Get_MissionType());
 
 	EnemiesGeneration_v02(M, MatchConfigMan, numPlayers);
+	InteractuablesGeneration_v02(M, MatchConfigMan, numPlayers, LInteractuables);
+
+
+
 #pragma endregion 
 
 	////////////////////////////
@@ -860,7 +872,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02 fill net map data "));
 	TArray <LogicPositionAmplified> walls = TArray <LogicPositionAmplified>();
 	LW.GenerateValueArray(walls);
-	Fill_NETMAPDATA_from(M, walls, LD);
+	Fill_NETMAPDATA_from(M, walls, LDoors, LInteractuables);
 
 
 	return false;
@@ -940,6 +952,11 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 			return false;
 			break;
 	}
+}
+
+bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & M, PD_MatchConfigManager * MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables)
+{
+	return false;
 }
 
 #pragma endregion
@@ -1043,7 +1060,7 @@ bool PD_MG_MapGenerationUtils::MapCanContainsRoom(MapProceduralInfo &M, RoomTemp
 PD_MG_LogicPosition PD_MG_MapGenerationUtils::Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot) {
 	return localPos - R_pivot + C;
 }
-bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD) {
+bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD, TArray<LogicPositionAmplified> &LInteractuables) {
 
 	//Actualizamos el array de adyacentes de la sala de la que le pasamos el identificador
 	uint8 IDR2 = 0;
@@ -1086,10 +1103,31 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 	M.mapElements[W1] = StaticMapElementInRoomTemplate::DOOR;
 
 	// actualizamos la lista de puertas 
-	LogicPositionAmplified d = LogicPositionAmplified(W1);
+	LogicPositionAmplified d = LogicPositionAmplified(W1); // ATENSIO! Esta posicion no está trimeada ... Se transformará en el Fill_NERMAPDATA
 	d.AddInfo(IDR);
 	d.AddInfo(IDR2);
+
+	UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at - adding door (%d,%d) - %d - %d"), 
+		d.logicPosition.GetX(), d.logicPosition.GetY(), d.info[0], d.info[1]);
+
+
 	LD.Add(d);
+
+	// actualizamos la lista de interactuables
+	LogicPositionAmplified lpa = LogicPositionAmplified(W1);
+	lpa.AddInfo(LD.Num()); // idInteractuable
+	lpa.AddInfo((int)StaticMapElement::DOOR); // type interactuable
+
+
+	UE_LOG(LogTemp, Error, TEXT("PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at - adding interactuable (%d,%d) - %d - %d"), 
+		lpa.logicPosition.GetX(), lpa.logicPosition.GetY(), lpa.info[0], lpa.info[1]);
+
+	LInteractuables.Add(lpa);
+
+
+	// si puedo poner puerta doble ... 
+
+	/*
 
 	TArray<PD_MG_LogicPosition> adjac = W1.GenerateAdjacents(), wall_adjac = TArray<PD_MG_LogicPosition>();
 	for (int i = 0; i < adjac.Num(); i++) {
@@ -1098,71 +1136,66 @@ bool PD_MG_MapGenerationUtils::Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M
 		}
 	}
 
-	// si puedo poner puerta doble ... 
 
-	/*
 	if (wall_adjac.Num() > 0) {
 		M.mapElements[wall_adjac[FMath::RandRange(0, wall_adjac.Num() - 1)]] = StaticMapElementInRoomTemplate::DOOR;
 		return true;
 	}
 	*/
 
-	return false;
+	return true;
 }
 // Te devuelve el StaticMapElement que puede tener en funcion del tipo de mapskin y del caracter que haya en el StaticMapElementInRoomTemplate
 StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType mst, StaticMapElementInRoomTemplate melem)
 {
+	// StaticMapElements que no dependen del MapSkinType a este nivel 
+	if (melem == StaticMapElementInRoomTemplate::EMPTY)
+		return StaticMapElement::EMPTY;
+
+	if (melem == StaticMapElementInRoomTemplate::NORMAL_TILE)
+		return StaticMapElement::NORMAL_TILE;
+
+	if (melem == StaticMapElementInRoomTemplate::SPECIAL_TILE)
+		return StaticMapElement::SPECIAL_TILE;
+
+	if (melem == StaticMapElementInRoomTemplate::DOOR)
+		return StaticMapElement::DOOR;
+
+
+
+
+
+
+
+
+
 	switch (mst) {
 
-	case MapSkinType::DUNGEON_NORMAL: {
+		case MapSkinType::DUNGEON_NORMAL: {
 
-		switch (melem) {
+			switch (melem) {
+			case StaticMapElementInRoomTemplate::COLUMN:
+			{
+				TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
+				posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
+				posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
+				posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
 
-		case StaticMapElementInRoomTemplate::EMPTY:
-			return StaticMapElement::EMPTY;
+				return posibles[FMath::RandRange(0, posibles.Num()-1)];
+			}
+			case StaticMapElementInRoomTemplate::PROP_CHEST:
+				return StaticMapElement::PROP_CHEST;
 
-		case StaticMapElementInRoomTemplate::NORMAL_TILE:
-			return StaticMapElement::NORMAL_TILE;
-
-		case StaticMapElementInRoomTemplate::SPECIAL_TILE:
-			return StaticMapElement::SPECIAL_TILE;
-
-		case StaticMapElementInRoomTemplate::COLUMN:
-		{
-			TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
-			posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
-			posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
-			posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
-
-			return posibles[FMath::RandRange(0, posibles.Num())];
-		}
-		case StaticMapElementInRoomTemplate::PROP_CHEST:
-			return StaticMapElement::PROP_CHEST;
-
-		}
-	}
-
-
-	case MapSkinType::GARDEN: {
-
-		switch (melem) {
-
-		case StaticMapElementInRoomTemplate::EMPTY:
-			return StaticMapElement::EMPTY;
-
-		case StaticMapElementInRoomTemplate::NORMAL_TILE:
-			return StaticMapElement::NORMAL_TILE;
-
-		case StaticMapElementInRoomTemplate::SPECIAL_TILE:
-			return StaticMapElement::SPECIAL_TILE;
-
-		case StaticMapElementInRoomTemplate::COLUMN:
-			return StaticMapElement::TREE_OR_COLUMN_00;
+			}
 		}
 
+		case MapSkinType::GARDEN: {
 
-	}
-
+			switch (melem) {
+				case StaticMapElementInRoomTemplate::COLUMN:
+					return StaticMapElement::TREE_OR_COLUMN_00;
+			}
+		}
 	}
 
 	return StaticMapElement::NORMAL_TILE;
@@ -1182,7 +1215,7 @@ uint32 PD_MG_MapGenerationUtils::RoomCompositionOf(PD_MG_LogicPosition logpos, S
 
 uint32 PD_MG_MapGenerationUtils::WallCompositionOf(PD_MG_LogicPosition logpos, int IdRoomA, int IdRoomB)
 {
-	return ((uint32)(logpos.GetIn16bits()) << 16) | ((uint32)((IdRoomA) & 0xFF) << 8) | ((uint32)((IdRoomA) & 0xFF));
+	return ((uint32)(logpos.GetIn16bits()) << 16) | (((uint32) (IdRoomA) & 0xFF) << 8) | ( ((uint32)(IdRoomB)) & 0xFF);
 }
 
 uint32 PD_MG_MapGenerationUtils::DoorCompositionOf(PD_MG_LogicPosition logpos, int IdRoomA, int IdRoomB)
@@ -1209,20 +1242,20 @@ uint32 PD_MG_MapGenerationUtils::EnemyCompositionOf(PD_MG_LogicPosition logpos, 
 #pragma endregion
 
 
-void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray<LogicPositionAmplified> walls, TArray<LogicPositionAmplified> doors) {
+void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray<LogicPositionAmplified> walls, TArray<LogicPositionAmplified> doors, TArray<LogicPositionAmplified> interactuablesId) {
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room "));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room "));
 	
 	// guardamos el idroom de la spawn room
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room: M.Spawn %d "), M.SPAWN_ID);
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room: M.Spawn %d "), M.SPAWN_ID);
 	M.NETMAPDATA->IDRoomSpawn = (uint8)M.SPAWN_ID;
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room: Netmapdata %d "), M.NETMAPDATA->IDRoomSpawn);
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from spawn room: Netmapdata %d "), M.NETMAPDATA->IDRoomSpawn);
 	M.NETMAPDATA->MAP_SIZE_IN_LOGIC_POSITIONS = (M.BOUNDING_BOX_DOWN_RIGHT - M.BOUNDING_BOX_TOP_LEFT).GetIn16bits();
 
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from skin room "));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from skin room "));
 	// guardamos el skinbyroom
 	for (int i = 0; i < M.mapRooms.Num(); i++) {
 		M.NETMAPDATA->skinByRoom.Add(MapSkinByRoomOf(M.mapRooms[i].ID, M.mapRooms[i].ChoosedTag));
@@ -1230,7 +1263,7 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 
 	// guardamos la lista de habitaciones adyacentes
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from mapadj"));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from mapadj"));
 	TArray<uint8> mapAdj_keys;
 	M.mapAdj.GenerateKeyArray(mapAdj_keys);
 	for (int i = 0; i < mapAdj_keys.Num(); i++) {
@@ -1241,89 +1274,115 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition"));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition"));
 	// guardamos el roomComposition
 	for (int i = 0; i < M.mapRooms.Num(); i++) {
 		TArray<PD_MG_LogicPosition> MAP_DATA_KEYS;
 		M.mapRooms[i].MAP_DATA.GenerateKeyArray(MAP_DATA_KEYS);
 
 
-		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - MAP_DATA_KEYS %d"), MAP_DATA_KEYS.Num());
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - MAP_DATA_KEYS %d"), MAP_DATA_KEYS.Num());
 
 		for (int j = 0; j < MAP_DATA_KEYS.Num(); j++) {
 
 
-			UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - MAP_DATA_KEYS value %d"), (int)M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]]);
+			//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - MAP_DATA_KEYS value %d"), (int)M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]]);
 			if (M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]] != StaticMapElementInRoomTemplate::WALL_ONLY &&
 				M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]] != StaticMapElementInRoomTemplate::WALL_OR_DOOR &&
 				M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]] != StaticMapElementInRoomTemplate::DOOR)
 			{
 
 
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - post if (%d, %d) - %d - %d"),
-					(MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT).GetX(), (MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT).GetY(), 
-					(int) GetStaticMapElementFrom(M.mapRooms[i].ChoosedTag, M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]]),
-					M.mapRooms[i].ID);
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - post if (%d, %d) - %d - %d"),
+				//	(MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT).GetX(), (MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT).GetY(), 
+				//	(int) GetStaticMapElementFrom(M.mapRooms[i].ChoosedTag, M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]]),
+				//	M.mapRooms[i].ID);
 				uint32 data = RoomCompositionOf(
-					MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT,
+					MAP_DATA_KEYS[j] + M.mapRooms[i].BOUNDING_BOX_TOP_LEFT - M.BOUNDING_BOX_TOP_LEFT,
 					GetStaticMapElementFrom(M.mapRooms[i].ChoosedTag, M.mapRooms[i].MAP_DATA[MAP_DATA_KEYS[j]]),
 					M.mapRooms[i].ID);
-				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - data value %d"), data);
+				//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from room composition - data value %d"), data);
 
 				M.NETMAPDATA->roomComposition.Add(data);
 			}
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from wall composition"));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from wall composition"));
 	// guardamos el wallComposition
 	for (int i = 0; i < walls.Num(); i++) {
 		if (walls[i].info.Num() == 1) {
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[0], 0xFFFF)
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[0], 0xFF)
 			);
 		}else if (walls[i].info.Num() == 2) {
 
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[0], walls[i].info[1])
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[0], walls[i].info[1])
 			);
 		}
 		else if (walls[i].info.Num() == 3) {
 
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[0], walls[i].info[1])
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[0], walls[i].info[1])
 			);
 
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[2], 0xFFFF)
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[2], 0xFF)
 			);
 		}
 		else if (walls[i].info.Num() == 4) {
 
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[0], walls[i].info[1])
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[0], walls[i].info[1])
 			);
 
 			M.NETMAPDATA->wallComposition.Add(
-				WallCompositionOf(walls[i].logicPosition, walls[i].info[2], walls[i].info[3])
+				WallCompositionOf(walls[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, walls[i].info[2], walls[i].info[3])
 			);
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from door composition"));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from door composition"));
 	// guardamos el doorComposition
 	for (int i = 0; i < doors.Num(); i++) {
-		M.NETMAPDATA->doorComposition.Add(DoorCompositionOf(doors[i].logicPosition, doors[i].info[0], doors[i].info[1]));
+		M.NETMAPDATA->doorComposition.Add(DoorCompositionOf(doors[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, doors[i].info[0], doors[i].info[1]));
+															// log pos											//IDRoomA			// IDRoom B
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from doorComposition value add %d"), M.NETMAPDATA->doorComposition[M.NETMAPDATA->doorComposition.Num() - 1]);
 	}
+
+	for (int i = 0; i < M.NETMAPDATA->doorComposition.Num(); i++) {
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from doorComposition value add %d"), M.NETMAPDATA->doorComposition[M.NETMAPDATA->doorComposition.Num() - 1]);
+	}
+
+	// guardamos el interactuableId
+	for (int i = 0; i < interactuablesId.Num(); i++) {
+		M.NETMAPDATA->interactuableId.Add(	InteractuableIDOf(interactuablesId[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, interactuablesId[i].info[0], interactuablesId[i].info[1]));
+											// log pos																		// idInteract				// typeInteract
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from interactuablesId value add %d"), M.NETMAPDATA->interactuableId[M.NETMAPDATA->interactuableId.Num() - 1]);
+		if (interactuablesId[i].info.Num() > 2) {
+			for (int j = 2; j < interactuablesId[i].info.Num(); j++) {
+				M.NETMAPDATA->interactuableComposition.Add(InteractuableComposition(interactuablesId[i].info[0], interactuablesId[i].info[j]));
+																					// idInteractuable			// idReactuable
+				UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from interactuableComposition value add %d"), M.NETMAPDATA->interactuableComposition[M.NETMAPDATA->interactuableComposition.Num() - 1]);
+			}
+		}
+	}
+
+
+	for (int i = 0; i < M.NETMAPDATA->interactuableId.Num(); i++) {
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from doorComposition value add %d"), M.NETMAPDATA->interactuableId[M.NETMAPDATA->interactuableId.Num() - 1]);
+	}
+	
 
 	TArray<PD_MG_LogicPosition> lp;
 	M.enemies.GenerateKeyArray(lp);
 	for (int i = 0; i <lp.Num() ; i++)
 	{
-		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Tipo de enemigo %d"), M.enemies[lp[i]]);
+		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Tipo de enemigo %d"), M.enemies[lp[i]]);
 		M.NETMAPDATA->enemyComposition.Add(EnemyCompositionOf(lp[i], i, M.enemies[lp[i]]));
 	}
-	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from fin"));
+	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from fin"));
 }
 
 #pragma endregion

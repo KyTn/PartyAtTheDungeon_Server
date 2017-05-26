@@ -9,7 +9,7 @@
 
 
 class PD_MM_Room;
-
+class PD_MM_DoorInfo;
 
 /**
  * 
@@ -24,7 +24,7 @@ public:
 		bool IsDoorOpen;
 		PD_MG_LogicPosition LP_A, LP_B;
 		PD_MM_Room* Room_A, Room_B;
-
+		PD_MM_DoorInfo* doorInfo;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,4 +38,6 @@ public:
 	// Se llamará a esta función para desactivar el interactuable
 	virtual void InteractToDeactivate(AActor* interactor, bool overwriteState = false);
 	
+
+	void ChangeRotationToReal(PD_MG_LogicPosition lp);
 };
