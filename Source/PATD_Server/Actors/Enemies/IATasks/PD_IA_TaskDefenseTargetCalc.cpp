@@ -34,14 +34,16 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 
 	int AP = logicCharacter->GetTotalStats()->APTotal;
 	
+	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: AP iniciales:%d "), AP);
+
 	if (logicCharacter->GetIAPersonality() == EIAPersonality::Coward) {
-		AP -= APDefense;
-	}
-	else {
 		AP -= APDefenseCoward;
 	}
+	else {
+		AP -= APDefense;
+	}
 	
-	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: AP iniciales:%d "), AP);
+	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: AP tras defensa:%d "), AP);
 
 	int indexPath = 0;
 	listPathPosition.RemoveAt(listPathPosition.Num() - 1); //Quitamos la ultima porque seria para ponerse encima, para chocar.

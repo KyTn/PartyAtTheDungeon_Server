@@ -94,6 +94,7 @@ void AServerCamera::Tick(float DeltaTime)
 
 	if (lookState == ECameraLookState::LookPoint) {
 		FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		PlayerRot.Yaw = 0;
 		//FRotator newrot = (GetActorLocation() - lookPosition).Rotation();
 		//this->AddActorWorldRotation(newrot);
 		SetActorRotation(PlayerRot);

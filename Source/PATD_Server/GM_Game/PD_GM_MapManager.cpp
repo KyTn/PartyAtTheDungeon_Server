@@ -607,9 +607,11 @@ void PD_GM_MapManager::InstantiateEnemies() {
 					UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
 					if (SGI)
 					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager:: hay sgi"));
+
 						//Weapon
 						int id_weapon, classWeapon, typeWeapon, damage, range;
-						SGI->LoadWeaponSpecificData((int)charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
+						SGI->LoadWeaponSpecificDataByType(charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
 						logicCha->GetWeapon()->ID_Weapon = id_weapon;
 						logicCha->GetWeapon()->ClassWeapon = classWeapon;
 						logicCha->GetWeapon()->TypeWeapon = typeWeapon;
@@ -646,6 +648,9 @@ void PD_GM_MapManager::InstantiateEnemies() {
 							logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
 						}
 					}
+					else {
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::NO HAY SGI"));
+					}
 				}
 
 
@@ -677,4 +682,9 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 }
 
+TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetAllTilesInRange(float range, PD_MG_LogicPosition logPos)
+{
+	return logPos.GetAllTilesInRange(range, MapInfo->allLogicPos);
+
+}
 #pragma endregion

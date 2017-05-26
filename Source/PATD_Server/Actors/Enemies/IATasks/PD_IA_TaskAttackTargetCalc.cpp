@@ -30,7 +30,7 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 	TArray<PD_MG_LogicPosition> listPathPosition;
 	listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
 	if (listPathPosition.Num() == 0) {
-		//ERROR, mirar como lo tratamos
+		return false;
 	}
 
 	int AP= logicCharacter->GetTotalStats()->APTotal;
