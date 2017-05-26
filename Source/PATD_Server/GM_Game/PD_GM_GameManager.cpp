@@ -838,8 +838,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 				newTargetPositions.Add(mapManager->LogicToWorldPosition(
 					playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
 			}
-			newTargetPositions.Add(mapManager->LogicToWorldPosition(
-				playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition()));
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition()));
 		}
 	}
 
@@ -853,8 +852,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 				newTargetPositions.Add(mapManager->LogicToWorldPosition(
 					enemyManager->GetEnemies()[i]->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
 			}
-			newTargetPositions.Add(mapManager->LogicToWorldPosition(
-				enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
 		}
 	}
 

@@ -7,8 +7,11 @@
 #include "PD_ServerGameInstance.h"
 #include "Actors/PD_SplineActors.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "PD_PlayersManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "GM_Game/PD_GM_MapManager.h"
+
 /*
 AServerCamera::AServerCamera()
 {
@@ -39,6 +42,14 @@ void AServerCamera::BeginPlay()
 	if (SGI)
 	{
 		SGI->Camera_Register(this);
+		TArray<FVector> targetsInitial = TArray<FVector>();
+		for (int i = 0; i < SGI->playersManager->GetNumPlayers(); i++)
+		{
+			targetsInitial.Add(SGI->mapManager->LogicToWorldPosition(
+			SGI->playersManager->GetCharacterByIndex(i)->GetCurrentLogicalPosition()));
+		}
+
+		Camera_MoveInMovementPhase(targetsInitial);
 	}
 
 	
@@ -51,7 +62,6 @@ void AServerCamera::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 	Super::Tick(DeltaTime);
 	if (moveState == ECameraMoveState::Moving) {
-		
 
 		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{//continua moviendose
@@ -75,6 +85,13 @@ void AServerCamera::Tick(float DeltaTime)
 
 	}
 	else if (moveState == ECameraMoveState::Patrol) {
+
+		FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(
+			GetActorLocation(), FVector(moveTargetPosition.X, moveTargetPosition.Y, moveTargetPosition.Z));
+
+		newRotator.Pitch = newRotator.Pitch - 50.0f;
+		SetActorRotation(newRotator);
+
 		//distance += DeltaTime*patrolVelocity;
 		distance += 0.5;
 		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
@@ -93,13 +110,19 @@ void AServerCamera::Tick(float DeltaTime)
 
 
 	if (lookState == ECameraLookState::LookPoint) {
-		FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
-		PlayerRot.Yaw = 0;
+
+		//LookAtPoint(moveTargetPosition);
+		//FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		//PlayerRot.Yaw = 0;
+
 		//FRotator newrot = (GetActorLocation() - lookPosition).Rotation();
 		//this->AddActorWorldRotation(newrot);
-		SetActorRotation(PlayerRot);
+		//SetActorRotation(PlayerRot);
+		
+		
 	}
 	else if (lookState == ECameraLookState::LookActor) {
+		UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::LookActor"));
 
 	}
 	
