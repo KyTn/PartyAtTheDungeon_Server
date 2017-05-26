@@ -84,13 +84,13 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 		UE_LOG(LogTemp, Warning, TEXT("NetworkManager::SendNow:: Recibiendo info: tamaño SIN cabecera: %d --> %s"), dataaux.Num(), *s);
 		*/
 
-
+		/*
 		if (UStructType(type) == UStructType::FStructMapData) {
 			for (int i = 0; i < dataaux.Num(); i++) {
 				UE_LOG(LogTemp, Warning, TEXT("PD_NW_NetworkManager::HandleNewSocketData:: %d"), dataaux[i]);
 			}
 		}
-
+		*/
 		FStructGeneric* genericStruct = serializerManager->DeserializeData(&dataaux, UStructType(type)); //Otra copia?
 																										 //genericStruct->structType = type;
 		UE_LOG(LogTemp, Warning, TEXT("NetworkManager::HandleNewSocketData:: While: type: %d : type2: %d"), type, genericStruct->structType);

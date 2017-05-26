@@ -18,11 +18,14 @@ public:
 
 		APD_E_Interactuable();
 
+		// es el id del interactuable 
+		int ID_Interactuable;
+
 	// Posiciones desde el cual un character puede interactuar con este elemento
 	TArray<PD_MG_LogicPosition> InteractFromThisLogicPositions;
 
 	// Cuando el interactuable se activa, llama al InteractActivate de los reactores, en funcion de su configuracion
-	TArray<APD_E_Interactuable> ActivateThisReactorsWhenActive;
+	TArray<APD_E_Interactuable*> ActivateThisReactorsWhenActive;
 	
 
 	bool IsCurrentlyActivated;

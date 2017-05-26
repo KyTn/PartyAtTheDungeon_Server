@@ -132,8 +132,15 @@ struct RoomTemplateInfo {
 			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
 			OPEN_WALLS.Add(p);
 			break;
+		case 'd':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::DOOR);
+			LOCAL_LOGIC_POSITIONS_ON_ROOM.Add(p);
+			break;
 		case 't':
 			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_CHEST);
+			break;
+		case 'c':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::COLUMN);
 			break;
 		default:
 			break;
@@ -585,6 +592,8 @@ public:
 
 	bool EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
 
+	bool InteractuablesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables);
+
 #pragma endregion
 
 
@@ -598,7 +607,7 @@ private:
 	bool MapCanContainsRoom(MapProceduralInfo &M, RoomTemplateInfo &R, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
 
 	PD_MG_LogicPosition Translate_LocalPosInRoom_To_MapPosition(PD_MG_LogicPosition localPos, PD_MG_LogicPosition C, PD_MG_LogicPosition R_pivot);
-	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD);
+	bool Put_Door_Tryng_doubleDoor_at(MapProceduralInfo &M, PD_MG_LogicPosition W1, uint8 IDR, TArray<LogicPositionAmplified> &LD, TArray<LogicPositionAmplified> &LInteractuables);
 
 	//devuelve la dificultad del dungeon
 	int DifficultyDungeon(MATCHCONFIG_DIFFICULTY matchConfig_MATCHCONFIG_MAPDIFFICULTY);
@@ -624,7 +633,7 @@ private:
 
 #pragma endregion
 
-	void Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray<LogicPositionAmplified> walls, TArray<LogicPositionAmplified> doors);
+	void Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray<LogicPositionAmplified> walls, TArray<LogicPositionAmplified> doors, TArray<LogicPositionAmplified> interactuables);
 
 #pragma endregion
 };

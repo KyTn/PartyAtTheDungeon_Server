@@ -16,6 +16,8 @@ class APD_E_Character;
 class APD_E_ElementActor;
 class APD_E_Door;
 class PD_MM_Room;
+class APD_E_WallActor;
+
 //////////////////////////
 
 UCLASS()
@@ -49,6 +51,12 @@ public:
 
 	TSubclassOf<class APD_E_Door> DoorClass;
 
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_1_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_2_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_03_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_1_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_2_Class;
 #pragma endregion
 
 
@@ -59,8 +67,6 @@ public:
 	
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Dungeon_Prop_Treasure_01_Class;
-
-
 
 #pragma endregion 
 
@@ -81,7 +87,8 @@ public:
 #pragma endregion 
 
 	APD_E_ElementActor* InstantiateTile(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* InstantiateWall(PD_MG_LogicPosition logpos);
+
+	APD_E_WallActor* InstantiateWall(PD_MG_LogicPosition logpos);
 
 	APD_E_Door* InstantiateDoor(PD_MG_LogicPosition logpos);
 
@@ -89,6 +96,11 @@ public:
 
 	APD_E_ElementActor* Instantiate_Dungeon_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Dungeon_SpecialTile(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_02_1(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_03(PD_MG_LogicPosition logpos);
+
+	
 
 #pragma endregion 
 

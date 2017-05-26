@@ -14,7 +14,7 @@ class PD_GM_GameManager;
 class PD_GM_EnemyManager;
 class PD_PlayersManager;
 class APD_GenericController;
-
+class PD_MM_DoorInfo;
 
 class PATD_SERVER_API PD_GM_MapManager
 {
@@ -85,6 +85,7 @@ public:
 	void InstantiateRoomAndAdj(uint8 id);
 	void InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMapElement element, PD_MG_LogicPosition lp);
 	void InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp);
+	void InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* doorInfo);
 	void InstantiateDynamicMap();
 	void InstantiateEnemies();
 

@@ -8,7 +8,7 @@ W......W
 w......w
 w..t...w
 w......w
-w......w
+w..c...w
 W......W
 WWwwwwWW
 START_ROOM
@@ -18,7 +18,7 @@ size_x: 8
 size_y: 8
 WWwwwwWW
 W......W
-w......w
+w..c...w
 w..,,..w
 w..,,..w
 w......w
