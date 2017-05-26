@@ -89,7 +89,8 @@ public:
 
 
 	
-
+	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
+		void UpdateCharLife(float damage); 
 
 
 	UFUNCTION()

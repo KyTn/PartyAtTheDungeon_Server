@@ -81,6 +81,9 @@ public:
 	}
 
 	TArray<PD_MG_LogicPosition> GetDiagonalsAndAdjacentsFromList(TArray<PD_MG_LogicPosition> list) {
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_MG_LogicPosition: GetDiagonalsAndAdjacentsFromList"));
+
 		TArray<PD_MG_LogicPosition> res = TArray<PD_MG_LogicPosition>();
 		for (int i = 0; i < list.Num(); i++) {
 			if (this->EuclideanDistance(list[i]) <=1.7f) {

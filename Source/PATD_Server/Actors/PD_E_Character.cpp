@@ -108,3 +108,8 @@ bool APD_E_Character::SetCharacterCameraOnView()
 	}
 
 }
+
+void APD_E_Character::UpdateCharLife(float damage)
+{
+	logic_character->UpdateHPCurrent(damage);
+}
