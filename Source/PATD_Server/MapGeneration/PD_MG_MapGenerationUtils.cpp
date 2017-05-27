@@ -1380,7 +1380,7 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 	for (int i = 0; i <lp.Num() ; i++)
 	{
 		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Tipo de enemigo %d"), M.enemies[lp[i]]);
-		M.NETMAPDATA->enemyComposition.Add(EnemyCompositionOf(lp[i], i, M.enemies[lp[i]]));
+		M.NETMAPDATA->enemyComposition.Add(EnemyCompositionOf(lp[i] - M.BOUNDING_BOX_TOP_LEFT, i, M.enemies[lp[i]]));
 	}
 	//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from fin"));
 }
