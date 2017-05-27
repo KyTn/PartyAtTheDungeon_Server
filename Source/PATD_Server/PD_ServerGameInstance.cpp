@@ -376,7 +376,9 @@ void UPD_ServerGameInstance::HandleEvent_LoadPlayerInfo(FStructGeneric* inDataSt
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->weapon = &playerStats->weapon;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->skin = &playerStats->skin;
 	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->characterState = &playerStats->charState;
-	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->SetIDCharacter("Player_0"+inPlayer);
+	FString id_character = "Player_0";
+	id_character = id_character.Append(FString::FromInt(inPlayer));
+	playersManager->GetDataStructPlayer(inPlayer)->logic_Character->SetIDCharacter(id_character);
 }
 
 void UPD_ServerGameInstance::HandleEvent_PlayerReady(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
@@ -1016,6 +1018,10 @@ void UPD_ServerGameInstance::GetMapsize(float &SizemapX, float &SizemapY)
 	SizemapY = ((mapY - 1) * 100) / 2;
 }
 
+
+int UPD_ServerGameInstance::GetServerPhase() {
+	return gameManager->getServerPhase();
+}
 
 /*
 FUNCIONES DE CONTROL DE CAMARA

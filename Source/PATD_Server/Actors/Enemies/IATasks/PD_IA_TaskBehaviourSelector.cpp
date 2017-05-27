@@ -262,9 +262,11 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Berserker"));
 			//Standard
-			AIController->goalCharacter = AIController->GetClosestPlayer();
-			AIController->turnsForGoal = 1; //En standard ponemos solo 1 turno para la accion, porque el objetivo es el mas proximo, que se deberia recalcular.
-			
+			AIController->goalCharacter = AIController->GetLeastHPPlayer();
+			//AIController->goalCharacter = AIController->GetClosestPlayer();
+			//AIController->turnsForGoal = 1; //En standard ponemos solo 1 turno para la accion, porque el objetivo es el mas proximo, que se deberia recalcular.
+			AIController->turnsForGoal = 1000;
+
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Smart) {
 				 
 				AIController->goalCharacter = AIController->GetLeastHPPlayer();

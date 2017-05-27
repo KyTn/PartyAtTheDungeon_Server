@@ -7,8 +7,11 @@
 #include "PD_ServerGameInstance.h"
 #include "Actors/PD_SplineActors.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "PD_PlayersManager.h"
 #include "GM_Game/PD_GM_GameManager.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "GM_Game/PD_GM_MapManager.h"
+
 /*
 AServerCamera::AServerCamera()
 {
@@ -39,6 +42,14 @@ void AServerCamera::BeginPlay()
 	if (SGI)
 	{
 		SGI->Camera_Register(this);
+		TArray<FVector> targetsInitial = TArray<FVector>();
+		for (int i = 0; i < SGI->playersManager->GetNumPlayers(); i++)
+		{
+			targetsInitial.Add(SGI->mapManager->LogicToWorldPosition(
+			SGI->playersManager->GetCharacterByIndex(i)->GetCurrentLogicalPosition()));
+		}
+
+		Camera_MoveInMovementPhase(targetsInitial);
 	}
 
 	
@@ -51,9 +62,10 @@ void AServerCamera::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Log, TEXT("Move camera. Position:%s"), *GetActorLocation().ToString());
 	Super::Tick(DeltaTime);
 	if (moveState == ECameraMoveState::Moving) {
-		
+		timeCurrent += DeltaTime;
 
-		if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
+		if (timeCurrent< timeTotal)
+		//if (!this->GetActorLocation().Equals(moveTargetPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{//continua moviendose
 			UE_LOG(LogTemp, Warning, TEXT("AServerCamera::Tick:: Objetivo:%s "), *moveTargetPosition.ToString());
 
@@ -62,9 +74,13 @@ void AServerCamera::Tick(float DeltaTime)
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento:%s"), *incrementPosition.ToString());
 			//UE_LOG(LogTemp, Log, TEXT("Move camera. Incremento valores:%s"), *targetDirection.ToString());
 			FVector newLocation=GetActorLocation() + incrementPosition;
+
 			SetActorLocation(newLocation);
 
-			
+			FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		//	PlayerRot.Yaw = 90;
+			SetActorRotation(PlayerRot);
+
 		}
 		else
 		{//ha llegado
@@ -75,6 +91,13 @@ void AServerCamera::Tick(float DeltaTime)
 
 	}
 	else if (moveState == ECameraMoveState::Patrol) {
+
+		FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(
+			GetActorLocation(), FVector(moveTargetPosition.X, moveTargetPosition.Y, moveTargetPosition.Z));
+
+		newRotator.Pitch = newRotator.Pitch - 50.0f;
+		SetActorRotation(newRotator);
+
 		//distance += DeltaTime*patrolVelocity;
 		distance += 0.5;
 		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
@@ -93,15 +116,22 @@ void AServerCamera::Tick(float DeltaTime)
 
 
 	if (lookState == ECameraLookState::LookPoint) {
-		FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
-		PlayerRot.Yaw = 0;
+
+		//LookAtPoint(moveTargetPosition);
+		//FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), lookPosition);
+		//PlayerRot.Yaw = 0;
+
 		//FRotator newrot = (GetActorLocation() - lookPosition).Rotation();
 		//this->AddActorWorldRotation(newrot);
-		SetActorRotation(PlayerRot);
+		//SetActorRotation(PlayerRot);
+		
+		
 	}
 	else if (lookState == ECameraLookState::LookActor) {
+		UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::LookActor"));
 
 	}
+
 	
 }
 
@@ -189,6 +219,18 @@ bool AServerCamera::IsInCurrentViewPort(FVector2D desiredPosition)
 
 }
 
+void AServerCamera::MoveToPositions(TArray<FVector> targetPositions) {
+	
+	FVector position = FindAvaragePosition(targetPositions);
+	//position.Z= GetZoomForPositionList(targetPositions);
+	//UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: zoomSelected %d"), position.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: %d"), GetZoomForPositionList(targetPositions));
+	//position.Z = 1000;
+	//UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: zoomSelected %d"), position.Z);
+	UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: Position con Zoom %s"), *position.ToString());
+	MoveTo(position);
+
+}
 
 void AServerCamera::MoveTo(FVector targetPosition) {
 	UE_LOG(LogTemp, Log, TEXT("CameraMoveTo targetDirection.Target:%s"), *targetPosition.ToString());
@@ -196,6 +238,9 @@ void AServerCamera::MoveTo(FVector targetPosition) {
 	targetDirection = (moveTargetPosition - this->GetActorLocation());
 	UE_LOG(LogTemp, Log, TEXT("CameraMoveTo targetDirection.Location:%s"), *this->GetActorLocation().ToString());
 	targetDirection.Normalize();
+
+	timeTotal = FVector::Dist(moveTargetPosition, this->GetActorLocation()) / velocity;
+	timeCurrent = 0;
 	moveState = ECameraMoveState::Moving;
 }
 
@@ -236,3 +281,68 @@ bool AServerCamera::SetCameraOnView()
 		return false;
 	}
 }
+
+
+FVector AServerCamera::FindMaxDeviation(TArray<FVector> desiredPositions) {
+	FVector averagePosition= FindAvaragePosition(desiredPositions);
+	FVector maxDiff = FVector(0,0,0);
+	for (FVector position : desiredPositions) {
+		FVector diff= position - averagePosition;
+		
+		if (maxDiff.X < FMath::Abs(diff.X)) {
+			maxDiff.X = FMath::Abs(diff.X);
+		}
+		if (maxDiff.Y < FMath::Abs(diff.Y)) {
+			maxDiff.Y = FMath::Abs(diff.Y);
+		}
+	}
+
+	return maxDiff;
+}
+
+float AServerCamera::GetZoomForPositionList(TArray<FVector> inPositionsToShowList) {
+
+	UE_LOG(LogTemp, Warning, TEXT("AServerCamera::GetZoomForPositionList: %s"), *this->GetName());
+	FVector deviation = FindMaxDeviation(inPositionsToShowList);
+
+
+
+	float zoomFromX = deviation.X*3;
+	float zoomFromY = deviation.Y*3;
+
+
+	float zoomDesired = 1000;
+	if (deviation.Equals(FVector(0, 0, 0))) {
+		zoomDesired = 1000;
+	}
+	else {
+		zoomDesired = FMath::Max((float)1000,FMath::Max(zoomFromX, zoomFromY));
+	}
+	FVector mostrar = FVector(zoomFromX, zoomFromY, zoomDesired);
+	UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::GetZoomForPositionList: FVectorMostrar %s"), *mostrar.ToString());
+
+	return zoomDesired;
+	/*
+	if (FMath::Abs(GetActorLocation().Z - zoomDesired) > 15) {
+
+
+		float newZ = 1000;
+		if (zoomDesired > GetActorLocation().Z) {
+			newZ = velocityZoom*DeltaTime + GetActorLocation().Z;
+
+		}
+		else {
+			newZ = velocityZoom*DeltaTime - GetActorLocation().Z;
+		}
+		FVector newLocation = GetActorLocation();
+		newLocation.Z = newZ;
+		SetActorLocation(newLocation);
+
+	}*/
+}
+
+/*
+void AServerCamera::SetDesiredPositionToShow(TArray<FVector> inPositionsToShowList) {
+	positionsToShowList = positionsToShowList;
+	
+}*/
