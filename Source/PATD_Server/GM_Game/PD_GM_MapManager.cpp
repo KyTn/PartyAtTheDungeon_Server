@@ -64,7 +64,7 @@ bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
 {
 	if (MapInfo->roomByLogPos.Contains(logpos)) {
 		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
-		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos) && r->tiles.Contains(logpos))
 			return true;
 	}
 	return false;
@@ -74,7 +74,7 @@ bool PD_GM_MapManager::IsLogicPositionAProp(PD_MG_LogicPosition logpos)
 {
 	if (MapInfo->roomByLogPos.Contains(logpos)) {
 		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
-		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos) && !r->tiles.Contains(logpos))
 			return true;
 	}
 	return false;
@@ -92,6 +92,14 @@ bool PD_GM_MapManager::IsLogicPositionADoor(PD_MG_LogicPosition logpos)
 	}
 	return false;
 }
+
+bool PD_GM_MapManager::IsLogicPositionAEnemy(PD_MG_LogicPosition logpos) {
+	for (PD_GM_LogicCharacter* logicCharacter : _GAMEMANAGER->enemyManager->GetEnemies()) {
+		if (logicCharacter->GetCurrentLogicalPosition() == logpos) return true;
+	}
+	return false;
+}
+
 
 #pragma endregion
 

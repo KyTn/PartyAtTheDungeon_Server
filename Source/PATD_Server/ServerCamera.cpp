@@ -222,7 +222,7 @@ bool AServerCamera::IsInCurrentViewPort(FVector2D desiredPosition)
 void AServerCamera::MoveToPositions(TArray<FVector> targetPositions) {
 	
 	FVector position = FindAvaragePosition(targetPositions);
-	//position.Z= GetZoomForPositionList(targetPositions);
+	position.Z= GetZoomForPositionList(targetPositions);
 	//UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: zoomSelected %d"), position.Z);
 	//UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::MoveToPositions: GetZoomForPositionList: %d"), GetZoomForPositionList(targetPositions));
 	//position.Z = 1000;

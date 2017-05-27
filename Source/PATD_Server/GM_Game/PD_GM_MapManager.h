@@ -47,6 +47,7 @@ public:
 	bool IsLogicPositionAProp(PD_MG_LogicPosition logpos);
 	bool IsLogicPositionADoor(PD_MG_LogicPosition logpos);
 	//bool IsLogicPositionASpawn(PD_MG_LogicPosition logpos);
+	bool IsLogicPositionAEnemy(PD_MG_LogicPosition logpos);
 
 
 #pragma endregion

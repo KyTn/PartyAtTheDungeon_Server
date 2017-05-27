@@ -4,6 +4,8 @@
 #include "PD_GM_Pathfinder.h"
 
 #include "MapGeneration/PD_MG_LogicPosition.h"
+#include "MapInfo/PD_MM_MapInfo.h"
+#include "Actors/Interactuables/PD_E_Door.h"
 
 PD_GM_Pathfinder::PD_GM_Pathfinder(PD_GM_MapManager* inMapManager)
 {
@@ -118,17 +120,27 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSe
 
 	}
 
-	//	UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
+		UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
 
 	TArray<PD_MG_LogicPosition> adyacentsList = mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(x, y));
 
 	for (PD_MG_LogicPosition adyacentLogicPosition : adyacentsList) {
-		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==%d,%d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsThereWall(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY()), !(adyacentLogicPosition == parentLogicPosition));
-		if (!mapManager->IsLogicPositionAWall(adyacentLogicPosition)
+		UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d, %d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsLogicPositionAWall(adyacentLogicPosition), mapManager->IsLogicPositionAProp(adyacentLogicPosition), (mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen), !(adyacentLogicPosition == parentLogicPosition));
+		
+
+		if (//Condiciones de no pasar
+			!(mapManager->IsLogicPositionAWall(adyacentLogicPosition)
+			||mapManager->IsLogicPositionAProp(adyacentLogicPosition)
+			//||mapManager->IsLogicPositionAEnemy(adyacentLogicPosition) //Lo dejamos para que puedan haber choques.
+			||(mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen)
+			
+			)
+
+			//condicion para que no repita
 			&& !(adyacentLogicPosition == parentLogicPosition)
 			)
 		{
-			//	UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
+			UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
 			MapSearchNode NewNode;
 			NewNode = MapSearchNode(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager);
 			astarsearch->AddSuccessor(NewNode);
