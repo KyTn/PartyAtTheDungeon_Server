@@ -22,6 +22,7 @@ enum class EGameState { Instantiate_Map, Start_Match, WaitingPlayerOrders, Execu
 enum class EServerState { StartApp, WaitingMasterClient, WaitingGameConfiguration, Lobby_Tabern, Launch_Match, GameInProcess, Podium, OnExit };
 
 //Maquina de estados de fases
+UENUM(BlueprintType)
 enum class EServerPhase { StartPhases, ConsumableIni, ConsumableCamera, ConsumableTick, MoveIni, MoveCamera, MoveTick, InteractionIni, InteractionCamera, InteractionTick, AttackIni, AttackCamera, AttackTick, EndAllPhases };
 
 //Fases que tenemos

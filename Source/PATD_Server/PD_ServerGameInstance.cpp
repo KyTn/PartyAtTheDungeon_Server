@@ -1019,6 +1019,10 @@ void UPD_ServerGameInstance::GetMapsize(float &SizemapX, float &SizemapY)
 }
 
 
+int UPD_ServerGameInstance::GetServerPhase() {
+	return gameManager->getServerPhase();
+}
+
 /*
 FUNCIONES DE CONTROL DE CAMARA
 */
