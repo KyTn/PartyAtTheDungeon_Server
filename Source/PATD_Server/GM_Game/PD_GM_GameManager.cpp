@@ -1194,7 +1194,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
 		
 		timer->InitTimer(timeWaitingPhases);
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de consumible")));
 
 		UpdatePhase();
 	}
@@ -1222,7 +1222,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		PlayersLogicTurn();
 
 		timer->InitTimer(timeWaitingPhases);
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
 
 		UpdatePhase();
 	}
@@ -1310,7 +1310,7 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
 		timer->InitTimer(timeWaitingPhases);
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
 
 		UpdatePhase();
 	}
@@ -1330,7 +1330,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del ataque logico
 
 		timer->InitTimer(timeWaitingPhases);
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
 
 		individualActionOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
 
@@ -1376,6 +1376,12 @@ void PD_GM_GameManager::OnBeginPhase()
 
 }
 #pragma endregion
+
+int PD_GM_GameManager::getServerPhase()
+{
+	return (int)structGamePhase->enumGamePhase;
+}
+
 
 bool PD_GM_GameManager::CheckWinGameConditions()
 {

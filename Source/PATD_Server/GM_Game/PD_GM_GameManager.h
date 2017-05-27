@@ -101,6 +101,8 @@ public:
 	void ChangePhase(EServerPhase newPhase);
 	void InitPhase();
 
+	int getServerPhase();
+
 #pragma endregion
 
 	//Funciones para crear las ordenes de los enemigos
