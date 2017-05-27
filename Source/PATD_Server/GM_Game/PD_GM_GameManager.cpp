@@ -1256,10 +1256,15 @@ void PD_GM_GameManager::OnBeginPhase()
 					}
 				}
 				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-					targetPositions.Add(mapManager->LogicToWorldPosition(
+					//targetPositions.Add(mapManager->LogicToWorldPosition(
 						//enemyManager->GetEnemies()[k]->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]));
-						enemyManager->GetEnemies()[k]->GetCurrentLogicalPosition()));
-
+					//	enemyManager->GetEnemies()[k]->GetCurrentLogicalPosition()));
+					if (enemyManager->GetTurnOrders(k)->positionsToMove.Num() > 0) {
+						FStructLogicPosition pos = enemyManager->GetTurnOrders(k)->positionsToMove[enemyManager->GetTurnOrders(k)->positionsToMove.Num() - 1];
+					
+					targetPositions.Add(mapManager->LogicToWorldPosition(PD_MG_LogicPosition(pos.positionX, pos.positionY)));
+					UE_LOG(LogTemp, Log, TEXT("Camera MOve adding logic: %s"), *(mapManager->LogicToWorldPosition(PD_MG_LogicPosition(pos.positionX, pos.positionY)).ToString()));
+					}
 
 				}
 			}
@@ -1283,8 +1288,10 @@ void PD_GM_GameManager::OnBeginPhase()
 			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
 
 			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
-			Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
+			//Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
 
+			Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
+			
 			FOutputDeviceNull ar;
 			const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
 																							//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);

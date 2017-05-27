@@ -30,6 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 		void MoveTo(FVector targetPosition);
+
+		void MoveToPositions(TArray<FVector> targetPositions);
 	//Mueve la camara en funcion de la posicion de los players
 	UFUNCTION(BlueprintCallable, Category = "CameraControl")
 		void Camera_MoveInMovementPhase(TArray<FVector> targetList);
@@ -61,6 +63,8 @@ public:
 	//Move
 	void OnMoveEnd();
 	float velocity=1000;
+	float timeTotal = 0;
+	float timeCurrent = 0;
 	FVector targetDirection;
 
 	//Patrol
@@ -72,10 +76,32 @@ public:
 //	bool patrolRotate = true;
 	void InitPatrol(FVector targetPosition);
 
+	//Sistema de mirar a
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	FVector lookPosition;
 
+
 	void LookAtPoint(FVector inLookPosition);
 	void StopLookAt();
+
+	//Sistema de zoom
+	FVector FindMaxDeviation(TArray<FVector> desiredPositions);
+	//TArray<FVector> positionsToShowList;
+	//FVector deviationFromList;
+	//float zoomDesired;
+
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float ratioZoomX=2;
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float ratioZoomY=2;
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float minZoom = 1000;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float velocityZoom;
+
+	//void SetPositionsToShow(TArray<FVector> inPositionsToShowList);
+	float GetZoomForPositionList(TArray<FVector> inPositionsToShowList);
+
 
 };
