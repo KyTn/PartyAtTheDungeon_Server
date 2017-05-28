@@ -11,7 +11,8 @@
 
 #pragma region INTERACTUABLE INFO
 
-PD_MM_InteractuableInfo::PD_MM_InteractuableInfo(PD_MG_LogicPosition lp, int id, StaticMapElement t) {
+PD_MM_InteractuableInfo::PD_MM_InteractuableInfo(PD_MG_LogicPosition lp, int id, StaticMapElement t, FString name) {
+	Name_Interactuable = name;
 	logpos = lp;
 	IDInteractuable = id;
 	type = t;

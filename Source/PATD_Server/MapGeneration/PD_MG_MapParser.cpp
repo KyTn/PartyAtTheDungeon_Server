@@ -353,9 +353,17 @@ bool PD_MG_MapParser::Parsing_v_0_2(FStructMapData * NETMAPDATA, PD_MM_MapInfo *
 			PD_MM_Room *roomA = MapInfoRef->roomByIDRoom[IDRoomA], *roomB = MapInfoRef->roomByIDRoom[IDRoomB];
 			PD_MM_DoorInfo* doorInfo = new PD_MM_DoorInfo(pos, idInter, typeInter, roomA, roomB);
 
+			FString n = "I_";
+			n.AppendInt((int)typeInter);
+			n.Append("_");
+			n.AppendInt(idInter);
+
+			PD_MM_InteractuableInfo* interactuableInfo = new PD_MM_InteractuableInfo(pos, idInter, typeInter, n);
+
+			doorInfo->interactuableInfo = interactuableInfo;
 
 			MapInfoRef->allLogicPos.AddUnique(pos);
-			
+
 			MapInfoRef->doorInfoInMap.Add(doorInfo);
 			MapInfoRef->doorInfoByLogPos.Add(pos, doorInfo);
 			MapInfoRef->doorInfoByID.Add(doorInfo->IDInteractuable, doorInfo);
@@ -367,7 +375,6 @@ bool PD_MG_MapParser::Parsing_v_0_2(FStructMapData * NETMAPDATA, PD_MM_MapInfo *
 			roomB->DoorInfoInRoomByLogicPosition.Add(pos, doorInfo);
 			roomB->LogicDoorPosInRoom.Add(pos);
 
-			PD_MM_InteractuableInfo* interactuableInfo = new PD_MM_InteractuableInfo(pos, idInter, typeInter);
 
 			MapInfoRef->interactuableInfoInMap.Add(interactuableInfo);
 			MapInfoRef->interactuableInfoByLogPos.Add(pos, interactuableInfo);
@@ -380,9 +387,12 @@ bool PD_MG_MapParser::Parsing_v_0_2(FStructMapData * NETMAPDATA, PD_MM_MapInfo *
 			continue;
 		}
 		else {
-
+			FString n = "I_";
+			n.AppendInt((int)typeInter);
+			n.Append("_");
+			n.AppendInt(idInter);
 			// añadamos el interactuable al mapa 
-			PD_MM_InteractuableInfo* interactuableInfo = new PD_MM_InteractuableInfo(pos, idInter, typeInter);
+			PD_MM_InteractuableInfo* interactuableInfo = new PD_MM_InteractuableInfo(pos, idInter, typeInter, n);
 
 			MapInfoRef->interactuableInfoInMap.Add(interactuableInfo);
 			MapInfoRef->interactuableInfoByLogPos.Add(pos, interactuableInfo);
