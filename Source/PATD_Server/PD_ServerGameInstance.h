@@ -210,4 +210,5 @@ public:
 		int GetServerPhase();
 
 	void LoadWeaponSpecificDataByType(TypeWeapons indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range);
+	void LoadSkillSpecificDataByType(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range);
 };

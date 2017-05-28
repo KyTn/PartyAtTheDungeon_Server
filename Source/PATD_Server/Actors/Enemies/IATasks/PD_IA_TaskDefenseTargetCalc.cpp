@@ -56,7 +56,7 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 			AP--;
 			//Coge la ultima a la que llege por el ap, pero si hay una en la que ya tenga rango, aunque le queden AP sale del bucle.
 			AIController->turnTargetPosition = pathPosition;
-			if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter)) {
+			if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 
 				break;
 			}

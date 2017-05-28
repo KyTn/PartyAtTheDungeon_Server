@@ -47,12 +47,19 @@ public:
 	FStructTurnOrders* GetTurnOrders() { return &actions; };
 	PD_GM_Pathfinder* GetPathFinder() { return pathfinder; };
 
+
+	TArray<PD_MG_LogicPosition> GetValidPositionsAdyacentsTo(PD_MG_LogicPosition position);
+
+	TArray<PD_GM_LogicCharacter*> GetEnemiesInRange(float range);
 //	TArray<PD_GM_LogicCharacter*> GetPlayersInRange();
 	PD_GM_LogicCharacter* GetClosestPlayer();
 	PD_GM_LogicCharacter* GetLeastHPPlayer();
 	PD_GM_LogicCharacter* GetMostHPEnemy();
 	PD_MG_LogicPosition GetClosestDoorPosition();
-	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character);
+	PD_MG_LogicPosition GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition);
+
+
+	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character,int range);
 	/*
 	virtual bool MoveTo(float x, float y) override;
 	virtual bool ActionTo(float x, float y, uint8 id_action) override;

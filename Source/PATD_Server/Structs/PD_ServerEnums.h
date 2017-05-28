@@ -113,7 +113,14 @@ enum class PasiveSkills
 	TheSweeper = 16
 };
 
-enum class ECharacterType { NoCharacter, Player, OrcMelee, OrcBow, OrcGuns };
+UENUM(BlueprintType)
+enum class ConsumableItems
+{
+	enemyBuffToAttack = 0,
+	enemyHeal=1
+};
+
+enum class ECharacterType { NoCharacter, Player, OrcMelee, OrcBow, OrcGuns, OrcBoss };
 /*
 EnumParser<ECharacterType>::EnumParser()
 {

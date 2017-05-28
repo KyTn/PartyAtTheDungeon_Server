@@ -16,6 +16,7 @@ class PATD_SERVER_API UPD_IA_TaskAttackTargetCalc : public UBTTaskNode
 	
 		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+protected:
 	bool CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp);
 
 

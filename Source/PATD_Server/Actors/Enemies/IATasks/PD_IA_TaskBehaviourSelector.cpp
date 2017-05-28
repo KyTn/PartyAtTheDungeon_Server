@@ -241,15 +241,31 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Flee"));
 			//PD_MG_LogicPosition positionToFlee = AIController->GetClosestDoorPosition();
-			if (AIController->GetMostHPEnemy()->GetIDCharacter()!= logicCharacter->GetIDCharacter()){
-				PD_MG_LogicPosition positionToFlee = AIController->GetMostHPEnemy()->GetCurrentLogicalPosition();
-				AIController->goalPosition = positionToFlee;
+			PD_MG_LogicPosition clostestDoorPos = AIController->GetClosestDoorPosition();
+			if (clostestDoorPos == PD_MG_LogicPosition(0, 0)) {
+				if (AIController->GetMostHPEnemy()->GetIDCharacter() != logicCharacter->GetIDCharacter()) {
+					AIController->goalCharacter = AIController->GetMostHPEnemy();
+				}
+				else {
+					AIController->selectedBehaviour = EIABehaviour::Defense;
+					SelectGoals(OwnerComp);
+				}
+			}
+			else {
+				AIController->goalPosition = AIController->GetClosestDoorPosition();
+			}
+			
+		/*	if (AIController->GetMostHPEnemy()->GetIDCharacter()!= logicCharacter->GetIDCharacter()){
+				//PD_MG_LogicPosition positionToFlee = AIController->GetMostHPEnemy()->GetCurrentLogicalPosition();
+				AIController->goalCharacter = AIController->GetMostHPEnemy();
+				//AIController->goalPosition = positionToFlee;
 			}
 			else {
 				//Si no hay nadie con mas vida pasa a modo berserker
 				AIController->selectedBehaviour = EIABehaviour::Defense;
 				SelectGoals( OwnerComp);
-			}
+				
+			}*/
 
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Coward) {
 				//Falta que puedan elegir otras posiciones, como el inteligente. o aleatoria el cobarde

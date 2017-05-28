@@ -344,9 +344,19 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 void PD_GM_GameManager::CreateEnemyOrders() {
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
-		APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
-		controller->StartAITurnCalcultion(mapManager);
+		if (enemyManager->GetEnemies()[i]->GetTypeCharacter() == ECharacterType::OrcMelee) {
+
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
+			APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
+			controller->StartAITurnCalcultion(mapManager);
+		}
+	}
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
+		if (!(enemyManager->GetEnemies()[i]->GetTypeCharacter() == ECharacterType::OrcMelee) ){
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
+			APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
+			controller->StartAITurnCalcultion(mapManager);
+		}
 	}
 }
 
@@ -391,6 +401,17 @@ void PD_GM_GameManager::PlayersLogicTurn() {
 }
 
 void PD_GM_GameManager::LogicTurnItemPhase() {
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		//numCharacters = playersManager->GetNumPlayers();
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		for (int iEnemy = 0; iEnemy < enemyManager->GetEnemies().Num(); iEnemy++) {
+			FStructTurnOrders* turnOrder= enemyManager->GetTurnOrders(iEnemy);
+			if (turnOrder->consumablesToConsume.Num() > 0) {
+				enemyManager->GetEnemies()[iEnemy]->ConsumeItem(turnOrder->consumablesToConsume[0]);
+			}
+		}
+	}
 	
 }
 
@@ -1064,6 +1085,7 @@ void PD_GM_GameManager::UpdatePhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)
 	{
 		ChangePhase(EServerPhase::MoveIni);
+
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)
 	{
@@ -1207,6 +1229,7 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableTick)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableTick"));
+		LogicTurnItemPhase();
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveIni)

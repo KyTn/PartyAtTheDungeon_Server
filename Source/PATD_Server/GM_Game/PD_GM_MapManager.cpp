@@ -534,6 +534,100 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	}
 	InstantiateEnemies();
 
+	APD_E_Character* charac = nullptr;
+	PD_GM_LogicCharacter* logicCha = nullptr;
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(instantiator->GetGameInstance());
+
+	PD_MG_LogicPosition logicPosition = _GAMEMANAGER->enemyManager->GetEnemies()[0]->GetCurrentLogicalPosition();
+	PD_MG_LogicPosition logicPositionInst = PD_MG_LogicPosition(logicPosition.GetX(), logicPosition.GetY() + 1);
+
+	charac = instantiator->InstantiateOrcBoss(logicPositionInst);
+
+	logicCha = new PD_GM_LogicCharacter();
+	logicCha->SetIsPlayer(false);
+	logicCha->SetTypeCharacter(ECharacterType::OrcBoss);
+	logicCha->SetIDCharacter("1");
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::Instanciando de risas id: %s"), *logicCha->GetIDCharacter());
+	logicCha->SetCharacterBP(charac);
+	logicCha->SetController(Cast<APD_AIController>(charac->GetController()));
+	logicCha->SetCurrentLogicalPosition(logicPositionInst);
+
+	///SETEAR AQUI TODOS LOS STATS- WEAPONS- SKILLS DE CADA TIOPO DE ENEMIGO ENE SU LOGIC CHARACTER
+	if (charac)
+	{
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::UPD_ServerGameInstance"));
+
+		//		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(charac->GetGameInstance());
+		if (SGI)
+		{
+			//Weapon
+			int id_weapon, classWeapon, typeWeapon, damage, range;
+			SGI->LoadWeaponSpecificDataByType(charac->weapon.GetValue(), id_weapon, classWeapon, typeWeapon, damage, range);
+			logicCha->GetWeapon()->ID_Weapon = id_weapon;
+			logicCha->GetWeapon()->ClassWeapon = classWeapon;
+			logicCha->GetWeapon()->TypeWeapon = typeWeapon;
+			logicCha->GetWeapon()->DMWeapon = damage;
+			logicCha->GetWeapon()->RangeWeapon = range;
+
+			//Skills
+			//PASIVAS
+			for (int z = 0; z < charac->pasiveSkillList.Num(); z++)
+			{
+				FStructSkill skillPasAdded = FStructSkill();
+				int weaponR, APSkill, CDSkill, targetSkill, Range;
+				SGI->LoadSkillSpecificDataByType(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+				skillPasAdded.ID_Skill = (int)charac->pasiveSkillList[z].GetValue();
+				skillPasAdded.weaponRequired = weaponR;
+				skillPasAdded.AP = APSkill;
+				skillPasAdded.CD = CDSkill;
+				skillPasAdded.currentCD = CDSkill;
+				skillPasAdded.range = Range;
+				skillPasAdded.target = targetSkill;
+				logicCha->GetSkills()->listPasiveSkills.Add(skillPasAdded);
+			}
+			//ACTIVAS
+			for (int j = 0; j < charac->activeSkillList.Num(); j++)
+			{
+				FStructSkill skillActAdded = FStructSkill();
+				int weaponR, APSkill, CDSkill, targetSkill, Range;
+				SGI->LoadSkillSpecificDataByType(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+				skillActAdded.ID_Skill = (int)charac->activeSkillList[j].GetValue();
+				skillActAdded.weaponRequired = weaponR;
+				skillActAdded.AP = APSkill;
+				skillActAdded.CD = CDSkill;
+				skillActAdded.currentCD = CDSkill;
+				skillActAdded.range = Range;
+				skillActAdded.target = targetSkill;
+				logicCha->GetSkills()->listActiveSkills.Add(skillActAdded);
+			}
+		}
+	}
+
+
+	//STATS
+	logicCha->SetBasicStats(charac->GetPOD(), charac->GetAGI(), charac->GetDES(), charac->GetCON(), charac->GetPER(), charac->GetMAL());
+	logicCha->SetInitBaseStats(charac->GetBaseHP(), charac->GetBaseDamage(), charac->GetBaseAP());
+
+	//IA
+	if (charac->generateRandomPersonality) {
+		//hardcodeado porque no admite c++ saber el tamaño de un enum
+		int randPersonality = FMath::RandRange(0, 3);
+		logicCha->SetIAPersonality(EIAPersonality(randPersonality));
+
+	}
+	else {
+		logicCha->SetIAPersonality(charac->IAPersonality.GetValue());
+
+	}
+
+	logicCha->SetTotalStats();
+
+	charac->SetLogicCharacter(logicCha);
+
+	_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
+
+
+
 
 }
 
@@ -645,7 +739,8 @@ void PD_GM_MapManager::InstantiateEnemies() {
 						{
 							FStructSkill skillPasAdded = FStructSkill();
 							int weaponR, APSkill, CDSkill, targetSkill, Range;
-							SGI->LoadSkillSpecificData(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							SGI->LoadSkillSpecificDataByType(1, (int)charac->pasiveSkillList[z].GetValue(), skillPasAdded.name_Skill, skillPasAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							skillPasAdded.ID_Skill = (int)charac->pasiveSkillList[z].GetValue();
 							skillPasAdded.weaponRequired = weaponR;
 							skillPasAdded.AP = APSkill;
 							skillPasAdded.CD = CDSkill;
@@ -659,7 +754,8 @@ void PD_GM_MapManager::InstantiateEnemies() {
 						{
 							FStructSkill skillActAdded = FStructSkill();
 							int weaponR, APSkill, CDSkill, targetSkill, Range;
-							SGI->LoadSkillSpecificData(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							SGI->LoadSkillSpecificDataByType(0, (int)charac->activeSkillList[j].GetValue(), skillActAdded.name_Skill, skillActAdded.description, weaponR, APSkill, CDSkill, targetSkill, Range);
+							skillActAdded.ID_Skill = (int)charac->activeSkillList[j].GetValue();
 							skillActAdded.weaponRequired = weaponR;
 							skillActAdded.AP = APSkill;
 							skillActAdded.CD = CDSkill;
