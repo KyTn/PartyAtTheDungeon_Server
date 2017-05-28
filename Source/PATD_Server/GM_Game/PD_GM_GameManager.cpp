@@ -1417,6 +1417,10 @@ int PD_GM_GameManager::getServerPhase()
 	return (int)structGamePhase->enumGamePhase;
 }
 
+int PD_GM_GameManager::getGameMngrGameState()
+{
+	return (int)structGameState->enumGameState;
+}
 
 bool PD_GM_GameManager::CheckWinGameConditions()
 {

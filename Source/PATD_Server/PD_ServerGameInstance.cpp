@@ -1023,6 +1023,11 @@ int UPD_ServerGameInstance::GetServerPhase() {
 	return gameManager->getServerPhase();
 }
 
+int UPD_ServerGameInstance::GetGameMngrGameState() {
+	return gameManager->getGameMngrGameState();
+}
+
+
 /*
 FUNCIONES DE CONTROL DE CAMARA
 */
