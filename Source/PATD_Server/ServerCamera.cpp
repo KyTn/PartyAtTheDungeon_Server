@@ -42,6 +42,7 @@ void AServerCamera::BeginPlay()
 	if (SGI)
 	{
 		SGI->Camera_Register(this);
+
 		TArray<FVector> targetsInitial = TArray<FVector>();
 		for (int i = 0; i < SGI->playersManager->GetNumPlayers(); i++)
 		{

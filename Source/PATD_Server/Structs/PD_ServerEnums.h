@@ -17,6 +17,7 @@ return iValue->second;
 };
 */
 
+UENUM(BlueprintType)
 enum class EGameState { Instantiate_Map, Start_Match, WaitingPlayerOrders, ExecutingPlayersTurn, WaitingEnemiesOrders, ExecutingEnemiesTurn, EndOfTurn };
 
 enum class EServerState { StartApp, WaitingMasterClient, WaitingGameConfiguration, Lobby_Tabern, Launch_Match, GameInProcess, Podium, OnExit };
@@ -113,7 +114,14 @@ enum class PasiveSkills
 	TheSweeper = 16
 };
 
-enum class ECharacterType { NoCharacter, Player, OrcMelee, OrcBow, OrcGuns };
+UENUM(BlueprintType)
+enum class ConsumableItems
+{
+	enemyBuffToAttack = 0,
+	enemyHeal=1
+};
+
+enum class ECharacterType { NoCharacter, Player, OrcMelee, OrcBow, OrcGuns, OrcBoss };
 /*
 EnumParser<ECharacterType>::EnumParser()
 {

@@ -307,17 +307,58 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 
 void PD_GM_LogicCharacter::ConsumeItem(uint32 idItem)
 {
-	/*
-	- OBJETIVO: Consume un item durante la fase de Consumibles
-	- PROCESO:
-	1. Recibe un ID que identifica el tipo de Item a consumir
-	2. Con el MapManager convierte la posicion logica en fisica
-	3.  Actualiza  las variables currentLogicalPosition a la recibida por parametro
-	4.Con el PlayerManager coge su personaje y llama a la funcion MoveTo() de su controlador
-	- SE LLAMA DESDE: Desde el GameManager cuando sea el turno de visualizar el movimiento.
-	Devuelve true si todo ha ido bien, si algo ha fallado, devuelve false (normalmente a raiz de que la funcion move del controlador
-	devuelva tambien false
-	*/
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ConsumeItem: Iniciando ConsumeItem: "));
+	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
+
+	//controller->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
+
+	switch (ConsumableItems(idItem))
+	{
+		case ConsumableItems::enemyBuffToAttack:
+		{
+			this->GetController()->Animation_CastSkill((int)ActiveSkills::Exclaimchas);
+
+			//get enemies in range
+			TArray<PD_GM_LogicCharacter*> listReturn;
+			for (PD_GM_LogicCharacter* otherEnemy : enemyManager->GetEnemies()) {
+				float iDistance = this->GetCurrentLogicalPosition().EuclideanDistance(otherEnemy->GetCurrentLogicalPosition());
+				bool isSelf = this == otherEnemy;
+				if (iDistance<10 && !isSelf) {
+					listReturn.Add(otherEnemy);
+				}
+			}
+
+			for (PD_GM_LogicCharacter* otherEnemy : listReturn) {
+				otherEnemy->Skill_Melee_Daggers_WhenFua(otherEnemy);
+			}
+
+			break;
+		}
+		
+		case ConsumableItems::enemyHeal:
+		{
+			this->GetController()->Animation_CastSkill((int)ActiveSkills::Exclaimchas);
+
+			//get enemies in range
+			TArray<PD_GM_LogicCharacter*> listReturn;
+			for (PD_GM_LogicCharacter* otherEnemy : enemyManager->GetEnemies()) {
+				float iDistance = this->GetCurrentLogicalPosition().EuclideanDistance(otherEnemy->GetCurrentLogicalPosition());
+				bool isSelf = this == otherEnemy;
+				if (iDistance<10 && !isSelf) {
+					listReturn.Add(otherEnemy);
+				}
+			}
+
+			for (PD_GM_LogicCharacter* otherEnemy : listReturn) {
+				otherEnemy->UpdateHPCurrent(20);
+			}
+
+			break;
+		}
+	default:
+		break;
+	}
 }
 
 void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)

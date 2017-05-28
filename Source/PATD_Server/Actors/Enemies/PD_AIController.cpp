@@ -16,6 +16,8 @@
 #include "Structs/PD_ServerStructs.h"
 #include "PD_PlayersManager.h"
 #include "GM_Game/PD_GM_MapManager.h"
+#include "MapInfo/PD_MM_MapInfo.h"
+#include "Actors/Interactuables/PD_E_Door.h"
 
 APD_AIController::APD_AIController(){
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>("BlackboardComp");
@@ -50,7 +52,10 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap)
 	//Preparar el struct de turno vacio
 	actions.positionsToMove.Empty();
 	actions.actions.Empty();
-	BlackboardComp->SetValueAsInt("AP", 5);
+	actions.consumablesToConsume.Empty();
+	actions.interactuablesToInteract.Empty();
+
+	
 
 	APD_E_Character* ch = Cast<APD_E_Character>(GetPawn());
 	BehaviorTreeComp->StartTree(*ch->behaviorTree, EBTExecutionMode::SingleRun);
@@ -157,18 +162,56 @@ PD_GM_LogicCharacter* APD_AIController::GetMostHPEnemy() {
 }
 
 PD_MG_LogicPosition APD_AIController::GetClosestDoorPosition() {
-	PD_MG_LogicPosition logicPosition;
-	return logicPosition;
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
+	TArray<PD_MG_LogicPosition> listPositions;
+	PD_MM_Room* room = nullptr;
+	room = mapMng->MapInfo->roomByLogPos[logicCharacter->GetCurrentLogicalPosition()];
+	TArray<APD_E_Door*> listActorDoors;
+	mapMng->MapInfo->doorActorByLogPos.GenerateValueArray(listActorDoors);
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::GetClosestDoorPosition: Puertas Totales:%d "), listActorDoors.Num());
+
+	for (APD_E_Door* door : listActorDoors) {
+		if (!(door->IsDoorOpen)) {
+			if (door->doorInfo->room_ConnA == room) {
+				listPositions.Add(door->doorInfo->connA);
+			}
+			else if (door->doorInfo->room_ConnB == room) {
+				listPositions.Add(door->doorInfo->connB);
+
+			}
+		}
+	}
+
+	
+	return GetClosestPosition(listPositions);
 }
-bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character) {
+
+PD_MG_LogicPosition APD_AIController::GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition) {
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
+	float minDistance = 10000; //Un maxint
+	PD_MG_LogicPosition selectedPosition;
+	for (PD_MG_LogicPosition logicPosition:listPosition) {
+		float iDistance = logicCharacter->GetCurrentLogicalPosition().EuclideanDistance(logicPosition);
+		if (iDistance < minDistance) {
+			selectedPosition = logicPosition;
+			minDistance = iDistance;
+		}
+	}
+
+	return selectedPosition;
+}
+
+
+
+bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character,int range) {
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
 	//float iDistance = positionFrom.EuclideanDistance(character->GetCurrentLogicalPosition());
-	
-	TArray<PD_MG_LogicPosition> listInRange=mapMng->GetAllTilesInRange(logicCharacter->weapon->RangeWeapon, positionFrom);
+	 
+	TArray<PD_MG_LogicPosition> listInRange=mapMng->GetAllTilesInRange(range, positionFrom);
 	//TArray<PD_MG_LogicPosition> listInRange = mapMng->GetAllTilesInRange(2, positionFrom);
 
 	
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  Rango: %d"),  logicCharacter->weapon->RangeWeapon);
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  Rango: %d"), range);
 	/*
 	if (iDistance > logicCharacter->weapon->RangeWeapon) {
 		return false;
@@ -200,4 +243,57 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 	return true;
 
 }
+TArray<PD_MG_LogicPosition>  APD_AIController::GetValidPositionsAdyacentsTo(PD_MG_LogicPosition position) {
+	TArray<PD_MG_LogicPosition> listAdyacents=mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(position);
+	TArray<PD_MG_LogicPosition> listResult;
+	for (PD_MG_LogicPosition logicPosition : listAdyacents) {
+		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d"), logicPosition.GetX(), logicPosition.GetY(), mapMng->IsLogicPositionAWall(logicPosition), mapMng->IsLogicPositionAProp(logicPosition), (mapMng->IsLogicPositionADoor(logicPosition) && !mapMng->MapInfo->doorActorByLogPos[logicPosition]->IsDoorOpen));
 
+		if (!(mapMng->IsLogicPositionAWall(logicPosition)
+			|| mapMng->IsLogicPositionAProp(logicPosition)
+			|| (mapMng->IsLogicPositionADoor(logicPosition) && !(mapMng->MapInfo->doorActorByLogPos[logicPosition]->IsDoorOpen))
+			)) {
+			//UE_LOG(LogTemp, Log, TEXT("APD_AIController::GetValidPositionsAdyacentsTo: %d,%d"), logicPosition.GetX(), logicPosition.GetY());
+			listResult.Add(logicPosition);
+
+		}
+			
+		
+	}
+	return listResult;
+}
+
+TArray<PD_GM_LogicCharacter*>  APD_AIController::GetEnemiesInRange(float range) {
+	
+	TArray<PD_GM_LogicCharacter*> listReturn;
+
+	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
+
+	for (PD_GM_LogicCharacter* otherEnemy : SGI->gameManager->enemyManager->GetEnemies()) {
+		float iDistance = logicCharacter->GetCurrentLogicalPosition().EuclideanDistance(otherEnemy->GetCurrentLogicalPosition());
+		bool isSelf = logicCharacter == otherEnemy;
+		if (iDistance<range && !isSelf) {
+			listReturn.Add(otherEnemy);
+		}
+	}
+	return listReturn;
+}
+
+
+void APD_AIController::SetGoalPosition(PD_MG_LogicPosition inGoalPosition) {
+	goalPosition = inGoalPosition;
+	usePosition = true;
+	useCharacter = false;
+}
+void APD_AIController::SetGoalCharacter(PD_GM_LogicCharacter* inGoalCharacter) {
+	goalCharacter = inGoalCharacter;
+	useCharacter = true;
+	usePosition = false;
+}
+void APD_AIController::SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalCharacter, PD_MG_LogicPosition inGoalPosition) {
+	goalCharacter = inGoalCharacter;
+	goalPosition = inGoalPosition;
+	useCharacter = true;
+	usePosition = true;
+}

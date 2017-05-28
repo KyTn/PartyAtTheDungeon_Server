@@ -25,6 +25,10 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 	//Por si acaso se llamase sin setear, por ejemplo el
 	//if(!AIController->goalCharacter) AIController->goalCharacter= AIController->GetClosestPlayer();
 
+	if (!AIController->useCharacter) {
+		return false;
+	}
+
 	TArray<PD_MG_LogicPosition> listPathPosition;
 	listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
 	if (listPathPosition.Num() == 0) {
@@ -56,7 +60,7 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 			AP--;
 			//Coge la ultima a la que llege por el ap, pero si hay una en la que ya tenga rango, aunque le queden AP sale del bucle.
 			AIController->turnTargetPosition = pathPosition;
-			if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter)) {
+			if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 
 				break;
 			}

@@ -27,6 +27,8 @@ private:
 		PD_GM_MapManager* mapMng;
 		FStructTurnOrders actions;
 		PD_GM_Pathfinder* pathfinder;
+
+
 public:
 		APD_AIController();
 
@@ -47,12 +49,19 @@ public:
 	FStructTurnOrders* GetTurnOrders() { return &actions; };
 	PD_GM_Pathfinder* GetPathFinder() { return pathfinder; };
 
+
+	TArray<PD_MG_LogicPosition> GetValidPositionsAdyacentsTo(PD_MG_LogicPosition position);
+
+	TArray<PD_GM_LogicCharacter*> GetEnemiesInRange(float range);
 //	TArray<PD_GM_LogicCharacter*> GetPlayersInRange();
 	PD_GM_LogicCharacter* GetClosestPlayer();
 	PD_GM_LogicCharacter* GetLeastHPPlayer();
 	PD_GM_LogicCharacter* GetMostHPEnemy();
 	PD_MG_LogicPosition GetClosestDoorPosition();
-	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character);
+	PD_MG_LogicPosition GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition);
+
+
+	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character,int range);
 	/*
 	virtual bool MoveTo(float x, float y) override;
 	virtual bool ActionTo(float x, float y, uint8 id_action) override;
@@ -68,13 +77,18 @@ public:
 
 	//Cuantos turnos se ha determinado que quedan hasta el goal. Lo calcula en PD_IA_TaskBehaviourSelector? o lo setea quien haga un orderImpossed.
 	int turnsForGoal=0;
-
-	//las calculamos en el PD_IA_TaskBehaviourSelector? o creamos otra task por cada behaviour
+	//las calculamos en el PD_IA_TaskBehaviourSelector y en los comportamientos que setean a minions
 	//Usado por Flee
 	PD_MG_LogicPosition goalPosition;
 	//Usado por Attack, Defense, Berserker 
 	PD_GM_LogicCharacter* goalCharacter;
-
+//Definen que goals han sido seteados.
+	bool usePosition;
+	bool useCharacter;
+	//Funciones para setear
+	void SetGoalPosition(PD_MG_LogicPosition inGoalPosition);
+	void SetGoalCharacter(PD_GM_LogicCharacter* inGoalCharacter);
+	void SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalCharacter, PD_MG_LogicPosition inGoalPosition);
 	//Elemento interactuable goal
 	//Se calculan en el TargetCalc de cada task y alimentan el CreateOrder
 	
@@ -86,5 +100,7 @@ public:
 	//Usado por Attack
 	//Indica cuantos ataques va a hacer este turno. 0 si no hace ninguno. 
 	int turnNumAttacks;
+
+
 
 };

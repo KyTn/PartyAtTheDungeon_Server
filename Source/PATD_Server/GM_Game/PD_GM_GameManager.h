@@ -102,6 +102,7 @@ public:
 	void InitPhase();
 
 	int getServerPhase();
+	int getGameMngrGameState();
 
 #pragma endregion
 

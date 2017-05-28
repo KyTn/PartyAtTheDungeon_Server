@@ -1023,6 +1023,11 @@ int UPD_ServerGameInstance::GetServerPhase() {
 	return gameManager->getServerPhase();
 }
 
+int UPD_ServerGameInstance::GetGameMngrGameState() {
+	return gameManager->getGameMngrGameState();
+}
+
+
 /*
 FUNCIONES DE CONTROL DE CAMARA
 */
@@ -1173,6 +1178,53 @@ void UPD_ServerGameInstance::LoadSkillSpecificData(int TypeSkill, int id_skill, 
 	}
 }
 
+void UPD_ServerGameInstance::LoadSkillSpecificDataByType(int TypeSkill, int id_skill, FString &nameSkill, FString &effectSkill, int &weaponRequired, int &AP, int &CD, int &target, int &range)
+{
+	
+		if (TypeSkill == 0) //ACTIVA
+		{
+			if (activeSkills.Num() > 0)
+			{
+				for (int i = 0; i < activeSkills.Num(); i++)
+				{
+					if (id_skill == activeSkills[i].ID_Skill)
+					{
+						nameSkill = activeSkills[id_skill].name_Skill;
+						effectSkill = activeSkills[id_skill].description;
+						weaponRequired = activeSkills[id_skill].weaponRequired;
+						AP = activeSkills[id_skill].AP;
+						CD = activeSkills[id_skill].CD;
+						target = activeSkills[id_skill].target;
+						range = activeSkills[id_skill].range;
+					}
+				}
+
+
+			}
+		}
+		else if (TypeSkill == 1)
+		{
+			if (pasiveSkills.Num() > 0)
+			{
+				for (int i = 0; i < pasiveSkills.Num(); i++)
+				{
+					if (id_skill == pasiveSkills[i].ID_Skill)
+					{
+						nameSkill = pasiveSkills[id_skill].name_Skill;
+						effectSkill = pasiveSkills[id_skill].description;
+						weaponRequired = pasiveSkills[id_skill].weaponRequired;
+						AP = pasiveSkills[id_skill].AP;
+						CD = pasiveSkills[id_skill].CD;
+						target = pasiveSkills[id_skill].target;
+						range = pasiveSkills[id_skill].range;
+					}
+				}
+
+			}
+		}
+		
+
+}
 
 void UPD_ServerGameInstance::LoadWeaponSpecificData(int indexWeapon, int &id_weapon, int &classWeapon, int &typeWeapon, int &damage, int &range)
 {

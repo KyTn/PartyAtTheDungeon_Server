@@ -120,12 +120,12 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSe
 
 	}
 
-		UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
+		//UE_LOG(LogTemp, Log, TEXT("Pathfinding nodo get successors %d,%d "), x, y);
 
 	TArray<PD_MG_LogicPosition> adyacentsList = mapManager->Get_LogicPosition_Adyacents_To(PD_MG_LogicPosition(x, y));
 
 	for (PD_MG_LogicPosition adyacentLogicPosition : adyacentsList) {
-		UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d, %d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsLogicPositionAWall(adyacentLogicPosition), mapManager->IsLogicPositionAProp(adyacentLogicPosition), (mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen), !(adyacentLogicPosition == parentLogicPosition));
+		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d, %d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsLogicPositionAWall(adyacentLogicPosition), mapManager->IsLogicPositionAProp(adyacentLogicPosition), (mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen), !(adyacentLogicPosition == parentLogicPosition));
 		
 
 		if (//Condiciones de no pasar
@@ -140,7 +140,7 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSe
 			&& !(adyacentLogicPosition == parentLogicPosition)
 			)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
+			//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());
 			MapSearchNode NewNode;
 			NewNode = MapSearchNode(adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager);
 			astarsearch->AddSuccessor(NewNode);
@@ -189,6 +189,8 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 	int searchState;
 	int searchSteps = 0;
 
+	error = false;
+
 	UE_LOG(LogTemp, Log, TEXT("Pathfinding de %d,%d a %d,%d"), posFrom.GetX(), posFrom.GetY(), posTo.GetX(), posTo.GetY());
 
 
@@ -236,7 +238,7 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 	else if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED)
 	{
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_Pathfinder::getPathFromTo: Error: SEARCH_STATE_FAILED"));
-
+		error = true;
 	}
 
 
