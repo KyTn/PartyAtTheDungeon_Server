@@ -30,6 +30,7 @@ public:
 	PD_GM_MapManager();
 	~PD_GM_MapManager();
 
+	int index_enemies_forID = 0;
 
 	void Init();
 

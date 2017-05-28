@@ -11,6 +11,10 @@
 #include "Components/SplineComponent.h"
 #include "../PD_ServerGameInstance.h"
 #include"../ServerCamera.h"
+#include "MapInfo/PD_MM_MapInfo.h"
+#include "Actors/Interactuables/PD_E_Interactuable.h"
+#include "Actors/Interactuables/PD_E_Door.h"
+
 
 //Includes of forward declaration
 #include "PD_PlayersManager.h"
@@ -26,6 +30,7 @@
 #include "Actors/PD_E_Character.h"
 #include "ServerCamera.h"
 #include "Structs/PD_NetStructs.h"
+
 
 PD_GM_GameManager::PD_GM_GameManager(PD_PlayersManager* inPlayersManager, PD_GM_MapManager* inMapManager, PD_NW_NetworkManager* inNetworkManager, APD_GM_SplineManager* inSplineManager, APD_TimerGame* inTimer)
 {
@@ -250,7 +255,7 @@ void PD_GM_GameManager::OnBeginState() {
 
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
-		
+		UpdatePoints();
 		//Popner la camara a patrullar
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
@@ -277,10 +282,13 @@ void PD_GM_GameManager::OnBeginState() {
 			FStructLogicPosition logicPosition;
 			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
 			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
-
+			structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
+			structUpdateCharacter.PointsCurrent = logicCharacter->GetTotalStats()->PointsCurrent;
 			structUpdateCharacter.currentCharacterPosition = logicPosition;
 			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 			structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager:: player con id %s"), *structUpdateCharacter.ID_character);
 		}
 		//Enemigos
 		for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
@@ -290,6 +298,7 @@ void PD_GM_GameManager::OnBeginState() {
 			FStructLogicPosition logicPosition = FStructLogicPosition();
 			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
 			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+			structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
 
 			structUpdateCharacter.currentCharacterPosition = logicPosition;
 			//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
@@ -355,20 +364,11 @@ void PD_GM_GameManager::IntitializeTurnStates() {
 
 
 void PD_GM_GameManager::CreateEnemyOrders() {
+	
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
-		if (enemyManager->GetEnemies()[i]->GetTypeCharacter() == ECharacterType::OrcMelee) {
-
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, num %d ----- enemyID:%s"), i, *enemyManager->GetEnemies()[i]->GetIDCharacter());
 			APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
 			controller->StartAITurnCalcultion(mapManager);
-		}
-	}
-	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++) {
-		if (!(enemyManager->GetEnemies()[i]->GetTypeCharacter() == ECharacterType::OrcMelee) ){
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CreateEnemyOrders, enemyID:%s"), *enemyManager->GetEnemies()[i]->GetIDCharacter());
-			APD_AIController* controller = (APD_AIController*)enemyManager->GetEnemies()[i]->GetController();
-			controller->StartAITurnCalcultion(mapManager);
-		}
 	}
 }
 
@@ -458,6 +458,47 @@ void PD_GM_GameManager::LogicTurnMovePhase(int numCharacters) {
 
 	}
 }
+void PD_GM_GameManager::LogicTurnInteractablePhase()
+{
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase"));
+
+	index_individualActionInteractablesOnTurns = 0;
+
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
+		{
+			for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract.Num(); index_actions++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  players -- adding interaction %d"), index_actions);
+
+				FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter();
+				int id_interc = playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract[index_actions];
+				individualActionInteractablesOnTurns.Add(id_player, id_interc);
+			}
+		}
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+
+		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
+		{
+			for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  enemies -- adding interaction %d"), index_actions);
+
+				FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+				int id_interc = enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract[index_actions];
+				individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
+			}
+		}
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  TOTAL  -- adding interaction %d"), individualActionInteractablesOnTurns.Num());
+
+}
+
+
+
 
 void PD_GM_GameManager::LogicTurnAttackPhase() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase"));
@@ -508,25 +549,6 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  TOTAL  -- adding action %d"), individualActionOnTurns.Num());
 
-	
-	//VIEJO CODIGO
-	/*
-	//Distincion para players o enemigos
-	//Calcular el numero de ticks a realizar (el de la lista mas larga)
-	int numTicks = 0;
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-		numTicks = playersManager->GetMaxLenghtActions(EActionPhase::Attack);
-	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-		numTicks = enemyManager->GetMaxLenghtActions(EActionPhase::Attack);
-	}
-	
-	
-	for (int i = 0; i < numTicks; i++) {
-			LogicAttackTick(i, numCharacters);
-		
-	}
-	*/
 }
 
 
@@ -855,84 +877,170 @@ void PD_GM_GameManager::VisualMoveTick() {
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
 		players = enemyManager->GetEnemies().Num();
 
-	//Todos a la vez
-	PD_GM_LogicCharacter* logicCharacter = nullptr;
+//Todos a la vez
+PD_GM_LogicCharacter* logicCharacter = nullptr;
 
-	TArray<FVector> newTargetPositions = TArray<FVector>();
-	//Setear nuevo punto medio, para mover la camara
-	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+TArray<FVector> newTargetPositions = TArray<FVector>();
+//Setear nuevo punto medio, para mover la camara
+UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
+{
+	for (int i = 0; i < players; i++)
+	{
+		int numTilesMoveOnturn = playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Num();
+		if (numTilesMoveOnturn > 0)
+		{
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(
+				playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
+		}
+		newTargetPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition()));
+	}
+}
+
+else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
+{
+	for (int i = 0; i < players; i++)
+	{
+		int numTilesMoveOnturn = enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Num();
+		if (numTilesMoveOnturn > 0)
+		{
+			newTargetPositions.Add(mapManager->LogicToWorldPosition(
+				enemyManager->GetEnemies()[i]->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
+		}
+		newTargetPositions.Add(mapManager->LogicToWorldPosition(enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
+	}
+}
+
+
+Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
+
+for (int i = 0; i < players; i++) {
+	//Distincion para players o enemigos
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
+		logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
+	}
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
+		logicCharacter = enemyManager->GetEnemies()[i];
+	}
+
+	if (logicCharacter->GetMovingLogicalPosition().Num() > 0) //Si hay posiciones en este array, quiere decir que se tiene que mover
+	{
+		//Set un spline para dicho character
+		if (!logicCharacter->GetController()->GetSpline())
+		{
+			logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
+		}
+
+		TArray<FVector> positionsToMove = TArray<FVector>();
+		//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
+		{
+			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
+			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+			//v.Z = 45.0f;
+			positionsToMove.Add(v);
+			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
+		}
+
+		logicCharacter->MoveToPhysicalPosition(positionsToMove);
+
+		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
+		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
+			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
+		}
+	}
+
+}
+
+
+}
+
+
+void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
+{
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- idInteract %d"), id_interact);
+
+	/*
+	- Para usar el interactuable
+	 1. Animacion de uso de interactuable
+	 2. Encontrar el interactuable por ID
+	 3. Conseguir su tipo de interactuable
+	 4. Hacer un Case
+		4.1 Si es una puerta: Acceder a las id de roomA y roomB, instanciarlas ambas, instanciar enemigos
+	*/
+
+	StaticMapElement typeInteract;
+
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
 	{
-		for (int i = 0; i < players; i++)
+		PD_GM_LogicCharacter* logic_char = playersManager->GetCharacterByID(id_char);
+
+		if (mapManager->MapInfo->interactuableInfoInMap.Num() > 0 )
 		{
-			int numTilesMoveOnturn = playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition().Num();
-			if (numTilesMoveOnturn > 0)
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Hay info interactublaInfoMap"));
+
+			for (int i = 0; i < mapManager->MapInfo->interactuableInfoInMap.Num(); i++)
 			{
-				newTargetPositions.Add(mapManager->LogicToWorldPosition(
-					playersManager->GetDataStructPlayer(i)->logic_Character->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
+				if (mapManager->MapInfo->interactuableInfoInMap[i]->IDInteractuable == id_interact) //encuentra el interactuable
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Ha encontrado el interactuable"));
+
+					typeInteract = mapManager->MapInfo->interactuableInfoInMap[i]->type;
+				}
 			}
-			newTargetPositions.Add(mapManager->LogicToWorldPosition(playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition()));
+
+			switch (StaticMapElement(typeInteract))
+			{
+			case StaticMapElement::PROP_CHEST:
+				break;
+			case StaticMapElement::DOOR:
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una puerta"));
+
+				int idRoomA = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnA->IDRoom;
+				int idRoomB = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnB->IDRoom;
+
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room A es: %d"), idRoomA);
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room B es: %d"), idRoomB);
+
+
+				mapManager->InstantiateRoomAndAdj(idRoomA);
+				mapManager->InstantiateRoomAndAdj(idRoomB);
+				mapManager->InstantiateEnemies();
+
+				APD_E_Door* doorOpend = nullptr;
+				doorOpend = mapManager->MapInfo->doorActorByID[id_interact];
+				if (doorOpend)
+				{
+					doorOpend->SetActorHiddenInGame(true);
+					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+					logic_char->UseInteractable();
+
+				}
+				break;
+			}
+			case StaticMapElement::LEVEL:
+				break;
+			case StaticMapElement::PRESURE_PLATE:
+				break;
+			case StaticMapElement::LARGE_CHEST:
+				break;
+			case StaticMapElement::SMALL_CHEST:
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
 	{
-		for (int i = 0; i < players; i++)
-		{
-			int numTilesMoveOnturn = enemyManager->GetEnemies()[i]->GetMovingLogicalPosition().Num();
-			if (numTilesMoveOnturn > 0)
-			{
-				newTargetPositions.Add(mapManager->LogicToWorldPosition(
-					enemyManager->GetEnemies()[i]->GetMovingLogicalPosition()[numTilesMoveOnturn - 1]));
-			}
-			newTargetPositions.Add(mapManager->LogicToWorldPosition(enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
-		}
+
 	}
-
-
-	Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
-
-	for (int i = 0; i < players; i++) {
-		//Distincion para players o enemigos
-		if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-			logicCharacter = playersManager->GetDataStructPlayer(i)->logic_Character;
-		}
-		else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-			logicCharacter = enemyManager->GetEnemies()[i];
-		}
-
-		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) //Si hay posiciones en este array, quiere decir que se tiene que mover
-		{
-			//Set un spline para dicho character
-			if (!logicCharacter->GetController()->GetSpline())
-			{
-				logicCharacter->GetController()->SetSpline(splineManager->GetSpline());
-			}
-
-			TArray<FVector> positionsToMove = TArray<FVector>();
-			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
-			for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
-			{
-				FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
-				//v.Z = 45.0f;
-				positionsToMove.Add(v);
-				//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
-			}
-
-			logicCharacter->MoveToPhysicalPosition(positionsToMove);
-
-			//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-			if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
-				logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
-			}
-		}
-		
-	}
-
-	
 }
+
+
 
 void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
@@ -1032,6 +1140,35 @@ void PD_GM_GameManager::OnAnimationEnd() {
 					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: lanzando accion de caract :%s , index  - %d"),*id_char, index_actionOfChar);
 
 					VisualAttackTick(id_char, index_actionOfChar);
+				}
+				else
+				{
+					UpdatePhase();
+
+				}
+			}
+			else if ((structGamePhase->enumGamePhase == EServerPhase::InteractionTick))
+			{
+				index_individualActionInteractablesOnTurns++;
+
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: index - %d"), index_IndividualActionsOnTurns);
+
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: totalindex - %d"), individualActionOnTurns.Num());
+
+				if (index_individualActionInteractablesOnTurns < individualActionInteractablesOnTurns.Num())
+				{
+					TArray<FString> id_charactersOnArray;
+					individualActionOnTurns.GenerateKeyArray(id_charactersOnArray);
+
+					TArray<int> index_totalActions;
+					individualActionOnTurns.GenerateValueArray(index_totalActions);
+
+					FString id_char = id_charactersOnArray[index_IndividualActionsOnTurns];
+					int id_interact = index_totalActions[index_IndividualActionsOnTurns];
+
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: lanzando interactuable de caract :%s , id  - %d"), *id_char, id_interact);
+
+					VisualInteractbaleTick(id_char, id_interact);
 				}
 				else
 				{
@@ -1343,6 +1480,11 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
+
+		individualActionInteractablesOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
+
+		LogicTurnInteractablePhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
+
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
 		timer->InitTimer(timeWaitingPhases);
 		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
@@ -1356,20 +1498,36 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
 	{
+		if (individualActionInteractablesOnTurns.Num() > 0)
+		{
+			TArray<FString> id_charactersOnArray;
+			individualActionInteractablesOnTurns.GenerateKeyArray(id_charactersOnArray);
+
+			TArray<int> index_totalActions;
+			individualActionInteractablesOnTurns.GenerateValueArray(index_totalActions);
+
+			FString id_char = id_charactersOnArray[0]; //siempre el primero
+			int id_interact = index_totalActions[0]; //siempre el primero
+
+			VisualInteractbaleTick(id_char, id_interact);
+		}
+
+
+
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
+		individualActionOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
+
+		LogicTurnAttackPhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
+
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
 
 		timer->InitTimer(timeWaitingPhases);
 		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
-
-		individualActionOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
-
-		LogicTurnAttackPhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
 
 		UpdatePhase();
 
@@ -1429,15 +1587,19 @@ bool PD_GM_GameManager::CheckWinGameConditions()
 	{
 		if (enemyManager->GetEnemies()[i]->GetTotalStats()->HPCurrent <= 0)
 		{
-			enemiesDied++;
-			enemyManager->DeleteEnemy(enemyManager->GetEnemies()[i]);
+			if (enemyManager->GetEnemies()[i]->GetTypeCharacter() == ECharacterType::OrcBoss) 
+			{
+				return true;
+			}
+			else 
+			{
+				enemiesDied++;
+				enemyManager->DeleteEnemy(enemyManager->GetEnemies()[i]);
+			}
 		}
-		
+
 	}
-	if (enemyManager->GetEnemies().Num() == enemiesDied)
-		return true; //all enemies died
-	else
-		return false;
+	return false;
 }
 
 bool PD_GM_GameManager::CheckLoseGameConditions()
@@ -1455,9 +1617,11 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 
 #pragma region POINTSSYSTEM
 
-void PD_GM_GameManager::UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy) {/// valdría con pasarles el id por ejemplo
-	player->SetPoints(player->GetPoints() + enemy->GetPoints());
-	TotalPoints += enemy->GetPoints();
+void PD_GM_GameManager::UpdatePoints() {/// valdría con pasarles el id por ejemplo
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+			TotalPoints += playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->PointsCurrent;
+	}
 }
 
 #pragma endregion

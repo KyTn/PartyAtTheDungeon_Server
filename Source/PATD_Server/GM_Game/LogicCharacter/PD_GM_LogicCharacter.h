@@ -32,7 +32,6 @@ class PATD_SERVER_API PD_GM_LogicCharacter
 	ECharacterType type_character; //0 si es player, N depende del enemigo
 	bool isDead; //cuando su HPcurrent =< 0 -> True, sino False ---> Para acabar el juego
 
-	int points;
 	//Controlador GenericoPadre. Se Castea a CharacterController o EnemyController dependiendo de la variable isPlayer.
 	APD_GenericController* controller;
 
@@ -102,6 +101,8 @@ public:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
 	bool ActionTo(FStructTargetToAction action);
+
+	bool UseInteractable();
 
 	/*
 	//Metodo para consumir un item
@@ -219,7 +220,6 @@ public:
 	//Metodos GET para variables globales de la clase
 	bool GetIsPlayer();
 	bool GetIsDead();
-	int GetPoints();
 	FString GetIDCharacter();
 	ECharacterType GetTypeCharacter();
 	APD_GenericController* GetController();
@@ -240,7 +240,6 @@ public:
 	//Metodos SET para variables globales de la clase
 	void SetIsPlayer(bool nIsPlayer);
 	void SetIsDead(bool nIsDead);
-	void SetPoints(int inPoints);
 	void SetIDCharacter(FString nID_character);
 	void SetTypeCharacter(ECharacterType ntype_character);
 	void SetController(APD_GenericController* ncontroller);
@@ -252,4 +251,7 @@ public:
 	void SetIAPersonality(EIAPersonality inPersonality);
 
 	void ClearMovingLogicalPosition();
+
+	void UpdatePointsCurrent(int inPoints);
+
 };
