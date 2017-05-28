@@ -4,7 +4,7 @@
 
 #include "Actors/PD_E_ElementActor.h"
 #include "MapGeneration/PD_MG_LogicPosition.h"
-
+#include "MapInfo/PD_MM_MapInfo.h"
 #include "PD_E_Interactuable.generated.h"
 /**
  * 
@@ -16,10 +16,17 @@ class PATD_SERVER_API APD_E_Interactuable : public APD_E_ElementActor
 
 public:
 
-		APD_E_Interactuable();
+	APD_E_Interactuable();
 
-		// es el id del interactuable 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Name Interactuable")
+		FString Name;
+
+	// es el id del interactuable 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ID Interactuable")
 		int ID_Interactuable;
+
+
+	PD_MM_InteractuableInfo* interactuableInfo;
 
 	// Posiciones desde el cual un character puede interactuar con este elemento
 	TArray<PD_MG_LogicPosition> InteractFromThisLogicPositions;
@@ -48,6 +55,9 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
+
+	// Guarda una referencia a su interInfo e inicializa las variables con su info 
+	virtual void Set_InteractuableInfo(TArray<APD_E_Interactuable*> otherInteractuables, PD_MM_InteractuableInfo* interInfo);
 
 	// Se llamará a esta funcion para activar el interactuable
 	virtual void InteractToActivate(AActor* interactor, bool overwriteState = false);

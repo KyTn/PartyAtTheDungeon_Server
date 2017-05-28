@@ -87,6 +87,23 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	
 #pragma endregion 
 
+
+
+
+#pragma region MAPSKIN GARDEN
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Tree_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/MapElements/ESCENARIOS/SKIN_GARDEN/BP_Garden_Tree_01.BP_Garden_Tree_01'"));
+	if (Garden_Prop_Tree_01_Blueprint.Object) {
+		Garden_Prop_Tree_1_Class = (UClass*)Garden_Prop_Tree_01_Blueprint.Object->GeneratedClass;
+	}
+
+
+
+
+#pragma endregion 
+
+
+
 #pragma region CHARACTERS
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> OrcBowBlueprint(TEXT("Blueprint'/Game/Blueprints/Enemies/Orco_Arco.Orco_Arco'"));
@@ -190,7 +207,14 @@ APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_Column_03(P
 
 
 
+#pragma region MAPSKIN DUNGEON
 
+APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos) 
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Garden_Prop_Tree_1_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+#pragma endregion 
 
 #pragma region CHARACTERS
 

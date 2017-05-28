@@ -291,6 +291,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -300,6 +302,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
+					instantiator->Instantiate_Garden_Prop_Tree_01(lp);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
@@ -320,6 +323,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -349,6 +354,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -378,6 +385,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -445,15 +454,13 @@ void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPos
 void PD_GM_MapManager::InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* doorInfo) {
 	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateDoor at (%d,%d)"), lp.GetX(), lp.GetY());
 	APD_E_Door* doorElement = instantiator->InstantiateDoor(lp);
-	doorElement->doorInfo = doorInfo;
-	doorElement->ID_Interactuable = doorInfo->IDInteractuable;
+
+	TArray<APD_E_Interactuable*> interact;
+	MapInfo->interactuableActorByID.GenerateValueArray(interact);
+	doorElement->Set_DoorInfo(interact, doorInfo);
+
 	MapInfo->AddDoor_WithoutLink(lp, doorElement);
 	doorElement->ChangeRotationToReal(lp);
-	/*
-	doorElement->ID_Interactuable = doorInfo->IDInteractuable;
-	
-	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::adding door to map info ..."));
-	*/
 }
 
 
