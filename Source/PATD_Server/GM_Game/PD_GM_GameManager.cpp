@@ -191,7 +191,7 @@ void PD_GM_GameManager::OnBeginState() {
 		FStructClientCanGenerateOrders clientGenerateOrders = FStructClientCanGenerateOrders();
 		networkManager->SendNow(&clientGenerateOrders, -1);
 
-
+		//Popner la camara a patrullar
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
 		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
@@ -222,8 +222,15 @@ void PD_GM_GameManager::OnBeginState() {
 		if (SGI)
 		{
 			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
+
+			//Popner la camara a patrullar
+			SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+			FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+			Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 		}
 
+		
 		enemyManager->newTurn();
 		CreateEnemyOrders();
 		UpdateState();
@@ -244,6 +251,11 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		
+		//Popner la camara a patrullar
+		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
