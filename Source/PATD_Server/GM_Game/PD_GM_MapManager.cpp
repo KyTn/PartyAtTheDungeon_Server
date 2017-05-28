@@ -291,6 +291,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -300,6 +302,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
+					instantiator->Instantiate_Garden_Prop_Tree_01(lp);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
@@ -320,6 +323,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -349,6 +354,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -378,6 +385,8 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
+					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
