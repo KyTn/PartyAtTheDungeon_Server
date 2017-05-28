@@ -33,7 +33,7 @@ bool UPD_IA_TaskBossRetreatTargetCalc::SetMinionsBehaviour(UBehaviorTreeComponen
 
 	//Get_LogicPosition_Diagonals_And_Adyacents_To()
 	TArray<PD_MG_LogicPosition> listAdyacentPosition = AIController->GetValidPositionsAdyacentsTo(AIController->turnTargetPosition);
-	TArray<PD_GM_LogicCharacter*> listMinions = AIController->GetEnemiesInRange(10);
+	TArray<PD_GM_LogicCharacter*> listMinions = AIController->GetEnemiesInRange(rangeControlMinions);
 
 	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBossRetreatTargetCalc:: SetMinionsBehaviour listAdyacentPosition: %d  listMinions: %d"),listAdyacentPosition.Num(), listMinions.Num());
 	int iEnemy = 0;
@@ -45,8 +45,8 @@ bool UPD_IA_TaskBossRetreatTargetCalc::SetMinionsBehaviour(UBehaviorTreeComponen
 		APD_AIController* minionController = ((APD_AIController*)listMinions[iEnemy]->GetController());
 		minionController->selectedBehaviour = EIABehaviour::Flee;
 		minionController->turnsForGoal = 2;
-		minionController->goalPosition = positionToCover;
-		minionController->goalCharacter = nullptr;
+		AIController->SetGoalPosition(positionToCover);
+
 		iEnemy++;
 	}
 

@@ -13,7 +13,7 @@ EBTNodeResult::Type UMyPD_IA_TaskBossAttackTargetCalc::ExecuteTask(UBehaviorTree
 {
 	CalculateTurnTarget(OwnerComp);
 	CalculateFireball(OwnerComp);
-
+	SetMinionsBehaviour(OwnerComp);
 
 
 return EBTNodeResult::Succeeded;
@@ -40,5 +40,40 @@ bool UMyPD_IA_TaskBossAttackTargetCalc::CalculateFireball(UBehaviorTreeComponent
 		}
 	}
 	//turnStruct->
+	return true;
+}
+
+bool UMyPD_IA_TaskBossAttackTargetCalc::SetMinionsBehaviour(UBehaviorTreeComponent& OwnerComp) {
+	UE_LOG(LogTemp, Log, TEXT("UMyPD_IA_TaskBossAttackTargetCalc:: SetMinionsBehaviour"));
+	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
+
+	//Get_LogicPosition_Diagonals_And_Adyacents_To()
+	TArray<PD_MG_LogicPosition> listAdyacentPosition = AIController->GetValidPositionsAdyacentsTo(AIController->goalCharacter->GetCurrentLogicalPosition());
+	TArray<PD_GM_LogicCharacter*> listMinions = AIController->GetEnemiesInRange(rangeControlMinions);
+
+	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBossRetreatTargetCalc:: SetMinionsBehaviour listAdyacentPosition: %d  listMinions: %d"), listAdyacentPosition.Num(), listMinions.Num());
+	int iEnemy = 0;
+	for (PD_MG_LogicPosition positionToCover : listAdyacentPosition) {
+		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBossRetreatTargetCalc:: SetMinionsBehaviour iEnemy %d  position:%d,%d"), iEnemy, positionToCover.GetX(), positionToCover.GetY());
+
+		if (iEnemy >= listMinions.Num()) break;
+
+		if (positionToCover == AIController->turnTargetPosition) {
+
+		}
+		else { //solo usamos a un minion si la posicion no es al a que vamos a ir nosotros
+			APD_AIController* minionController = ((APD_AIController*)listMinions[iEnemy]->GetController());
+			minionController->selectedBehaviour = EIABehaviour::Attack;
+			minionController->turnsForGoal = 2;
+			minionController->SetGoalCharacterAndPosition(AIController->goalCharacter,positionToCover);
+			iEnemy++;
+
+		}
+
+
+
+	}
+
 	return true;
 }

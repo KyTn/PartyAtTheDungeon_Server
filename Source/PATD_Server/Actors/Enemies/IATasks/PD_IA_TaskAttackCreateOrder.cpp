@@ -34,16 +34,18 @@ void UPD_IA_TaskAttackCreateOrder::CreateMoveOrders(UBehaviorTreeComponent& Owne
 
 	//Movimiento
 	TArray<PD_MG_LogicPosition> listPathPosition;
-	listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->turnTargetPosition);
+	if (!(logicCharacter->GetCurrentLogicalPosition() == AIController->turnTargetPosition)) {
+		listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->turnTargetPosition);
 
-	for (PD_MG_LogicPosition pathPosition : listPathPosition) {
-		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: Añadiendo movimiento:%d , %d "),pathPosition.GetX(), pathPosition.GetY());
-		FStructLogicPosition logicPositionStruct = FStructLogicPosition();
+		for (PD_MG_LogicPosition pathPosition : listPathPosition) {
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: Añadiendo movimiento:%d , %d "), pathPosition.GetX(), pathPosition.GetY());
+			FStructLogicPosition logicPositionStruct = FStructLogicPosition();
 
-		logicPositionStruct.positionX = pathPosition.GetX();
-		logicPositionStruct.positionY = pathPosition.GetY();
+			logicPositionStruct.positionX = pathPosition.GetX();
+			logicPositionStruct.positionY = pathPosition.GetY();
 
-		turnStruct->positionsToMove.Add(logicPositionStruct);
+			turnStruct->positionsToMove.Add(logicPositionStruct);
+		}
 	}
 }
 

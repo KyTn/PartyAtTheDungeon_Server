@@ -18,7 +18,8 @@ class PATD_SERVER_API UPD_IA_TaskBossRetreatTargetCalc : public UPD_IA_TaskFleeT
 	
 	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
 		int probToUseMinions=50;
-
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		int rangeControlMinions = 10;
 
 	bool SetMinionsBehaviour(UBehaviorTreeComponent& OwnerComp);
 	bool SetHealConsumible(UBehaviorTreeComponent& OwnerComp);

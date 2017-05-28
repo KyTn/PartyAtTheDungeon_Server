@@ -52,7 +52,10 @@ void APD_AIController::StartAITurnCalcultion(PD_GM_MapManager* refMap)
 	//Preparar el struct de turno vacio
 	actions.positionsToMove.Empty();
 	actions.actions.Empty();
-	BlackboardComp->SetValueAsInt("AP", 5);
+	actions.consumablesToConsume.Empty();
+	actions.interactuablesToInteract.Empty();
+
+	
 
 	APD_E_Character* ch = Cast<APD_E_Character>(GetPawn());
 	BehaviorTreeComp->StartTree(*ch->behaviorTree, EBTExecutionMode::SingleRun);
@@ -275,4 +278,22 @@ TArray<PD_GM_LogicCharacter*>  APD_AIController::GetEnemiesInRange(float range) 
 		}
 	}
 	return listReturn;
+}
+
+
+void APD_AIController::SetGoalPosition(PD_MG_LogicPosition inGoalPosition) {
+	goalPosition = inGoalPosition;
+	usePosition = true;
+	useCharacter = false;
+}
+void APD_AIController::SetGoalCharacter(PD_GM_LogicCharacter* inGoalCharacter) {
+	goalCharacter = inGoalCharacter;
+	useCharacter = true;
+	usePosition = false;
+}
+void APD_AIController::SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalCharacter, PD_MG_LogicPosition inGoalPosition) {
+	goalCharacter = inGoalCharacter;
+	goalPosition = inGoalPosition;
+	useCharacter = true;
+	usePosition = true;
 }

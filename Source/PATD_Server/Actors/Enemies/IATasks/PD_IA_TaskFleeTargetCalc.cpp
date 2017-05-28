@@ -29,19 +29,20 @@ bool UPD_IA_TaskFleeTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Owne
 
 	TArray<PD_MG_LogicPosition> listPathPosition;
 
-	bool noMove=false;
+	bool noNeedToMove=false;
 
-	if (AIController->goalCharacter) {
+	if (AIController->useCharacter) {
 		listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
 		if (listPathPosition.Num() == 1) { //Esta justo al lado
-			noMove = true;
+			noNeedToMove = true;
 		}
 		listPathPosition.RemoveAt(listPathPosition.Num() - 1); //Quitamos la ultima porque seria para ponerse encima, para chocar.
 	}
-	else {
+	else if(AIController->usePosition){
+
 		if (logicCharacter->GetCurrentLogicalPosition() == AIController->goalPosition) {
 			//ya esta en la posicion
-			noMove = true;
+			noNeedToMove = true;
 		}
 		else {
 			listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalPosition);
@@ -49,12 +50,14 @@ bool UPD_IA_TaskFleeTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Owne
 		}
 	}
 	
-	if (listPathPosition.Num() == 0 && noMove==false) { 
+	if (listPathPosition.Num() == 0 && noNeedToMove ==false) {
 		//Error no puede llegar.
 		return false;
 	}
+	if (noNeedToMove) {
+		AIController->turnTargetPosition = logicCharacter->GetCurrentLogicalPosition();//En este caso no necesita moverse para llegar al objetivo.
 
-	if (noMove == false) {
+	}else {
 		int AP = logicCharacter->GetTotalStats()->APTotal;
 		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskFleeTurnCalc:: AP iniciales:%d "), AP);
 
@@ -69,9 +72,7 @@ bool UPD_IA_TaskFleeTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Owne
 
 			}
 	}
-	else { //En este caso no necesita moverse para llegar al objetivo.
-		AIController->turnTargetPosition = AIController->goalPosition;
-	}
+
 
 	if (AIController->turnTargetPosition == AIController->goalPosition) {
 		//si ha llegado al punto en este turno, reseteamos turnsForGoal para recibir nuevo comportamiento.

@@ -189,6 +189,8 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 	int searchState;
 	int searchSteps = 0;
 
+	error = false;
+
 	UE_LOG(LogTemp, Log, TEXT("Pathfinding de %d,%d a %d,%d"), posFrom.GetX(), posFrom.GetY(), posTo.GetX(), posTo.GetY());
 
 
@@ -236,7 +238,7 @@ TArray<PD_MG_LogicPosition> PD_GM_Pathfinder::getPathFromTo(PD_MG_LogicPosition 
 	else if (searchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED)
 	{
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_Pathfinder::getPathFromTo: Error: SEARCH_STATE_FAILED"));
-
+		error = true;
 	}
 
 

@@ -25,6 +25,10 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 	//Por si acaso se llamase sin setear, por ejemplo el
 	//if(!AIController->goalCharacter) AIController->goalCharacter= AIController->GetClosestPlayer();
 
+	if (!AIController->useCharacter) {
+		return false;
+	}
+
 	TArray<PD_MG_LogicPosition> listPathPosition;
 	listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
 	if (listPathPosition.Num() == 0) {

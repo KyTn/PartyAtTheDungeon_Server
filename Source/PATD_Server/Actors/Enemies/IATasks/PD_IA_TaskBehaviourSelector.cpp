@@ -223,7 +223,8 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Attack"));
 
 			//Standard
-			AIController->goalCharacter = AIController->GetClosestPlayer();
+			AIController->SetGoalCharacter(AIController->GetClosestPlayer());
+
 			AIController->turnsForGoal = 1; //En standard ponemos solo 1 turno para la accion, porque el objetivo es el mas proximo, que se deberia recalcular.
 
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Coward) {
@@ -233,7 +234,8 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		case EIABehaviour::Defense:
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Defense"));
-			AIController->goalCharacter = AIController->GetClosestPlayer();
+			AIController->SetGoalCharacter(AIController->GetClosestPlayer());
+
 			AIController->turnsForGoal = 1; //En standard ponemos solo 1 turno para la accion, porque el objetivo es el mas proximo, que se deberia recalcular.
 			break;
 		}
@@ -244,7 +246,8 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 			PD_MG_LogicPosition clostestDoorPos = AIController->GetClosestDoorPosition();
 			if (clostestDoorPos == PD_MG_LogicPosition(0, 0)) {
 				if (AIController->GetMostHPEnemy()->GetIDCharacter() != logicCharacter->GetIDCharacter()) {
-					AIController->goalCharacter = AIController->GetMostHPEnemy();
+					AIController->SetGoalCharacter(AIController->GetMostHPEnemy());
+						
 				}
 				else {
 					AIController->selectedBehaviour = EIABehaviour::Defense;
@@ -252,7 +255,7 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 				}
 			}
 			else {
-				AIController->goalPosition = AIController->GetClosestDoorPosition();
+				AIController->SetGoalPosition(AIController->GetClosestDoorPosition());
 			}
 			
 		/*	if (AIController->GetMostHPEnemy()->GetIDCharacter()!= logicCharacter->GetIDCharacter()){
@@ -278,14 +281,16 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Berserker"));
 			//Standard
-			AIController->goalCharacter = AIController->GetLeastHPPlayer();
+			AIController->SetGoalCharacter(AIController->GetLeastHPPlayer());
 			//AIController->goalCharacter = AIController->GetClosestPlayer();
 			//AIController->turnsForGoal = 1; //En standard ponemos solo 1 turno para la accion, porque el objetivo es el mas proximo, que se deberia recalcular.
 			AIController->turnsForGoal = 1000;
 
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Smart) {
 				 
-				AIController->goalCharacter = AIController->GetLeastHPPlayer();
+				AIController->SetGoalCharacter(AIController->GetLeastHPPlayer());
+
+	
 
 			}else if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) {
 				//AIController->turnsForGoal = 1000; //Ponemos esto para que nunca deje de perseguir a ese mismo objetivo

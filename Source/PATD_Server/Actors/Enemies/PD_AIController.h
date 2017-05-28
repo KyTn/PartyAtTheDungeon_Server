@@ -27,6 +27,8 @@ private:
 		PD_GM_MapManager* mapMng;
 		FStructTurnOrders actions;
 		PD_GM_Pathfinder* pathfinder;
+
+
 public:
 		APD_AIController();
 
@@ -75,13 +77,18 @@ public:
 
 	//Cuantos turnos se ha determinado que quedan hasta el goal. Lo calcula en PD_IA_TaskBehaviourSelector? o lo setea quien haga un orderImpossed.
 	int turnsForGoal=0;
-
-	//las calculamos en el PD_IA_TaskBehaviourSelector? o creamos otra task por cada behaviour
+	//las calculamos en el PD_IA_TaskBehaviourSelector y en los comportamientos que setean a minions
 	//Usado por Flee
 	PD_MG_LogicPosition goalPosition;
 	//Usado por Attack, Defense, Berserker 
 	PD_GM_LogicCharacter* goalCharacter;
-
+//Definen que goals han sido seteados.
+	bool usePosition;
+	bool useCharacter;
+	//Funciones para setear
+	void SetGoalPosition(PD_MG_LogicPosition inGoalPosition);
+	void SetGoalCharacter(PD_GM_LogicCharacter* inGoalCharacter);
+	void SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalCharacter, PD_MG_LogicPosition inGoalPosition);
 	//Elemento interactuable goal
 	//Se calculan en el TargetCalc de cada task y alimentan el CreateOrder
 	
@@ -93,5 +100,7 @@ public:
 	//Usado por Attack
 	//Indica cuantos ataques va a hacer este turno. 0 si no hace ninguno. 
 	int turnNumAttacks;
+
+
 
 };

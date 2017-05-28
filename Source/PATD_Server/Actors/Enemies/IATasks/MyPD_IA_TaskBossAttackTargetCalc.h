@@ -15,6 +15,11 @@ class PATD_SERVER_API UMyPD_IA_TaskBossAttackTargetCalc : public UPD_IA_TaskAtta
 	
 		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
-	
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		int probToUseMinions = 50;
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		int rangeControlMinions = 10;
+
 	bool CalculateFireball(UBehaviorTreeComponent& OwnerComp);
+	bool SetMinionsBehaviour(UBehaviorTreeComponent& OwnerComp);
 };

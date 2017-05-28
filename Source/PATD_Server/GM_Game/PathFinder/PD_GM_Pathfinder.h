@@ -16,4 +16,5 @@ public:
 	~PD_GM_Pathfinder();
 
 	TArray<PD_MG_LogicPosition> getPathFromTo(PD_MG_LogicPosition posFrom, PD_MG_LogicPosition posTo);
+	bool error;
 };
