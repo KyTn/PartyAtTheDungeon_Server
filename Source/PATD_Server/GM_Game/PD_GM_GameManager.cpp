@@ -252,7 +252,9 @@ void PD_GM_GameManager::OnBeginState() {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		
 		//Popner la camara a patrullar
+		
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView(); //pinchar esta camara
 		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
 		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
 		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
@@ -858,7 +860,7 @@ void PD_GM_GameManager::VisualMoveTick() {
 	//Todos a la vez
 	PD_GM_LogicCharacter* logicCharacter = nullptr;
 
-	TArray<FVector> newTargetPositions = TArray<FVector>();
+	/*TArray<FVector> newTargetPositions = TArray<FVector>();
 	//Setear nuevo punto medio, para mover la camara
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
@@ -888,9 +890,9 @@ void PD_GM_GameManager::VisualMoveTick() {
 			newTargetPositions.Add(mapManager->LogicToWorldPosition(enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
 		}
 	}
+	*/
 
-
-	Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
+	//Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
 
 	for (int i = 0; i < players; i++) {
 		//Distincion para players o enemigos
@@ -1318,7 +1320,7 @@ void PD_GM_GameManager::OnBeginPhase()
 			}
 
 			//SGI->targetPositionsToCenterCamera = targetPositions;
-
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView(); //pinchar esta camara
 			UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager %d"), targetPositions.Num());
 			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
 
