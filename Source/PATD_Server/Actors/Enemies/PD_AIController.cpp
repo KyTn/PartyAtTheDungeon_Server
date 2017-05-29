@@ -231,15 +231,15 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
 	endPos.Z = 50;
 
-	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_WorldStatic);
+	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Visibility);
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 		
-		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
+		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
 
-		//return false;
+		return false;
 	}
-
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
 	return true;
 
 }

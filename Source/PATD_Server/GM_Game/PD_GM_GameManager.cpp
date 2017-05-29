@@ -1073,21 +1073,21 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 		{
 			PD_GM_LogicCharacter* logic_char = playersManager->GetCharacterByID(id_char);
 	
-			if (playersManager->GetStructPlayerByIDClient(id_char))
+			if (playersManager->GetStructPlayerByIDCharacter(id_char))
 			{
-				if (playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions.Num() > 0)
+				if (playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions.Num() > 0)
 				{
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick - Si hay acciones que hacer"));
 
 					Cast<APD_E_Character>(logic_char->GetCharacterBP())->SetCharacterCameraOnView();
 
-					FStructTargetToAction action = playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions[index_action];
+					FStructTargetToAction action = playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions[index_action];
 					logic_char->ActionTo(action);
 				}
 			}
 			
 			
-//			playersManager->GetCharacterByID(id_char)->ActionTo(playersManager->GetStructPlayerByIDClient(id_char)->turnOrders->actions[index_action]);
+//			playersManager->GetCharacterByID(id_char)->ActionTo(playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions[index_action]);
 		}
 
 	}

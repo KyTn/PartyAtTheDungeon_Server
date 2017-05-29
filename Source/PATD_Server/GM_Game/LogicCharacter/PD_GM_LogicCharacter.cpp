@@ -650,18 +650,18 @@ int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* C
 	if (CharWhoAttacks->isPlayer)
 	{
 		//Calculamos el AP necesario para su movimiento
-		APleft = APleft - playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->positionsToMove.Num();
+		APleft = APleft - playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->positionsToMove.Num();
 		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
-		for (int i = 0; i < playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions.Num(); i++)
+		for (int i = 0; i < playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions.Num(); i++)
 		{
-			if ((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
-				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
-				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
+			if ((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
+				((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
+				((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
 			{
 				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
 				{
 					if (Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].ID_Skill ==
-						playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
+						playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action) //buscar la habilidad en el listado totales de habilidades -> saber cuanto AP consume
 					{
 						APleft = APleft - Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills[j].AP;
 					}
@@ -676,9 +676,9 @@ int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* C
 		//Calculamos el AP gastado para el resto de las acciones , que no sean defensa u otras (ya elegidas)
 		for (int i = 0; i < enemyManager->GetTurnOrders(enemyManager->GetIndexByID(CharWhoAttacks->ID_character))->actions.Num(); i++)
 		{
-			if ((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
-				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
-				((playersManager->GetStructPlayerByIDClient(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
+			if ((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Defense) &&
+				((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::WhenFua)) &&
+				((playersManager->GetStructPlayerByIDCharacter(CharWhoAttacks->ID_character)->turnOrders->actions[i].id_action != (int)ActiveSkills::Hostion)))
 			{
 				for (int j = 0; j < Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->activeSkills.Num(); j++)
 				{
