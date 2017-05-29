@@ -94,9 +94,9 @@ void AServerCamera::Tick(float DeltaTime)
 	else if (moveState == ECameraMoveState::Patrol) {
 
 		FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(
-			GetActorLocation(), FVector(moveTargetPosition.X, moveTargetPosition.Y, moveTargetPosition.Z));
+			GetActorLocation(), lookPosition);
 
-		newRotator.Pitch = newRotator.Pitch - 50.0f;
+		//newRotator.Pitch = newRotator.Pitch - 50.0f;
 		SetActorRotation(newRotator);
 
 		//distance += DeltaTime*patrolVelocity;
@@ -247,6 +247,7 @@ void AServerCamera::MoveTo(FVector targetPosition) {
 
 void AServerCamera::InitPatrol(FVector targetPosition) {
 	FVector v=FVector(targetPosition.X, targetPosition.Y, 1000);
+	lookPosition = FVector(targetPosition.X, targetPosition.Y, 0);
 	spline->SetActorLocation(v);
 	moveState = ECameraMoveState::Patrol;
 	

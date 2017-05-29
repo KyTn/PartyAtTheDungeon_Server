@@ -124,6 +124,7 @@ public:
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString,int> individualActionOnTurns = TMultiMap<FString, int>();
 	int index_IndividualActionsOnTurns = 0;
+	TArray<uint32> listOfRoomsInstiantate = TArray<uint32>();	//limpiar en cada turno - lista de id de las habitaciones a instanciar en el cliente
 
 	///PARA VISUALIZAR LA ACCION DE INTERACTUABLE MANERA INDIVIDUAL
 	//Tmap<Id_Char, index action>

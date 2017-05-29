@@ -747,6 +747,9 @@ struct FStructUpdateTurn : public  FStructGeneric
 	UPROPERTY()
 		TArray<FStructUpdateCharacter> listEnemyCharacters;
 
+	UPROPERTY()
+		TArray<uint32> listOfRoomsInstiantate;
+
 	//Constructor
 	FStructUpdateTurn()
 	{

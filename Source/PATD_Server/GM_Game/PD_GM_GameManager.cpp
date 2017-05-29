@@ -201,6 +201,7 @@ void PD_GM_GameManager::OnBeginState() {
 		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
 		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
 		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
 
 		UpdateState();
 
@@ -258,6 +259,7 @@ void PD_GM_GameManager::OnBeginState() {
 		UpdatePoints();
 		//Popner la camara a patrullar
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
 		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
 		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
 		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
@@ -305,6 +307,11 @@ void PD_GM_GameManager::OnBeginState() {
 			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
 		}
+
+		//Update de Salas del mapa
+		
+		structUpdateTurn.listOfRoomsInstiantate = listOfRoomsInstiantate;
+		listOfRoomsInstiantate.Empty(); //limpiamos las salas para el siguiente turno
 
 		//Envio a todos los clientes con el update del turno
 		networkManager->SendNow(&structUpdateTurn);
@@ -1007,12 +1014,19 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 
 				mapManager->InstantiateRoomAndAdj(idRoomA);
 				mapManager->InstantiateRoomAndAdj(idRoomB);
+				
+				//metemos en la lista de habitaciones instanciadas las que se van a instanciar
+				listOfRoomsInstiantate.Add(idRoomA);
+				listOfRoomsInstiantate.Add(idRoomB);
+
 				mapManager->InstantiateEnemies();
 
 				APD_E_Door* doorOpend = nullptr;
 				doorOpend = mapManager->MapInfo->doorActorByID[id_interact];
 				if (doorOpend)
 				{
+					doorOpend->IsDoorOpen = true;
+
 					doorOpend->SetActorHiddenInGame(true);
 					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 					logic_char->UseInteractable();
