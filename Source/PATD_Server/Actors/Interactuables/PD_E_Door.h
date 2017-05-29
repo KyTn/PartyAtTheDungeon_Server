@@ -44,4 +44,8 @@ public:
 	
 
 	void ChangeRotationToReal(PD_MG_LogicPosition lp);
+
+	UFUNCTION(BlueprintCallable, Category = "OpenDoor")
+		bool OpenTheDoor();
+
 };

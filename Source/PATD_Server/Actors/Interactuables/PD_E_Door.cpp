@@ -96,3 +96,19 @@ void APD_E_Door::ChangeRotationToReal(PD_MG_LogicPosition lp) {
 	}
 }
 
+bool APD_E_Door::OpenTheDoor()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("OpenDoor_Mesh"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OpenTheDoor -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::OpenTheDoor - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
+}

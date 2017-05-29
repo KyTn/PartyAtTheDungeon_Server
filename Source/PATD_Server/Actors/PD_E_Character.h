@@ -92,6 +92,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
 		void UpdateCharLife(float damage); 
 
+	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
+		void DeleteCharacter(); //Sirve para eliminar desde BP a un enemigo del game manager
+
+
 
 	UFUNCTION()
 	void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
@@ -120,6 +124,5 @@ public:
 
 	int  GetBaseHP() { return baseHP; };
 
-	
 
 };

@@ -71,7 +71,15 @@ bool UPD_IA_TaskDefenseTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& O
 
 	if (AP > 0) {
 		AIController->turnTargetCharacter = AIController->goalCharacter;
-		AIController->turnNumAttacks = AP;
+		if (AP > 2) //ponemos un tope de maximo 2 ATK
+		{
+			AIController->turnNumAttacks = 2;
+		}
+		else
+		{
+			AIController->turnNumAttacks = AP;
+
+		}
 	}
 
 	if (AIController->turnNumAttacks > 0 && logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) {

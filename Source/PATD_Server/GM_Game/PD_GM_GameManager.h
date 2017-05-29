@@ -129,6 +129,7 @@ public:
 	///PARA VISUALIZAR LA ACCION DE INTERACTUABLE MANERA INDIVIDUAL
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString, int> individualActionInteractablesOnTurns = TMultiMap<FString, int>();
+	TArray<uint32> doorsOpened = TArray<uint32>();
 	int index_individualActionInteractablesOnTurns = 0;
 
 	void LogicMoveTick(int tick, int numCharacters);

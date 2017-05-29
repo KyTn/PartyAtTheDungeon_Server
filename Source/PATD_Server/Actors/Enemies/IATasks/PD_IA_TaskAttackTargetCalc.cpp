@@ -98,7 +98,15 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 
 	if (AP > 0 && AIController->CheckInRangeFromPositionToCharacter(AIController->turnTargetPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 		AIController->turnTargetCharacter = AIController->goalCharacter;
-		AIController->turnNumAttacks = AP;
+		if (AP > 2) //ponemos un tope de maximo 2 ATK
+		{
+			AIController->turnNumAttacks = 2;
+		}
+		else
+		{
+			AIController->turnNumAttacks = AP;
+
+		}
 	}
 
 	

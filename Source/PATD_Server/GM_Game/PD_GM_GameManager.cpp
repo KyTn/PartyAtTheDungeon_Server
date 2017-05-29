@@ -312,7 +312,8 @@ void PD_GM_GameManager::OnBeginState() {
 		
 		structUpdateTurn.listOfRoomsInstiantate = listOfRoomsInstiantate;
 		listOfRoomsInstiantate.Empty(); //limpiamos las salas para el siguiente turno
-
+		structUpdateTurn.listOfDoorOpend = doorsOpened;
+		doorsOpened.Empty();
 		//Envio a todos los clientes con el update del turno
 		networkManager->SendNow(&structUpdateTurn);
 
@@ -1026,8 +1027,9 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 				if (doorOpend)
 				{
 					doorOpend->IsDoorOpen = true;
-
-					doorOpend->SetActorHiddenInGame(true);
+					doorsOpened.Add(doorOpend->ID_Interactuable);
+					doorOpend->OpenTheDoor();
+					//doorOpend->SetActorHiddenInGame(true);
 					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 					logic_char->UseInteractable();
 
@@ -1379,7 +1381,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
 		
 		timer->InitTimer(timeWaitingPhases);
-		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
 
 		UpdatePhase();
 	}
@@ -1408,7 +1410,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		PlayersLogicTurn();
 
 		timer->InitTimer(timeWaitingPhases);
-		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
 
 		UpdatePhase();
 	}
@@ -1501,7 +1503,7 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
 		timer->InitTimer(timeWaitingPhases);
-		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
 
 		UpdatePhase();
 	}
@@ -1541,7 +1543,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del ataque logico
 
 		timer->InitTimer(timeWaitingPhases);
-		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
 
 		UpdatePhase();
 

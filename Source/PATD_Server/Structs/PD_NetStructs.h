@@ -750,6 +750,9 @@ struct FStructUpdateTurn : public  FStructGeneric
 	UPROPERTY()
 		TArray<uint32> listOfRoomsInstiantate;
 
+	UPROPERTY()
+		TArray<uint32> listOfDoorOpend;
+
 	//Constructor
 	FStructUpdateTurn()
 	{

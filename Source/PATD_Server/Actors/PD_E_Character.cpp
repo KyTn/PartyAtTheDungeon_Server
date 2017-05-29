@@ -4,6 +4,9 @@
 #include "PD_E_Character.h"
 
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "GM_Game/PD_GM_EnemyManager.h"
+#include "PD_ServerGameInstance.h"
+
 #include "PD_GenericController.h"
 
 // Sets default values
@@ -112,4 +115,24 @@ bool APD_E_Character::SetCharacterCameraOnView()
 void APD_E_Character::UpdateCharLife(float damage)
 {
 	logic_character->UpdateHPCurrent(damage);
+}
+
+void APD_E_Character::DeleteCharacter() //Sirve para eliminar desde BP a un enemigo del game manager
+{
+
+	logic_character->GetTotalStats()->HPCurrent = 0;
+	logic_character->SetIsDead(true);
+
+	/*
+	if (logic_character->GetIsPlayer())
+	{
+		logic_character->GetTotalStats()->HPCurrent = 0;
+		logic_character->SetIsDead(true);
+	}
+	else {
+		PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->enemyManager;
+
+		enemyManager->DeleteEnemy(logic_character);
+	}
+	*/
 }
