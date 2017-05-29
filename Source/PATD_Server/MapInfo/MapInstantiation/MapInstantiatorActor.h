@@ -71,6 +71,13 @@ public:
 #pragma endregion 
 
 
+#pragma region MAPSKIN GARDEN
+
+
+	//Props
+	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Tree_1_Class;
+#pragma endregion
+
 #pragma region ENEMIES
 
 	//Enemies
@@ -104,7 +111,13 @@ public:
 	
 
 #pragma endregion 
+	APD_E_ElementActor* Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos);
 
+
+#pragma region Instantiate Dungeon MapElements 
+
+
+#pragma endregion 
 	APD_E_Character* InstantiateOrcBow(PD_MG_LogicPosition logpos);
 	APD_E_Character* InstantiateOrcGuns(PD_MG_LogicPosition logpos);
 	APD_E_Character* InstantiateOrcMelee(PD_MG_LogicPosition logpos);

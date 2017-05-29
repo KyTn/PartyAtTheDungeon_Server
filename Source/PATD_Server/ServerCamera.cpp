@@ -159,7 +159,7 @@ FVector AServerCamera::GetPlayersAveragePosition()
 
 void AServerCamera::Camera_MoveInMovementPhase(TArray<FVector> targetPointList)
 {
-	moveTargetPosition = FindAvaragePosition(targetPointList);
+//	moveTargetPosition = FindAvaragePosition(targetPointList);
 
 	
 	//SetActorLocation();
