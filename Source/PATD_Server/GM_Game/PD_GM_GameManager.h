@@ -116,6 +116,7 @@ public:
 
 	void LogicTurnItemPhase();
 	void LogicTurnMovePhase(int numCharacters);
+	void LogicTurnInteractablePhase();
 	void LogicTurnAttackPhase(); //calcula cuantas acciones de enemigos o players en un turno
 
 	//Funciones para procesar cada accion individual
@@ -123,6 +124,11 @@ public:
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString,int> individualActionOnTurns = TMultiMap<FString, int>();
 	int index_IndividualActionsOnTurns = 0;
+
+	///PARA VISUALIZAR LA ACCION DE INTERACTUABLE MANERA INDIVIDUAL
+	//Tmap<Id_Char, index action>
+	TMultiMap<FString, int> individualActionInteractablesOnTurns = TMultiMap<FString, int>();
+	int index_individualActionInteractablesOnTurns = 0;
 
 	void LogicMoveTick(int tick, int numCharacters);
 	void LogicAttackTick(int tick, int numCharacters);
@@ -155,12 +161,13 @@ public:
 	void VisualTickControl();
 	void VisualMoveTick();
 	void VisualAttackTick(FString id_char, int index_action);
+	void VisualInteractbaleTick(FString id_char, int id_interact);
 
 	bool CheckWinGameConditions();
 
 	bool CheckLoseGameConditions();
 
 	//Función del sistema de puntuación
-	void UpdatePoints(PD_GM_LogicCharacter* player, PD_GM_LogicCharacter* enemy);//Recibe el jugador y el enemigo, de tal manera que ve los puntos que vale el enemigo para sumarselos
+	void UpdatePoints();//Recibe el jugador y el enemigo, de tal manera que ve los puntos que vale el enemigo para sumarselos
 
 };

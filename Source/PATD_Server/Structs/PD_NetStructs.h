@@ -271,6 +271,8 @@ struct FStructTotalStats
 	UPROPERTY()
 		int8 SA;
 
+	UPROPERTY()
+		int PointsCurrent;
 
 	//Constructor
 	FStructTotalStats()
@@ -325,8 +327,10 @@ struct FStructUpdateCharacter
 {
 	GENERATED_BODY()
 
-		UPROPERTY()
+	UPROPERTY()
 		uint8 HPCurrent;
+	UPROPERTY()
+		uint8 PointsCurrent;
 	UPROPERTY()
 		FString ID_character; //Identifica al LogicCharacter que realiza la modificacion
 	UPROPERTY()

@@ -113,7 +113,7 @@ bool PD_GM_MapManager::IsTherePlayer(uint32 x, uint32 y) {
 	logpos.SetX(x);
 	logpos.SetY(y);
 	if (DynamicMapRef->getEnemies().Contains(logpos))
-		if (DynamicMapRef->getEnemies()[logpos].type_Character == ECharacterType::Player)
+		if (DynamicMapRef->getEnemies()[logpos]->type_Character == ECharacterType::Player)
 			return true;
 	return false;
 }
@@ -582,6 +582,8 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	}
 	InstantiateEnemies();
 
+	//Instancacion del Jefe FINAL
+	/*
 	APD_E_Character* charac = nullptr;
 	PD_GM_LogicCharacter* logicCha = nullptr;
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(instantiator->GetGameInstance());
@@ -675,7 +677,7 @@ void PD_GM_MapManager::InstantiateDynamicMap() {
 	_GAMEMANAGER->enemyManager->AddEnemy(logicCha);
 
 
-
+	*/
 
 }
 
@@ -686,10 +688,18 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Numero de enemigos enemigos %d"), DynamicMapRef->GetLogicPositions().Num());
 	for (int i = 0; i < DynamicMapRef->GetLogicPositions().Num(); i++) {
-		if (MapInfo->roomByLogPos[DynamicMapRef->GetLogicPositions()[i]]->IsInstantiated && !DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated) {
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap is %s"), (DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->isInstantiated ? TEXT("True") : TEXT("False")));
+
+		if (MapInfo->roomByLogPos[DynamicMapRef->GetLogicPositions()[i]]->IsInstantiated && !DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->isInstantiated) {
 			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap - Instanciando enemigos %d"), i);
-			DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated = true;
-			enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character; ///Cogemos el tipo
+			
+			DynamicMapRef->UpdateIsInstantiatedEnemy(DynamicMapRef->GetLogicPositions()[i], true);
+			//DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].isInstantiated = true;
+
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::InstantiateDynamicMap DESPUES is %s"), (DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->isInstantiated ? TEXT("True") : TEXT("False")));
+
+			enemyType = DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->type_Character; ///Cogemos el tipo
 			APD_E_Character* charac = nullptr;
 			PD_GM_LogicCharacter* logicCha = nullptr;
 			bool enemyInstantiated = false;
@@ -720,6 +730,13 @@ void PD_GM_MapManager::InstantiateEnemies() {
 
 				break;
 			}
+			case ECharacterType::OrcBoss: {
+				charac = instantiator->InstantiateOrcBoss(DynamicMapRef->GetLogicPositions()[i]);
+				if (charac)
+					enemyInstantiated = true;
+
+				break;
+			}
 			default:
 			{
 				charac = instantiator->InstantiateOrcMelee(DynamicMapRef->GetLogicPositions()[i]);
@@ -733,8 +750,12 @@ void PD_GM_MapManager::InstantiateEnemies() {
 			if (enemyInstantiated) {
 				logicCha = new PD_GM_LogicCharacter();
 				logicCha->SetIsPlayer(false);
-				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].type_Character);
-				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]].ID_Character);
+				logicCha->SetTypeCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->type_Character);
+				FString id_char = "Enemy_";
+				id_char.Append(FString::FromInt(index_enemies_forID));
+				//index_enemies_forID++;
+				//logicCha->SetIDCharacter(id_char);
+				logicCha->SetIDCharacter(DynamicMapRef->getEnemies()[DynamicMapRef->GetLogicPositions()[i]]->ID_Character);
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_MapManager::InstantiateDynamicMap: Id Dinamicmap: %s"), *logicCha->GetIDCharacter());
 				logicCha->SetCharacterBP(charac);
 				logicCha->SetController(Cast<APD_AIController>(charac->GetController()));

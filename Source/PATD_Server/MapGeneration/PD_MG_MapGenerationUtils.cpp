@@ -938,7 +938,18 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 					}
 				}
 			}
-
+			//Instanciamos el boss
+			bool bossinstanciated = false;
+			while (!bossinstanciated) {
+				int pos = FMath::RandRange(0, M.mapRooms[M.mapRooms.Num() - 1].NORMAL_TILES.Num() - 1);
+				if (!M.enemies.Contains(M.mapRooms[M.mapRooms.Num() - 1].BOUNDING_BOX_TOP_LEFT + M.mapRooms[M.mapRooms.Num() - 1].NORMAL_TILES[pos])) {
+					UE_LOG(LogTemp, Log, TEXT("Poniendo boss en sala %d"), M.mapRooms[M.mapRooms.Num() - 1].ID);
+					//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::MarkARoomAsSpawingRoom testing Spawn point on (%d,%d), inicio de la sala (%d,%d)"), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetX(), M.mapRooms[keys[i]].BOUNDING_BOX_TOP_LEFT.GetY());
+					enemy = 5;///Con esto conseguimos un enemigo aleatorio de la lista de enemigos
+					M.enemies.Add(M.mapRooms[M.mapRooms.Num() - 1].BOUNDING_BOX_TOP_LEFT + M.mapRooms[M.mapRooms.Num() - 1].NORMAL_TILES[pos], enemy);///falta pasar de posición local a posicion global en el mapa
+					bossinstanciated = true;
+				}
+			}
 			return true;
 			break;
 		}

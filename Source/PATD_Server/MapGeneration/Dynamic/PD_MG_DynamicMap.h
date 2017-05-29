@@ -41,7 +41,7 @@ class PATD_SERVER_API PD_MG_DynamicMap
 private:
 	
 	uint32 _Height, _Width;
-	TMap<PD_MG_LogicPosition, StructEnemy> enemies;
+	TMap<PD_MG_LogicPosition, StructEnemy*> enemies;
 	TArray<PD_MG_LogicPosition> _LogicPositionsRefs;
 
 public:
@@ -56,7 +56,7 @@ public:
 	void SetHeight(uint32 val) { _Height = val; }
 	void SetWidth(uint32 val) { _Width = val; }
 
-	TMap<PD_MG_LogicPosition, StructEnemy> getEnemies() { return enemies; }
+	TMap<PD_MG_LogicPosition, StructEnemy*> getEnemies() { return enemies; }
 	TArray<PD_MG_LogicPosition> GetLogicPositions() { return _LogicPositionsRefs; }
 
 #pragma endregion
@@ -64,6 +64,7 @@ public:
 	//PD_MG_LogicPosition* AddNewLogicPosition(uint32 x, uint32 y, TCHAR c);
 
 	void AddNewEnemy(PD_MG_LogicPosition lp, ECharacterType type, FString ID_Character);
+	void UpdateIsInstantiatedEnemy(PD_MG_LogicPosition posEnemy, bool isInstantiated);
 
 	void UpdateActor(AActor* actor, PD_MG_LogicPosition lp);
 

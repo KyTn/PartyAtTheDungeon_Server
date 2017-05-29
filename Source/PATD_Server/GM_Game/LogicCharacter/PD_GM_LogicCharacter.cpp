@@ -148,6 +148,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
 
+
 	//controller->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
 
 	switch (ActiveSkills(action.id_action))
@@ -159,6 +160,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 			//controller->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 			//como es un ataque basico, siempre sera el primero de los id_characters que este en el array de targets de los characters
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
+
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
 			else
@@ -194,8 +196,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		case ActiveSkills::Hostion:
 		{
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: Hostion "));
-
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
+
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
 			else
@@ -210,8 +212,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		case ActiveSkills::SomeHit:
 		{
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: SomeHit "));
-
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
+
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
 			else
@@ -226,8 +228,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		case ActiveSkills::RightInTheAsshole:
 		{
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: RightInTheAsshole "));
-
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
+
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
 			else
@@ -242,8 +244,8 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 		case ActiveSkills::GiveMeTheFireBlast:
 		{
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: GiveMeTheFireBlast "));
-
 			PD_GM_LogicCharacter* characterToAttack = nullptr;
+
 			if (isPlayer)
 				characterToAttack = enemyManager->GetCharacterByID(action.id_character[0]);
 			else
@@ -268,6 +270,7 @@ bool PD_GM_LogicCharacter::ActionTo(FStructTargetToAction action)
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::ActionTo: BeInCrossroads "));
 
 			Skill_Magic_BeInCrossroads(this);
+
 			break;
 		}
 		case ActiveSkills::WhoHeal:
@@ -359,6 +362,13 @@ void PD_GM_LogicCharacter::ConsumeItem(uint32 idItem)
 	default:
 		break;
 	}
+}
+
+bool PD_GM_LogicCharacter::UseInteractable()
+{
+
+	GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+	return true;
 }
 
 void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
@@ -779,6 +789,14 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		//lanzar animacion de defensa por parte del atacado
 		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
+
+	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+	{
+		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+		CharWhoReceiveTheAttacks->isDead = true;
+		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+	}
+
 }
 
 void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
@@ -865,6 +883,14 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
 				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+
+				if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
+				{
+					CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+					enemyManager->GetEnemies()[j]->isDead = true;
+					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+				}
+
 			}
 		}
 	}
@@ -900,6 +926,13 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 	CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
 	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
+
+	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+	{
+		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+		CharWhoReceiveTheAttacks->isDead = true;
+		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+	}
 
 }
 
@@ -939,6 +972,14 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
 		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+	}
+
+	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+	{
+		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+		CharWhoReceiveTheAttacks->isDead = true;
+		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 	}
 }
 
@@ -965,6 +1006,13 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
 		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+		if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+		{
+			CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+			CharWhoReceiveTheAttacks->isDead = true;
+			UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+		}
 }
 
 /*MAGIA*/
@@ -1060,6 +1108,14 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
 				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+
+				if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
+				{
+					CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+					enemyManager->GetEnemies()[j]->isDead = true;
+					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+				}
+
 			}
 		}
 	}
@@ -1132,7 +1188,6 @@ FStructCharacterState* PD_GM_LogicCharacter::GetCharacterState() { return charac
 
 bool PD_GM_LogicCharacter::GetIsPlayer() { return isPlayer; }
 bool PD_GM_LogicCharacter::GetIsDead() { return isDead; }
-int PD_GM_LogicCharacter::GetPoints() { return points; }
 FString PD_GM_LogicCharacter::GetIDCharacter() { return ID_character; }
 ECharacterType PD_GM_LogicCharacter::GetTypeCharacter() { return type_character; }
 APD_GenericController* PD_GM_LogicCharacter::GetController() { return controller; }
@@ -1296,11 +1351,33 @@ void PD_GM_LogicCharacter::SetTotalStats()
 	totalStats->HPTotal = (initBaseStats->HPBase) * (1 + totalStats->CONBonus);
 	totalStats->HPCurrent = totalStats->HPTotal;
 
+	switch (type_character)
+	{
+	case ECharacterType::OrcMelee:
+		totalStats->PointsCurrent = 10;
+		break;
+	case ECharacterType::OrcBow:
+		totalStats->PointsCurrent = 5;
+		break;
+	case ECharacterType::OrcGuns:
+		totalStats->PointsCurrent = 8;
+		break;
+	case ECharacterType::OrcBoss:
+		totalStats->PointsCurrent = 25;
+		break;
+	default:
+		break;
+	}
+
+}
+
+void PD_GM_LogicCharacter::UpdatePointsCurrent(int inPoints) 
+{
+	GetTotalStats()->PointsCurrent = GetTotalStats()->PointsCurrent + inPoints;
 }
 
 void PD_GM_LogicCharacter::SetIsPlayer(bool nIsPlayer) { isPlayer = nIsPlayer; }
 void PD_GM_LogicCharacter::SetIsDead(bool nIsDead) { isDead = nIsDead; }
-void PD_GM_LogicCharacter::SetPoints(int inPoints) { points = inPoints; }
 void PD_GM_LogicCharacter::SetIDCharacter(FString nID_character) { ID_character = nID_character; }
 void PD_GM_LogicCharacter::SetTypeCharacter(ECharacterType nID_character) { type_character = nID_character; }
 void PD_GM_LogicCharacter::SetController(APD_GenericController* ncontroller) { controller = ncontroller; }

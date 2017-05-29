@@ -20,11 +20,11 @@ void PD_MG_DynamicMap::AddNewEnemy(PD_MG_LogicPosition lp, ECharacterType type, 
 
 	_LogicPositionsRefs.Add(lp);
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_DynamicMap::AddNewEnemy: id Enemy:%s"), *ID_Character);
-	struct StructEnemy  structEnemy =  StructEnemy();
-	structEnemy.currentPosition = lp;
-	structEnemy.ID_Character = ID_Character;
-	structEnemy.type_Character = type;
-
+	struct StructEnemy*  structEnemy =  new StructEnemy();
+	structEnemy->currentPosition = lp;
+	structEnemy->ID_Character = ID_Character;
+	structEnemy->type_Character = type;
+	structEnemy->isInstantiated = false;
 	enemies.Add(lp, structEnemy);
 }
 
@@ -38,5 +38,19 @@ void PD_MG_DynamicMap::UpdateActor(AActor* actor, PD_MG_LogicPosition lp) {
 	enemies.Emplace(*lp,chs);
 	*/
 }
+
+void PD_MG_DynamicMap::UpdateIsInstantiatedEnemy(PD_MG_LogicPosition posEnemy, bool isInstantiated)
+{
+	UE_LOG(LogTemp, Warning, TEXT("PD_MG_DynamicMap::UpdateIsInstantiatedEnemy"));
+
+	if (getEnemies().Contains(posEnemy))
+	{
+		getEnemies()[posEnemy]->isInstantiated = isInstantiated;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("PD_MG_DynamicMap::UpdateIsInstantiatedEnemy - No encuentra la posicion del enemigo"));
+	}
+}
+
 
 bool PD_MG_DynamicMap::Clear() { return false; }
