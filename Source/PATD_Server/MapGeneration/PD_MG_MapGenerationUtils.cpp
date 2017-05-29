@@ -1192,19 +1192,71 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 				posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
 				posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
 
-				return posibles[FMath::RandRange(0, posibles.Num()-1)];
+				return posibles[FMath::RandRange(0, posibles.Num() - 1)];
 			}
 			case StaticMapElementInRoomTemplate::PROP_CHEST:
 				return StaticMapElement::PROP_CHEST;
 
+
+			case StaticMapElementInRoomTemplate::OBSTRUCTION:
+				return StaticMapElement::OBSTRUCTION_00;
 			}
 		}
 
 		case MapSkinType::GARDEN: {
-
 			switch (melem) {
 				case StaticMapElementInRoomTemplate::COLUMN:
 					return StaticMapElement::TREE_OR_COLUMN_00;
+				
+				case StaticMapElementInRoomTemplate::PROP_CHEST:
+					return StaticMapElement::PROP_CHEST;
+
+				case StaticMapElementInRoomTemplate::OBSTRUCTION: {
+					return StaticMapElement::OBSTRUCTION_00;
+				}
+			
+			}
+		}
+		case MapSkinType::LIBRARY: {
+
+			switch (melem) {
+			case StaticMapElementInRoomTemplate::COLUMN:
+				return StaticMapElement::TREE_OR_COLUMN_00;
+
+			case StaticMapElementInRoomTemplate::PROP_CHEST:
+				return StaticMapElement::PROP_CHEST;
+
+			case StaticMapElementInRoomTemplate::OBSTRUCTION:
+				return StaticMapElement::OBSTRUCTION_00;
+			
+			}
+		}
+		case MapSkinType::SACRIFICE: {
+
+			switch (melem) {
+			case StaticMapElementInRoomTemplate::COLUMN:
+				return StaticMapElement::TREE_OR_COLUMN_00;
+
+			case StaticMapElementInRoomTemplate::PROP_CHEST:
+				return StaticMapElement::PROP_CHEST;
+
+			case StaticMapElementInRoomTemplate::OBSTRUCTION:
+				return StaticMapElement::OBSTRUCTION_00;
+			
+			}
+		}
+		case MapSkinType::BOSS: {
+
+			switch (melem) {
+			case StaticMapElementInRoomTemplate::COLUMN:
+				return StaticMapElement::TREE_OR_COLUMN_00;
+
+			case StaticMapElementInRoomTemplate::PROP_CHEST:
+				return StaticMapElement::PROP_CHEST;
+
+			case StaticMapElementInRoomTemplate::OBSTRUCTION:
+				return StaticMapElement::OBSTRUCTION_00;
+			
 			}
 		}
 	}

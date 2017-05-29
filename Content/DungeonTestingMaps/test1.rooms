@@ -1,6 +1,6 @@
 START_ROOM
 Name: simple_Cuadrada
-tags: 0, 10
+tags: 0, 10, 20, 30, 100
 size_x: 8
 size_y: 8
 WWwwwwWW
@@ -13,7 +13,7 @@ W......W
 WWwwwwWW
 START_ROOM
 Name: Cuadrada_1
-tags: 10, 0
+tags: 0, 10, 20, 30, 100
 size_x: 8
 size_y: 8
 WWwwwwWW
@@ -21,6 +21,6 @@ W......W
 w..c...w
 w..,,..w
 w..,,..w
-w......w
+w..t...w
 W......W
 WWwwwwWW
