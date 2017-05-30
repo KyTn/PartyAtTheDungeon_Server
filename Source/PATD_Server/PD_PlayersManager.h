@@ -42,7 +42,11 @@ public:
 	bool AnyPlayerDead();
 	bool AllAnimationEnd();
 	int GetIndexClientMaster();
+	//Para encontrar un structPlayer por su idCliente, el idCliente es el que viene del movil, unico.
 	StructPlayer* GetStructPlayerByIDClient(FString ID_ClientToSearch);
+
+	//Para encontrar un structPlayer por el idCharacter del character que contiene el propio structPlayer, Pej: Player_00
+	StructPlayer* GetStructPlayerByIDCharacter(FString ID_CharacterToSearch);
 
 	int GetMaxLenghtActions(EActionPhase phase);
 	int GetPlayerMaxLenghtActions(EActionPhase phase);
