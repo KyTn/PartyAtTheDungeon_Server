@@ -752,7 +752,8 @@ struct FStructUpdateTurn : public  FStructGeneric
 
 	UPROPERTY()
 		TArray<uint32> listOfDoorOpend;
-
+	UPROPERTY()
+		bool goToGenerateOrders;
 	//Constructor
 	FStructUpdateTurn()
 	{

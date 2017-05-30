@@ -231,7 +231,9 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
 	endPos.Z = 50;
 
-	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Visibility);
+	FCollisionQueryParams paramsRay = FCollisionQueryParams();
+	paramsRay.AddIgnoredActor(GetPawn());
+	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Visibility, paramsRay);
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 		
