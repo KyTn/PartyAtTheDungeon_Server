@@ -141,8 +141,14 @@ void PD_GM_GameManager::UpdateState() {
 			//Actualizar estados alteadores y de efectos en enemigos --- despues del turno de los players
 			CheckAndUpdate_ActiveEffectsOnEnemies();
 			CheckAndUpdate_AlteredStateOnEnemies();
-			CheckWinGameConditions();
-			this->ChangeState(EGameState::WaitingEnemiesOrders);
+			if(CheckWinGameConditions())
+			{
+				this->ChangeState(EGameState::EndOfTurn);
+			}
+			else 
+			{
+				this->ChangeState(EGameState::WaitingEnemiesOrders);
+			}
 		}
 		
 

@@ -54,7 +54,7 @@ void PD_NW_NetworkManager::HandleNewSocketData(TArray<uint8>* data, int socketIn
 
 
 
-		uint32 size = ((*data)[0] << 24) + ((*data)[1] << 16) + ((*data)[2] << 8) + ((*data)[3]);
+		uint32 size = ((uint32)((*data)[0]) << 24) + ((uint32)((*data)[1]) << 16) + ((uint32)((*data)[2]) << 8) + (uint32)(*data)[3]);
 		uint8 type = (*data)[4];
 
 		TArray<uint8> dataaux = TArray<uint8>();
