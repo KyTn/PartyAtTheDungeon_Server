@@ -1,6 +1,6 @@
 START_ROOM
 Name: simple_Cuadrada
-tags: 0, 10, 20, 30, 100
+tags: 0, 10, 20, 30
 size_x: 8
 size_y: 8
 WWwwwwWW
@@ -8,19 +8,107 @@ W......W
 w......w
 w..t...w
 w......w
-w..c...w
+w......w
 W......W
 WWwwwwWW
 START_ROOM
 Name: Cuadrada_1
-tags: 0, 10, 20, 30, 100
+tags: 0, 10, 20, 30
 size_x: 8
-size_y: 8
-WWwwwwWW
-W......W
-w..c...w
-w..,,..w
-w..,,..w
+size_y: 9
+WWWWWWWW
+W..WW..W
+w..WW..w
+w......w
+w......w
 w..t...w
+w......w
 W......W
 WWwwwwWW
+START_ROOM
+Name: Cuadrada_2
+tags: 0, 10, 20, 30
+size_x: 9
+size_y: 9
+WWwwwwwWW
+W.......W
+w...t...w
+w..OOO..w
+w.,OOO,.w
+w..OOO..w
+W...,...W
+W.......W
+WWwwwwwWW
+START_ROOM
+Name: Boss_simple_Cuadrada_2
+tags: 0, 10, 20, 30, 100
+size_X: 16
+size_Y: 16
+WWwwwwwwwwwwwwWW
+W..............W
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+w..............w
+W..............W
+WWwwwwwwwwwwwwWW
+START_ROOM
+Name: Rectangular_1
+tags: 0, 10, 20, 30
+size_X: 20
+size_Y: 10
+WWwwwwwWWWWwwwwwwwWW
+W.......WW.........W
+w.......OO.........w
+w.......OO......t..w
+w.......WW.........w
+w..................w
+w..................w
+w.......WW.........w
+W.......WW.........W
+WWwwwwwWWWWwwwwwwwWW
+START_ROOM
+Name: forma_L_Cuadrada
+tags: 0, 10, 20, 30
+size_X: 12
+size_Y: 11
+WWwwwwwwwwWW
+W..........W
+w.......t..w
+w..........w
+W..........w
+WWwwwWW....w
+      W....w
+      w....w
+      w....w
+      W....W
+      WWwwWW
+START_ROOM
+Name: forma_Cruz
+tags: 0, 10, 20, 30
+size_X: 16
+size_Y: 16
+     WWwwWW     
+     W....W     
+     W....W     
+     W....W     
+     W....W     
+WWWWWW....WWWWWW
+W......t.......W
+w..............w
+w..............w
+W..............W
+WWWWWW....WWWWWW
+     W....W     
+     W....W     
+     W....W     
+     W....W     
+     WWwwWW     
