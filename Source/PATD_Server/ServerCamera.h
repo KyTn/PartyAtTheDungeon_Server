@@ -72,7 +72,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APD_SplineActors* spline;
 	float distance;
-	float patrolVelocity = 100;
+	float patrolVelocity = 20;
 //	bool patrolRotate = true;
 	void InitPatrol(FVector targetPosition);
 

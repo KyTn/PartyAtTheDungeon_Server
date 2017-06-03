@@ -99,8 +99,8 @@ void AServerCamera::Tick(float DeltaTime)
 		//newRotator.Pitch = newRotator.Pitch - 50.0f;
 		SetActorRotation(newRotator);
 
-		//distance += DeltaTime*patrolVelocity;
-		distance += 0.5;
+		distance += DeltaTime*patrolVelocity;
+		//distance += 0.5;
 		SetActorLocation(spline->GetSplineComponent()->GetWorldLocationAtDistanceAlongSpline(distance));
 		/*
 		if (patrolRotate) {
