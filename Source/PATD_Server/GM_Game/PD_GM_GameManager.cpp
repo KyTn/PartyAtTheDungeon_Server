@@ -275,51 +275,17 @@ void PD_GM_GameManager::OnBeginState() {
 			structPlayer->turnOrders->positionsToMove.Empty();
 			structPlayer->turnOrders->actions.Empty();
 			structPlayer->playerSendOrder = false;
-			//structPlayer->turnOrders->consumablesToConsume.Empty();
-			//structPlayer->turnOrders->interactuablesToInteract.Empty();
+			structPlayer->turnOrders->consumablesToConsume.Empty();
+			structPlayer->turnOrders->interactuablesToInteract.Empty();
 
 		}
 
 		//Enviar a cliente actualizacion del mapa
-		FStructUpdateTurn structUpdateTurn;
-		//Jugadores
-		for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
-			PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
-			FStructUpdateCharacter structUpdateCharacter;
-			//Conversion de Struct a LogicPosition
-			FStructLogicPosition logicPosition;
-			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
-			structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
-			structUpdateCharacter.PointsCurrent = logicCharacter->GetTotalStats()->PointsCurrent;
-			structUpdateCharacter.currentCharacterPosition = logicPosition;
-			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-			structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+		FStructUpdateTurn structUpdateTurn = GenerateStructUpdateTurn();
 
-			UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager:: player con id %s"), *structUpdateCharacter.ID_character);
-		}
-		//Enemigos
-		for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
-			PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
-			FStructUpdateCharacter structUpdateCharacter;
-			//Conversion de Struct a LogicPosition
-			FStructLogicPosition logicPosition = FStructLogicPosition();
-			logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
-			logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
-			structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
+		//listOfRoomsInstiantate.Empty(); //limpiamos las salas para el siguiente turno
 
-			structUpdateCharacter.currentCharacterPosition = logicPosition;
-			//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
-			structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
-			structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
-		}
-
-		//Update de Salas del mapa
-		
-		structUpdateTurn.listOfRoomsInstiantate = listOfRoomsInstiantate;
-		listOfRoomsInstiantate.Empty(); //limpiamos las salas para el siguiente turno
-		structUpdateTurn.listOfDoorOpend = doorsOpened;
-		doorsOpened.Empty();
+		//doorsOpened.Empty();
 		//Envio a todos los clientes con el update del turno
 		networkManager->SendNow(&structUpdateTurn);
 
@@ -364,6 +330,51 @@ bool PD_GM_GameManager::Send_FStructClientStartMatchOnGM() {
 	return networkManager->SendNow(&msg, -1);
 }
 
+
+
+FStructUpdateTurn PD_GM_GameManager::GenerateStructUpdateTurn() {
+	//Enviar a cliente actualizacion del mapa
+	FStructUpdateTurn structUpdateTurn;
+	//Jugadores
+	for (int iPlayers = 0; iPlayers < playersManager->GetDataPlayers().Num(); iPlayers++) {
+		PD_GM_LogicCharacter* logicCharacter = playersManager->GetDataPlayers()[iPlayers]->logic_Character;
+		FStructUpdateCharacter structUpdateCharacter;
+		//Conversion de Struct a LogicPosition
+		FStructLogicPosition logicPosition;
+		logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+		logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+		structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
+		structUpdateCharacter.PointsCurrent = logicCharacter->GetTotalStats()->PointsCurrent;
+		structUpdateCharacter.currentCharacterPosition = logicPosition;
+		structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+		structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager:: player con id %s"), *structUpdateCharacter.ID_character);
+	}
+	//Enemigos
+	for (int iEnemies = 0; iEnemies < enemyManager->GetEnemies().Num(); iEnemies++) {
+		PD_GM_LogicCharacter* logicCharacter = enemyManager->GetEnemies()[iEnemies];
+		FStructUpdateCharacter structUpdateCharacter;
+		//Conversion de Struct a LogicPosition
+		FStructLogicPosition logicPosition = FStructLogicPosition();
+		logicPosition.positionX = logicCharacter->GetCurrentLogicalPosition().GetX();
+		logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
+		structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
+
+		structUpdateCharacter.currentCharacterPosition = logicPosition;
+		//	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: id Enemy:%s" ), *logicCharacter->GetIDCharacter());
+		structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
+		structUpdateTurn.listEnemyCharacters.Add(structUpdateCharacter);
+	}
+
+	//Update de Salas del mapa
+
+	structUpdateTurn.listOfRoomsInstiantate = listOfRoomsInstiantate;
+
+	structUpdateTurn.listOfDoorOpend = doorsOpened;
+
+	return structUpdateTurn;
+}
 #pragma endregion
 
 

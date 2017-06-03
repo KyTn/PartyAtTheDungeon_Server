@@ -120,6 +120,8 @@ public:
 	void BroadcastMatchConfigFullUpdate();
 	void BroadcastEndMatchConfig();
 
+	FStructCharacter GenerateFStructCharacter(int indexPlayer);
+
 	//Carga de mapa
 	void LoadMap(FString mapName);
 	//Callback cuando el mapa este cargado (Lo llama el estado GameStateInitializer en su beginPlay)

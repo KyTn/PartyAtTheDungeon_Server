@@ -241,18 +241,36 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 
 
 			
+
 			//Enviamos el string del map, que se envia en condiciones normales cuando el lobby se inicializa (despues de la carga del mapa de lobby en el servidor)
 			//BroadcastMapString();
 			BroadcastFStructMapData(mapManager->MapInfo->NETMAPDATA);
 			//Habria que pasarle un struct con su propio personaje, ya que no lo va a poder crear porque no pasa por el lobby
+			FStructCharacter characterSend = GenerateFStructCharacter(aux_theClient->ID_PLAYER);
+			networkManager->SendNow(&characterSend, aux_theClient->ID_PLAYER);
+
+		
 
 			//Con esto hacemos que haga launchMatch como cuando todos dan ready en el lobby
 			FStructClientStartMatchOnGM launchMatch = FStructClientStartMatchOnGM();
 			networkManager->SendNow(&launchMatch, -1);
 
+			FStructUpdateTurn structUpdateTurn = gameManager->GenerateStructUpdateTurn();
+			if (gameManager->structGameState->enumGameState == EGameState::WaitingPlayerOrders) {
+				structUpdateTurn.goToGenerateOrders = true;
+				networkManager->SendNow(&structUpdateTurn, aux_theClient->ID_PLAYER);
+
+			}
+			else {
+				structUpdateTurn.goToGenerateOrders = false;
+			}
+
 
 			BroadcastInstantiatePlayers();
 
+
+
+			
 
 		}else if (structServerState->enumServerState == EServerState::Launch_Match) {
 			//Aqui yo pienso que podemos no dejar entrar al nuevo. Poner algo asi como "el juego esta cargando, por favor intenta reconectarte cuando termine"
@@ -477,6 +495,19 @@ void UPD_ServerGameInstance::BroadcastEndMatchConfig()
 	networkManager->SendNow(&msg, -1);
 
 }
+
+FStructCharacter UPD_ServerGameInstance::GenerateFStructCharacter(int indexPlayer) {
+	FStructCharacter structCharacter = FStructCharacter();
+	structCharacter.totalStats = *playersManager->GetCharacterByIndex(indexPlayer)->totalStats;
+	structCharacter.basicStats = *playersManager->GetCharacterByIndex(indexPlayer)->basicStats;
+	structCharacter.initBaseStats = *playersManager->GetCharacterByIndex(indexPlayer)->initBaseStats;
+	structCharacter.skills = *playersManager->GetCharacterByIndex(indexPlayer)->skills;
+	structCharacter.weapon = *playersManager->GetCharacterByIndex(indexPlayer)->weapon;
+	structCharacter.skin = *playersManager->GetCharacterByIndex(indexPlayer)->skin;
+	structCharacter.charState = *playersManager->GetCharacterByIndex(indexPlayer)->characterState;
+	return structCharacter;
+}
+
 #pragma endregion
 
 #pragma region ONBEGIN & UPDATE STATES

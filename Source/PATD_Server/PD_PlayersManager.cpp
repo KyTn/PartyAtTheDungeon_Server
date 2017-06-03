@@ -63,12 +63,18 @@ bool PD_PlayersManager::AllPlayersReady() {
 bool PD_PlayersManager::AllPlayersSendOrders() {
 	UE_LOG(LogTemp, Log, TEXT("PD_PlayersManager::AllPlayersSendOrders"));
 	bool checkAllPlayerSendData = true;
+	int numDesconected = 0;
 	for (StructPlayer* player : dataPlayers) {
 		if (player->isConnected) {
 			checkAllPlayerSendData = checkAllPlayerSendData && player->playerSendOrder;
 		}
-
+		else {
+			numDesconected++;
+		}
+		
 	}
+
+	if (numDesconected == dataPlayers.Num()) return false;
 	return checkAllPlayerSendData;
 }
 

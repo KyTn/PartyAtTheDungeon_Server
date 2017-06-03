@@ -89,6 +89,8 @@ public:
 	// se le envia un FStructClientStartMatchOnGM para que puedan pasar al Start_Match
 	bool Send_FStructClientStartMatchOnGM();
 
+	FStructUpdateTurn GenerateStructUpdateTurn();
+
 #pragma endregion
 
 
