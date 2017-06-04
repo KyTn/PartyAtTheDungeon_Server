@@ -957,12 +957,15 @@ for (int i = 0; i < players; i++) {
 		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
-		//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		if (!logicCharacter->GetIsPlayer())
+		{
+			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		}
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 		{
 			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
-			v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
-			//v.Z = 45.0f;
+			//v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
+			v.Z = 10.0f;
 			positionsToMove.Add(v);
 			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
 		}
@@ -973,6 +976,7 @@ for (int i = 0; i < players; i++) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
 		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
 			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
+
 		}
 	}
 
