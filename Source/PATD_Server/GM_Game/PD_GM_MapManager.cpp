@@ -133,7 +133,17 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	
 	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  IDSPAN   %d"), MapInfo->SpawnRoomIndex);
 
-	return MapInfo->SpawnRoom->LogicPosInRoom;
+	TArray<PD_MG_LogicPosition> ret = TArray<PD_MG_LogicPosition>();
+
+	for (int i = 0; i < MapInfo->SpawnRoom->LogicPosInRoom.Num(); i++) {
+
+		if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
+		{
+			ret.Add(MapInfo->SpawnRoom->LogicPosInRoom[i]);
+		}
+	}
+
+	return ret;
 
 }
 
