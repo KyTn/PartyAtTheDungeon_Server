@@ -66,6 +66,12 @@ void PD_GM_GameManager::InitState() {
 
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	
+	if (playersManager->GetNumPlayers() > 0)
+	{
+		if (!playersManager->GetDataStructPlayer(inPlayer)->isConnected) //si el que envia esta a no conectado
+			playersManager->GetDataStructPlayer(inPlayer)->isConnected = true;
+	}
+
 	if (structGameState->enumGameState == EGameState::Instantiate_Map) {
 		// Si se recibe del servidor un Start_Match, ir a ese estado. 
 		if (inEventType == UStructType::FStructClientMapAlreadyInstantiated) {
@@ -90,6 +96,7 @@ void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, 
 
 			playersManager->GetDataStructPlayer(inPlayer)->turnOrders = turnStruct;
 			playersManager->GetDataStructPlayer(inPlayer)->playerSendOrder = true;
+
 			UpdateState();
 		}
 		else if (inEventType == UStructType::FStructLostConnection) {

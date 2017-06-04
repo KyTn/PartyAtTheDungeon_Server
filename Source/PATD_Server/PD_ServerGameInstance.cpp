@@ -52,6 +52,14 @@ bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) 
 #pragma region HandleEvent Functions 
 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
+
+	if (playersManager->GetNumPlayers() > 0)
+	{
+		if (!playersManager->GetDataStructPlayer(inPlayer)->isConnected) //si el que envia esta a no conectado
+			playersManager->GetDataStructPlayer(inPlayer)->isConnected = true;
+	 }
+	
+
 	UE_LOG(LogTemp, Warning, TEXT("ServerGameInstance::HandleEvent:: Evento recibido:%d Estado del servidor: %d"), static_cast<uint8>(inEventType), static_cast<uint8>(structServerState->enumServerState));
 
 	//Este IF es el Inicio de una nueva conexion. Simplemente da la bienvenida al nuevo cliente y sirve para pedir a este su ID_Cliente (Comprobar que el cliente existe o no)
