@@ -233,7 +233,7 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 
 	FCollisionQueryParams paramsRay = FCollisionQueryParams();
 	paramsRay.AddIgnoredActor(GetPawn());
-	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Visibility, paramsRay);
+	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Camera, paramsRay);
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 		
