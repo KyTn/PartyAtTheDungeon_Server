@@ -82,6 +82,10 @@ PD_MM_MapInfo::PD_MM_MapInfo(PD_GM_MapManager* mM)
 	roomByLogPos = TMap<PD_MG_LogicPosition, PD_MM_Room*>();
 	roomByIDRoom = TMap<int, PD_MM_Room*>();
 
+	// WALLS
+	wallsByLogPos = TMap<PD_MG_LogicPosition, APD_E_ElementActor*>();
+
+
 	// Doors e interactaubles
 
 	doorInfoInMap = TArray<PD_MM_DoorInfo*>();
@@ -157,6 +161,14 @@ bool PD_MM_MapInfo::IsDoorInstantiatedAt(PD_MG_LogicPosition lp) {
 bool PD_MM_MapInfo::AddWall(PD_MG_LogicPosition logpos, APD_E_ElementActor *wall)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("logpos %d %d"), logpos.GetX(), logpos.GetY());
+
+	if (!wallsByLogPos.Contains(logpos)) {
+		wallsByLogPos.Add(logpos, wall);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("PD_MM_MapInfo::AddWall error adding wall-logpos (%d,%d)"), logpos.GetX(), logpos.GetY());
+	}
+
 
 	for (int i = 0; i < rooms.Num(); i++)
 	{

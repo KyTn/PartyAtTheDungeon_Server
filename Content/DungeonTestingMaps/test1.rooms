@@ -17,7 +17,7 @@ tags: 0, 10, 20, 30
 size_x: 8
 size_y: 9
 WWWWWWWW
-W..WW..W
+WqlWW..W
 w..WW..w
 w......w
 w......w
@@ -31,11 +31,11 @@ tags: 0, 10, 20, 30
 size_x: 9
 size_y: 9
 WWwwwwwWW
-W.......W
+Wq.....lW
 w...t...w
-w..OOO..w
-w.,OOO,.w
-w..OOO..w
+w.......w
+w.,...,.w
+w.......w
 W...,...W
 W.......W
 WWwwwwwWW
@@ -45,7 +45,7 @@ tags: 0, 10, 20, 30, 100
 size_X: 16
 size_Y: 16
 WWwwwwwwwwwwwwWW
-W..............W
+Wq............lW
 w..............w
 w..............w
 w..............w
@@ -65,24 +65,24 @@ Name: Rectangular_1
 tags: 0, 10, 20, 30
 size_X: 20
 size_Y: 10
-WWwwwwwWWWWwwwwwwwWW
-W.......WW.........W
-w.......OO.........w
-w.......OO......t..w
-w.......WW.........w
+WWwwwwwwWWWWwwwwwwWW
+Wq......lWW........W
+w..................w
+w..c............c..w
 w..................w
 w..................w
-w.......WW.........w
-W.......WW.........W
-WWwwwwwWWWWwwwwwwwWW
+w..c............c..w
+w..................w
+W........WW........W
+WWwwwwwwWWWWwwwwwwWW
 START_ROOM
 Name: forma_L_Cuadrada
 tags: 0, 10, 20, 30
 size_X: 12
 size_Y: 11
 WWwwwwwwwwWW
-W..........W
-w.......t..w
+Wq........lW
+w..........w
 w..........w
 W..........w
 WWwwwWW....w
@@ -102,7 +102,7 @@ size_Y: 16
      W....W     
      W....W     
 WWWWWW....WWWWWW
-W......t.......W
+W....q....l....W
 w..............w
 w..............w
 W..............W

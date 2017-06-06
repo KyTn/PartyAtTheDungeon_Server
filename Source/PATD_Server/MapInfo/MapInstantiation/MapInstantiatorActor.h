@@ -17,6 +17,7 @@ class APD_E_ElementActor;
 class APD_E_Door;
 class PD_MM_Room;
 class APD_E_WallActor;
+class APD_E_WallProp;
 
 //////////////////////////
 
@@ -48,7 +49,6 @@ public:
 
 	TSubclassOf<class APD_E_ElementActor> TileClass;
 	TSubclassOf<class APD_E_ElementActor> WallClass;
-
 	TSubclassOf<class APD_E_Door> DoorClass;
 
 	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_01_Class;
@@ -75,6 +75,10 @@ public:
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Dungeon_Prop_Treasure_01_Class;
 
+	//Wall prop
+	TSubclassOf<class APD_E_WallProp> Dungeon_WallProp_grille_torch_01_Class;
+	TSubclassOf<class APD_E_WallProp> Dungeon_WallProp_grille_window_01_Class;
+
 #pragma endregion 
 
 
@@ -85,11 +89,18 @@ public:
 	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Treasure_01_Class;
 	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Tree_01_Class;
 	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Bush_01_Class;
+
+	//WallProp
+	TSubclassOf<class APD_E_WallProp> Garden_WallProp_Lamp_01_Class;
+	TSubclassOf<class APD_E_WallProp> Garden_WallProp_Font_01_Class;
 #pragma endregion
 
 #pragma region MAPSKIN LIBRARY
 	TSubclassOf<class APD_E_ElementActor> Library_Prop_Treasure_01_Class;
 
+	//WallProp
+	TSubclassOf<class APD_E_WallProp> Library_WallProp_Torch_01_Class;
+	TSubclassOf<class APD_E_WallProp> Library_WallProp_Stairs_01_Class;
 #pragma endregion
 
 #pragma region MAPSKIN SACRIFICE
@@ -98,9 +109,15 @@ public:
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Sacrifice_Prop_Treasure_01_Class;
 	TSubclassOf<class APD_E_ElementActor> Sacrifice_Prop_Jail_01_Class;
+
+	//WallProp
+	TSubclassOf<class APD_E_WallProp> Sacrifice_WallProp_grille_window_01_Class;
+
 #pragma endregion
 #pragma region MAPSKIN BOSS
 
+	//WallProp
+	TSubclassOf<class APD_E_WallProp> Boss_WallProp_Fence_01_Class;
 
 #pragma endregion
 
@@ -121,6 +138,11 @@ public:
 #pragma endregion 
 #pragma endregion 
 
+
+	///////////////////
+	//   FUNCTIONS   //
+	///////////////////
+
 	APD_E_ElementActor* InstantiateTile(PD_MG_LogicPosition logpos);
 
 	APD_E_WallActor* InstantiateWall(PD_MG_LogicPosition logpos);
@@ -135,8 +157,13 @@ public:
 	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_02_1(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_03(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_04_1(PD_MG_LogicPosition logpos);
-	
+
 	APD_E_ElementActor* Instantiate_Dungeon_Prop_Obstruction_02(PD_MG_LogicPosition logpos);
+
+
+	// Wallprops 
+	APD_E_WallProp* Instantiate_Dungeon_WallProp_grille_torch_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Dungeon_WallProp_grille_window_01(PD_MG_LogicPosition logpos);
 
 #pragma endregion 
 
@@ -144,18 +171,38 @@ public:
 	APD_E_ElementActor* Instantiate_Garden_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Garden_Prop_Bush_01(PD_MG_LogicPosition logpos);
+
+	// Wallprops 
+	APD_E_WallProp* Instantiate_Garden_WallProp_Lamp_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Garden_WallProp_Font_01(PD_MG_LogicPosition logpos);
+
 #pragma endregion
 
 #pragma region Instantiate Library MapElements 
 	APD_E_ElementActor* Instantiate_Library_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor * Instantiate_Library_Prop_Column_04_2(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Library_Prop_Obstruction_12_1(PD_MG_LogicPosition logpos);
+
+
+	// Wallprops 
+	APD_E_WallProp* Instantiate_Library_WallProp_Torch_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Library_WallProp_Stairs_01(PD_MG_LogicPosition logpos);
+
 #pragma endregion
+
 #pragma region Instantiate Sacrifice MapElements 
 	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Jail_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Obstruction_12_2(PD_MG_LogicPosition logpos);
+
+
+	// Wallprops 
+	APD_E_WallProp* Instantiate_Sacrifice_WallProp_grille_window_01(PD_MG_LogicPosition logpos);
+
 #pragma region Instantiate Boss MapElements 
+
+	// Wallprops 
+	APD_E_WallProp* Instantiate_Boss_WallProp_Fence_01(PD_MG_LogicPosition logpos);
 
 #pragma endregion
 

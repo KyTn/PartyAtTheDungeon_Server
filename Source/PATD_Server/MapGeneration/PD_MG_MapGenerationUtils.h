@@ -142,6 +142,12 @@ struct RoomTemplateInfo {
 		case 'c':
 			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::COLUMN);
 			break;
+		case 'q':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_PROP_1);
+			break;
+		case 'l':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_PROP_TORCH);
+			break;
 		default:
 			break;
 		}

@@ -86,7 +86,9 @@ public:
 	void InstantiateMap();
 	void InstantiateRoomAndAdj(uint8 id);
 	void InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMapElement element, PD_MG_LogicPosition lp);
-	void InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp);
+	void InstantiateWallAt(PD_MG_LogicPosition lp);
+	void InstantiateWallBySkin(PD_MG_LogicPosition lp);
+	void InstantiateStraigthWallBySkin(PD_MG_LogicPosition lp, bool rotate);
 	void InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* doorInfo);
 	void InstantiateDynamicMap();
 	void InstantiateEnemies();
