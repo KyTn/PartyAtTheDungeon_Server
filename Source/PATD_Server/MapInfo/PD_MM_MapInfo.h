@@ -82,7 +82,7 @@ public:
 	~PD_MM_Room();
 
 	bool IsInstantiated;
-
+	bool IsOpen;
 
 	bool IsSpawnRoom;
 	int IDRoom;

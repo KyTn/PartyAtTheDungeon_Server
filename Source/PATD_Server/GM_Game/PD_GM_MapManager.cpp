@@ -129,11 +129,11 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	}
 	*/
 	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  Room %d num spawnpoints: %d"), MapInfo->SpawnRoom->GetIDRoom(), MapInfo->rooms[MapInfo->SpawnRoom->GetIDRoom()].LogicPosInRoom.Num());
-	//return MapInfo->rooms[MapInfo->SpawnRoom->GetIDRoom()].LogicPosInRoom;
+	return MapInfo->rooms[MapInfo->SpawnRoom->GetIDRoom()]->LogicPosInRoom;
 	
 	//UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() -  IDSPAN   %d"), MapInfo->SpawnRoomIndex);
 
-	TArray<PD_MG_LogicPosition> ret = TArray<PD_MG_LogicPosition>();
+	/*TArray<PD_MG_LogicPosition> ret = TArray<PD_MG_LogicPosition>();
 
 	for (int i = 0; i < MapInfo->SpawnRoom->LogicPosInRoom.Num(); i++) {
 
@@ -143,7 +143,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 		}
 	}
 
-	return ret;
+	return ret;*/
 
 }
 
@@ -208,6 +208,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 		UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateRoomAndAdj - El mapAdj no contiene el id %d "), id);
 	}
 	PD_MM_Room* room = MapInfo->roomByIDRoom[id];
+	room->IsOpen = true;
 	if (!room->IsInstantiated) {
 		TArray<PD_MG_LogicPosition> lp;
 		room->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);

@@ -679,6 +679,7 @@ PD_MM_Room::PD_MM_Room()
 {
 	IsInstantiated = false;
 	IsSpawnRoom = false;
+	IsOpen = false;
 	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
 	//LogicTilesPosInRoom = TArray<PD_MG_LogicPosition>();
 	LogicWallPosInRoom = TArray<PD_MG_LogicPosition>();
@@ -701,6 +702,7 @@ PD_MM_Room::PD_MM_Room(int idRoom)
 {
 	IsInstantiated = false;
 	IsSpawnRoom = false;
+	IsOpen = false;
 	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
 	//LogicTilesPosInRoom = TArray<PD_MG_LogicPosition>();
 	LogicWallPosInRoom = TArray<PD_MG_LogicPosition>();
