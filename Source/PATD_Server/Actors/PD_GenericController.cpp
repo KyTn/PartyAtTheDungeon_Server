@@ -18,16 +18,11 @@
 
 // Sets default values
 
-APD_GenericController::APD_GenericController()
-{
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-}
-
+/*
 APD_GenericController::APD_GenericController(FString type) {
 
-}
+}*/
 
 void APD_GenericController::Tick(float DeltaTime)
 {
@@ -48,7 +43,7 @@ void APD_GenericController::Tick(float DeltaTime)
 		
 		//FTimerHandle handleForPong;
 		//GetWorldTimerManager().SetTimer(handleForPong, this, &APD_GenericController::MoveWithSpline, 2.00f, false);
-		MoveWithSpline();
+		MoveWithSpline(DeltaTime);
 		
 	}
 	
@@ -158,7 +153,7 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 
 
 //Funcion para mover al Character mediante Splines
-void APD_GenericController::MoveWithSpline()
+void APD_GenericController::MoveWithSpline(float deltaTime)
 {
 	FVector lastPosition;
 	FVector currentPosition;
@@ -205,7 +200,7 @@ void APD_GenericController::MoveWithSpline()
 
 			GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
 
-			distance = distance + 2; //actualizamos el variable
+			distance = distance + velocity*deltaTime; //actualizamos el variable
 
 		}
 		else
