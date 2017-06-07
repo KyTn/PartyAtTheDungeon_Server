@@ -72,8 +72,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APD_SplineActors* spline;
 	float distance;
-	float patrolVelocity = 20;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float patrolVelocity = 10;
 //	bool patrolRotate = true;
+	void InitPatrolPositions(TArray<FVector> targetPositions);
 	void InitPatrol(FVector targetPosition);
 
 	//Sistema de mirar a
@@ -90,12 +92,12 @@ public:
 	//FVector deviationFromList;
 	//float zoomDesired;
 
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//float ratioZoomX=2;
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//float ratioZoomY=2;
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//float minZoom = 1000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ratioZoomX=1.75;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ratioZoomY=1.75;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float minZoom = 1000;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	//float velocityZoom;

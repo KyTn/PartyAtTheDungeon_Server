@@ -242,11 +242,11 @@ void PD_GM_GameManager::OnBeginState() {
 		{
 			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
 
-			//Popner la camara a patrullar
-			SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-			FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-			Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			//Popner la camara a patrullar - ya no es necesario porque siempre patrulla
+			//SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+			//FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+			//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+			//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 		}
 
 		
@@ -270,12 +270,12 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		UpdatePoints();
-		//Popner la camara a patrullar
+		//Popner la camara a patrullar - ya no es necesario porque siempre patrulla
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
-		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+	//	FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+		//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+		//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
@@ -1304,10 +1304,10 @@ void PD_GM_GameManager::UpdatePhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-		if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
+	//	if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
 
 			ChangePhase(EServerPhase::MoveTick);
-		}
+	//	}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -1494,7 +1494,9 @@ void PD_GM_GameManager::OnBeginPhase()
 
 				}
 				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-					targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					if (enemyManager->GetTurnOrders(z)->positionsToMove.Num() > 0) { //Solo metemos las posiciones  de los enemigos que se mueven este turno.
+						targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					}
 				}
 			}
 
@@ -1503,10 +1505,14 @@ void PD_GM_GameManager::OnBeginPhase()
 			UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager %d"), targetPositions.Num());
 			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
 
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			
 			//Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
 
-			Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
+			//Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
+
+			Cast<AServerCamera>(SGI->CameraServer)->InitPatrolPositions(targetPositions);
+			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
 			
 			FOutputDeviceNull ar;
 			const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
