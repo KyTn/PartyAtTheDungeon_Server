@@ -104,10 +104,10 @@ void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
 			else 
 			{
 				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
-				charWhoCrash->logic_character->GetController()->IsCalculatingMovePath = true;
-				charWhoCrash->logic_character->GetController()->StopMoving();
-				charWhoCrash->logic_character->GetController()->GetSpline()->RemovePoints();
-				charWhoCrash->logic_character->MoveWhenCollisionLost();
+				//charWhoCrash->logic_character->GetController()->IsCalculatingMovePath = true;
+				//charWhoCrash->logic_character->GetController()->StopMoving();
+				//charWhoCrash->logic_character->GetController()->GetSpline()->RemovePoints();
+				//charWhoCrash->logic_character->MoveWhenCollisionLost();
 			}
 		}
 	}
