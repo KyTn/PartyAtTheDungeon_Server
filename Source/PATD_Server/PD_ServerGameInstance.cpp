@@ -53,7 +53,7 @@ bool UPD_ServerGameInstance::SuscribeToEvents(int inPlayer, UStructType inType) 
 
 void UPD_ServerGameInstance::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 
-	if (playersManager->GetNumPlayers() > 0)
+	if (playersManager->GetNumPlayers() >= inPlayer+1)
 	{
 		if (!playersManager->GetDataStructPlayer(inPlayer)->isConnected) //si el que envia esta a no conectado
 			playersManager->GetDataStructPlayer(inPlayer)->isConnected = true;
@@ -656,12 +656,16 @@ void UPD_ServerGameInstance::OnBeginState() {
 			//spawnPoints.Add(spawn[randomize.RandHelper(spawn.Num())]);
 		}
 
-		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		if (spawn.Num() > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("tructServerState->enumServerState == EServerState::Launch_Match - Player %d is at (%d,%d)"), i, spawn[i].GetX(), spawn[i].GetY());
-			playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(spawn[i]);
+			for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("tructServerState->enumServerState == EServerState::Launch_Match - Player %d is at (%d,%d)"), i, spawn[i].GetX(), spawn[i].GetY());
+				playersManager->GetDataPlayers()[i]->logic_Character->SetCurrentLogicalPosition(spawn[i]);
 
+			}
 		}
+		
 
 
 

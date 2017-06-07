@@ -137,11 +137,13 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 
 	for (int i = 0; i < MapInfo->SpawnRoom->LogicPosInRoom.Num(); i++) {
 
-		if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
-		{
+		//if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
+		//{
 			ret.Add(MapInfo->SpawnRoom->LogicPosInRoom[i]);
-		}
+		//}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num tiles possibles to spawb: %d"), ret.Num());
 
 	return ret;
 

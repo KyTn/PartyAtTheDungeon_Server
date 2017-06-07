@@ -106,6 +106,11 @@ public:
 	int getServerPhase();
 	int getGameMngrGameState();
 
+	bool IsThereAnyConsumableOrders(); 
+	bool IsThereAnyMovementOrder();
+	bool IsThereAnyInteractbaleOrder();
+	bool IsThereAnyAttackOrder();
+
 #pragma endregion
 
 	//Funciones para crear las ordenes de los enemigos
@@ -139,9 +144,7 @@ public:
 	void LogicItemTick(int tick);
 
 	//Funciones para gestionar el choque - devuelve si se ha chocado y a perdido (true) o no ha chocado o no ha perdido éste (false)
-	bool  CheckAndManageCollisionWithPlayers(int indexDataPlayers, int tick, int numCharacters);
-	bool  CheckAndManageCollisionWithEnemies(int indexDataPlayers, int tick, int numCharacters);
-	bool  CheckAndManageCollisionWithMapElements(int indexDataPlayers, int tick, int  numCharacters);
+	bool  CheckAndManageCollisionWithCharacters(int indexDataPlayers, int tick, int numCharacters);
 	bool  CheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck);
 	
 #pragma region CHECK ACTIVEEFFECTS AND ALTEREDSTATE
