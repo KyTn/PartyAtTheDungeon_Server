@@ -22,6 +22,7 @@
 #include "Actors/PD_E_ElementActor.h"
 #include "Actors/Interactuables/PD_E_Door.h"
 #include "Actors/MapElements/PD_E_WallActor.h"
+#include "Actors/MapElements/PD_E_WallProp.h"
 
 
 PD_GM_MapManager::PD_GM_MapManager()
@@ -206,10 +207,10 @@ void PD_GM_MapManager::InstantiateMap()
 void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 
 	if (!MapInfo->mapAdj.Contains(id)) {
-
 		UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateRoomAndAdj - El mapAdj no contiene el id %d "), id);
 	}
 	PD_MM_Room* room = MapInfo->roomByIDRoom[id];
+	room->IsOpen = true;
 	if (!room->IsInstantiated) {
 		TArray<PD_MG_LogicPosition> lp;
 		room->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);
@@ -219,7 +220,15 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 		}
 		for (int j = 0; j < room->LogicWallPosInRoom.Num(); j++)///Instanciamos los tiles de una habitacion.
 		{
-			InstantiateWallBySkin(room->mapSkin, room->LogicWallPosInRoom[j]);
+			//InstantiateWallBySkin(room->mapSkin, room->LogicWallPosInRoom[j]);
+			if (MapInfo->wallsByLogPos.Contains(room->LogicWallPosInRoom[j]))
+			{
+				UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateRoomAndAdj - wall already in room "));
+			}
+			else
+			{
+				InstantiateWallAt(room->LogicWallPosInRoom[j]);
+			}
 		}
 		room->IsInstantiated = true;
 	}
@@ -236,7 +245,16 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 			}
 			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicWallPosInRoom.Num(); j++)///Instanciamos los muros de una habitacion.
 			{
-				InstantiateWallBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]);
+				//InstantiateWallBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]);
+				if (MapInfo->wallsByLogPos.Contains(MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]))
+				{
+					UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateRoomAndAdj - wall already in room "));
+				}
+				else
+				{
+					InstantiateWallAt(MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]);
+				}
+
 			}
 			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateRoomAndAdj - door in room %d -> %d"), MapInfo->rooms[adj[i]]->IDRoom, MapInfo->rooms[adj[i]]->LogicDoorPosInRoom.Num());
 
@@ -293,8 +311,17 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
 					
-
 					instantiator->Instantiate_Dungeon_Prop_Obstruction_02(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_1: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_grille_torch_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_grille_window_01(lp);
+					wp->SearchWallAndFix(lp);
 					break;
 				}
 			}
@@ -337,6 +364,17 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					instantiator->Instantiate_Garden_Prop_Bush_01(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_1: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Garden_WallProp_Font_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Garden_WallProp_Lamp_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+
 			}
 			break;
 		}
@@ -377,6 +415,17 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					instantiator->Instantiate_Sacrifice_Prop_Obstruction_12_2(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_1: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Sacrifice_WallProp_grille_window_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Sacrifice_WallProp_grille_window_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+
 			}
 			break;
 		}
@@ -417,6 +466,17 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					instantiator->Instantiate_Dungeon_Prop_Obstruction_02(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_1: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Boss_WallProp_Fence_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Boss_WallProp_Fence_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+
 			}
 			break;
 		}
@@ -457,6 +517,17 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					instantiator->Instantiate_Library_Prop_Obstruction_12_1(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_1: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Library_WallProp_Stairs_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Library_WallProp_Torch_01(lp);
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+
 			}
 			break;
 		}
@@ -464,7 +535,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 }
 
 
-void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp) {
+/*void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPosition lp) {
 	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateWallBySkin at (%d,%d)"), lp.GetX(), lp.GetY());
 	APD_E_WallActor* actorElement;
 	switch (mapSkin) {
@@ -500,8 +571,51 @@ void PD_GM_MapManager::InstantiateWallBySkin(MapSkinType mapSkin, PD_MG_LogicPos
 	}
 	}
 
-
 }
+*/
+void PD_GM_MapManager::InstantiateWallAt(PD_MG_LogicPosition lp)
+{
+	TArray<PD_MG_LogicPosition> adj_reales = Get_LogicPosition_Adyacents_To(lp);
+	PD_MG_LogicPosition N = PD_MG_LogicPosition(lp.GetX() - 1, lp.GetY());
+	PD_MG_LogicPosition S = PD_MG_LogicPosition(lp.GetX() + 1, lp.GetY());
+	PD_MG_LogicPosition E = PD_MG_LogicPosition(lp.GetX(), lp.GetY() + 1);
+	PD_MG_LogicPosition W = PD_MG_LogicPosition(lp.GetX(), lp.GetY() - 1);
+
+	if (adj_reales.Contains(N) && IsLogicPositionAWall(N) && adj_reales.Contains(S) && IsLogicPositionAWall(S) &&
+		!(adj_reales.Contains(W) && IsLogicPositionAWall(W)) && !(adj_reales.Contains(E) && IsLogicPositionAWall(E))) {
+		InstantiateStraigthWallBySkin(lp, false);
+	}
+	else if (adj_reales.Contains(W) && IsLogicPositionAWall(W) && adj_reales.Contains(E) && IsLogicPositionAWall(E) &&
+		!(adj_reales.Contains(N) && IsLogicPositionAWall(N)) && !(adj_reales.Contains(S) && IsLogicPositionAWall(S))) {
+		InstantiateStraigthWallBySkin(lp, true);
+	}
+	else
+	{
+		InstantiateWallBySkin(lp);
+	}
+}
+
+
+void PD_GM_MapManager::InstantiateWallBySkin(PD_MG_LogicPosition lp) {
+	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateWallBySkin at (%d,%d)"), lp.GetX(), lp.GetY());
+	APD_E_WallActor* actorElement;
+	actorElement = instantiator->InstantiateWall(lp);
+	actorElement->isThinWall = false;
+	actorElement->SetMaterialSkin(lp);
+	MapInfo->AddWall(lp, actorElement);
+}
+
+
+void PD_GM_MapManager::InstantiateStraigthWallBySkin(PD_MG_LogicPosition lp, bool rotate) {
+	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateStraigthWallBySkin at (%d,%d)"), lp.GetX(), lp.GetY());
+	APD_E_WallActor* actorElement;
+	actorElement = instantiator->InstantiateWall(lp);
+	actorElement->isThinWall = true;
+	actorElement->rotated = rotate;
+	actorElement->SetMaterialSkin(lp);
+	MapInfo->AddWall(lp, actorElement);
+}
+
 
 
 void PD_GM_MapManager::InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* doorInfo) {

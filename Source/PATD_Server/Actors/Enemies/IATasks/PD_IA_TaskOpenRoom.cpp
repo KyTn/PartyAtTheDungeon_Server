@@ -18,11 +18,19 @@ EBTNodeResult::Type UPD_IA_TaskOpenRoom::ExecuteTask(UBehaviorTreeComponent& Own
 
 	if (room->IsOpen) {//la habitacion está abierta
 		if (AIController->canAction) {
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open"));
+
 			return EBTNodeResult::Succeeded;
 		}
 		else {//es el primer turno despues de que este abierta
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open, pero no puede hacer accion"));
+
 			AIController->canAction = true;
 		}
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Close"));
+
 	}
 	AIController->turnTargetCharacter = nullptr;
 	AIController->turnNumAttacks = 0;

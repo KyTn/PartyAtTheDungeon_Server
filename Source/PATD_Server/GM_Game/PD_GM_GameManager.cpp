@@ -244,9 +244,9 @@ void PD_GM_GameManager::OnBeginState() {
 
 			//Popner la camara a patrullar
 			SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-			FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-			Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			//FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+			//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+			//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 		}
 
 		
@@ -285,9 +285,9 @@ void PD_GM_GameManager::OnBeginState() {
 		//Popner la camara a patrullar
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
-		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+		//FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+		//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+		//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
@@ -463,9 +463,13 @@ void PD_GM_GameManager::LogicTurnItemPhase() {
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		for (int iEnemy = 0; iEnemy < enemyManager->GetEnemies().Num(); iEnemy++) {
 			FStructTurnOrders* turnOrder= enemyManager->GetTurnOrders(iEnemy);
-			if (turnOrder->consumablesToConsume.Num() > 0) {
-				enemyManager->GetEnemies()[iEnemy]->ConsumeItem(turnOrder->consumablesToConsume[0]);
+			if (turnOrder)
+			{
+				if (turnOrder->consumablesToConsume.Num() > 0) {
+					enemyManager->GetEnemies()[iEnemy]->ConsumeItem(turnOrder->consumablesToConsume[0]);
+				}
 			}
+			
 		}
 	}
 	
@@ -530,13 +534,16 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 		{
 			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
+				if (enemyManager->GetTurnOrders(index_enemies))
 				{
-					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  enemies -- adding interaction %d"), index_actions);
+					for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
+					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  enemies -- adding interaction %d"), index_actions);
 
-					FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
-					int id_interc = enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract[index_actions];
-					individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
+						FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+						int id_interc = enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract[index_actions];
+						individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
+					}
 				}
 			}
 		}
@@ -590,12 +597,18 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 		{
 			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->actions.Num(); index_actions++)
+				if (enemyManager->getListTurnOrders().Num() > 0) // hay ordenes
 				{
-					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  enemies -- adding action %d"), index_actions);
+					if (enemyManager->GetTurnOrders(index_enemies))
+					{
+						for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->actions.Num(); index_actions++)
+						{
+							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  enemies -- adding action %d"), index_actions);
 
-					FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
-					individualActionOnTurns.Add(id_enemy, index_actions);
+							FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+							individualActionOnTurns.Add(id_enemy, index_actions);
+						}
+					}
 				}
 			}
 		}
@@ -629,9 +642,12 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				
-				if (!enemyManager->GetEnemies()[i]->GetIsStoppingByCollision() && enemyManager->getListTurnOrders()[i]->positionsToMove.Num() > tick)
+				if (enemyManager->getListTurnOrders()[i])
 				{
-					enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+					if (!enemyManager->GetEnemies()[i]->GetIsStoppingByCollision() && enemyManager->getListTurnOrders()[i]->positionsToMove.Num() > tick)
+					{
+						enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+					}
 				}
 			}			
 	}
@@ -946,7 +962,7 @@ PD_GM_LogicCharacter* logicCharacter = nullptr;
 /* ============
 SET DE LA POSICION DE LA CAMARA PARA VISUALIZAR TODOS LOS JUGADORES
 ===============*/
-
+/*
 TArray<FVector> newTargetPositions = TArray<FVector>();
 //Setear nuevo punto medio, para mover la camara
 UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
@@ -978,7 +994,7 @@ else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
 	}
 }
 Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
-
+*/
 
 /* ============
 SET DE PUNTOS DE MOVIMIENTO DE CADA JUGADOR Y CORRESPONDIENTE LLAMADA AL MOVIMIENTO
@@ -1215,6 +1231,8 @@ void PD_GM_GameManager::OnAnimationEnd() {
 				}
 				else
 				{
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde Ataque"));
+
 					UpdatePhase();
 
 				}
@@ -1244,11 +1262,15 @@ void PD_GM_GameManager::OnAnimationEnd() {
 				}
 				else
 				{
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde interaccion"));
+
 					UpdatePhase();
 				}
 			}
 			else 
 			{
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde movimiento o consumable"));
+
 				UpdatePhase();
 
 			}
@@ -1331,10 +1353,9 @@ void PD_GM_GameManager::UpdatePhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-		if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
-
+		//if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
 			ChangePhase(EServerPhase::MoveTick);
-		}
+		//}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -1435,11 +1456,11 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
 		
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+
 		if (IsThereAnyConsumableOrders())
 			timer->InitTimer(timeWaitingPhases);
 
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
-		
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::ConsumableCamera)
@@ -1466,11 +1487,11 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del movimiento logico
 		PlayersLogicTurn();
 
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+
 		if (IsThereAnyMovementOrder())
 			timer->InitTimer(timeWaitingPhases);
 		
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
-
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
@@ -1525,7 +1546,9 @@ void PD_GM_GameManager::OnBeginPhase()
 
 				}
 				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-					targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					if (enemyManager->GetTurnOrders(z)->positionsToMove.Num() > 0) { //Solo metemos las posiciones  de los enemigos que se mueven este turno.
+						targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					}
 				}
 			}
 
@@ -1534,11 +1557,13 @@ void PD_GM_GameManager::OnBeginPhase()
 			UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager %d"), targetPositions.Num());
 			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
 
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 			//Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
+			//Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
 
-			Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
-			
+			Cast<AServerCamera>(SGI->CameraServer)->InitPatrolPositions(targetPositions);
+			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
+
 			FOutputDeviceNull ar;
 			const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
 																							//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
@@ -1560,11 +1585,11 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		LogicTurnInteractablePhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
 
+		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+
 		if (IsThereAnyInteractbaleOrder())
 			timer->InitTimer(timeWaitingPhases);
 		
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
-
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
@@ -1574,6 +1599,8 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
+
 		if (individualActionInteractablesOnTurns.Num() > 0)
 		{
 			TArray<FString> id_charactersOnArray;
@@ -1592,10 +1619,6 @@ void PD_GM_GameManager::OnBeginPhase()
 			UpdatePhase();
 		}
 
-
-
-		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
-		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
@@ -1605,10 +1628,11 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
-		if (IsThereAnyAttackOrder())
-			timer->InitTimer(timeWaitingPhases);
 
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+
+		if (IsThereAnyAttackOrder())
+			timer->InitTimer(timeWaitingPhases);
 
 		UpdatePhase();
 
@@ -1676,8 +1700,12 @@ bool  PD_GM_GameManager::IsThereAnyMovementOrder()
 	{
 		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
 		{
-			if (enemyManager->GetTurnOrders(index_enemies)->positionsToMove.Num() > 0)
-				return true;
+			if (enemyManager->GetTurnOrders(index_enemies))
+			{
+				if (enemyManager->GetTurnOrders(index_enemies)->positionsToMove.Num() > 0)
+					return true;
+			}
+			
 		}
 	}
 
