@@ -74,6 +74,7 @@ public:
 	//Determina si la orden de selectedBehaviour es propia o es impuesta
 	bool orderImpossed;
 
+	bool canAction;
 
 	//Cuantos turnos se ha determinado que quedan hasta el goal. Lo calcula en PD_IA_TaskBehaviourSelector? o lo setea quien haga un orderImpossed.
 	int turnsForGoal=0;

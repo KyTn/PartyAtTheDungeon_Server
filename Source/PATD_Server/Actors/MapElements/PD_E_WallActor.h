@@ -32,6 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
 		MapSkinType mapSkin_W;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotated")
+		bool rotated = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thin Wall")
+		bool isThinWall = false;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,6 +45,9 @@ public:
 
 
 	void SetMaterialSkin(PD_MG_LogicPosition lp);
+
+
+	void ChangeRotationToReal(PD_MG_LogicPosition lp);
 
 private:
 	void ChangeMaterialProperties_MapSkin(PD_MG_LogicPosition lp);

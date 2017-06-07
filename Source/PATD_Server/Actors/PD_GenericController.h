@@ -37,12 +37,15 @@ class PATD_SERVER_API APD_GenericController : public AAIController
 	APD_SplineActors*  spline = nullptr;
 	float distance = 0.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Move Parameters")
+		float velocity = 150;
+
 public:
 	GENERATED_BODY()
 
-	APD_GenericController();
 
-	APD_GenericController(FString type);
+
+//	APD_GenericController(FString type);
 
 	void SetSpline(APD_SplineActors* newSpline);
 	APD_SplineActors* GetSpline();
@@ -50,7 +53,7 @@ public:
 	bool IsCalculatingMovePath = false; //Variable que dice si esta calculando path del camino o no. Sirve para que solo se llame una vez a la funcion de moverse cuando llama  a la funcion ReceiveHit
 
 	//Funcion para moverse por el mundo con splines
-	void MoveWithSpline();
+	void MoveWithSpline(float deltaTime);
 
 	//Funcion para actualizar la rotacion del personaje
 	void UpdateRotationCharacterToEnemy(FVector target);

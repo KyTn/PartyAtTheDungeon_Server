@@ -82,7 +82,7 @@ public:
 	~PD_MM_Room();
 
 	bool IsInstantiated;
-
+	bool IsOpen;
 
 	bool IsSpawnRoom;
 	int IDRoom;
@@ -153,6 +153,8 @@ public:
 	TMap<int, PD_MM_Room*> roomByIDRoom; // dado un IDRoom, cual es su IDRoom asociado
 	TMap<PD_MG_LogicPosition, PD_MM_Room*> roomByLogPos; // dada una posicion logica, a que room pertenece
 
+	// WALLS
+	TMap<PD_MG_LogicPosition, APD_E_ElementActor*> wallsByLogPos; // dada una posicion logica, que muro es
 	
 	// DOORS E INTERACTUABLES
 

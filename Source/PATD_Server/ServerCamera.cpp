@@ -253,6 +253,15 @@ void AServerCamera::InitPatrol(FVector targetPosition) {
 	
 }
 
+void AServerCamera::InitPatrolPositions(TArray<FVector> targetPositions) {
+	FVector position = FindAvaragePosition(targetPositions);
+	position.Z = GetZoomForPositionList(targetPositions);
+	lookPosition = FVector(position.X, position.Y, 0);
+	spline->SetActorLocation(position);
+	moveState = ECameraMoveState::Patrol;
+}
+
+
 void AServerCamera::OnMoveEnd() {
 	moveState = ECameraMoveState::EndMoving;
 	UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetGameInstance());
@@ -309,16 +318,16 @@ float AServerCamera::GetZoomForPositionList(TArray<FVector> inPositionsToShowLis
 
 
 
-	float zoomFromX = deviation.X*3;
-	float zoomFromY = deviation.Y*3;
+	float zoomFromX = deviation.X*ratioZoomX;
+	float zoomFromY = deviation.Y*ratioZoomY;
 
 
-	float zoomDesired = 1000;
+	float zoomDesired = minZoom;
 	if (deviation.Equals(FVector(0, 0, 0))) {
-		zoomDesired = 1000;
+		zoomDesired = minZoom;
 	}
 	else {
-		zoomDesired = FMath::Max((float)1000,FMath::Max(zoomFromX, zoomFromY));
+		zoomDesired = FMath::Max((float)minZoom,FMath::Max(zoomFromX, zoomFromY));
 	}
 	FVector mostrar = FVector(zoomFromX, zoomFromY, zoomDesired);
 	UE_LOG(LogTemp, Warning, TEXT("ECameraMoveState::GetZoomForPositionList: FVectorMostrar %s"), *mostrar.ToString());

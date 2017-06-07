@@ -1172,12 +1172,22 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 	if (melem == StaticMapElementInRoomTemplate::DOOR)
 		return StaticMapElement::DOOR;
 
+	if (melem == StaticMapElementInRoomTemplate::WALL_PROP_TORCH)
+		return StaticMapElement::WALL_PROP_TORCH;
+
+	if (melem == StaticMapElementInRoomTemplate::WALL_PROP_1)
+		return StaticMapElement::WALL_PROP_1;
+
+	if (melem == StaticMapElementInRoomTemplate::PROP_CHEST)
+		return StaticMapElement::PROP_CHEST;
+
+	if (melem == StaticMapElementInRoomTemplate::OBSTRUCTION)
+		return StaticMapElement::OBSTRUCTION_00;
 
 
 
 
-
-
+	// StaticMapElements que si dependan del MapSkinType en el switch
 
 
 	switch (mst) {
@@ -1185,21 +1195,15 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 		case MapSkinType::DUNGEON_NORMAL: {
 
 			switch (melem) {
-			case StaticMapElementInRoomTemplate::COLUMN:
-			{
-				TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
-				posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
-				posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
-				posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
+				case StaticMapElementInRoomTemplate::COLUMN:
+				{
+					TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
+					posibles.Add(StaticMapElement::TREE_OR_COLUMN_00);
+					posibles.Add(StaticMapElement::TREE_OR_COLUMN_01);
+					posibles.Add(StaticMapElement::TREE_OR_COLUMN_02);
 
-				return posibles[FMath::RandRange(0, posibles.Num() - 1)];
-			}
-			case StaticMapElementInRoomTemplate::PROP_CHEST:
-				return StaticMapElement::PROP_CHEST;
-
-
-			case StaticMapElementInRoomTemplate::OBSTRUCTION:
-				return StaticMapElement::OBSTRUCTION_00;
+					return posibles[FMath::RandRange(0, posibles.Num() - 1)];
+				}
 			}
 		}
 
@@ -1207,14 +1211,6 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			switch (melem) {
 				case StaticMapElementInRoomTemplate::COLUMN:
 					return StaticMapElement::TREE_OR_COLUMN_00;
-				
-				case StaticMapElementInRoomTemplate::PROP_CHEST:
-					return StaticMapElement::PROP_CHEST;
-
-				case StaticMapElementInRoomTemplate::OBSTRUCTION: {
-					return StaticMapElement::OBSTRUCTION_00;
-				}
-			
 			}
 		}
 		case MapSkinType::LIBRARY: {
@@ -1222,13 +1218,6 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			switch (melem) {
 			case StaticMapElementInRoomTemplate::COLUMN:
 				return StaticMapElement::TREE_OR_COLUMN_00;
-
-			case StaticMapElementInRoomTemplate::PROP_CHEST:
-				return StaticMapElement::PROP_CHEST;
-
-			case StaticMapElementInRoomTemplate::OBSTRUCTION:
-				return StaticMapElement::OBSTRUCTION_00;
-			
 			}
 		}
 		case MapSkinType::SACRIFICE: {
@@ -1236,13 +1225,6 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			switch (melem) {
 			case StaticMapElementInRoomTemplate::COLUMN:
 				return StaticMapElement::TREE_OR_COLUMN_00;
-
-			case StaticMapElementInRoomTemplate::PROP_CHEST:
-				return StaticMapElement::PROP_CHEST;
-
-			case StaticMapElementInRoomTemplate::OBSTRUCTION:
-				return StaticMapElement::OBSTRUCTION_00;
-			
 			}
 		}
 		case MapSkinType::BOSS: {
@@ -1250,13 +1232,6 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 			switch (melem) {
 			case StaticMapElementInRoomTemplate::COLUMN:
 				return StaticMapElement::TREE_OR_COLUMN_00;
-
-			case StaticMapElementInRoomTemplate::PROP_CHEST:
-				return StaticMapElement::PROP_CHEST;
-
-			case StaticMapElementInRoomTemplate::OBSTRUCTION:
-				return StaticMapElement::OBSTRUCTION_00;
-			
 			}
 		}
 	}
