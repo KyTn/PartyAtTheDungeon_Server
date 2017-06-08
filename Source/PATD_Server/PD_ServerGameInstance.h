@@ -73,6 +73,7 @@ public:
 #pragma endregion
 
 
+
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;
 	TArray<FVector> targetPositionsToCenterCamera = TArray<FVector>();
@@ -152,6 +153,12 @@ public:
 	//=========
 	//Funciones que son llamadas desde BP / Funciones UTILES para el JUEGO
 	//=========
+
+#pragma region Functions for GameManager
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		void GameManagerFunction_PlayAnimationHDHOnCharacter();
+
+#pragma endregion
 
 	UFUNCTION(BlueprintCallable, Category = "GameInstance")
 		FString GetServerIP();

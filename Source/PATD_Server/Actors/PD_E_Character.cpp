@@ -90,25 +90,29 @@ void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
 {
 	if (logic_character)
 	{
-		if (!logic_character->GetController()->IsCalculatingMovePath)
+		if (logic_character->GetController())
 		{
-			if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
+			if (!logic_character->GetController()->IsCalculatingMovePath)
 			{
-				//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
-				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter PIERDE: %s"), *logic_character->GetIDCharacter());
+				if (logic_character->GetTotalStats())
+				{
+					if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
+					{
+						//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+						UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter PIERDE: %s"), *logic_character->GetIDCharacter());
 
-				logic_character->GetController()->IsCalculatingMovePath = true;
-				logic_character->GetController()->StopMoving();
-				logic_character->GetController()->GetSpline()->RemovePoints();
-				logic_character->MoveWhenCollisionLost();
-			}
-			else 
-			{
-				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
-				//charWhoCrash->logic_character->GetController()->IsCalculatingMovePath = true;
-				//charWhoCrash->logic_character->GetController()->StopMoving();
-				//charWhoCrash->logic_character->GetController()->GetSpline()->RemovePoints();
-				//charWhoCrash->logic_character->MoveWhenCollisionLost();
+						logic_character->GetController()->IsCalculatingMovePath = true;
+						logic_character->GetController()->StopMoving();
+						logic_character->GetController()->GetSpline()->RemovePoints();
+						logic_character->MoveWhenCollisionLost();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
+
+					}
+				}
+				
 			}
 		}
 	}
@@ -153,8 +157,11 @@ bool APD_E_Character::SetCharacterCameraOnView()
 
 void APD_E_Character::UpdateCharLife(float damage)
 {
+	logic_character->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 	logic_character->UpdateHPCurrent(damage);
 }
+
+
 
 void APD_E_Character::DeleteCharacter() //Sirve para eliminar desde BP a un enemigo del game manager
 {
@@ -194,4 +201,15 @@ void APD_E_Character::StopAnimationParticleSystem()
 bool APD_E_Character::IscharacterStoppingByCollision() 
 {
 	return logic_character->GetIsStoppingByCollision();
+}
+
+void APD_E_Character::GetCharacterID(FString &ID_Char)
+{
+	FString positionLogic = "PoX: ";
+	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetX()));
+	positionLogic.Append(" PosY: ");
+	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetY()));
+
+	ID_Char = logic_character->GetIDCharacter();
+	//ID_Char.Append(positionLogic);
 }

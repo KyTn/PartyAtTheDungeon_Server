@@ -42,7 +42,7 @@ void APD_GenericController::Tick(float DeltaTime)
 	//Control del final de movimiento (el movimiento es la unica animacion que se controla en el controller y no en la maquina de estados del BP)
 	if (isMoving)
 	{
-		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Se va a mover IsMOving %s"), *GetCharacter()->GetName());
+		//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Se va a mover IsMOving %s"), *GetCharacter()->GetName());
 
 		//FTimerHandle handleForPong;
 		//GetWorldTimerManager().SetTimer(handleForPong, this, &APD_GenericController::MoveWithSpline, 2.00f, false);
@@ -121,7 +121,7 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 //Funcion para mover al Character mediante Splines
 void APD_GenericController::MoveWithSpline(float deltaTime)
 {
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline %s"), *GetCharacter()->GetName());
+	//UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline %s"), *GetCharacter()->GetName());
 
 	FVector lastPosition;
 	FVector currentPosition;
