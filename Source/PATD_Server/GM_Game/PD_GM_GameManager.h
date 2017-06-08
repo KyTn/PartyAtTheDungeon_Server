@@ -131,12 +131,19 @@ public:
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString,int> individualActionOnTurns = TMultiMap<FString, int>();
 	int index_IndividualActionsOnTurns = 0;
-	TArray<uint32> listOfRoomsInstiantate = TArray<uint32>();	//limpiar en cada turno - lista de id de las habitaciones a instanciar en el cliente
+	
+	//Para lanzar apropiadamente animaciones de defensa
+	TArray<PD_GM_LogicCharacter*> characterWhoPlayDefenseAnim = TArray<PD_GM_LogicCharacter*>();
+	TArray<PD_GM_LogicCharacter*> characterWhoPlayGetHurtAnim = TArray<PD_GM_LogicCharacter*>();
+	TArray<PD_GM_LogicCharacter*> characterWhoPlayHealAnim = TArray<PD_GM_LogicCharacter*>();
+
+	void PlayAnimationOnCharacters_HurtDefenseHeal();
 
 	///PARA VISUALIZAR LA ACCION DE INTERACTUABLE MANERA INDIVIDUAL
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString, int> individualActionInteractablesOnTurns = TMultiMap<FString, int>();
 	TArray<uint32> doorsOpened = TArray<uint32>();
+	TArray<uint32> listOfRoomsInstiantate = TArray<uint32>();	
 	int index_individualActionInteractablesOnTurns = 0;
 
 	void LogicMoveTick(int tick, int numCharacters);

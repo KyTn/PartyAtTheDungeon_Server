@@ -1138,6 +1138,10 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
 
+	characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
+	characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
+	characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
+
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
 	{
 	
@@ -1278,6 +1282,26 @@ void PD_GM_GameManager::OnAnimationEnd() {
 
 		}
 
+}
+
+void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
+{
+	for (int character = 0; character < characterWhoPlayDefenseAnim.Num(); character++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal: Defense animation"));
+
+		characterWhoPlayDefenseAnim[character]->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
+	}
+	
+	for (int character = 0; character < characterWhoPlayGetHurtAnim.Num(); character++)
+	{
+		characterWhoPlayGetHurtAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+	}
+
+	for (int character = 0; character < characterWhoPlayHealAnim.Num(); character++)
+	{
+		characterWhoPlayHealAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::WhoHeal);
+	}
 }
 
 void PD_GM_GameManager::OnCameraEndMove() {

@@ -112,7 +112,8 @@ public:
 	//UFUNCTION()
 	//void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-
+	UFUNCTION(BlueprintCallable, Category = "DataCharacter")
+		void GetCharacterID(FString &ID_Char);
 
 	//FStructBasicStats
 	uint8 GetPOD() { return POD; };

@@ -1504,7 +1504,13 @@ void UPD_ServerGameInstance::LoadWeaponDataFromFile()
 
 #pragma endregion
 
+#pragma region Functions for GameManager
+void UPD_ServerGameInstance::GameManagerFunction_PlayAnimationHDHOnCharacter()
+{
+	gameManager->PlayAnimationOnCharacters_HurtDefenseHeal();
+}
 
+#pragma endregion
 
 
 
