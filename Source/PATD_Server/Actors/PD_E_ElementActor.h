@@ -19,6 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	APD_E_ElementActor();
 
+	bool isActive = false; // activa y desactiva del fog 
 	PD_MG_LogicPosition ActualLogicPosition;
 	UPD_ServerGameInstance* SGI; 
 

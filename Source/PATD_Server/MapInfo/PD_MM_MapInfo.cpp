@@ -690,6 +690,7 @@ Por cada posicion p(x,y) en el mapa
 PD_MM_Room::PD_MM_Room()
 {
 	IsInstantiated = false;
+	IsActive = false;
 	IsSpawnRoom = false;
 	LogicPosInRoom = TArray<PD_MG_LogicPosition>();
 	//LogicTilesPosInRoom = TArray<PD_MG_LogicPosition>();
@@ -740,4 +741,10 @@ PD_MM_Room::~PD_MM_Room()
 bool PD_MM_Room::AddTile(PD_MG_LogicPosition logpos, APD_E_ElementActor* tile) { return tiles.Add(logpos, tile) != nullptr; }
 bool PD_MM_Room::AddWall(PD_MG_LogicPosition logpos, APD_E_ElementActor* wall){ return walls.Add(logpos, wall) != nullptr; }
 bool PD_MM_Room::AddInteractuable(PD_MG_LogicPosition logpos, APD_E_Interactuable* interactuable) { return interactuables.Add(logpos, interactuable) != nullptr; }
+
+
+void PD_MM_Room::SetActive(bool act) {
+
+}
+
 #pragma endregion
