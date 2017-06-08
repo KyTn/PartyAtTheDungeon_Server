@@ -34,7 +34,8 @@ void APD_E_Character::BeginPlay()
 void APD_E_Character::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	percentHP =  (float)logic_character->totalStats->HPCurrent / (float)logic_character->totalStats->HPTotal;
+//	percentHP = 0.6;
 }
 
 // Called to bind functionality to input

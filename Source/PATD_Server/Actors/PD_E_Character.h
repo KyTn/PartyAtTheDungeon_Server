@@ -134,4 +134,8 @@ public:
 	int  GetBaseHP() { return baseHP; };
 
 
+	//Funciones para mantener la barra de vida actualizada.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InGameStats")
+	float percentHP=1.0;
+
 };
