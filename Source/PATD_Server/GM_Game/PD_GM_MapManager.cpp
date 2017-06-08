@@ -210,14 +210,13 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 		UE_LOG(LogTemp, Log, TEXT("MapManager::InstantiateRoomAndAdj - El mapAdj no contiene el id %d "), id);
 	}
 	PD_MM_Room* room = MapInfo->roomByIDRoom[id];
+
+	room->IsActive = true; // activa el fog
 	room->IsOpen = true;
 	if (!room->IsInstantiated) {
 		TArray<PD_MG_LogicPosition> lp;
 		room->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);
-		for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
-		{
-			InstantiateMapElementBySkin(room->mapSkin, room->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
-		}
+		
 		for (int j = 0; j < room->LogicWallPosInRoom.Num(); j++)///Instanciamos los tiles de una habitacion.
 		{
 			//InstantiateWallBySkin(room->mapSkin, room->LogicWallPosInRoom[j]);
@@ -230,6 +229,10 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 				InstantiateWallAt(room->LogicWallPosInRoom[j]);
 			}
 		}
+		for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
+		{
+			InstantiateMapElementBySkin(room->mapSkin, room->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
+		}
 		room->IsInstantiated = true;
 	}
 
@@ -239,10 +242,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 		if (!MapInfo->rooms[adj[i]]->IsInstantiated) {
 			TArray<PD_MG_LogicPosition> lp;
 			MapInfo->rooms[adj[i]]->PropsAndTilesInRoomByLogicPosition.GenerateKeyArray(lp);
-			for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
-			{
-				InstantiateMapElementBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
-			}
+			
 			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicWallPosInRoom.Num(); j++)///Instanciamos los muros de una habitacion.
 			{
 				//InstantiateWallBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->LogicWallPosInRoom[j]);
@@ -256,6 +256,12 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 				}
 
 			}
+
+			for (int j = 0; j < lp.Num(); j++)///Instanciamos los tiles de una habitacion.
+			{
+				InstantiateMapElementBySkin(MapInfo->rooms[adj[i]]->mapSkin, MapInfo->rooms[adj[i]]->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
+			}
+
 			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateRoomAndAdj - door in room %d -> %d"), MapInfo->rooms[adj[i]]->IDRoom, MapInfo->rooms[adj[i]]->LogicDoorPosInRoom.Num());
 
 			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicDoorPosInRoom.Num(); j++)///Instanciamos las puertas de una habitacion.

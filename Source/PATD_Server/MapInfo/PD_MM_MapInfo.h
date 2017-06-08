@@ -82,6 +82,7 @@ public:
 	~PD_MM_Room();
 
 	bool IsInstantiated;
+	bool IsActive = false;
 	bool IsOpen;
 
 	bool IsSpawnRoom;
@@ -110,6 +111,7 @@ public:
 	bool AddWall(PD_MG_LogicPosition logpos, APD_E_ElementActor* wall);
 	bool AddInteractuable(PD_MG_LogicPosition logpos, APD_E_Interactuable* interactuable);
 
+	void SetActive(bool act);
 
 
 	// TEST PD_MM_ROOM

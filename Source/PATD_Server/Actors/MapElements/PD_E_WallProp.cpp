@@ -66,7 +66,7 @@ void APD_E_WallProp::SearchWallAndFix(PD_MG_LogicPosition lp) {
 	// si no hay ninguna, pues se desactiva el render del mesh
 
 	if (posibles.Num() == 0) {
-		//this->CallFunctionByNameWithArguments(TEXT("BP_Not_Visible"), debug, this, true);
+		this->CallFunctionByNameWithArguments(TEXT("BP_Not_Visible"), debug, this, true);
 		return;
 	}
 	// si hay posibles, dame uno
@@ -74,15 +74,31 @@ void APD_E_WallProp::SearchWallAndFix(PD_MG_LogicPosition lp) {
 	int r = FMath::RandRange(0, posibles.Num() - 1);
 
 	if (posibles[r] == N) {
+		if (Super::SGI->mapManager->IsLogicPositionAWall(N) && ((APD_E_WallActor*)(Super::SGI->mapManager->MapInfo->wallsByLogPos[N]))->isThinWall) 
+		{
+			this->CallFunctionByNameWithArguments(TEXT("BP_MoveProp_to_ThinWall"), debug, this, true);
+		}
 		this->CallFunctionByNameWithArguments(TEXT("BP_Rotate_180"), debug, this, true);
 	}
 	else if (posibles[r] == S) {
+		if (Super::SGI->mapManager->IsLogicPositionAWall(S) && ((APD_E_WallActor*)(Super::SGI->mapManager->MapInfo->wallsByLogPos[S]))->isThinWall)
+		{
+			this->CallFunctionByNameWithArguments(TEXT("BP_MoveProp_to_ThinWall"), debug, this, true);
+		}
 		//this->CallFunctionByNameWithArguments(TEXT("BP_Rotate_180"), debug, this, true);
 	}
 	else if (posibles[r] == W) {
+		if (Super::SGI->mapManager->IsLogicPositionAWall(W) && ((APD_E_WallActor*)(Super::SGI->mapManager->MapInfo->wallsByLogPos[W]))->isThinWall)
+		{
+			this->CallFunctionByNameWithArguments(TEXT("BP_MoveProp_to_ThinWall"), debug, this, true);
+		}
 		this->CallFunctionByNameWithArguments(TEXT("BP_Rotate_90"), debug, this, true);
 	}
 	else if (posibles[r] == E) {
+		if (Super::SGI->mapManager->IsLogicPositionAWall(E) && ((APD_E_WallActor*)(Super::SGI->mapManager->MapInfo->wallsByLogPos[E]))->isThinWall)
+		{
+			this->CallFunctionByNameWithArguments(TEXT("BP_MoveProp_to_ThinWall"), debug, this, true);
+		}
 		this->CallFunctionByNameWithArguments(TEXT("BP_Rotate_270"), debug, this, true);
 	}
 	

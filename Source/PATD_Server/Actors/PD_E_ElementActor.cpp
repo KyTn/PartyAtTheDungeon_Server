@@ -3,6 +3,9 @@
 #include "PATD_Server.h"
 #include "PD_E_ElementActor.h"
 #include "PD_ServerGameInstance.h"
+#include "MapGeneration/PD_MG_LogicPosition.h"
+#include "GM_Game/PD_GM_MapManager.h"
+#include "MapInfo/PD_MM_MapInfo.h"
 
 // Sets default values
 APD_E_ElementActor::APD_E_ElementActor()
@@ -25,6 +28,23 @@ void APD_E_ElementActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	FOutputDeviceDebug  debug;
+
+	UE_LOG(LogTemp, Log, TEXT("APD_E_ElementActor::Tick - ActualLogicPosition (%d,%d)"), ActualLogicPosition.GetX(), ActualLogicPosition.GetY());
+
+
+	if (SGI->mapManager->MapInfo->roomByLogPos.Contains(ActualLogicPosition)) {
+		if (isActive != SGI->mapManager->MapInfo->roomByLogPos[ActualLogicPosition]->IsActive) {
+
+			if (SGI->mapManager->MapInfo->roomByLogPos[ActualLogicPosition]->IsActive) {
+				this->CallFunctionByNameWithArguments(TEXT("BP_ACTIVATE"), debug, this, true);
+			}
+			else {
+				this->CallFunctionByNameWithArguments(TEXT("BP_DEACTIVATE"), debug, this, true);
+			}
+
+		}
+	}
 }
 
 
