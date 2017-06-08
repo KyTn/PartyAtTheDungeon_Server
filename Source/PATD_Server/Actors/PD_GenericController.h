@@ -66,6 +66,7 @@ public:
 
 	bool IsAtAnimation();
 
+	void StopMoving();
 
 		/*
 		//Para mover al personaje de forma visual por el mapa
@@ -94,6 +95,8 @@ public:
 	void Animation_DefenseChar(int ID_Skill);
 	
 	void SetTypeCharanimation(int typeChar);
+
+	void Animation_Idle(); //To go back to Idle Anim, for reset or something
 	/*
 	//Sirve para lanzar la animacion determinada del character
 	Recibe:

@@ -34,8 +34,17 @@ public:
 	void SetLogicCharacter(PD_GM_LogicCharacter* nlogic_character);
 	PD_GM_LogicCharacter* GetLogicCharacter();
 
+	APD_E_Character* charWhoCollideWithMe = nullptr;
+
+	UFUNCTION(BlueprintCallable, Category = "CollisionWithCharacters")
+		void CollisionWithOtherCharacter(APD_E_Character* charWhoCrash);
+
 	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
 		bool PlayAnimationSkill(int ID_Skill);
+	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
+		void StopAnimationParticleSystem(); //Reset or stop the particle system of character
+	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
+		bool IscharacterStoppingByCollision(); //Si true, display particle of stunned by collision
 
 	UFUNCTION(BlueprintCallable, Category = "SkillAnimation")
 		bool SetCharacterCameraOnView();
@@ -100,8 +109,8 @@ public:
 	UFUNCTION()
 	void OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 	
-	UFUNCTION()
-	void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	//UFUNCTION()
+	//void ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
 

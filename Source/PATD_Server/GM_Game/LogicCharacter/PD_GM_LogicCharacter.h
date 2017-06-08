@@ -159,8 +159,10 @@ public:
 
 	//Moverse cuando se choca con alquien y pierde el choque
 	void MoveWhenCollisionLost();
+	void SetCurrentLogicalPositionFromOut(FVector positionWorld);
 
-
+	//Da valor para comparar el choque en caso de que tenga el mismo CH
+	int GetAValueToDecideCollision();
 	// Calcular si ha sido CRITICO y su %, devuelve el valor final
 	bool CheckIfWasACriticalAttack(int* initialDamage, PD_GM_LogicCharacter* character);
 

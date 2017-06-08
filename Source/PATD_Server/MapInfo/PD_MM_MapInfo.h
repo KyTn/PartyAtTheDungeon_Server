@@ -83,7 +83,7 @@ public:
 
 	bool IsInstantiated;
 	bool IsActive = false;
-
+	bool IsOpen;
 
 	bool IsSpawnRoom;
 	int IDRoom;

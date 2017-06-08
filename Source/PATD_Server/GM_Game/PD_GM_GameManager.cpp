@@ -66,7 +66,7 @@ void PD_GM_GameManager::InitState() {
 
 void PD_GM_GameManager::HandleEvent(FStructGeneric* inDataStruct, int inPlayer, UStructType inEventType) {
 	
-	if (playersManager->GetNumPlayers() > 0)
+	if (playersManager->GetNumPlayers() >= inPlayer + 1)
 	{
 		if (!playersManager->GetDataStructPlayer(inPlayer)->isConnected) //si el que envia esta a no conectado
 			playersManager->GetDataStructPlayer(inPlayer)->isConnected = true;
@@ -244,9 +244,9 @@ void PD_GM_GameManager::OnBeginState() {
 
 			//Popner la camara a patrullar
 			SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-			FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-			Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			//FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+			//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+			//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 		}
 
 		
@@ -270,12 +270,24 @@ void PD_GM_GameManager::OnBeginState() {
 	}*/else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn"));
 		UpdatePoints();
+		//Limpiar que el player este parado por haber perdido una collision
+		for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+		{
+			playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(false); //limpiamos que se hayan quedado parados por collision
+			Cast<APD_E_Character>(playersManager->GetDataStructPlayer(i)->logic_Character->GetCharacterBP())->StopAnimationParticleSystem();
+		}
+		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+		{
+			enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(false); //limpiamos que se hayan quedado parados por collision
+			Cast<APD_E_Character>(enemyManager->GetEnemies()[i]->GetCharacterBP())->StopAnimationParticleSystem();
+
+		}
 		//Popner la camara a patrullar
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
 		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
-		FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
-		Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
-		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+		//FVector target = Cast<AServerCamera>(SGI->CameraServer)->GetPlayersAveragePosition();
+		//Cast<AServerCamera>(SGI->CameraServer)->InitPatrol(target);
+		//Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 
 		//Hay que hacer lo necesario (borrar las cosas de este turno) para que se pueda recibir otro normalmente.
 		for (StructPlayer* structPlayer : playersManager->GetDataPlayers()) {
@@ -451,9 +463,13 @@ void PD_GM_GameManager::LogicTurnItemPhase() {
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		for (int iEnemy = 0; iEnemy < enemyManager->GetEnemies().Num(); iEnemy++) {
 			FStructTurnOrders* turnOrder= enemyManager->GetTurnOrders(iEnemy);
-			if (turnOrder->consumablesToConsume.Num() > 0) {
-				enemyManager->GetEnemies()[iEnemy]->ConsumeItem(turnOrder->consumablesToConsume[0]);
+			if (turnOrder)
+			{
+				if (turnOrder->consumablesToConsume.Num() > 0) {
+					enemyManager->GetEnemies()[iEnemy]->ConsumeItem(turnOrder->consumablesToConsume[0]);
+				}
 			}
+			
 		}
 	}
 	
@@ -499,13 +515,16 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
 		{
-			for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract.Num(); index_actions++)
+			if (!playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  players -- adding interaction %d"), index_actions);
+				for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract.Num(); index_actions++)
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  players -- adding interaction %d"), index_actions);
 
-				FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter();
-				int id_interc = playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract[index_actions];
-				individualActionInteractablesOnTurns.Add(id_player, id_interc);
+					FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter();
+					int id_interc = playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract[index_actions];
+					individualActionInteractablesOnTurns.Add(id_player, id_interc);
+				}
 			}
 		}
 	}
@@ -513,13 +532,19 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 
 		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
 		{
-			for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
+			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  enemies -- adding interaction %d"), index_actions);
+				if (enemyManager->GetTurnOrders(index_enemies))
+				{
+					for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
+					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  enemies -- adding interaction %d"), index_actions);
 
-				FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
-				int id_interc = enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract[index_actions];
-				individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
+						FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+						int id_interc = enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract[index_actions];
+						individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
+					}
+				}
 			}
 		}
 	}
@@ -555,25 +580,36 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
 		{
-			for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->actions.Num(); index_actions++)
+			if (!playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  players -- adding action %d"), index_actions);
+				for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->actions.Num(); index_actions++)
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  players -- adding action %d"), index_actions);
 
-				FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter(); 
-				individualActionOnTurns.Add(id_player, index_actions);
+					FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter();
+					individualActionOnTurns.Add(id_player, index_actions);
+				}
 			}
 		}
 	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-		
+	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {	
 		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
 		{
-			for (int index_actions  = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->actions.Num(); index_actions++)
+			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
 			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  enemies -- adding action %d"), index_actions);
+				if (enemyManager->getListTurnOrders().Num() > 0) // hay ordenes
+				{
+					if (enemyManager->GetTurnOrders(index_enemies))
+					{
+						for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->actions.Num(); index_actions++)
+						{
+							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  enemies -- adding action %d"), index_actions);
 
-				FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
-				individualActionOnTurns.Add(id_enemy, index_actions);
+							FString id_enemy = enemyManager->GetEnemies()[index_enemies]->GetIDCharacter();
+							individualActionOnTurns.Add(id_enemy, index_actions);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -600,33 +636,21 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 			if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 				if (!playersManager->GetDataStructPlayer(i)->logic_Character->GetIsStoppingByCollision() && playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num() > tick)
 				{
-					
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
-
-					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithPlayers(i, tick, numCharacters));
-
-					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithEnemies(i, tick, numCharacters));
-
-					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
-
+					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 				
-				if (!enemyManager->GetEnemies()[i]->GetIsStoppingByCollision() && enemyManager->getListTurnOrders()[i]->positionsToMove.Num() > tick)
+				if (enemyManager->getListTurnOrders()[i])
 				{
-					enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithPlayers(i, tick, numCharacters));
-
-					enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithEnemies(i, tick, numCharacters));
-
-					enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithMapElements(i, tick, numCharacters));
-
+					if (!enemyManager->GetEnemies()[i]->GetIsStoppingByCollision() && enemyManager->getListTurnOrders()[i]->positionsToMove.Num() > tick)
+					{
+						enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+					}
 				}
-			}
-	
-			
+			}			
 	}
-	//Comprobar que choques.//Resolucion de conflictos
 }
 
 
@@ -642,11 +666,32 @@ bool  PD_GM_GameManager::CheckIsLogicCharacterInPosition(PD_MG_LogicPosition pos
 	{
 		if (positionToCheck == playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition())
 			thereIsSomething = true;
+		if (playersManager->GetDataStructPlayer(i)->turnOrders)
+		{
+			for (int posMoving = 0; posMoving < playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num(); posMoving++)
+			{
+				PD_MG_LogicPosition positionInMoving = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[posMoving].positionX,
+					playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[posMoving].positionY);
+				if (positionToCheck == positionInMoving)
+					thereIsSomething = true;
+			}
+		}
 	}
 	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
 	{
 		if (positionToCheck == enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition())
 			thereIsSomething = true;
+		if (enemyManager->getListTurnOrders().Num() > 0)
+		{
+			for (int posMoving = 0; posMoving < enemyManager->GetTurnOrders(i)->positionsToMove.Num(); posMoving++)
+			{
+				PD_MG_LogicPosition positionInMoving = PD_MG_LogicPosition(enemyManager->GetTurnOrders(i)->positionsToMove[posMoving].positionX,
+					enemyManager->GetTurnOrders(i)->positionsToMove[posMoving].positionY);
+				if (positionToCheck == positionInMoving)
+					thereIsSomething = true;
+			}
+		}
+		
 	}
 
 	return thereIsSomething;
@@ -654,7 +699,7 @@ bool  PD_GM_GameManager::CheckIsLogicCharacterInPosition(PD_MG_LogicPosition pos
 }
 
 
-bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers, int tick, int numCharacters)
+bool  PD_GM_GameManager::CheckAndManageCollisionWithCharacters(int indexDataPlayers, int tick, int numCharacters)
 {
 	/*
 		Comprueba si ha habido choque con los otros jugadores durante la fase de movimiento
@@ -664,15 +709,15 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 	4 - Actualizar al otro player su bool isStoppingPlayer
 	5 - Seguir comprobando hasta que no queden jugadores.
 	*/
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters "));
+
 	PD_MG_LogicPosition LogicPosPlayerToCheck;
 	PD_MG_LogicPosition LogicPosOtherPlayerToCheck;
 	bool isCollisionOrCollisionLost = false;
+
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		  LogicPosPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX,
 			playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
-		  UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers %d %d"), playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX
-		  , playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
-
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 		LogicPosPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionX,
@@ -682,11 +727,11 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) //Los jugadores comprueban su posicion con el resto de jugadores en ese mismo tick
 	{
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 1"));
+		//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 1"));
 
 		for (int i = 0; i < numCharacters; i++)
 		{
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 2"));
+			//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 2"));
 
 			if (indexDataPlayers != i && (playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num()) > tick  )
 			{
@@ -694,13 +739,22 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 					playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionY);
 				if (LogicPosPlayerToCheck == LogicPosOtherPlayerToCheck) //Si las dos son iguales, se va a producir una collision -> se comprueba quien gana
 				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters -- se va a producir un choque entre %s y %s"), *playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->GetIDCharacter(),
+						*playersManager->GetDataStructPlayer(i)->logic_Character->GetIDCharacter());
+
 					if (playersManager->GetDataStructPlayer(indexDataPlayers)->logic_Character->GetTotalStats()->CH >=
 						playersManager->GetDataStructPlayer(i)->logic_Character->GetTotalStats()->CH)
 					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters --Jugador que estaba comprobando GANA el choque"));
 						//El Jugador a comprobar gana el choque, El otro se pone su variable isStoppingByCollision a true y se busca una posicion a la que ir
 						playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(true);
 
-						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosOtherPlayerToCheck);
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Diagonals_And_Adyacents_To(LogicPosOtherPlayerToCheck);
+						for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+						{
+							int index = rand() % (j + 1);
+							possibleNewPositionToMove.Swap(j, index);
+						}
 						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 						{
 							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
@@ -713,9 +767,16 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 					}
 					else
 					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters --Jugador que estaba comprobando PIERDE el choque"));
 						//El Jugador a comprobar pierde el choque, se setea la variable isCollisionOrCollisionLost a true y se da una nueva posicion del mapa a la que se desplaza el jugador
 						isCollisionOrCollisionLost = true;
-						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosPlayerToCheck);
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Diagonals_And_Adyacents_To(LogicPosPlayerToCheck);
+						for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+						{
+							int index = rand() % (j + 1);
+							possibleNewPositionToMove.Swap(j, index);
+						}
+
 						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 						{
 							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
@@ -734,57 +795,35 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithPlayers(int indexDataPlayers
 
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
 	{
-		//A priori cuando es el turno de movimiento de los enemigos, no se sabe cuando pueden chocar con un player, para que sea correcto
-		//los desplazamientos de los jugadores-enemigos, este se tiene que hacer cuando collision REALMENTE-- en el apartado logico no se puede hacer nada
-		//A PRIORI!
-		
-		//Esto al menos para añadir la posicion, igual que hacemos al final para los players 
-		enemyManager->GetEnemies()[indexDataPlayers]->AddMovementLogicalPosition(LogicPosPlayerToCheck);
-	}
-	
-	return isCollisionOrCollisionLost;
-}
+		//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 1"));
 
-
-bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers, int tick, int  numCharacters)
-{
-	PD_MG_LogicPosition LogicPosPlayerToCheck;
-	PD_MG_LogicPosition LogicPosOtherPlayerToCheck;
-	bool isCollisionOrCollisionLost = false;
-
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
-		LogicPosPlayerToCheck = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionX,
-			playersManager->GetDataStructPlayer(indexDataPlayers)->turnOrders->positionsToMove[tick].positionY);
-	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-		LogicPosPlayerToCheck = PD_MG_LogicPosition(0, 0);
-		PD_MG_LogicPosition(enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionX,
-			enemyManager->getListTurnOrders()[indexDataPlayers]->positionsToMove[tick].positionY);
-	}
-
-	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
-	{
-		//Al igual que en el metodo CheckPlayers -> en el turno de los jugadores es dificil decir cuando un enemigo con el que se ha producdido 
-		//un choque se tiene que mover-> hay que hacerlo cuando se producza realmente el choque
-	}
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
-	{
-		//Cuando se chequean los enemigos, en la fase de movimiento todos se estan moviendo a la vez, hay que comprobar el tick de cada enemigo
-		for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+		for (int i = 0; i < numCharacters; i++)
 		{
-			if (indexDataPlayers != i && (enemyManager->getListTurnOrders()[i]->positionsToMove.Num()) > tick)
+			//UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithPlayers 2"));
+
+			if (indexDataPlayers != i && (enemyManager->GetTurnOrders(i)->positionsToMove.Num()) > tick)
 			{
-				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionX,
-					enemyManager->getListTurnOrders()[i]->positionsToMove[tick].positionY);
+				LogicPosOtherPlayerToCheck = PD_MG_LogicPosition(enemyManager->GetTurnOrders(i)->positionsToMove[tick].positionX,
+					enemyManager->GetTurnOrders(i)->positionsToMove[tick].positionY);
 				if (LogicPosPlayerToCheck == LogicPosOtherPlayerToCheck) //Si las dos son iguales, se va a producir una collision -> se comprueba quien gana
 				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters -- ENEMIGOS se va a producir un choque entre %s y %s"), *enemyManager->GetEnemies()[indexDataPlayers]->GetIDCharacter(),
+						*enemyManager->GetEnemies()[i]->GetIDCharacter());
 					if (enemyManager->GetEnemies()[indexDataPlayers]->GetTotalStats()->CH >=
 						enemyManager->GetEnemies()[i]->GetTotalStats()->CH)
 					{
-						//El Enemigo char a comprobar gana el choque, El otro se pone su variable isStoppingByCollision a true y se busca una posicion a la que ir
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters --Enemigo que estaba comprobando GANA el choque"));
+
+						//El Jugador a comprobar gana el choque, El otro se pone su variable isStoppingByCollision a true y se busca una posicion a la que ir
 						enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(true);
 
-						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosOtherPlayerToCheck);
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Diagonals_And_Adyacents_To(LogicPosOtherPlayerToCheck);
+						for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+						{
+							int index = rand() % (j + 1);
+							possibleNewPositionToMove.Swap(j, index);
+						}
+
 						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 						{
 							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
@@ -797,9 +836,17 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers
 					}
 					else
 					{
-						//El Enemigo char a comprobar pierde el choque, se setea la variable isCollisionOrCollisionLost a true y se da una nueva posicion del mapa a la que se desplaza el jugador
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::CheckAndManageCollisionWithCharacters --Enemigo que estaba comprobando PIERDE el choque"));
+
+						//El Jugador a comprobar pierde el choque, se setea la variable isCollisionOrCollisionLost a true y se da una nueva posicion del mapa a la que se desplaza el jugador
 						isCollisionOrCollisionLost = true;
-						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Adyacents_To(LogicPosPlayerToCheck);
+						TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapManager->Get_LogicPosition_Diagonals_And_Adyacents_To(LogicPosPlayerToCheck);
+						for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+						{
+							int index = rand() % (j + 1);
+							possibleNewPositionToMove.Swap(j, index);
+						}
+
 						for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 						{
 							if (!CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
@@ -809,18 +856,18 @@ bool  PD_GM_GameManager::CheckAndManageCollisionWithEnemies(int indexDataPlayers
 					}
 				}
 			}
+
 		}
+		//Añadir al Array movingLogicalPosition la posicion que se esta comprobando para ver si se mueve ahi u es otra diferente por el choque
+		enemyManager->GetEnemies()[indexDataPlayers]->AddMovementLogicalPosition(LogicPosPlayerToCheck);
+		return isCollisionOrCollisionLost;
+
 	}
 	
 	return isCollisionOrCollisionLost;
 }
 
 
-
-bool  PD_GM_GameManager::CheckAndManageCollisionWithMapElements(int indexDataPlayers, int tick, int  numCharacters)
-{
-	return false;
-}
 
 
 
@@ -912,6 +959,10 @@ void PD_GM_GameManager::VisualMoveTick() {
 //Todos a la vez
 PD_GM_LogicCharacter* logicCharacter = nullptr;
 
+/* ============
+SET DE LA POSICION DE LA CAMARA PARA VISUALIZAR TODOS LOS JUGADORES
+===============*/
+/*
 TArray<FVector> newTargetPositions = TArray<FVector>();
 //Setear nuevo punto medio, para mover la camara
 UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
@@ -942,9 +993,12 @@ else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
 		newTargetPositions.Add(mapManager->LogicToWorldPosition(enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition()));
 	}
 }
-
-
 Cast<AServerCamera>(SGI->CameraServer)->Camera_MoveInMovementPhase(newTargetPositions);
+*/
+
+/* ============
+SET DE PUNTOS DE MOVIMIENTO DE CADA JUGADOR Y CORRESPONDIENTE LLAMADA AL MOVIMIENTO
+===============*/
 
 for (int i = 0; i < players; i++) {
 	//Distincion para players o enemigos
@@ -974,17 +1028,12 @@ for (int i = 0; i < players; i++) {
 			//v.Z = logicCharacter->GetCharacterBP()->GetActorLocation().Z;
 			v.Z = 10.0f;
 			positionsToMove.Add(v);
-			//positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]));
 		}
 
 		logicCharacter->MoveToPhysicalPosition(positionsToMove);
-
-		//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualMoveTick %d"), logicCharacter->GetMovingLogicalPosition().Num());
-		if (logicCharacter->GetMovingLogicalPosition().Num() > 0) {
-			logicCharacter->SetCurrentLogicalPosition(logicCharacter->GetMovingLogicalPosition()[logicCharacter->GetMovingLogicalPosition().Num() - 1]);
-
-		}
+	}
+	else {
+		logicCharacter->GetController()->OnAnimationEnd();
 	}
 
 }
@@ -1089,11 +1138,6 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick"));
 
-	//Distincion para players o enemigos
-	//	TArray<FStructTargetToAction> listAttack;
-	//int indexCharacter;
-	//PD_GM_LogicCharacter* logicCharacter=nullptr;
-
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
 	{
 	
@@ -1112,10 +1156,7 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 					FStructTargetToAction action = playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions[index_action];
 					logic_char->ActionTo(action);
 				}
-			}
-			
-			
-//			playersManager->GetCharacterByID(id_char)->ActionTo(playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions[index_action]);
+			}			
 		}
 
 	}
@@ -1125,14 +1166,18 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick enemigos"));
 
+		if (enemyManager->GetEnemies().Num() > 0)
+		{
+			int index_enemy = enemyManager->GetIndexByID(id_char);
 
-		Cast<APD_E_Character>(enemyManager->GetCharacterByID(id_char)->GetCharacterBP())->SetCharacterCameraOnView();
+			if (enemyManager->GetTurnOrders(index_enemy)->actions.Num() > 0)
+			{
+				Cast<APD_E_Character>(enemyManager->GetCharacterByID(id_char)->GetCharacterBP())->SetCharacterCameraOnView();
 
-		int index_enemy = enemyManager->GetIndexByID(id_char);
-
-		enemyManager->GetCharacterByID(id_char)->ActionTo(
-			enemyManager->GetTurnOrders(index_enemy)->actions[index_action]);
-
+				enemyManager->GetCharacterByID(id_char)->ActionTo(
+					enemyManager->GetTurnOrders(index_enemy)->actions[index_action]);
+			}
+		}
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick despues de players/enemigos"));
@@ -1161,7 +1206,6 @@ void PD_GM_GameManager::OnAnimationEnd() {
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd: TRUE"));
 			//Aqui deberia estar en un estado de fase que sea tick (no INI)
 
-			
 			if ((structGamePhase->enumGamePhase == EServerPhase::AttackTick))
 			{
 				index_IndividualActionsOnTurns++;
@@ -1187,6 +1231,8 @@ void PD_GM_GameManager::OnAnimationEnd() {
 				}
 				else
 				{
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde Ataque"));
+
 					UpdatePhase();
 
 				}
@@ -1216,12 +1262,15 @@ void PD_GM_GameManager::OnAnimationEnd() {
 				}
 				else
 				{
-					UpdatePhase();
+					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde interaccion"));
 
+					UpdatePhase();
 				}
 			}
 			else 
 			{
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: UpdatePhase Desde movimiento o consumable"));
+
 				UpdatePhase();
 
 			}
@@ -1304,10 +1353,9 @@ void PD_GM_GameManager::UpdatePhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
 	{
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
-		if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
-
+		//if (Cast<AServerCamera>(SGI->CameraServer)->GetMoveState() == ECameraMoveState::EndMoving) {
 			ChangePhase(EServerPhase::MoveTick);
-		}
+		//}
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveTick)
 	{
@@ -1408,8 +1456,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
 		
-		timer->InitTimer(timeWaitingPhases);
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+
+		if (IsThereAnyConsumableOrders())
+			timer->InitTimer(timeWaitingPhases);
 
 		UpdatePhase();
 	}
@@ -1437,9 +1487,11 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del movimiento logico
 		PlayersLogicTurn();
 
-		timer->InitTimer(timeWaitingPhases);
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
 
+		if (IsThereAnyMovementOrder())
+			timer->InitTimer(timeWaitingPhases);
+		
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::MoveCamera)
@@ -1494,7 +1546,9 @@ void PD_GM_GameManager::OnBeginPhase()
 
 				}
 				if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
-					targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					if (enemyManager->GetTurnOrders(z)->positionsToMove.Num() > 0) { //Solo metemos las posiciones  de los enemigos que se mueven este turno.
+						targetPositions.Add(enemyManager->GetEnemies()[z]->GetCharacterBP()->GetActorLocation());
+					}
 				}
 			}
 
@@ -1503,11 +1557,13 @@ void PD_GM_GameManager::OnBeginPhase()
 			UE_LOG(LogTemp, Log, TEXT("Camera MOve from GameManager %d"), targetPositions.Num());
 			FVector target = Cast<AServerCamera>(SGI->CameraServer)->FindAvaragePosition(targetPositions);
 
-			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 			//Cast<AServerCamera>(SGI->CameraServer)->MoveTo(FVector(target.X, target.Y,1000));
+			//Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
 
-			Cast<AServerCamera>(SGI->CameraServer)->MoveToPositions(targetPositions);
-			
+			Cast<AServerCamera>(SGI->CameraServer)->InitPatrolPositions(targetPositions);
+			Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
+			Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
+
 			FOutputDeviceNull ar;
 			const FString command = FString::Printf(TEXT("ManageZoomWithTargetPositions")); //Funcion en BP de ServerCamera_GamePlay
 																							//Cast<AServerCamera>(SGI->CameraServer)->CallFunctionByNameWithArguments(*command, ar, NULL, true);
@@ -1529,10 +1585,11 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		LogicTurnInteractablePhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
 
-		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionIni"));
-		timer->InitTimer(timeWaitingPhases);
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
 
+		if (IsThereAnyInteractbaleOrder())
+			timer->InitTimer(timeWaitingPhases);
+		
 		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionCamera)
@@ -1542,6 +1599,8 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionTick)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
+
 		if (individualActionInteractablesOnTurns.Num() > 0)
 		{
 			TArray<FString> id_charactersOnArray;
@@ -1555,11 +1614,11 @@ void PD_GM_GameManager::OnBeginPhase()
 
 			VisualInteractbaleTick(id_char, id_interact);
 		}
+		else 
+		{
+			UpdatePhase();
+		}
 
-
-
-		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: InteractionTick"));
-		UpdatePhase();
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::AttackIni)
 	{
@@ -1570,8 +1629,10 @@ void PD_GM_GameManager::OnBeginPhase()
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
 
-		timer->InitTimer(timeWaitingPhases);
 		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+
+		if (IsThereAnyAttackOrder())
+			timer->InitTimer(timeWaitingPhases);
 
 		UpdatePhase();
 
@@ -1600,6 +1661,11 @@ void PD_GM_GameManager::OnBeginPhase()
 
 			VisualAttackTick(id_char, index_actionOfChar);
 		}
+		else 
+		{
+			UpdatePhase();
+		}
+
 		
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases)
@@ -1612,6 +1678,54 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 
 }
+
+
+
+bool  PD_GM_GameManager::IsThereAnyConsumableOrders()
+{
+	return false;
+}
+bool  PD_GM_GameManager::IsThereAnyMovementOrder()
+{
+	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
+	{
+		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
+		{
+			if (playersManager->GetDataStructPlayer(index_players)->turnOrders->positionsToMove.Num() > 0)
+				return true;
+		}
+
+	}
+	if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
+	{
+		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
+		{
+			if (enemyManager->GetTurnOrders(index_enemies))
+			{
+				if (enemyManager->GetTurnOrders(index_enemies)->positionsToMove.Num() > 0)
+					return true;
+			}
+			
+		}
+	}
+
+	return false;
+}
+bool  PD_GM_GameManager::IsThereAnyInteractbaleOrder()
+{
+	if (individualActionInteractablesOnTurns.Num() > 0)
+		return true;
+	else
+		return false;
+}
+bool  PD_GM_GameManager::IsThereAnyAttackOrder()
+{
+	if (individualActionOnTurns.Num() > 0)
+		return true;
+	else
+		return false;
+}
+
 #pragma endregion
 
 int PD_GM_GameManager::getServerPhase()

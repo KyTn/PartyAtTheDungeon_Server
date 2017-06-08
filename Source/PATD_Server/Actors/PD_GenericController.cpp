@@ -12,6 +12,8 @@
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "GM_Game/PD_GM_GameManager.h"
+#include"Actors/PD_E_Character.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_SplineManager.h"
 //Includes Forward
 #include "PD_SplineActors.h"
@@ -40,7 +42,8 @@ void APD_GenericController::Tick(float DeltaTime)
 	//Control del final de movimiento (el movimiento es la unica animacion que se controla en el controller y no en la maquina de estados del BP)
 	if (isMoving)
 	{
-		
+		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::Se va a mover IsMOving %s"), *GetCharacter()->GetName());
+
 		//FTimerHandle handleForPong;
 		//GetWorldTimerManager().SetTimer(handleForPong, this, &APD_GenericController::MoveWithSpline, 2.00f, false);
 		MoveWithSpline(DeltaTime);
@@ -69,8 +72,10 @@ bool APD_GenericController::IsAtAnimation() {
 
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation antes de comprobar: currentState:%s  isMoving:%d "), *currentState.ToString(), isMoving);
 
-		if (currentState.ToString().Compare(idleStateName) == 0 && !isMoving) return false;
-		else return true;
+		if (currentState.ToString().Compare(idleStateName,ESearchCase::IgnoreCase) == 0 && !isMoving) 
+			return false;
+		else 
+			return true;
 	}
 	else {
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::IsAtAnimation: ERROR: No hay AnimInstance para este character"));
@@ -85,10 +90,8 @@ bool APD_GenericController::IsAtAnimation() {
 
 bool APD_GenericController::MoveTo(float x, float y)
 {
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveTo"));
-	//moveTargetPosition.X = x;
-	//moveTargetPosition.Y = y;
-	//moveTargetPosition.Z = GetPawn()->GetActorLocation().Z; //Todo en el mismo plano
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveTo %s"), *GetCharacter()->GetName());
+	
 	isMoving = true;
 
 	
@@ -97,44 +100,7 @@ bool APD_GenericController::MoveTo(float x, float y)
 
 bool APD_GenericController::ActionTo(FStructTargetToAction action)
 {
-	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::ActionTo"));
-
-
-	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->enemyManager;
-	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetGameInstance())->gameManager->playersManager;
-
-
-	for (int i = 0; i < action.id_character.Num(); i++) {
-		if (enemyManager->GetCharacterByID(action.id_character[i])) {
-			enemyManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(150);
-		}
-	}
-
-	for (int i = 0; i < action.id_character.Num(); i++) {
-		if (playersManager->GetCharacterByID(action.id_character[i])) {
-			playersManager->GetCharacterByID(action.id_character[i])->UpdateHPCurrent(150);
-		}
-	}
-
-
-
-	//Activar enableAttack en el BP de anim
-	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
-	if (AnimInst) {
-		UBoolProperty* MyFloatProp = FindField<UBoolProperty>(AnimInst->GetClass(), "EnableAttack");
-		if (MyFloatProp != NULL) {
-			bool FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
-			MyFloatProp->SetPropertyValue_InContainer(AnimInst, true);
-			FloatVal = MyFloatProp->GetPropertyValue_InContainer(AnimInst);
-		}
-	}
-	else {
-		OnAnimationEnd();
-	}
-
-
-
-
+	
 	return true;
 
 }
@@ -155,6 +121,8 @@ bool APD_GenericController::Animate(uint8 typeAnimation)
 //Funcion para mover al Character mediante Splines
 void APD_GenericController::MoveWithSpline(float deltaTime)
 {
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline %s"), *GetCharacter()->GetName());
+
 	FVector lastPosition;
 	FVector currentPosition;
 	if (spline->GetSplineComponent()->GetNumberOfSplinePoints() != 0) {
@@ -226,14 +194,47 @@ void APD_GenericController::MoveWithSpline(float deltaTime)
 			}
 			else {
 				OnAnimationEnd();
+				IsCalculatingMovePath = false;
 			}
 
+			PD_GM_LogicCharacter* logic_character = nullptr;
+			logic_character = Cast<APD_E_Character>(GetCharacter())->GetLogicCharacter();
+			if (logic_character)
+			{
+				if (logic_character->GetIsStoppingByCollision())
+				{
+					Animation_GetHurt((int)ActiveSkills::GetStunnedByCollision);
+				}
+			}
 		}
 	}
 	else {
 		UE_LOG(LogTemp, Log, TEXT("APD_GenericController::MoveWithSpline:Error moviendose con 0 puntos en la spline %s"),*this->GetName());
+		IsCalculatingMovePath = false;
 		OnAnimationEnd();
 		return;
+	}
+}
+
+void APD_GenericController::StopMoving()
+{
+	UE_LOG(LogTemp, Log, TEXT("APD_GenericController::StopMoving:"));
+
+	isMoving = false;
+	distance = 0;
+	OnAnimationEnd();
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "BackToIdle");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+		IsCalculatingMovePath = false;
 	}
 }
 
@@ -498,5 +499,22 @@ void APD_GenericController::Animation_DefenseChar(int ID_Skill)
 		else {
 			OnAnimationEnd();
 		}
+	}
+}
+
+void APD_GenericController::Animation_Idle()
+{
+	UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
+	if (AnimInst) {
+		UBoolProperty* BoolProperty = FindField<UBoolProperty>(AnimInst->GetClass(), "BackToIdle");
+		if (BoolProperty != NULL) {
+			bool enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+			BoolProperty->SetPropertyValue_InContainer(AnimInst, true);
+			enable = BoolProperty->GetPropertyValue_InContainer(AnimInst);
+		}
+	}
+	else {
+		OnAnimationEnd();
+		IsCalculatingMovePath = false;
 	}
 }

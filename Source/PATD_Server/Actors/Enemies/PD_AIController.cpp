@@ -34,7 +34,7 @@ APD_E_Character* ch = Cast<APD_E_Character>(charac);
 	{
 		BlackboardComp->InitializeBlackboard(*ch->behaviorTree->BlackboardAsset);
 		BlackboardComp->SetValueAsInt("AP",0);
-	
+		canAction = false;
 		/*BehaviorTreeComp->StartTree(*ch->behaviorTree);
 		BehaviorTreeComp->RestartTree();
 		BehaviorTreeComp->Start

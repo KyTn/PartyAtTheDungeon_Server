@@ -104,14 +104,21 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderActio
 bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsToMove)
 {
 
-	
-	if (!controller) {
-		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
+	//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
+	if (GetMovingLogicalPosition().Num() > 0) 
+	{
+		SetCurrentLogicalPosition(GetMovingLogicalPosition()[GetMovingLogicalPosition().Num() - 1]);
 	}
 
-	if (isPlayer){
+	if (!controller) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: No se encuentra el controller (null)"));
+	}
+	else
+	{
+		if (isPlayer) {
 			//Cast<APD_CharacterController>(controller)->MoveTo(realPosition.X, realPosition.Y);
-			
+
 			//Ponemos como ocupado el spline elegido
 			Cast<APD_CharacterController>(controller)->GetSpline()->SetIsUsing(true);
 			//limpiamos los puntos del spline anteriores
@@ -121,10 +128,10 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
 			Cast<APD_CharacterController>(controller)->GetSpline()->SetPoints(listPositionsToMove);
 			//Llamamos al metodo Mover del Controller
-			Cast<APD_CharacterController>(controller)->MoveTo(0,0); ///Hablar con CARLOS y MARCOS para ver como tocar esto sin afectar a su EnemyController
-	}
-	else {
-		
+			Cast<APD_CharacterController>(controller)->MoveTo(0, 0); ///Hablar con CARLOS y MARCOS para ver como tocar esto sin afectar a su EnemyController
+		}
+		else {
+
 			//Cast<APD_EnemyController>(controller)->MoveTo(realPosition.X, realPosition.Y);
 
 			//Ponemos como ocupado el spline elegido
@@ -134,9 +141,10 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 			//Seteamos el Spline Component con los puntos a los que queremos movernos
 			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(listPositionsToMove);
 			//Llamamos al metodo Mover del Controller
-			Cast<APD_AIController>(controller)->MoveTo(0,0);
-
+			Cast<APD_AIController>(controller)->MoveTo(0, 0);
+		}
 	}
+	
 	return true;
 
 }
@@ -496,7 +504,13 @@ int8 PD_GM_LogicCharacter::GetEvasionCharacter()
 
 void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 {
-	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: MoveWhenCollisionLost"));
+
+	SetIsStoppingByCollision(true); //si ha perdido el choque, se tiene que poner a true
+
+	GetController()->Animation_GetHurt((int)ActiveSkills::GetStunnedByCollision);
+
+
+	UE_LOG(LogTemp, Warning, TEXT("LogicCharacter: MoveWhenCollisionLost - Character %s moving...."), *GetIDCharacter());
 
 	//Remove the splines point and set the character
 	if (!controller) {
@@ -522,52 +536,51 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 				Cast<APD_CharacterController>(controller)->SetSpline(SGI->gameManager->splineManager->GetSpline());
 			}
 		}
-
-		
 		//Seteamos el spline en la posicion del actor
 		Cast<APD_CharacterController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
-
 		//Seteamos los nuevos puntos del spline para moverse
 		TArray<FVector> newPositionsToMove = TArray<FVector>();
 		newPositionsToMove.Add(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
 
-		
-		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Adyacents_To(GetCurrentLogicalPosition());
-		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
+		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(GetCurrentLogicalPosition());
+		for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+		{
+			int index = rand() % (j + 1);
+			possibleNewPositionToMove.Swap(j, index);
+		}
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-
 			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 			if (SGI)
 			{
 				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
 				{
-					newPositionsToMove.Add(mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]));
-					SetCurrentLogicalPosition(possibleNewPositionToMove[j]);
+					FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
+					positonToAdd.Z = 10.0f;
+					newPositionsToMove.Add(positonToAdd);
 					break;
 				}
 			}
-
 		}
-
-		
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
 		//Seteamos el Spline Component con los puntos a los que queremos movernos
 		if (newPositionsToMove.Num() > 0)
 		{
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
-
-			if (Cast<APD_CharacterController>(controller)->GetSpline())
-			{
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost - SetPoints"));
 
+				SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(newPositionsToMove.Last()));
 				controller->GetSpline()->SetPoints(newPositionsToMove);
+				MoveToPhysicalPosition(newPositionsToMove);
+
 				//Llamamos al metodo Mover del Controller
-				//Cast<APD_CharacterController>(controller)->MoveTo(0, 0);
-			}
-			else{}
-			
+				//GetCharacterBP()->SetActorLocation(newPositionsToMove.Last());
+				
+				//if (GetCharacterBP()->TeleportTo(newPositionsToMove.Last(), GetCharacterBP()->GetActorRotation(),false, false))//return a boolean
+					//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Se ha movido por collision")));
+				//else
+					//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("NO Se ha movido por collision")));
 		}
-		
+
 	}
 	else
 	{
@@ -586,38 +599,128 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 
 		//Seteamos el spline en la posicion del actor
 		Cast<APD_AIController>(controller)->GetSpline()->SetActorLocation(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
-
 		//Seteamos los nuevos puntos del spline para moverse
 		TArray<FVector> newPositionsToMove = TArray<FVector>();
 		newPositionsToMove.Add(mapMng->LogicToWorldPosition(GetCurrentLogicalPosition()));
 
-		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Adyacents_To(GetCurrentLogicalPosition());
+		TArray<PD_MG_LogicPosition> possibleNewPositionToMove = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(GetCurrentLogicalPosition());
+		for (int32 j = 0; j < possibleNewPositionToMove.Num(); j++) //Shuffel de posibles posiciones para mover
+		{
+			int index = rand() % (j + 1);
+			possibleNewPositionToMove.Swap(j, index);
+		}
+
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-
 			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 			if (SGI)
 			{
 				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
 				{
-					newPositionsToMove.Add(mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]));
-					SetCurrentLogicalPosition(possibleNewPositionToMove[j]);
+					FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
+					positonToAdd.Z = 10.0f;
+					newPositionsToMove.Add(positonToAdd);
 					break;
 				}
 			}
 
 		}
 
-		//Seteamos el Spline Component con los puntos a los que queremos movernos
-		Cast<APD_AIController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
-		//Llamamos al metodo Mover del Controller
-		Cast<APD_AIController>(controller)->MoveTo(0, 0);
+		if (newPositionsToMove.Num() > 0)
+		{
+			//Seteamos el Spline Component con los puntos a los que queremos movernos
+			//Llamamos al metodo Mover del Controller
+
+			SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(newPositionsToMove.Last()));
+			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
+			MoveToPhysicalPosition(newPositionsToMove);
+
+			//GetCharacterBP()->SetActorLocation(newPositionsToMove.Last());
+			//if (GetCharacterBP()->TeleportTo(newPositionsToMove.Last(), GetCharacterBP()->GetActorRotation(), false, false))//return a boolean
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Se ha movido por collision")));
+			//else
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("NO Se ha movido por collision")));
+
+		}
+	
 
 	}
 
 	
 	
 }
+
+void PD_GM_LogicCharacter::SetCurrentLogicalPositionFromOut(FVector positionWorld)
+{
+	SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(positionWorld));
+}
+
+
+
+int PD_GM_LogicCharacter::GetAValueToDecideCollision()
+{
+	int roll = GetARoll(3, 6);
+
+	roll += GetTotalStats()->CH;
+
+	switch (TypeWeapons(GetWeapon()->TypeWeapon))
+	{
+		case TypeWeapons::SwordAndShield:
+		{
+			roll += roll += 20;;
+			break;
+		}
+		case TypeWeapons::Daggers:
+		{
+			roll += 20;
+			break;
+		}
+		case TypeWeapons::TwoHandSword:
+		{
+			roll += 25;
+			break;
+		}
+		case TypeWeapons::CrossbowAndShield:
+		{
+			roll += 15;
+			break;
+		}
+		case TypeWeapons::TwoGuns:
+		{
+			roll += 11;
+			break;
+		}
+		case TypeWeapons::Bow:
+		{
+			roll += 10;
+			break;
+		}
+		case TypeWeapons::WandAndShield:
+		{
+			roll += 8;
+			break;
+		}
+		case TypeWeapons::ScepterAndArcaneBook:
+		{
+			roll += 2;
+			break;
+		}
+		case TypeWeapons::Staff:
+		{
+			roll += 5;
+			break;
+		}
+	default:
+		roll += 5;
+		break;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i en collision"), *GetIDCharacter(), roll);
+
+	return roll;
+
+}
+
 
 /*
 ======================================================
@@ -758,48 +861,53 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
-
-	if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
+	if (!CharWhoReceiveTheAttacks->isDead) 
 	{
-		//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
-		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
-		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
-
-		//Calcular si es critico el ataque
-		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+		if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
 		{
-			//lanzar animacion de ataque critico
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+			//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
+			int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+			int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+			totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
+
+			//Calcular si es critico el ataque
+			if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+			{
+				//lanzar animacion de ataque critico
+				CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+			}
+			else
+			{
+				//lanzar animacion de ataque normal
+				CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+			}
+
+			//quitarselo al charWhoRecieveTheAttacks
+			int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+			totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+			CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+
 		}
-		else
+		else  //Fallo del Ataque
 		{
-			//lanzar animacion de ataque normal
-			CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FALLO DE ATAQUE DEL CHARACTER !");
+
+			//lanzar animacion de defensa por parte del atacado
+			CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 		}
 
-		//quitarselo al charWhoRecieveTheAttacks
-		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
-
-		
+		if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+		{
+			CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+			CharWhoReceiveTheAttacks->isDead = true;
+			UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+		}
 	}
-	else  //Fallo del Ataque
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FALLO DE ATAQUE DEL CHARACTER !");
-
-		//lanzar animacion de defensa por parte del atacado
-		CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
+	else {
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 	}
-
-	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
-	{
-		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
-		CharWhoReceiveTheAttacks->isDead = true;
-		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
-	}
-
 }
 
 void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
@@ -867,33 +975,39 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 	{
 		for (int j = 0; j < enemyManager->GetEnemies().Num(); j++)
 		{
-			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide el baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
+			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide la baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
 			{
-				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-				int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
-				totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
-
-				//Calcular si es critico el ataque
-				if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+				if (!enemyManager->GetEnemies()[j]->isDead)
 				{
-					CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
-				}
-				else
-				{
-					CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
-				}
+					int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+					int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+					totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
 
-				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
-				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+					//Calcular si es critico el ataque
+					if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+					{
+						CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+					}
+					else
+					{
+						CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+					}
 
-				if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
-				{
-					CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
-					enemyManager->GetEnemies()[j]->isDead = true;
-					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+					int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
+					totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+					enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+
+					if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
+					{
+						CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+						enemyManager->GetEnemies()[j]->isDead = true;
+						UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+					}
 				}
-
+				else {
+					CharWhoAttacks->GetController()->OnAnimationEnd();
+					enemyManager->GetEnemies()[j]->GetController()->OnAnimationEnd();
+				}
 			}
 		}
 	}
@@ -914,29 +1028,34 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-
-
-	int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-	int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
-	totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
-
-	int APLeftBonus = CalculateAPleftInPlayerActions(CharWhoAttacks);
-
-	totalDamage = totalDamage + ((APLeftBonus / 100) * totalDamage);
-
-	int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-	totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-	CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
-
-	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
-
-	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+	if (!CharWhoReceiveTheAttacks->isDead)
 	{
-		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
-		CharWhoReceiveTheAttacks->isDead = true;
-		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
-	}
 
+		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
+
+		int APLeftBonus = CalculateAPleftInPlayerActions(CharWhoAttacks);
+
+		totalDamage = totalDamage + ((APLeftBonus / 100) * totalDamage);
+
+		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
+
+		if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+		{
+			CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+			CharWhoReceiveTheAttacks->isDead = true;
+			UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+		}
+	}
+	else {
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
+	}
 }
 
 /*RANGO*/
@@ -958,31 +1077,37 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 
 	for (int i = 0; i < 2; i++)
 	{
-		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
-		totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
-
-		//Calcular si es critico el ataque
-		if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+		if (!CharWhoReceiveTheAttacks->isDead) 
 		{
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
-		}
-		else
-		{
-			CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
-		}
-		//quitarselo al charWhoRecieveTheAttacks
-		int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-		totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-		CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+			int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+			int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
+			totalDamage = totalDamage + ((increaseOfDMG / 100)  * totalDamage);
 
-	}
+			//Calcular si es critico el ataque
+			if (CheckIfWasACriticalAttack(&totalDamage, CharWhoAttacks))
+			{
+				CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+			}
+			else
+			{
+				CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+			}
+			//quitarselo al charWhoRecieveTheAttacks
+			int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
+			totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+			CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
-	if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
-	{
-		CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
-		CharWhoReceiveTheAttacks->isDead = true;
-		UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+			if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+			{
+				CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+				CharWhoReceiveTheAttacks->isDead = true;
+				UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+			}
+		}
+		else {
+			CharWhoAttacks->GetController()->OnAnimationEnd();
+			CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
+		}
 	}
 }
 
@@ -996,8 +1121,9 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 	3. lanzar las respectivas animaciones
 	*/
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-
-	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+	if (!CharWhoReceiveTheAttacks->isDead)
+	{
+		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 		int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 		int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
@@ -1016,6 +1142,11 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 			CharWhoReceiveTheAttacks->isDead = true;
 			UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 		}
+	}
+	else {
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
+	}
 }
 
 /*MAGIA*/
@@ -1033,11 +1164,17 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	//Lanzar animacion de casteo de habilidad
+	if (!CharWhoReceiveTheAttacks->isDead)
+	{
+		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
-	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
-
-	CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
-	
+		CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
+	}
+	else
+	{
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
+	}
 
 }
 void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToTeleport)
@@ -1106,19 +1243,25 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 		{
 			if (nearTiles[i] == enemyManager->GetEnemies()[j]->GetCurrentLogicalPosition()) //Si coincide el baldosa a comprobar con la posicion del enemigo a comprobar, se calcula el daño
 			{
-				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
-				
-				int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
-				totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-				enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
-
-				if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
+				if (!enemyManager->GetEnemies()[j]->isDead)
 				{
-					CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
-					enemyManager->GetEnemies()[j]->isDead = true;
-					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
-				}
+					int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 
+					int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
+					totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
+					enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
+
+					if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
+					{
+						CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+						enemyManager->GetEnemies()[j]->isDead = true;
+						UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+					}
+				}
+				else {
+					CharWhoAttacks->GetController()->OnAnimationEnd();
+					enemyManager->GetEnemies()[j]->GetController()->OnAnimationEnd();
+				}
 			}
 		}
 	}

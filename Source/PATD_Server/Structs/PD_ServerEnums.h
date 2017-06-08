@@ -88,6 +88,7 @@ enum class ActiveSkills
 	BeInCrossroads = 9,
 	WhoHeal = 10,
 	ShotMana = 11,
+	GetStunnedByCollision = 249,
 	GetHurt = 250,
 };
 

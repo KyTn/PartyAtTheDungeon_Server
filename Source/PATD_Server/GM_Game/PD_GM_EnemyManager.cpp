@@ -5,6 +5,7 @@
 
 //Includes del forward declaration
 #include "Structs/PD_ServerStructs.h"//Para todos los structs
+#include "../Actors/PD_GenericController.h"
 #include "PATD_Server/GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 
 PD_GM_EnemyManager::PD_GM_EnemyManager()
@@ -54,11 +55,14 @@ FStructTurnOrders* PD_GM_EnemyManager::GetTurnOrders(int indexEnemy) {
 int PD_GM_EnemyManager::GetMaxLenghtActions(EActionPhase phase) {
 	int indexplayer = this->GetEnemyMaxLenghtActions(phase);
 	if (indexplayer != -1) {
-		if (phase == EActionPhase::Move) {
-			return this->listTurnOrders[indexplayer]->positionsToMove.Num();
-		}
-		else if (phase == EActionPhase::Attack) {
-			return this->listTurnOrders[indexplayer]->actions.Num();
+		if (listTurnOrders[indexplayer])
+		{
+			if (phase == EActionPhase::Move) {
+				return this->listTurnOrders[indexplayer]->positionsToMove.Num();
+			}
+			else if (phase == EActionPhase::Attack) {
+				return this->listTurnOrders[indexplayer]->actions.Num();
+			}
 		}
 	}
 	return 0;
@@ -75,14 +79,27 @@ int PD_GM_EnemyManager::GetEnemyMaxLenghtActions(EActionPhase phase) {
 
 		int listActions = 0;
 		if (phase == EActionPhase::Move) {
-			if (this->listTurnOrders[i]->positionsToMove.Num() > 0) {}
-			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
-			listActions = this->listTurnOrders[i]->positionsToMove.Num();
+			if (this->listTurnOrders[i])
+			{
+				if (this->listTurnOrders[i]->positionsToMove.Num() > 0) {}
+				//UE_LOG(LogTemp, Error, TEXT("Enemigo %i se mueve"), i);
+				listActions = this->listTurnOrders[i]->positionsToMove.Num();
+			}
+			else {
+				listActions = 0;
+			}
+			
 		}
 		else if (phase == EActionPhase::Attack) {
 			//UE_LOG(LogTemp, Error, TEXT("Enemigo %i ataca"), i);
-			if(this->listTurnOrders[i]->actions.Num()>0) {}
-			listActions = this->listTurnOrders[i]->actions.Num();
+			if (this->listTurnOrders[i])
+			{
+				if (this->listTurnOrders[i]->actions.Num() > 0) {}
+				listActions = this->listTurnOrders[i]->actions.Num();
+			}
+			else {
+				listActions = 0;
+			}
 		}
 
 
@@ -139,7 +156,6 @@ bool PD_GM_EnemyManager::AllEnemiesHaveOrders() {
 	int numWithOrders = 0;
 	for (int i = 0; i < enemies.Num();i++) {
 
-		//(listTurnOrders[i]->actions.Num() == 0) && (listTurnOrders[i]->positionsToMove.Num() == 0)
 		if (!listTurnOrders[i] ) {
 			//listTurnOrders[i] = new FStructTurnOrders();
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_EnemyManager::AllEnemiesHaveOrders: Enemigo numero %d no tiene ordenes"),i);

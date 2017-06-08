@@ -8,6 +8,8 @@
 #include "PD_ServerGameInstance.h"
 
 #include "PD_GenericController.h"
+#include "PD_SplineActors.h"
+
 
 // Sets default values
 APD_E_Character::APD_E_Character()
@@ -57,7 +59,7 @@ void APD_E_Character::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Norma
 }
 
 //Por si acaso hay que usar el metodo de recibir hit
-void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+/*void APD_E_Character::ReceiveHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
 APD_E_Character* other = Cast<APD_E_Character>(OtherActor);
@@ -65,16 +67,52 @@ if (other != nullptr) //Los dos son characters
 {
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of own actor > %d"), logic_character->GetTotalStats()->CH);
 //	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OnHit CH of actor hited> %d"), other->GetLogicCharacter()->GetTotalStats()->CH);
-
-	if ((logic_character->GetTotalStats()->CH <= other->GetLogicCharacter()->GetTotalStats()->CH) && (!logic_character->GetController()->IsCalculatingMovePath) )
+	if (!logic_character->GetController()->IsCalculatingMovePath)
 	{
-		//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
-		logic_character->GetController()->IsCalculatingMovePath = true;
-		//logic_character->MoveWhenCollisionLost();
+		if (logic_character->GetAValueToDecideCollision() < other->GetLogicCharacter()->GetAValueToDecideCollision()) 
+		{
+			//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+			//logic_character->GetController()->IsCalculatingMovePath = true;
+			//logic_character->MoveWhenCollisionLost();
+		}
+		else {
+
+		}
 	}
+	
 }
 }
 
+*/
+
+void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
+{
+	if (logic_character)
+	{
+		if (!logic_character->GetController()->IsCalculatingMovePath)
+		{
+			if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
+			{
+				//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter PIERDE: %s"), *logic_character->GetIDCharacter());
+
+				logic_character->GetController()->IsCalculatingMovePath = true;
+				logic_character->GetController()->StopMoving();
+				logic_character->GetController()->GetSpline()->RemovePoints();
+				logic_character->MoveWhenCollisionLost();
+			}
+			else 
+			{
+				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
+				//charWhoCrash->logic_character->GetController()->IsCalculatingMovePath = true;
+				//charWhoCrash->logic_character->GetController()->StopMoving();
+				//charWhoCrash->logic_character->GetController()->GetSpline()->RemovePoints();
+				//charWhoCrash->logic_character->MoveWhenCollisionLost();
+			}
+		}
+	}
+
+}
 
 bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
 {
@@ -84,11 +122,11 @@ bool APD_E_Character::PlayAnimationSkill(int ID_Skill)
 
 	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::PlayAnimationSkill -- EXITO EN LLAMAR A LA FUNCION"));
+		//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::PlayAnimationSkill -- EXITO EN LLAMAR A LA FUNCION"));
 		return true;
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::PlayAnimationSkill - EEROR EN LLAMATR A LA FUNCION"));
+		//UE_LOG(LogTemp, Error, TEXT("APD_E_Character::PlayAnimationSkill - EEROR EN LLAMATR A LA FUNCION"));
 		return false;
 	}
 
@@ -135,4 +173,24 @@ void APD_E_Character::DeleteCharacter() //Sirve para eliminar desde BP a un enem
 		enemyManager->DeleteEnemy(logic_character);
 	}
 	*/
+}
+
+void APD_E_Character::StopAnimationParticleSystem()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("StopParticleSystem"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::StopAnimationParticleSystem -- EXITO EN LLAMAR A LA FUNCION"));
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::StopAnimationParticleSystem - EEROR EN LLAMATR A LA FUNCION"));
+	}
+}
+
+bool APD_E_Character::IscharacterStoppingByCollision() 
+{
+	return logic_character->GetIsStoppingByCollision();
 }
