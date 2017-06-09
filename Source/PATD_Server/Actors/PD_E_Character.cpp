@@ -204,7 +204,10 @@ void APD_E_Character::UpdateCharLife(float damage)
 	logic_character->UpdateHPCurrent(damage);
 }
 
-
+bool APD_E_Character::IsPlayer()
+{
+	return logic_character->GetIsPlayer();
+}
 
 void APD_E_Character::DeleteCharacter() //Sirve para eliminar desde BP a un enemigo del game manager
 {

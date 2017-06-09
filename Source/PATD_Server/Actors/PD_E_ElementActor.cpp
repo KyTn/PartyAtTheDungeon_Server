@@ -30,7 +30,7 @@ void APD_E_ElementActor::Tick( float DeltaTime )
 
 	FOutputDeviceDebug  debug;
 
-	UE_LOG(LogTemp, Log, TEXT("APD_E_ElementActor::Tick - ActualLogicPosition (%d,%d)"), ActualLogicPosition.GetX(), ActualLogicPosition.GetY());
+	//UE_LOG(LogTemp, Log, TEXT("APD_E_ElementActor::Tick - ActualLogicPosition (%d,%d)"), ActualLogicPosition.GetX(), ActualLogicPosition.GetY());
 
 
 	if (SGI->mapManager->MapInfo->roomByLogPos.Contains(ActualLogicPosition)) {

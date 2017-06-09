@@ -1318,7 +1318,7 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 	//animacion de casteo de habilidad
-	CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
+	CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::WhoHeal);
 
 	int totalHeal = 20;
 	//comprobacion de que tiene pasivas que puedan incrementar el efecto del hechizo

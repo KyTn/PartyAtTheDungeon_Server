@@ -111,6 +111,9 @@ public:
 		void UpdateCharLife(float damage); 
 
 	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
+		bool IsPlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
 		void DeleteCharacter(); //Sirve para eliminar desde BP a un enemigo del game manager
 
 
