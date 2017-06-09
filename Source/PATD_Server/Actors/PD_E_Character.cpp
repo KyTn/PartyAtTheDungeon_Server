@@ -6,11 +6,12 @@
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
 #include "PD_ServerGameInstance.h"
-
+#include "Kismet/KismetMathLibrary.h"
 #include "PD_GenericController.h"
 #include "PD_SplineActors.h"
 
 
+/*
 // Sets default values
 APD_E_Character::APD_E_Character()
 {
@@ -19,8 +20,28 @@ APD_E_Character::APD_E_Character()
 
 	OnActorHit.AddDynamic(this, &APD_E_Character::OnHit);
 
-}
+}*/
+APD_E_Character::APD_E_Character(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer) {
+	Widget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PD_Char_Widget"));
+	
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("PD_Char_SpringArm"));
+	
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("PD_Char_Camera"));
+	
+	Camera->bUsePawnControlRotation = true;
+	//Camera->AttachToComponent(SpringArm,);
+	//FRotator(0, -50, 180);
+	SpringArm->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator( -50.0, 180.0 ,0));
+	SpringArm->TargetArmLength = 600;
+	SpringArm->bDoCollisionTest = false;
+	Widget->SetRelativeLocation(FVector(0, 0, 250.0));
+	Widget->bGenerateOverlapEvents = false;
 
+	Widget->SetupAttachment(RootComponent);
+	SpringArm->SetupAttachment(RootComponent);
+	Camera->SetupAttachment(SpringArm);
+}
 // Called when the game starts or when spawned
 void APD_E_Character::BeginPlay()
 {
@@ -35,7 +56,27 @@ void APD_E_Character::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 	percentHP =  (float)logic_character->totalStats->HPCurrent / (float)logic_character->totalStats->HPTotal;
-//	percentHP = 0.6;
+
+
+//	Update del widget para que apunte a la camara
+	AActor* targetView= UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetViewTarget();
+	ACameraActor* camera = Cast<ACameraActor>(targetView);
+	APD_E_Character* PDCharacter = Cast<APD_E_Character>(targetView);
+	UCameraComponent* cameraRotateTo = nullptr;
+	if (camera) {
+		cameraRotateTo = camera->GetCameraComponent();
+	}
+	else if (PDCharacter){
+		cameraRotateTo = PDCharacter->Camera;
+	}
+	FMinimalViewInfo viewInfo;
+	cameraRotateTo->GetCameraView(0, viewInfo);
+	
+	FRotator widgetRot = UKismetMathLibrary::FindLookAtRotation(Widget->ComponentToWorld.GetLocation(), viewInfo.Location);
+	widgetRot.Roll = 0;
+	Widget->SetWorldRotation(widgetRot);
+	
+
 }
 
 // Called to bind functionality to input
@@ -96,20 +137,22 @@ void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
 			{
 				if (logic_character->GetTotalStats())
 				{
-					if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
-					{
-						//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
-						UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter PIERDE: %s"), *logic_character->GetIDCharacter());
+					if (charWhoCrash && charWhoCrash->GetLogicCharacter() && charWhoCrash->GetLogicCharacter()->GetTotalStats()) {
+						if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
+						{
+							//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover
+							UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter PIERDE: %s"), *logic_character->GetIDCharacter());
 
-						logic_character->GetController()->IsCalculatingMovePath = true;
-						logic_character->GetController()->StopMoving();
-						logic_character->GetController()->GetSpline()->RemovePoints();
-						logic_character->MoveWhenCollisionLost();
-					}
-					else
-					{
-						UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
+							logic_character->GetController()->IsCalculatingMovePath = true;
+							logic_character->GetController()->StopMoving();
+							logic_character->GetController()->GetSpline()->RemovePoints();
+							logic_character->MoveWhenCollisionLost();
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter: GANA %s"), *logic_character->GetIDCharacter());
 
+						}
 					}
 				}
 				

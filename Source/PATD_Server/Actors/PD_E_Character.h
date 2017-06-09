@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BehaviorTree.h"
 #include "Structs/PD_ServerStructs.h"
+#include "Components/WidgetComponent.h"
 #include "PD_E_Character.generated.h"
 
 
@@ -17,8 +18,16 @@ class PATD_SERVER_API APD_E_Character : public ACharacter
 
 public:
 	// Sets default values for this character's properties
-	APD_E_Character();
+	APD_E_Character(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+//	APD_E_Character();
 
+
+	UPROPERTY(Category = PD, VisibleAnywhere, BlueprintReadWrite)
+		class UWidgetComponent* Widget;
+	UPROPERTY(Category = PD, VisibleAnywhere, BlueprintReadWrite)
+		class USpringArmComponent* SpringArm;
+	UPROPERTY(Category = PD, VisibleAnywhere, BlueprintReadWrite)
+		class UCameraComponent* Camera;
 	//Variable Logic Character para tener doble referencia y poder llamar a los metodos logicos con metodos del Character
 	PD_GM_LogicCharacter* logic_character;
 
