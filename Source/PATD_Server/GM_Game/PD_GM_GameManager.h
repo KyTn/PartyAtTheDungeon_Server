@@ -153,6 +153,7 @@ public:
 	//Funciones para gestionar el choque - devuelve si se ha chocado y a perdido (true) o no ha chocado o no ha perdido éste (false)
 	bool  CheckAndManageCollisionWithCharacters(int indexDataPlayers, int tick, int numCharacters);
 	bool  CheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck);
+	bool  CollisionCheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck);
 	
 #pragma region CHECK ACTIVEEFFECTS AND ALTEREDSTATE
 	//Funciones para comprobar los ActiveEffects y los AlteredState de enemigos y jugadores;

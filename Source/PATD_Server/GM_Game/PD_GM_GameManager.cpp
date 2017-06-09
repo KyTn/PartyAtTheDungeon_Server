@@ -637,7 +637,9 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 				if (!playersManager->GetDataStructPlayer(i)->logic_Character->GetIsStoppingByCollision() && playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove.Num() > tick)
 				{
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicMoveTick : moviendo logic character"));
-					playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+				//	playersManager->GetDataStructPlayer(i)->logic_Character->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+					PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionX, playersManager->GetDataStructPlayer(i)->turnOrders->positionsToMove[tick].positionY);
+					playersManager->GetDataStructPlayer(i)->logic_Character->AddMovementLogicalPosition(logicPosition);
 				}
 			}
 			else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
@@ -646,7 +648,9 @@ void PD_GM_GameManager::LogicMoveTick(int tick, int numCharacters) {
 				{
 					if (!enemyManager->GetEnemies()[i]->GetIsStoppingByCollision() && enemyManager->getListTurnOrders()[i]->positionsToMove.Num() > tick)
 					{
-						enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+						//enemyManager->GetEnemies()[i]->SetIsStoppingByCollision(CheckAndManageCollisionWithCharacters(i, tick, numCharacters));
+						PD_MG_LogicPosition logicPosition = PD_MG_LogicPosition(enemyManager->GetTurnOrders(i)->positionsToMove[tick].positionX, enemyManager->GetTurnOrders(i)->positionsToMove[tick].positionY);
+						enemyManager->GetEnemies()[i]->AddMovementLogicalPosition(logicPosition);
 					}
 				}
 			}			
@@ -698,6 +702,55 @@ bool  PD_GM_GameManager::CheckIsLogicCharacterInPosition(PD_MG_LogicPosition pos
 
 }
 
+//Funciones de CHOQUE
+bool  PD_GM_GameManager::CollisionCheckIsLogicCharacterInPosition(PD_MG_LogicPosition positionToCheck)
+{
+	//Devuelve true si hay algo en esa posicion - False si esta libre
+	bool thereIsSomething = false;
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++) //Check For Players
+	{
+		if (positionToCheck == playersManager->GetDataStructPlayer(i)->logic_Character->GetCurrentLogicalPosition())
+			thereIsSomething = true;
+		else if (playersManager->GetCharacterByIndex(i)->GetController()
+			&& playersManager->GetCharacterByIndex(i)->GetController()->GetSpline()
+			&& playersManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetNumberOfSplinePoints() > 0) 
+		{
+			FVector lastPosition = playersManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetLocationAtSplinePoint(playersManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
+			
+			
+			PD_MG_LogicPosition positionInMoving = mapManager->WorldToLogicPosition(lastPosition);
+			if (positionToCheck == positionInMoving) {
+				thereIsSomething = true;
+			}
+
+		}
+		
+	}
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		if (positionToCheck == enemyManager->GetEnemies()[i]->GetCurrentLogicalPosition())
+			thereIsSomething = true;
+
+		else if (enemyManager->GetCharacterByIndex(i)->GetController()
+			&& enemyManager->GetCharacterByIndex(i)->GetController()->GetSpline()
+			&& enemyManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetNumberOfSplinePoints() > 0)
+		{
+			FVector lastPosition = enemyManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetLocationAtSplinePoint(enemyManager->GetCharacterByIndex(i)->GetController()->GetSpline()->GetSplineComponent()->GetNumberOfSplinePoints(), ESplineCoordinateSpace::World);
+
+
+			PD_MG_LogicPosition positionInMoving = mapManager->WorldToLogicPosition(lastPosition);
+			if (positionToCheck == positionInMoving) {
+				thereIsSomething = true;
+			}
+
+		}
+
+	}
+
+	return thereIsSomething;
+
+}
 
 bool  PD_GM_GameManager::CheckAndManageCollisionWithCharacters(int indexDataPlayers, int tick, int numCharacters)
 {
@@ -1695,6 +1748,10 @@ void PD_GM_GameManager::OnBeginPhase()
 	else if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: EndAllPhases"));
+		characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
+		characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
+		characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
+
 		UpdateState(); //Devolvemos el flujo a la maquina de estados del game manager (no de fases)
 	}else //Caso indeterminado
 	{

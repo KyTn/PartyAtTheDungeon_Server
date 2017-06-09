@@ -14,23 +14,28 @@ EBTNodeResult::Type UPD_IA_TaskOpenRoom::ExecuteTask(UBehaviorTreeComponent& Own
 
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
-	PD_MM_Room* room = AIController->GetMapMng()->MapInfo->roomByLogPos[logicCharacter->GetCurrentLogicalPosition()];
+	PD_MM_Room* room = nullptr;
+	if (AIController->GetMapMng()->MapInfo->roomByLogPos.Contains(logicCharacter->GetCurrentLogicalPosition())) {
+		room = AIController->GetMapMng()->MapInfo->roomByLogPos[logicCharacter->GetCurrentLogicalPosition()];
+		//room = *AIController->GetMapMng()->MapInfo->roomByLogPos.Find(logicCharacter->GetCurrentLogicalPosition());
+		if (room) {
+			if (room->IsOpen) {//la habitacion está abierta
+				if (AIController->canAction) {
+					UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open"));
 
-	if (room->IsOpen) {//la habitacion está abierta
-		if (AIController->canAction) {
-			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open"));
+					return EBTNodeResult::Succeeded;
+				}
+				else {//es el primer turno despues de que este abierta
+					UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open, pero no puede hacer accion"));
 
-			return EBTNodeResult::Succeeded;
+					AIController->canAction = true;
+				}
+			}
+			else {
+				UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Close"));
+
+			}
 		}
-		else {//es el primer turno despues de que este abierta
-			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Open, pero no puede hacer accion"));
-
-			AIController->canAction = true;
-		}
-	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskOpenRoom:: room is Close"));
-
 	}
 	AIController->turnTargetCharacter = nullptr;
 	AIController->turnNumAttacks = 0;

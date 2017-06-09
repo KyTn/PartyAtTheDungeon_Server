@@ -32,8 +32,8 @@ APD_E_Character::APD_E_Character(const FObjectInitializer& ObjectInitializer)
 	Camera->bUsePawnControlRotation = true;
 	//Camera->AttachToComponent(SpringArm,);
 	//FRotator(0, -50, 180);
-	SpringArm->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator( -50.0, 180.0 ,0));
-	SpringArm->TargetArmLength = 600;
+	SpringArm->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator( -50.0, 90 ,0));
+	SpringArm->TargetArmLength = 800;
 	SpringArm->bDoCollisionTest = false;
 	Widget->SetRelativeLocation(FVector(0, 0, 250.0));
 	Widget->bGenerateOverlapEvents = false;
@@ -129,15 +129,25 @@ if (other != nullptr) //Los dos son characters
 
 void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
 {
+	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter Entrando: YO:%s EL:%s"), *logic_character->GetIDCharacter(), *charWhoCrash->logic_character->GetIDCharacter());
+
 	if (logic_character)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter TIENE LOGIC_CHAR: %s"), *logic_character->GetIDCharacter());
+
 		if (logic_character->GetController())
 		{
+			UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter TIENE CONTROLLER: %s"), *logic_character->GetIDCharacter());
+
 			if (!logic_character->GetController()->IsCalculatingMovePath)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter NO IsCalculatingMovePath: %s"), *logic_character->GetIDCharacter());
 				if (logic_character->GetTotalStats())
 				{
+					UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter GET TOTAL STAT: %s"), *logic_character->GetIDCharacter());
+
 					if (charWhoCrash && charWhoCrash->GetLogicCharacter() && charWhoCrash->GetLogicCharacter()->GetTotalStats()) {
+						UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter charWHOCRASH CORRECT: %s"), *logic_character->GetIDCharacter());
 						if (logic_character->GetTotalStats()->CH <= charWhoCrash->GetLogicCharacter()->GetTotalStats()->CH) //Si el CH es menor que el que te choca, te mueves tu
 						{
 							//El character que ejecuta el codigo pierde, asi que es el que se tiene que mover

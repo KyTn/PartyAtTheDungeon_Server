@@ -557,15 +557,19 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 		}
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
-			if (SGI)
-			{
-				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
+
+
+				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+				if (SGI)
 				{
-					FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
-					positonToAdd.Z = 10.0f;
-					newPositionsToMove.Add(positonToAdd);
-					break;
+					if (!SGI->gameManager->CollisionCheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+					{
+						FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
+						positonToAdd.Z = 10.0f;
+						newPositionsToMove.Add(positonToAdd);
+						break;
+					}
 				}
 			}
 		}
@@ -619,15 +623,19 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
-			if (SGI)
-			{
-				if (SGI->gameManager->CheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
+
+
+				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
+				if (SGI)
 				{
-					FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
-					positonToAdd.Z = 10.0f;
-					newPositionsToMove.Add(positonToAdd);
-					break;
+					if (!SGI->gameManager->CollisionCheckIsLogicCharacterInPosition(possibleNewPositionToMove[j]))
+					{
+						FVector positonToAdd = mapMng->LogicToWorldPosition(possibleNewPositionToMove[j]);
+						positonToAdd.Z = 10.0f;
+						newPositionsToMove.Add(positonToAdd);
+						break;
+					}
 				}
 			}
 

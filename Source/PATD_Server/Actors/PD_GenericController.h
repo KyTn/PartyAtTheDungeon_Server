@@ -85,6 +85,8 @@ public:
 	*/
 	virtual bool ActionTo(FStructTargetToAction action);
 
+	bool CheckCanAnimate();
+
 	void Animation_BasicAttack(int ID_Skill);
 	void Animation_CriticalBasicAttack(int ID_Skill);
 	void Animation_UseConsumable(int ID_Skill);
