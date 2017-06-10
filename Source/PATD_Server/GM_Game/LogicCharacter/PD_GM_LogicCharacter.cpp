@@ -101,6 +101,10 @@ PD_MG_LogicPosition* PD_GM_LogicCharacter::MoveToLogicPosition(FStructOrderActio
 	return &currentLogicalPosition;
 }
 
+void PD_GM_LogicCharacter::SetCurrentLogicalPositionFromFVector(FVector PostInWorld)
+{
+	SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(PostInWorld));
+}
 
 bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsToMove)
 {
@@ -108,7 +112,7 @@ bool PD_GM_LogicCharacter::MoveToPhysicalPosition(TArray<FVector> listPositionsT
 	//Actualizar la currentLogicPosition con el ultima posicion del array movingLogicalPosition
 	if (GetMovingLogicalPosition().Num() > 0) 
 	{
-		SetCurrentLogicalPosition(GetMovingLogicalPosition()[GetMovingLogicalPosition().Num() - 1]);
+		//SetCurrentLogicalPosition(GetMovingLogicalPosition()[GetMovingLogicalPosition().Num() - 1]);
 	}
 
 	if (!controller) 

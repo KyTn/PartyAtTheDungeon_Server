@@ -38,7 +38,8 @@ UCLASS() //Interfaz observer para reaccionar a eventos del netmanager
 class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_NW_iEventObserver
 {
 	GENERATED_BODY()
-	void InitializeNetworking();
+
+
 		
 	FString serverIP;
 	FString serverName;
@@ -46,6 +47,9 @@ class PATD_SERVER_API UPD_ServerGameInstance : public UGameInstance, public PD_N
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "GameInstance")
+		void InitializeNetworking();
+	
 	//Para tener los nombres de los niveles - diferenciar ejecución en editor o en ejecutable
 	LevelsNameDictionary levelsNameDictionary;
 	//PD_MG_Map*  LOGIC_MAP;

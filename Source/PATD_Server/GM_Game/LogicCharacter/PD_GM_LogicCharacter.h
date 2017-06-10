@@ -90,7 +90,7 @@ public:
 	- Un bool para indicar si la accion se ha resuelto con exito o no
 	*/
 	bool MoveToPhysicalPosition(TArray<FVector> listPositionsToMove);
-
+	void SetCurrentLogicalPositionFromFVector(FVector PostInWorld);
 
 	/*
 	//Metodo para realizar una acción

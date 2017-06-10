@@ -889,11 +889,18 @@ void UPD_ServerGameInstance::InitializeNetworking()
 	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	socketManager->SetNetworkManager(networkManager);
 
-	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
+	if (serverIP.Equals("NO CONNECTION"))
+	{
 
+	}
+	else 
+	{
+		socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
 
-																		 //Seteamos este gameinstance como observador de eventos en el networkmanager.
-	networkManager->RegisterObserver(this);
+	 //Seteamos este gameinstance como observador de eventos en el networkmanager.
+		networkManager->RegisterObserver(this);
+	}
+	
 
 }
 
@@ -969,21 +976,29 @@ void UPD_ServerGameInstance::InitializeServerAddress()
 	FString myServerName =  "";
 	FString textToPrint = "";
 
-
+	
 	if (ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->HasNetworkDevice()) //Se puede usar funciones de red
 	{
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetHostName(myServerName); //Get Server Name HOST
 		
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(myIPAddress); //Get List of Address in Host
 		
-		for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
+		if (myIPAddress.Num() > 0)
 		{
-			auxmyIP = myIPAddress[i]->ToString(false);
-			myIP.Append(auxmyIP);
+			for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
+			{
+				auxmyIP = myIPAddress[i]->ToString(false);
+				myIP.Append(auxmyIP);
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+			serverIP = myIP;
+			serverName = myServerName;
 		}
-		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
-		serverIP = myIP;
-		serverName = myServerName;
+		else
+		{
+			serverIP = "NO CONNECTION";
+			serverName = "NO SERVER";
+		}
 	}
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
 	{/*
