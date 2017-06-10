@@ -377,7 +377,7 @@ Por claridad es mejor que el nombre del struct coincida con el del enumerado. (a
 enum class UStructType {
 	NotDefined = 0, AllStructs = 1, FStructNewConnection = 2, FStructRequestIDClient = 3, FStructClientID = 4 , FStructWelcome = 5, FStructPing = 6, FStructPong = 7, FStructLostConnection=8, FStructMap = 10, FStructMapData = 11, FStructOrderMenu = 20, FStructMatchConfig = 21, FStructMatchConfigDone = 22, FStructTurnOrders = 30,
 	FStructCharacter = 40, FStructUpdateTurn = 41, FStructClientMapAlreadyInstantiated = 50, FStructClientStartMatchOnGM = 51, FStructClientCanGenerateOrders = 52,
-	FStructInstatiatePlayers = 60
+	FStructInstatiatePlayers = 60, FStructEndOfMatch = 70
 };
 
 
@@ -715,6 +715,17 @@ struct FStructClientStartMatchOnGM : public FStructGeneric
 
 		FStructClientStartMatchOnGM() {
 		structType = static_cast<uint8>(UStructType::FStructClientStartMatchOnGM);
+	}
+};
+
+//Paquete to go to podium
+USTRUCT()
+struct FStructEndOfMatch : public FStructGeneric
+{
+	GENERATED_BODY()
+
+		FStructEndOfMatch() {
+		structType = static_cast<uint8>(UStructType::FStructEndOfMatch);
 	}
 };
 

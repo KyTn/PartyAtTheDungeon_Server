@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "PD_TimerGame.generated.h"
 class PD_GM_GameManager;
+class UPD_ServerGameInstance;
 
 UCLASS()
 class PATD_SERVER_API APD_TimerGame : public AActor
@@ -21,7 +22,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
+	UPD_ServerGameInstance* SGI;
 
 	FTimerHandle timer;
 
@@ -34,4 +35,7 @@ public:
 	
 	void InitTimer(float time);
 	void OnTimerEnds();
+
+	void InitTimerPodium(float time, UPD_ServerGameInstance* inSGI);
+	void OnTimerEndPodiums();
 };

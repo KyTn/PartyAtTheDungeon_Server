@@ -63,6 +63,8 @@ public:
 	StructGamePhase* structGamePhase;
 	//Funciones de gestion del estado (maquina de estados)
 
+	//Variable para saber desde interfaz si se ha ganado o perdido la partida
+	int MatchIsWinOrLost = 0; // 0 defect - 1 win, 2 - lost
 
 #pragma region State Machine
 

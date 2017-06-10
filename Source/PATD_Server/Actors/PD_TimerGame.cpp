@@ -2,7 +2,9 @@
 
 #include "PATD_Server.h"
 #include "PD_TimerGame.h"
+
 #include "GM_Game/PD_GM_GameManager.h"
+#include "PD_ServerGameInstance.h"
 
 // Sets default values
 APD_TimerGame::APD_TimerGame()
@@ -34,4 +36,16 @@ void APD_TimerGame::InitTimer(float time) {
 void APD_TimerGame::OnTimerEnds() {
 	timerRunning = false;
 	gameManager->OnTimerEnd();
+}
+
+void APD_TimerGame::InitTimerPodium(float time, UPD_ServerGameInstance* inSGI) {
+	SGI = inSGI;
+	timerRunning = true;
+	GetWorldTimerManager().SetTimer(timer, this, &APD_TimerGame::OnTimerEndPodiums, time, false);
+}
+
+void APD_TimerGame::OnTimerEndPodiums() {
+	timerRunning = false;
+	UE_LOG(LogTemp, Log, TEXT("APD_TimerGame::OnTimerEndPodiums - Tiempo se acabo en el podium "));
+	SGI->OnTimerPodiumEnds();
 }

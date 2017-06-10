@@ -179,10 +179,33 @@ void PD_GM_GameManager::UpdateState() {
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
 
+		if (CheckWinGameConditions()) //Jugadores Ganan la partida
+		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: GANAN PLAYERS"));
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+			if (SGI)
+			{
+				MatchIsWinOrLost = 1; //Victoria
+				SGI->UpdateState();
+			}
+		}
+		else if (CheckLoseGameConditions()) //Jugadores pierden la partida
+		{
+			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: PIERDEN PLAYERS"));
+			UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(splineManager->GetGameInstance());
+			if (SGI)
+			{
+				MatchIsWinOrLost = 2; //Derrota
+
+				SGI->UpdateState();
+			}
+		}
+		else
+		{
 			//Transicion inmediata de estado
 			this->ChangeState(EGameState::WaitingPlayerOrders);
-
-
+		}
+			
 	}else{ //Caso indeterminado
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::UpdateState: WARNING: estado sin update"));
 	}
@@ -308,22 +331,9 @@ void PD_GM_GameManager::OnBeginState() {
 		//Envio a todos los clientes con el update del turno
 		networkManager->SendNow(&structUpdateTurn);
 
-
-
-		if (CheckWinGameConditions()) //Jugadores Ganan la partida
-		{
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: GANAN PLAYERS"));
-		}
-		else if (CheckLoseGameConditions()) //Jugadores pierden la partida
-		{
-			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnBeginState: EndOfTurn: PIERDEN PLAYERS"));
-		}
-		else
-		{
-
-			
-			UpdateState();//transicion inmediata
-		}
+		
+		UpdateState();//transicion inmediata
+		
 
 	}else //Caso indeterminado
 	{
