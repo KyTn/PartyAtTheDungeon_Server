@@ -10,6 +10,7 @@
 
 
 class UPD_ServerGameInstance;
+class PD_MM_Room;
 
 /**
  * 
@@ -22,6 +23,11 @@ class PATD_SERVER_API APD_E_WallActor : public APD_E_ElementActor
 public:
 
 	APD_E_WallActor();
+
+	TArray<PD_MM_Room*> adjacentRooms; 
+
+
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
 		MapSkinType mapSkin_N;

@@ -9,13 +9,46 @@
 #include "MapInfo/PD_MM_MapInfo.h"
 
 APD_E_WallActor::APD_E_WallActor() {
-	
+	adjacentRooms = TArray<PD_MM_Room*>();
 }
 
 // Called when the game starts or when spawned
 void APD_E_WallActor::BeginPlay()
 {
 	Super::BeginPlay();
+	adjacentRooms = TArray<PD_MM_Room*>();
+
+
+	for (int i = 0; i < SGI->mapManager->MapInfo->rooms.Num(); i++) {
+		if (SGI->mapManager->MapInfo->rooms[i]->LogicWallPosInRoom.Contains(ActualLogicPosition)) {
+			adjacentRooms.Add(SGI->mapManager->MapInfo->rooms[i]);
+		}
+	}
+
+	isActive = false;
+
+
+
+	/*
+	TArray<PD_MG_LogicPosition> adj_reales = SGI->mapManager->Get_LogicPosition_Adyacents_To(ActualLogicPosition);
+	PD_MG_LogicPosition N = PD_MG_LogicPosition(ActualLogicPosition.GetX() - 1, ActualLogicPosition.GetY());
+	PD_MG_LogicPosition S = PD_MG_LogicPosition(ActualLogicPosition.GetX() + 1, ActualLogicPosition.GetY());
+	PD_MG_LogicPosition E = PD_MG_LogicPosition(ActualLogicPosition.GetX(), ActualLogicPosition.GetY() + 1);
+	PD_MG_LogicPosition W = PD_MG_LogicPosition(ActualLogicPosition.GetX(), ActualLogicPosition.GetY() - 1);
+	
+	if (adj_reales.Contains(N)) {
+		adjacentRooms.Add(SGI->mapManager->MapInfo->roomByLogPos[N]);
+	}
+	if (adj_reales.Contains(S)) {
+		adjacentRooms.Add(SGI->mapManager->MapInfo->roomByLogPos[S]);
+	}
+	if (adj_reales.Contains(W)) {
+		adjacentRooms.Add(SGI->mapManager->MapInfo->roomByLogPos[W]);
+	}
+	if (adj_reales.Contains(E)) {
+		adjacentRooms.Add(SGI->mapManager->MapInfo->roomByLogPos[E]);
+	}
+	*/
 	
 }
 
@@ -24,6 +57,31 @@ void APD_E_WallActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	// los WallActors no tienen una habitacion asociada, por lo que no entran nunca en el if del tick del padre ... 
+	// hacemos un custom aqui
+
+	FOutputDeviceDebug  debug;
+
+	//UE_LOG(LogTemp, Log, TEXT("APD_E_ElementActor::Tick - ActualLogicPosition (%d,%d)"), ActualLogicPosition.GetX(), ActualLogicPosition.GetY());
+
+
+	
+	if (!isActive) {
+
+		for (int i = 0; i < adjacentRooms.Num(); i++) {
+			if (adjacentRooms[i]->IsActive) {
+				isActive = true;
+				break;
+			}
+		}
+
+		if (isActive) {
+			this->CallFunctionByNameWithArguments(TEXT("BP_DEACTIVATE_FOG"), debug, this, true);
+		}
+
+	}
+	
 }
 
 

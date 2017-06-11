@@ -20,7 +20,9 @@ APD_E_ElementActor::APD_E_ElementActor()
 void APD_E_ElementActor::BeginPlay()
 {
 	Super::BeginPlay();
+	FOutputDeviceDebug  debug;
 	SGI = Cast<UPD_ServerGameInstance> (GetWorld()->GetGameInstance());
+	this->CallFunctionByNameWithArguments(TEXT("BP_ACTIVATE_FOG"), debug, this, true);
 }
 
 // Called every frame
@@ -37,10 +39,10 @@ void APD_E_ElementActor::Tick( float DeltaTime )
 		if (isActive != SGI->mapManager->MapInfo->roomByLogPos[ActualLogicPosition]->IsActive) {
 
 			if (SGI->mapManager->MapInfo->roomByLogPos[ActualLogicPosition]->IsActive) {
-				this->CallFunctionByNameWithArguments(TEXT("BP_ACTIVATE"), debug, this, true);
+				this->CallFunctionByNameWithArguments(TEXT("BP_DEACTIVATE_FOG"), debug, this, true);
 			}
 			else {
-				this->CallFunctionByNameWithArguments(TEXT("BP_DEACTIVATE"), debug, this, true);
+				this->CallFunctionByNameWithArguments(TEXT("BP_ACTIVATE_FOG"), debug, this, true);
 			}
 
 		}
