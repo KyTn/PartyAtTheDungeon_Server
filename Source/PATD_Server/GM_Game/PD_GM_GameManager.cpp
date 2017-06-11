@@ -144,6 +144,10 @@ void PD_GM_GameManager::UpdateState() {
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 
+		characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
+		characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
+		characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
+
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
 			//Actualizar estados alteadores y de efectos en enemigos --- despues del turno de los players
 			CheckAndUpdate_ActiveEffectsOnEnemies();
@@ -169,6 +173,10 @@ void PD_GM_GameManager::UpdateState() {
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
+		characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
+		characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
+		characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
+
 		if (structGamePhase->enumGamePhase == EServerPhase::EndAllPhases) {
 			//Actualizar activeeffects and alteredState de los jugadores --- justo antes de actualizarlos en el server
 			CheckAndUpdate_ActiveEffectsOnPlayers();
@@ -178,6 +186,10 @@ void PD_GM_GameManager::UpdateState() {
 	
 
 	}else if (structGameState->enumGameState == EGameState::EndOfTurn) {
+
+		characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
+		characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
+		characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
 
 		if (CheckWinGameConditions()) //Jugadores Ganan la partida
 		{
@@ -1311,7 +1323,6 @@ void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 {
 	for (int character = 0; character < characterWhoPlayDefenseAnim.Num(); character++)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal: Defense animation"));
 
 		characterWhoPlayDefenseAnim[character]->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
@@ -1503,7 +1514,7 @@ void PD_GM_GameManager::OnBeginPhase()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: ConsumableIni"));
 		
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Orange, FString::Printf(TEXT("Cartel de Inicio de consumible")));
 
 		if (IsThereAnyConsumableOrders())
 			timer->InitTimer(timeWaitingPhases);
@@ -1534,7 +1545,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		//Llamar al procceso del movimiento logico
 		PlayersLogicTurn();
 
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Green, FString::Printf(TEXT("Cartel de Inicio de movimiento")));
 
 		if (IsThereAnyMovementOrder())
 			timer->InitTimer(timeWaitingPhases);
@@ -1632,7 +1643,7 @@ void PD_GM_GameManager::OnBeginPhase()
 
 		LogicTurnInteractablePhase(); //va a calcular las acciones de TODOS los PLAYERS O ENEMIGOS de ese turno
 
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Yellow, FString::Printf(TEXT("Cartel de Inicio de interaccion")));
 
 		if (IsThereAnyInteractbaleOrder())
 			timer->InitTimer(timeWaitingPhases);
@@ -1676,7 +1687,7 @@ void PD_GM_GameManager::OnBeginPhase()
 		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnBeginPhase: AttackIni"));
 		//Llamar al procceso del ataque logico
 
-		GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
+		//GEngine->AddOnScreenDebugMessage(-1, timeWaitingPhases, FColor::Red, FString::Printf(TEXT("Cartel de Inicio de ataque")));
 
 		if (IsThereAnyAttackOrder())
 			timer->InitTimer(timeWaitingPhases);
