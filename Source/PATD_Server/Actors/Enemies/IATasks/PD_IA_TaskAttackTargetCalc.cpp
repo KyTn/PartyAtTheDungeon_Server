@@ -21,7 +21,7 @@ EBTNodeResult::Type UPD_IA_TaskAttackTargetCalc::ExecuteTask(UBehaviorTreeCompon
 
 
 bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp) {
-	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: Entrando a comportamiento de ataque "));
+	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackTargetCalc:: Entrando a comportamiento de ataque "));
 
 	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
@@ -30,33 +30,128 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 	//if(!AIController->goalCharacter) AIController->goalCharacter= AIController->GetClosestPlayer();
 	TArray<PD_MG_LogicPosition> listPathPosition;
 	bool noNeedToMove = false;
+	int AP = logicCharacter->GetTotalStats()->APTotal;
 
-
-	if (AIController->useCharacter && !AIController->usePosition) {
-		listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
+	if (AIController->useCharacter && !AIController->usePosition) { //Esto es cuando se setea solo un character como objetivo. Se usa cuando coge el objetivo el mismo
 		
-		if (listPathPosition.Num() == 1) {
+		if (AIController->CheckInRangeFromPositionToCharacter(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+			//En este caso no necesita moverse
+			AIController->turnTargetCharacter = AIController->goalCharacter;
+			AIController->turnNumAttacks = APMaxAttack;
+
+			if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) { //Si es warlike tiene mas ataques
+				AIController->turnNumAttacks = APMaxAttackWarlike;
+			}
+		}else {
+			//el objetivo no esta a rango.
+			listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter->GetCurrentLogicalPosition());
+
+			if (listPathPosition.Num() == 0) {
+				UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackTargetCalc:: Return error porque no hay ruta"));
+				return false; //sin objetivo character no podemos hacer el ataque de momento
+			}
+			/*if (listPathPosition.Num() == 1) {
 			noNeedToMove = true;
-		}
-		
-		listPathPosition.RemoveAt(listPathPosition.Num() - 1); //Quitamos la ultima porque seria para ponerse encima, para chocar.
+			}*/
+			listPathPosition.RemoveAt(listPathPosition.Num() - 1); //Quitamos la ultima porque seria para ponerse encima, para chocar.
+			
+			int indexPath = 0;
+			while (AP > 0 && indexPath < listPathPosition.Num()) {
+				PD_MG_LogicPosition pathPosition = listPathPosition[indexPath];
+				//AIController->CheckInRangeAtPosition()
+				indexPath++;
+				AP--;
+				//Coge la ultima a la que llege por el ap, pero si hay una en la que ya tenga rango, aunque le queden AP sale del bucle.
+				AIController->turnTargetPosition = pathPosition;
+				if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+					break;
+				}
 
-	}
-	else if (AIController->useCharacter && AIController->usePosition) {
+			}
+
+			//Al salir del bucle nos pueden sobrar ap para atacar o no. Tambien podemos estar en rango o no.
+			if (AP > 0 && AIController->CheckInRangeFromPositionToCharacter(AIController->turnTargetPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+				AIController->turnTargetCharacter = AIController->goalCharacter;
+				if (AP < APMaxAttack) {
+					AIController->turnNumAttacks = AP;
+				}
+				else {
+					AIController->turnNumAttacks = APMaxAttack;
+						if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) { //Si es warlike tiene mas ataques
+							AIController->turnNumAttacks = APMaxAttackWarlike;
+						}
+				}
+			}
+
+
+		}
+	}else if (AIController->useCharacter && AIController->usePosition) { //Esto es cuando tiene un character y una posicion. Lo usa el jefe para dar ordenes
 
 		if (logicCharacter->GetCurrentLogicalPosition() == AIController->goalPosition) {
-			//ya esta en la posicion
-			noNeedToMove = true;
+			
+			if (AIController->CheckInRangeFromPositionToCharacter(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+				//En este caso no necesita moverse
+				AIController->turnTargetCharacter = AIController->goalCharacter;
+				AIController->turnNumAttacks = APMaxAttack;
+
+				if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) { //Si es warlike tiene mas ataques
+					AIController->turnNumAttacks = APMaxAttackWarlike;
+				}
+			}
+			else {
+				UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackTargetCalc:: Error al dar orden con targetCharacter y targetPosition: Desde la posicion indicada no puede ser objetivo"));
+				return false;
+			}
+
 		}
 		else {
+			//Hay que ir hasta la posicion
 			listPathPosition = AIController->GetPathFinder()->getPathFromTo(logicCharacter->GetCurrentLogicalPosition(), AIController->goalPosition);
+
+			if (listPathPosition.Num() == 0) {
+				UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackTargetCalc:: Return error porque no hay ruta"));
+				return false; //sin objetivo character no podemos hacer el ataque de momento
+			}
+
+
+			int indexPath = 0;
+			while (AP > 0 && indexPath < listPathPosition.Num()) {
+				PD_MG_LogicPosition pathPosition = listPathPosition[indexPath];
+				//AIController->CheckInRangeAtPosition()
+				indexPath++;
+				AP--;
+				//Coge la ultima a la que llege por el ap, pero si llega a la ultima le puede sobrar ap y atacar
+				AIController->turnTargetPosition = pathPosition;
+			}
+
+			//Al salir del bucle nos pueden sobrar ap para atacar o no. Tambien podemos estar en rango o no.
+			if (AP > 0 && AIController->CheckInRangeFromPositionToCharacter(AIController->turnTargetPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+				AIController->turnTargetCharacter = AIController->goalCharacter;
+				if (AP < APMaxAttack) {
+					AIController->turnNumAttacks = AP;
+				}
+				else {
+					AIController->turnNumAttacks = APMaxAttack;
+					if (logicCharacter->GetIAPersonality() == EIAPersonality::Warlike) { //Si es warlike tiene mas ataques
+						AIController->turnNumAttacks = APMaxAttackWarlike;
+					}
+				}
+			}
+
 		}
 	}
 	else {
-		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: Return error por que no hay objetivos seteados"));
+		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: Return error porque no hay objetivos seteados"));
 		return false; //sin objetivo character no podemos hacer el ataque de momento
 	}
 
+
+	if (AIController->turnNumAttacks > 0) {
+		if (AIController->selectedBehaviour != EIABehaviour::Berserker) //Esto esta aqui porque el beserker usa el mismo task que el ataque pero con distintos parametros.
+		AIController->turnsForGoal = 0; //Si llega a hacer un ataque consideramos que ya ha cumplido su goal
+	}
+
+	/*
 
 	if (AIController->GetPathFinder()->error) {
 		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: ErrorEnPathFinder"));
@@ -70,28 +165,16 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 
 
 	
-	int AP= logicCharacter->GetTotalStats()->APTotal;
+
 	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackCreateOrder:: AP iniciales:%d "), AP);
 	if (noNeedToMove) {
 		AIController->turnTargetPosition = logicCharacter->GetCurrentLogicalPosition();
 	}
 	else {
-		int indexPath = 0;
+
 
 		if (listPathPosition.Num() > 0) {
-			while (AP > 0 && indexPath < listPathPosition.Num()) {
-				PD_MG_LogicPosition pathPosition = listPathPosition[indexPath];
-				//AIController->CheckInRangeAtPosition()
-				indexPath++;
-				AP--;
-				//Coge la ultima a la que llege por el ap, pero si hay una en la que ya tenga rango, aunque le queden AP sale del bucle.
-				AIController->turnTargetPosition = pathPosition;
-				if (!AIController->usePosition && AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 
-					break;
-				}
-
-			}
 
 		} //Si salta este if, significa que estamos al lado del target, por lo que solo hacemos ataques.
 	}
@@ -109,6 +192,6 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 		}
 	}
 
-	
+	*/
 	return true;
 }

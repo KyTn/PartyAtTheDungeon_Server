@@ -13,5 +13,9 @@ EBTNodeResult::Type UPD_IA_TaskErrorBehaviour::ExecuteTask(UBehaviorTreeComponen
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
 	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskErrorBehaviour:: Entrando en error behaviour %s"), *logicCharacter->GetIDCharacter());
+
+
+	AIController->turnsForGoal=0; //Por si acaso que no se lie y coja siempre nuevos comportamientos el siguiente turno.
+
 	return EBTNodeResult::Succeeded;
 }

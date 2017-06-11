@@ -267,5 +267,27 @@ void APD_E_Character::GetCharacterID(FString &ID_Char)
 	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetY()));
 
 	ID_Char = logic_character->GetIDCharacter();
+
+	switch (logic_character->GetIAPersonality())
+	{
+		case EIAPersonality::Coward:{
+			ID_Char.Append("::Coward");
+			break;
+		};
+		case EIAPersonality::Neutral: {
+			ID_Char.Append("::Neutral");
+			break;
+		};
+		case EIAPersonality::Smart: {
+			ID_Char.Append("::Smart");
+			break;
+		};
+		case EIAPersonality::Warlike: {
+			ID_Char.Append("::Warlike");
+			break;
+		};
+	default:
+		break;
+	}
 	//ID_Char.Append(positionLogic);
 }

@@ -20,5 +20,8 @@ protected:
 	bool CalculateTurnTarget(UBehaviorTreeComponent& OwnerComp);
 
 
-	
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		float APMaxAttack = 2;
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		float APMaxAttackWarlike = 3;
 };

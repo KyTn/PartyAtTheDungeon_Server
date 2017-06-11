@@ -21,5 +21,8 @@ class PATD_SERVER_API UPD_IA_TaskDefenseTargetCalc : public UBTTaskNode
 		float APDefense = 3;
 	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
 		float APDefenseCoward = 4;
-	
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		float APMaxAttack= 2;
+	UPROPERTY(EditAnywhere, Category = "Selection Parameters")
+		float APMaxAttackWarlike = 3;
 };
