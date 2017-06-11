@@ -30,7 +30,7 @@ enum class EServerPhase { StartPhases, ConsumableIni, ConsumableCamera, Consumab
 enum class EActionPhase { Move, Attack };
 
 
-enum class EClientState { NoConnection, ConfigureGame, WaitingConfiguration, ConfigureCharacter, GameInProcess };
+enum class EClientState { NoConnection, ConfigureGame, WaitingConfiguration, ConfigureCharacter, GameInProcess, Podium, OnExit};
 
 //Cabezones
 UENUM(BlueprintType)

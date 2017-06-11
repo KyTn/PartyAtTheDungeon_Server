@@ -553,7 +553,12 @@ void UPD_ServerGameInstance::UpdateState() {
 
 	}
 	else if (structServerState->enumServerState == EServerState::GameInProcess) {
+		//Enviar cambio a podium
+		FStructEndOfMatch endMatch = FStructEndOfMatch();
+		networkManager->SendNow(&endMatch, -1);
 
+		//cambiar a podium
+		this->ChangeState(EServerState::Podium);
 	}
 	else if (structServerState->enumServerState == EServerState::Podium) {
 
@@ -684,6 +689,8 @@ void UPD_ServerGameInstance::OnBeginState() {
 	}
 	else if (structServerState->enumServerState == EServerState::Podium) {
 
+		this->LoadMap(levelsNameDictionary.GetMapName(5));//Mapa de Podium
+
 	}
 	else if (structServerState->enumServerState == EServerState::OnExit) {
 
@@ -781,7 +788,13 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 	}
 	else if (structServerState->enumServerState == EServerState::Podium) {
+		
+		APD_TimerGame* timerOnPodium = (APD_TimerGame*)GetWorld()->SpawnActor(APD_TimerGame::StaticClass());
 
+		UE_LOG(LogTemp, Warning, TEXT("enumServerState == EServerState::Podium -"));
+
+		timerOnPodium->InitTimerPodium(20.0f, this);
+		
 	}
 	else if (structServerState->enumServerState == EServerState::OnExit) {
 
@@ -876,11 +889,18 @@ void UPD_ServerGameInstance::InitializeNetworking()
 	APD_NW_TimerActor* ServerActorSpawned = (APD_NW_TimerActor*)GetWorld()->SpawnActor(APD_NW_TimerActor::StaticClass());
 	socketManager->SetNetworkManager(networkManager);
 
-	socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
+	if (serverIP.Equals("NO CONNECTION"))
+	{
 
+	}
+	else 
+	{
+		socketManager->Init(ServerActorSpawned, serverIP, defaultServerPort);//Con esto empezaria el timer
 
-																		 //Seteamos este gameinstance como observador de eventos en el networkmanager.
-	networkManager->RegisterObserver(this);
+	 //Seteamos este gameinstance como observador de eventos en el networkmanager.
+		networkManager->RegisterObserver(this);
+	}
+	
 
 }
 
@@ -956,21 +976,29 @@ void UPD_ServerGameInstance::InitializeServerAddress()
 	FString myServerName =  "";
 	FString textToPrint = "";
 
-
+	
 	if (ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->HasNetworkDevice()) //Se puede usar funciones de red
 	{
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetHostName(myServerName); //Get Server Name HOST
 		
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(myIPAddress); //Get List of Address in Host
 		
-		for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
+		if (myIPAddress.Num() > 0)
 		{
-			auxmyIP = myIPAddress[i]->ToString(false);
-			myIP.Append(auxmyIP);
+			for (int i = 0; i < 1; i++)///Hay que recorrerlo más adelante mirando todas
+			{
+				auxmyIP = myIPAddress[i]->ToString(false);
+				myIP.Append(auxmyIP);
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
+			serverIP = myIP;
+			serverName = myServerName;
 		}
-		//UE_LOG(LogTemp, Warning, TEXT("My ip %d"), myIP.Len());
-		serverIP = myIP;
-		serverName = myServerName;
+		else
+		{
+			serverIP = "NO CONNECTION";
+			serverName = "NO SERVER";
+		}
 	}
 	else  //No hay un dispositivo de red / no esta bien configurada la tarjeta de red
 	{/*
@@ -1510,7 +1538,98 @@ void UPD_ServerGameInstance::GameManagerFunction_PlayAnimationHDHOnCharacter()
 	gameManager->PlayAnimationOnCharacters_HurtDefenseHeal();
 }
 
+int UPD_ServerGameInstance::GetVictoryOrLostGameState()
+{
+	return gameManager->MatchIsWinOrLost;
+}
+
 #pragma endregion
 
+#pragma region Functions of Podium
+int UPD_ServerGameInstance::GetNumberOfPlayers()
+{
+	return playersManager->GetNumPlayers();
+}
 
+void UPD_ServerGameInstance::GetInfoPlayerForPodium(TArray<FString> &NamePlayer, TArray<int> &Score, TArray<int> &id_Skin)
+{
+	int MaxScore = 0;
+	TArray<int> out_Scores = TArray<int>();
+	TArray<int> out_Scores_sorted = TArray<int>();
 
+	if (playersManager->GetNumPlayers() > 0)
+	{
+		for (int index_player = 0; index_player < playersManager->GetNumPlayers(); index_player++)
+		{
+			out_Scores.Add(playersManager->GetDataStructPlayer(index_player)->logic_Character->GetTotalStats()->PointsCurrent);
+		}
+
+		out_Scores_sorted = out_Scores;
+		out_Scores_sorted.Sort(); //de menor a mayor
+
+		//Get and ADD the WINNER
+		if (playersManager->GetNumPlayers() == 1) //solo 1 jugador
+		{
+			NamePlayer.Add(playersManager->GetDataStructPlayer(0)->logic_Character->GetIDCharacter());
+			Score.Add(out_Scores_sorted[0]);
+			id_Skin.Add(playersManager->GetDataStructPlayer(0)->logic_Character->GetSkin()->ID_SkinHead);
+		}
+		else 
+		{
+			for (int i = 0; i < out_Scores.Num(); i++)
+			{
+				int ScoreMax_Winner = out_Scores_sorted.Pop();
+				int index_winner = 0;
+				if (out_Scores.Find(ScoreMax_Winner, index_winner))
+				{
+					NamePlayer.Add(playersManager->GetDataStructPlayer(index_winner)->logic_Character->GetIDCharacter());
+					Score.Add(ScoreMax_Winner);
+					id_Skin.Add(playersManager->GetDataStructPlayer(index_winner)->logic_Character->GetSkin()->ID_SkinHead);
+				}
+			}
+		}
+	}
+	
+}
+
+#pragma endregion
+
+void UPD_ServerGameInstance::ResetApplication()
+{
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ResetApplication - Reiniciando APP ... "));
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ResetApplication - Borrando networking ... "));
+
+	
+	///delete network - delete Sockets
+	if (networkManager) {
+		delete networkManager;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ResetApplication - Inicializando variables SGI ... "));
+
+	///Inizaliza the same as UPD_ServerGameInstance::Init()
+	UE_LOG(LogTemp, Warning, TEXT("Init GameInstance ~> "));
+	//Inicializar Arrays de Skills and Weapons
+	LoadSkillActiveDatafromFile();
+	LoadSkillPasiveDatafromFile();
+	LoadWeaponDataFromFile();
+	levelsNameDictionary = LevelsNameDictionary();
+	playersManager = new PD_PlayersManager();
+	structServerState = new StructServerState();
+	mapGenerator = new PD_MG_MapGenerator();
+	//en el inicialize networking seteamos el gameinstance como observador.
+	InitializeNetworking();
+	MatchConfigManager = new PD_MatchConfigManager(this);
+
+	ChangeState(EServerState::StartApp);
+
+	UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::ResetApplication - Cambiando de mapa a INICIAL ... "));
+	///Pasar al primer nivel
+	LoadMap(levelsNameDictionary.GetMapName(1));
+	
+}
+
+void UPD_ServerGameInstance::OnTimerPodiumEnds()
+{
+	ResetApplication();
+}

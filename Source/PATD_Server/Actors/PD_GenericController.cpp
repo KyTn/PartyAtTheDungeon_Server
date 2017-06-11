@@ -166,6 +166,8 @@ void APD_GenericController::MoveWithSpline(float deltaTime)
 
 			GetPawn()->SetActorLocation(spline->GetSplineComponent()->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la posicion del character
 
+			Cast<APD_E_Character>(GetPawn())->logic_character->SetCurrentLogicalPositionFromFVector(GetPawn()->GetActorLocation()); //Actualizamos la posicion logical del character
+			 
 			GetPawn()->SetActorRotation(spline->GetSplineComponent()->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World)); //Actualizamos la rotacion del character
 
 			distance = distance + velocity*deltaTime; //actualizamos el variable
