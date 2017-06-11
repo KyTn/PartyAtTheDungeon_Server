@@ -1028,29 +1028,15 @@ TArray<FString> UPD_ServerGameInstance::GetPlayersConnected()
 
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
-		auxNamePlayer = "Player ";
+		auxNamePlayer = "Player_0";
 		auxNamePlayer.Append(FString::FromInt(i));
 		playersConnected.Add(auxNamePlayer);
-	}
-	/*
-	TArray<PD_NW_Socket*> socketArray = networkManager->GetSocketManager()->GetSocketArray();
 
-	for (int i = 0; i < socketArray.Num(); i++)
-	{
-		auxNamePlayer = "Player ";
-		auxNamePlayer.Append(FString::FromInt(i));
-		playersConnected.Add(auxNamePlayer);
-	}
-	*/
+		
+		//UE_LOG(LogTemp, Warning, TEXT(" id character is %s "),*auxNamePlayer);
 
-	// Se queda a modo de debug para probar el ADDCHild del Widget
-	/*for (int i = 0; i < 12; i++) 
-	{
-		auxNamePlayer = "Player ";
-		auxNamePlayer.Append(FString::FromInt(i));
-		playersConnected.Add(auxNamePlayer);
 	}
-	*/
+	
 
 	return playersConnected;
 }
