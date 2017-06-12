@@ -296,74 +296,78 @@ void APD_E_Character::GetInfoCharcaterForWidget(FString &ID_Char, FString &TypeC
 {
 	ID_Char = logic_character->GetIDCharacter();
 
-	if (logic_character->GetIsPlayer())
+	if (logic_character)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge weapon - %d "), logic_character->GetWeapon()->TypeWeapon);
+		if (logic_character->GetIsPlayer())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge weapon - %d "), logic_character->GetWeapon()->TypeWeapon);
 
-		switch (TypeWeapons(logic_character->GetWeapon()->TypeWeapon))
-		{
-		case TypeWeapons::SwordAndShield:
-		{
-			TypeChar = "Legionary";
-			break;
-		}
-		case TypeWeapons::CrossbowAndShield:
-		{
-			TypeChar = "Ranger";
-			break;
-		}
-		case TypeWeapons::Staff:
-		{
-			TypeChar = "Wizard";
-			break;
-		}
-		default:
-		{
-			TypeChar = "NotFound";
-			break;
-		}
-		}
-		FString auxNumberplayer = logic_character->GetIDCharacter();
-		FString charSplit = "_0";
-		FString FStringNumberPlayerLeft = "";
-		FString FStringNumberPlayerRight = "";
-		auxNumberplayer.Split(charSplit, &FStringNumberPlayerLeft, &FStringNumberPlayerRight);
+			switch (TypeWeapons(logic_character->GetWeapon()->TypeWeapon))
+			{
+			case TypeWeapons::SwordAndShield:
+			{
+				TypeChar = "Legionary";
+				break;
+			}
+			case TypeWeapons::CrossbowAndShield:
+			{
+				TypeChar = "Ranger";
+				break;
+			}
+			case TypeWeapons::Staff:
+			{
+				TypeChar = "Wizard";
+				break;
+			}
+			default:
+			{
+				TypeChar = "NotFound";
+				break;
+			}
+			}
+			FString auxNumberplayer = logic_character->GetIDCharacter();
+			FString charSplit = "_0";
+			FString FStringNumberPlayerLeft = "";
+			FString FStringNumberPlayerRight = "";
+			auxNumberplayer.Split(charSplit, &FStringNumberPlayerLeft, &FStringNumberPlayerRight);
 
-		int numChar = FCString::Atoi(*FStringNumberPlayerRight);
-		numChar++;
-		numberPlayer = numChar;
+			int numChar = FCString::Atoi(*FStringNumberPlayerRight);
+			numChar++;
+			numberPlayer = numChar;
+		}
+		else
+		{
+			//Type Char
+			switch (ECharacterType(logic_character->GetTypeCharacter()))
+			{
+			case ECharacterType::OrcBow:
+			{
+				TypeChar = "Archer Orc";
+				break;
+			}
+			case ECharacterType::OrcGuns:
+			{
+				TypeChar = "Guns Orc";
+				break;
+			}
+			case ECharacterType::OrcMelee:
+			{
+				TypeChar = "Melee Orc";
+				break;
+			}
+			case ECharacterType::OrcBoss:
+			{
+				TypeChar = "Boss Orc";
+				break;
+			}
+			default:
+				break;
+			}
+			//NumberPlayer (For the color)
+			numberPlayer = 0;
+		}
 	}
-	else
-	{
-		//Type Char
-		switch (ECharacterType(logic_character->GetTypeCharacter()))
-		{
-		case ECharacterType::OrcBow:
-		{
-			TypeChar = "Archer Orc";
-			break;
-		}
-		case ECharacterType::OrcGuns:
-		{
-			TypeChar = "Guns Orc";
-			break;
-		}
-		case ECharacterType::OrcMelee:
-		{
-			TypeChar = "Melee Orc";
-			break;
-		}
-		case ECharacterType::OrcBoss:
-		{
-			TypeChar = "Boss Orc";
-			break;
-		}
-		default:
-			break;
-		}
-		//NumberPlayer (For the color)
-		numberPlayer = 0;
-	}
+	
 
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge - name %s "), *ID_Char);
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge - type  %s "), *TypeChar);
