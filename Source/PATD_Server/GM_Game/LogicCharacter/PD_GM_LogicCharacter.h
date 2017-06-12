@@ -172,8 +172,8 @@ public:
 	============================*/
 	///Comprobar los estados del jugador o los powerUps para ver si se incrementa el ataque o no
 	void CheckCharacterActiveEffects(PD_GM_LogicCharacter* CharWhoAttacks);
-
-	///Calcular el % de defensa que tiene un jugador
+	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character, int range);
+		///Calcular el % de defensa que tiene un jugador
 	int CalculateReductionOfDamage(PD_GM_LogicCharacter* CharWhoDeffense);
 	int CalculateIncreaseOfDamage(PD_GM_LogicCharacter* CharWhoAttacks);
 
