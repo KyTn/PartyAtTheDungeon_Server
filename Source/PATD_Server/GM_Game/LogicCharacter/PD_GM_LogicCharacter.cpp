@@ -1268,7 +1268,7 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-	if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
+	if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, 6))
 	{
 		//Lanzar animacion de casteo de habilidad
 		if (!CharWhoReceiveTheAttacks->isDead)
