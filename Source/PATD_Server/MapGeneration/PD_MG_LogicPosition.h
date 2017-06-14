@@ -143,7 +143,26 @@ public:
 		return sqrt(result);
 	}
 
+	PD_MG_LogicPosition ClosestTo(TArray<PD_MG_LogicPosition> list) {
+		PD_MG_LogicPosition ret;
+		if (list.Num() > 0) {
 
+			ret = list[0];
+			float d = this->EuclideanDistance(ret);
+
+			for (int i = 0; i < list.Num(); i++) {
+				if (this->EuclideanDistance(list[i]) < d) {
+					ret = list[i];
+					d = this->EuclideanDistance(list[i]);
+				}
+			}
+
+		}
+		else {
+			return *this;
+		}
+		return ret;
+	}
 
 
 

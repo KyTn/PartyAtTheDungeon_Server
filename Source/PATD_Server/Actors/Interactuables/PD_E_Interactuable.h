@@ -59,6 +59,10 @@ public:
 	// Guarda una referencia a su interInfo e inicializa las variables con su info 
 	virtual void Set_InteractuableInfo(TArray<APD_E_Interactuable*> otherInteractuables, PD_MM_InteractuableInfo* interInfo);
 
+
+	// Se llamará a esta funcion para activar el interactuable
+	virtual void Interact(AActor* interactor, bool overwriteState = false);
+
 	// Se llamará a esta funcion para activar el interactuable
 	virtual void InteractToActivate(AActor* interactor, bool overwriteState = false);
 

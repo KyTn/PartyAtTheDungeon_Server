@@ -5,26 +5,25 @@
 #include "Actors/Interactuables/PD_E_Interactuable.h"
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "MapInfo/PD_MM_MapInfo.h"
-#include "PD_E_Door.generated.h"
+#include "PD_E_Chest.generated.h"
+
 
 
 class PD_MM_Room;
-class PD_MM_DoorInfo;
+class PD_MM_InteractuableInfo;
 
 /**
  * 
  */
 UCLASS()
-class PATD_SERVER_API APD_E_Door : public APD_E_Interactuable
+class PATD_SERVER_API APD_E_Chest : public APD_E_Interactuable
 {
 	GENERATED_BODY()
-public: 
-		APD_E_Door();
+		APD_E_Chest();
 
-		bool IsDoorOpen;
-		PD_MG_LogicPosition LP_A, LP_B;
-		PD_MM_Room* Room_A, Room_B;
-		PD_MM_DoorInfo* doorInfo;
+	bool isChestOpened = false;
+	PD_MM_InteractuableInfo* interacInfo;
+
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,9 +32,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	// Guarda una referencia a su interInfo e inicializa las variables con su info 
-	virtual void Set_DoorInfo(TArray<APD_E_Interactuable*> otherInteractuables, PD_MM_DoorInfo* doorInfo);
-
-
+	virtual void Set_ChestInfo(TArray<APD_E_Interactuable*> otherInteractuables, PD_MM_InteractuableInfo* interInfo);
 
 	virtual void Interact(AActor* interactor, bool overwriteState = false);
 
@@ -44,15 +41,14 @@ public:
 
 	// Se llamará a esta función para desactivar el interactuable
 	virtual void InteractToDeactivate(AActor* interactor, bool overwriteState = false);
+
+
+	void ChangeRotationToClosestWall();
+
+	UFUNCTION(BlueprintCallable, Category = "OpenChest")
+		bool OpenChest();
+	UFUNCTION(BlueprintCallable, Category = "CloseChest")
+		bool CloseChest();
 	
-
-	void ChangeRotationToReal(PD_MG_LogicPosition lp);
-
-	UFUNCTION(BlueprintCallable, Category = "OpenDoor")
-		bool OpenTheDoor();
-
-
-	UFUNCTION(BlueprintCallable, Category = "CloseDoor")
-		bool CloseTheDoor();
-
+	
 };
