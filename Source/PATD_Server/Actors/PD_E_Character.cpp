@@ -210,14 +210,39 @@ bool APD_E_Character::SetCharacterCameraOnView()
 
 void APD_E_Character::UpdateCharLife(float damage)
 {
-	logic_character->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 	logic_character->UpdateHPCurrent(damage);
+	if (logic_character->GetTotalStats()->HPCurrent <= 0)
+	{
+		logic_character->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
+		logic_character->SetIsDead(true);
+	}
+	else
+	{
+		logic_character->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+	}
 }
 
 bool APD_E_Character::IsPlayer()
 {
 	return logic_character->GetIsPlayer();
 }
+
+bool APD_E_Character::IsDead()
+{
+	return logic_character->GetIsDead();
+
+}
+
+void APD_E_Character::UpdatePoints(int inPoints)
+{
+	logic_character->UpdatePointsCurrent(inPoints);
+}
+
+int APD_E_Character::GetPoints()
+{
+	return logic_character->GetTotalStats()->PointsCurrent;
+}
+
 
 void APD_E_Character::DeleteCharacter() //Sirve para eliminar desde BP a un enemigo del game manager
 {

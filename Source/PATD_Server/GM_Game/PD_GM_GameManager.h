@@ -184,6 +184,8 @@ public:
 
 	bool CheckLoseGameConditions();
 
+	void CheckIfCharacterIsDead_ForHidden();
+
 	//Función del sistema de puntuación
 	void UpdatePoints();//Recibe el jugador y el enemigo, de tal manera que ve los puntos que vale el enemigo para sumarselos
 

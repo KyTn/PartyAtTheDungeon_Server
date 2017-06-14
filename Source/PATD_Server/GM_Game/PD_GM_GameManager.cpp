@@ -1053,10 +1053,9 @@ for (int i = 0; i < players; i++) {
 		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
-		if (!logicCharacter->GetIsPlayer())
-		{
-			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
-		}
+		
+		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 		{
 			FVector v = mapManager->LogicToWorldPosition(logicCharacter->GetMovingLogicalPosition()[j]);
@@ -1242,6 +1241,9 @@ void PD_GM_GameManager::OnAnimationEnd() {
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd"));
 
 		if (playersManager->AllAnimationEnd() && enemyManager->AllAnimationEnd()) {
+
+			CheckIfCharacterIsDead_ForHidden(); //Poner en invisible a los que han muerto en un turno (se destruiran despues)
+
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::OnAnimationEnd: TRUE"));
 			//Aqui deberia estar en un estado de fase que sea tick (no INI)
 
@@ -1329,7 +1331,10 @@ void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 	
 	for (int character = 0; character < characterWhoPlayGetHurtAnim.Num(); character++)
 	{
-		characterWhoPlayGetHurtAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
+		if (characterWhoPlayGetHurtAnim[character]->GetTotalStats()->HPCurrent <= 0.0f)
+			characterWhoPlayGetHurtAnim[character]->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
+		else
+			characterWhoPlayGetHurtAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 	}
 
 	for (int character = 0; character < characterWhoPlayHealAnim.Num(); character++)
@@ -1800,6 +1805,36 @@ int PD_GM_GameManager::getGameMngrGameState()
 	return (int)structGameState->enumGameState;
 }
 
+void PD_GM_GameManager::CheckIfCharacterIsDead_ForHidden()
+{
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		if (enemyManager->GetEnemies()[i]->GetTotalStats()->HPCurrent <= 0)
+		{
+			enemyManager->GetEnemies()[i]->GetCharacterBP()->SetActorHiddenInGame(true);
+			Cast<APD_E_Character>(enemyManager->GetEnemies()[i]->GetCharacterBP())->Widget->SetHiddenInGame(true);
+			FVector newPositionToDie = enemyManager->GetEnemies()[i]->GetCharacterBP()->GetActorLocation();
+			newPositionToDie.Z = newPositionToDie.Z - 300.0f;
+			enemyManager->GetEnemies()[i]->GetCharacterBP()->SetActorLocation(newPositionToDie);
+			enemyManager->GetEnemies()[i]->SetIsDead(true);
+		}
+	}
+
+	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
+	{
+		if (playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->HPCurrent <= 0)
+		{
+			playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->SetActorHiddenInGame(true);
+			Cast<APD_E_Character>(playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP())->Widget->SetHiddenInGame(true);
+			FVector newPositionToDie = playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->GetActorLocation();
+			newPositionToDie.Z = newPositionToDie.Z - 300.0f;
+			playersManager->GetDataPlayers()[i]->logic_Character->GetCharacterBP()->SetActorLocation(newPositionToDie);
+			playersManager->GetDataPlayers()[i]->logic_Character->SetIsDead(true);
+		}
+	}
+
+}
+
 bool PD_GM_GameManager::CheckWinGameConditions()
 {
 	int enemiesDied = 0;
@@ -1829,7 +1864,11 @@ bool PD_GM_GameManager::CheckLoseGameConditions()
 	for (int i = 0; i < playersManager->GetNumPlayers(); i++)
 	{
 		if (playersManager->GetDataPlayers()[i]->logic_Character->GetTotalStats()->HPCurrent <= 0)
+		{
+			playersManager->GetDataPlayers()[i]->logic_Character->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
 			playersLose = true;
+		}
+
 	}
 
 	return playersLose;

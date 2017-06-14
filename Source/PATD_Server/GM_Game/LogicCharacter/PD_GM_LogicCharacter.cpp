@@ -920,18 +920,14 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 	{
 		_GameManager = SGI->gameManager;
 	}
-
-
-	
+	if (!CharWhoReceiveTheAttacks->isDead)
+	{
 		//Rotar al character hacia la direccion donde esta su enemigo
 		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
 		if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
-		{
-			//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-			if (!CharWhoReceiveTheAttacks->isDead)
-			{
-				if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Empacto acertado
+		{			
+				if (CharWhoAttacks->GetImpactCharacter() >= CharWhoReceiveTheAttacks->GetEvasionCharacter()) //Impacto acertado
 				{
 					//calcular daño -> % Porcentaje de bounus de daño puede cambiar aqui
 					int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
@@ -978,15 +974,17 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 				}
 			}
-		else {
+		else 
+		{
+			//No acierta
 			CharWhoAttacks->GetController()->OnAnimationEnd();
 			CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 		}
 	}
 	else {
-		//No acierta
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
-
+		//esta ya muerto
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 	}
 	
 }
@@ -1106,14 +1104,11 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 	4. Quitar la vida a l enemigo
 	5. Animaciones
 	*/
-	
+	if (!CharWhoReceiveTheAttacks->isDead)
+	{
 		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 		if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
 		{
-			//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-			if (!CharWhoReceiveTheAttacks->isDead)
-			{
-
 				int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 				int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
 				totalDamage = totalDamage + FMath::TruncToInt((((double)increaseOfDMG / 100)  * totalDamage));
@@ -1134,14 +1129,18 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 				}
 			}
-			else {
+			else 
+			{
+				//No acierta
 				CharWhoAttacks->GetController()->OnAnimationEnd();
 				CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 			}
 	}
-	else {
-		//No acierta
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+	else 
+	{
+		//esta ya muerto
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 	}
 
 }
@@ -1157,18 +1156,15 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 	*/
 	///NOTA: si vemos que va mal lo de la repeticion de las animaciones (que no se repite o da problemas) se quitara y se dejaria un efecto FX
 	//Se pone 2, para que se haga una rafaga de disparos -> pero se puede poner la cifra que se quiera. 
-
+	if (!CharWhoReceiveTheAttacks->isDead)
+	{
 		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 		
 		if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
 		{
-			//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-			//Calcular si es critico el ataque
-
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
-			int totalDamage = 0;
-			if (!CharWhoReceiveTheAttacks->isDead)
-			{
+				CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
+				int totalDamage = 0;
+			
 				for (int i = 0; i < 2; i++)
 				{
 
@@ -1180,12 +1176,15 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 					int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
 					totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 
+					CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
 					if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
 					{
 						CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
 						CharWhoReceiveTheAttacks->isDead = true;
 						UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 					}
+
 					if (!CharWhoReceiveTheAttacks->isDead)
 						break;
 				}
@@ -1196,7 +1195,6 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 				CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 			}
 
-			CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 	}
 	else {
 		//No acierta
@@ -1215,14 +1213,12 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 	3. lanzar las respectivas animaciones
 	*/
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
-
-	if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
+	if (!CharWhoReceiveTheAttacks->isDead)
 	{
+		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
-		if (!CharWhoReceiveTheAttacks->isDead)
+		if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, CharWhoAttacks->GetWeapon()->RangeWeapon))
 		{
-
 			int totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 			int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
 			totalDamage = totalDamage + FMath::TruncToInt((((double)increaseOfDMG / 100)  * totalDamage));
@@ -1241,14 +1237,16 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 				UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 			}
 		}
-		else {
+		else 
+		{
 			CharWhoAttacks->GetController()->OnAnimationEnd();
 			CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 		}
 	}
-	else {
-		//No acierta
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+	else 
+	{
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 	}
 
 }
@@ -1264,30 +1262,30 @@ void PD_GM_LogicCharacter::Skill_Magic_GiveMeTheFireBlas(PD_GM_LogicCharacter* C
 	3. Lanzar bola de fuego
 	*/
 	///NOTA: Hay que comprobar el metodo ReceiveHit de los characteres, lo suyo seria que al chocar la bola de fuego es cuando se quita la vida y se ejecuta la animacion de pain y tal
-	
-	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
-
-	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-	if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, 6))
+	if (!CharWhoReceiveTheAttacks->isDead)//&& ((CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent - 30) > 0))
 	{
-		//Lanzar animacion de casteo de habilidad
-		if (!CharWhoReceiveTheAttacks->isDead)
-		{
+		controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
-			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
+		//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+		if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, 6))
+		{
+				//Lanzar animacion de casteo de habilidad
+				CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::GiveMeTheFireBlast);
 		}
 		else
 		{
-			CharWhoAttacks->GetController()->OnAnimationEnd();
-			CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
+				CharWhoAttacks->GetController()->OnAnimationEnd();
+				CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 		}
 	}
 	else {
 		//No acierta
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
+		CharWhoAttacks->GetController()->OnAnimationEnd();
+		CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 	}
 
 }
+
 void PD_GM_LogicCharacter::Skill_Magic_ExclaimChas(PD_GM_LogicCharacter* CharWhoAttacks, PD_MG_LogicPosition PositionToTeleport)
 {
 	/*
@@ -1333,7 +1331,7 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 
 		//Animacion de casteo de habilidad
 		//CharWhoAttacks->GetController()->Animation_CastSkill();
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BeInCrossroads);
+		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::BeInCrossroads);
 
 		//Conseguir a los enemigos adyacentes
 
@@ -1407,7 +1405,7 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 		//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 		//animacion de casteo de habilidad
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::WhoHeal);
+		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
 
 		int totalHeal = 20;
 		//comprobacion de que tiene pasivas que puedan incrementar el efecto del hechizo
