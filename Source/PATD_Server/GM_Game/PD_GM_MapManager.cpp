@@ -136,15 +136,24 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 
 	TArray<PD_MG_LogicPosition> ret = TArray<PD_MG_LogicPosition>();
 
-	for (int i = 0; i < MapInfo->SpawnRoom->LogicPosInRoom.Num(); i++) {
+	for (int i = 0; i < MapInfo->SpawnRoom->LogicDoorPosInRoom.Num(); i++) {
+		TArray<PD_MG_LogicPosition> actualAdjacents = MapInfo->SpawnRoom->LogicDoorPosInRoom[i].GetAllTilesInRange(5, MapInfo->SpawnRoom->LogicPosInRoom);
+
+		for (int j = 0; j < actualAdjacents.Num(); j++) {
+			ret.AddUnique(actualAdjacents[j]);
+		}
+	}
+
+
+	//for (int i = 0; i < MapInfo->SpawnRoom->LogicPosInRoom.Num(); i++) {
 
 		//if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
 		//{
-			ret.Add(MapInfo->SpawnRoom->LogicPosInRoom[i]);
+			//ret.Add(MapInfo->SpawnRoom->LogicPosInRoom[i]);
 		//}
-	}
+	//}
 
-	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num tiles possibles to spawb: %d"), ret.Num());
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - Num tiles possibles to spawn: %d"), ret.Num());
 
 	return ret;
 
