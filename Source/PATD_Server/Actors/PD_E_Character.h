@@ -162,4 +162,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InGameStats")
 	float percentHP=1.0;
 
+
+	//PARA MUSICA
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
+		USoundBase* sound_Attack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
+		USoundBase* sound_AttackEsp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
+		USoundBase* sound_CastSkill;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
+		USoundBase* sound_GetHurt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
+		USoundBase* sound_Death;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
+		USoundBase* sound_Defense;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
+		USoundBase* sound_Heal;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
+		USoundBase* sound_Fua;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
+		USoundBase* sound_GiveFire;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
+		USoundBase* sound_IceBorder;
 };

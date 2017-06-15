@@ -76,7 +76,16 @@ public:
 
 #pragma endregion
 
+	//music
+	AAmbientSound* backgroundMusic = nullptr;
+	float timeCurrentMusic = 0.0f;
+	float timeStartMusicBackground = 0.0f;
 
+	UFUNCTION(BlueprintCallable, Category = "GameInstance_Sound")
+		void RegisterBackgroundMusic(AAmbientSound* newMusic, bool newSong);
+
+	UFUNCTION(BlueprintCallable, Category = "GameInstance_Sound")
+		AAmbientSound*  GetBackgroundMusic();
 
 	//Camara Server del nivel 4
 	ACameraActor* CameraServer;

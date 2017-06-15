@@ -708,6 +708,12 @@ void UPD_ServerGameInstance::OnBeginState() {
 #pragma region MAPS 
 void UPD_ServerGameInstance::LoadMap(FString mapName)
 {
+	float musicDuration = backgroundMusic->GetAudioComponent()->Sound->GetDuration();
+
+	timeCurrentMusic = UGameplayStatics::GetUnpausedTimeSeconds(GetWorld()) - timeStartMusicBackground;
+
+	if (timeCurrentMusic >= musicDuration)
+		timeCurrentMusic = timeCurrentMusic - musicDuration;
 
 	UGameplayStatics::OpenLevel((UObject*)this, FName(*mapName));
 
@@ -1618,4 +1624,22 @@ void UPD_ServerGameInstance::ResetApplication()
 void UPD_ServerGameInstance::OnTimerPodiumEnds()
 {
 	ResetApplication();
+}
+
+void UPD_ServerGameInstance::RegisterBackgroundMusic(AAmbientSound* newMusic, bool newSong)
+{
+	backgroundMusic = newMusic;
+	
+	if (newSong)
+		backgroundMusic->Play();
+	else
+		backgroundMusic->Play(timeCurrentMusic);
+
+	timeStartMusicBackground = UGameplayStatics::GetUnpausedTimeSeconds(GetWorld());
+		//backgroundMusic->Play();
+}
+
+AAmbientSound*  UPD_ServerGameInstance::GetBackgroundMusic()
+{
+	return backgroundMusic;
 }
