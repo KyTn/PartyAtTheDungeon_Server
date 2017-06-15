@@ -55,12 +55,47 @@ void APD_E_Door::Set_DoorInfo(TArray<APD_E_Interactuable*> otherInteractuables, 
 
 }
 
+
+// Se llamará a esta funcion para activar el interactuable
+void APD_E_Door::Interact(AActor* interactor, bool overwriteState) {
+
+	if (IsCurrentlyActivated) {
+		IsCurrentlyActivated = !IsCurrentlyActivated;
+		InteractToDeactivate(interactor, overwriteState);
+	}
+	else {
+		IsCurrentlyActivated = !IsCurrentlyActivated;
+		InteractToActivate(interactor, overwriteState);
+	}
+
+}
+
 void APD_E_Door::InteractToActivate(AActor * interactor, bool overwriteState)
 {
+	OpenTheDoor();
+
+	for (APD_E_Interactuable* reactives : ActivateThisReactorsWhenActive) {
+		if (reactives->IsCurrentlyActivated) {
+			reactives->InteractToDeactivate(this, true);
+		}
+		else {
+			reactives->InteractToActivate(this, true);
+		}
+	}
 }
 
 void APD_E_Door::InteractToDeactivate(AActor * interactor, bool overwriteState)
 {
+	CloseTheDoor();
+
+	for (APD_E_Interactuable* reactives : ActivateThisReactorsWhenActive) {
+		if (reactives->IsCurrentlyActivated) {
+			reactives->InteractToDeactivate(this, true);
+		}
+		else {
+			reactives->InteractToActivate(this, true);
+		}
+	}
 }
 
 
@@ -111,4 +146,24 @@ bool APD_E_Door::OpenTheDoor()
 		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::OpenTheDoor - EEROR EN LLAMATR A LA FUNCION"));
 		return false;
 	}
+
 }
+
+bool APD_E_Door::CloseTheDoor() {
+
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("CloseDoor_Mesh"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::OpenTheDoor -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::OpenTheDoor - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
+
+}
+

@@ -1139,7 +1139,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 				{
 					doorOpend->IsDoorOpen = true;
 					doorsOpened.Add(doorOpend->ID_Interactuable);
-					doorOpend->OpenTheDoor();
+					doorOpend->Interact(nullptr);
 					//doorOpend->SetActorHiddenInGame(true);
 					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 					logic_char->UseInteractable();

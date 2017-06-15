@@ -15,6 +15,8 @@ class PD_GM_EnemyManager;
 class PD_PlayersManager;
 class APD_GenericController;
 class PD_MM_DoorInfo;
+class PD_MM_InteractuableInfo;
+class APD_E_Interactuable;
 
 class PATD_SERVER_API PD_GM_MapManager
 {
@@ -90,6 +92,7 @@ public:
 	void InstantiateWallBySkin(PD_MG_LogicPosition lp);
 	void InstantiateStraigthWallBySkin(PD_MG_LogicPosition lp, bool rotate);
 	void InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* doorInfo);
+	APD_E_Interactuable* InstantiateInteractuable(PD_MG_LogicPosition lp, PD_MM_InteractuableInfo* interInfo);
 	void InstantiateDynamicMap();
 	void InstantiateEnemies();
 
