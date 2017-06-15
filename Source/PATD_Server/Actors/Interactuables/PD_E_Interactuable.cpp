@@ -46,6 +46,7 @@ void APD_E_Interactuable::Set_InteractuableInfo(TArray<APD_E_Interactuable*> oth
 
 
 
+void APD_E_Interactuable::Interact(AActor* interactor, bool overwriteState) {}
 
 // Se llamará a esta funcion para activar el interactuable
 void APD_E_Interactuable::InteractToActivate(AActor* interactor, bool overwriteState) {}

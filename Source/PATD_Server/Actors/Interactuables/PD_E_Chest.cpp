@@ -134,6 +134,7 @@ void APD_E_Chest::InteractToActivate(AActor * interactor, bool overwriteState)
 	}
 	OpenChest();
 
+	// sacar del interactor lo que haga falta para aumentar el score del logicCharacter que lo activó
 
 
 	isChestOpened = true;
@@ -150,6 +151,9 @@ void APD_E_Chest::InteractToActivate(AActor * interactor, bool overwriteState)
 
 
 void APD_E_Chest::InteractToDeactivate(AActor* interactor, bool overwriteState) {
+	if (isChestOpened) {
+		return;
+	}
 
 	CloseChest();
 
@@ -169,7 +173,33 @@ void APD_E_Chest::InteractToDeactivate(AActor* interactor, bool overwriteState) 
 
 bool APD_E_Chest::OpenChest() {
 
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("BP_OPEN_CHEST"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Chest::OpenTheDoor -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Chest::OpenTheDoor - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
 }
 bool APD_E_Chest::CloseChest() {
 
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("BP_CLOSE_CHEST"));
+
+	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Chest::OpenTheDoor -- EXITO EN LLAMAR A LA FUNCION"));
+		return true;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Chest::OpenTheDoor - EEROR EN LLAMATR A LA FUNCION"));
+		return false;
+	}
 }

@@ -967,8 +967,38 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 
 bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & M, PD_MatchConfigManager * MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables)
 {
+	int difficulty = DifficultyDungeon(MatchConfigMan->Get_Difficulty());
+	int totalTreasures = (numPlayers * difficulty/3.f * M.mapRooms.Num()) / 2.f + numPlayers/3.f;///Esto hay que ir balanceandolo
+	
+	MATCHCONFIG_MISSIONTYPE matchConfig_MATCHCONFIG_MISSIONTYPE = MatchConfigMan->Get_MissionType();
+
+	for (int i = 0; i < totalTreasures; i++) {
+		int index_room = FMath::RandRange(0, M.mapRooms.Num() - 1);
+		PD_MG_LogicPosition lp = M.mapRooms[index_room].NORMAL_TILES[FMath::RandRange(0, M.mapRooms[index_room].NORMAL_TILES.Num() - 1)];
+
+		bool found_ = false;
+
+		for (int j = 0; j < LInteractuables.Num(); j++) {
+			if (LInteractuables[j].logicPosition == lp) {
+				found_ = true;
+				break;
+			}
+		}
+
+		if (found_) {
+			i--;
+		}
+		else {
+			LogicPositionAmplified lpAmp = LogicPositionAmplified(lp);
+			lpAmp.AddInfo(LInteractuables.Num()); // idInteractuable
+			lpAmp.AddInfo((int)StaticMapElement::LARGE_CHEST); // typeInteractuable
+
+			LInteractuables.Add(lpAmp);
+		}
+	}
 	return false;
 }
+
 
 #pragma endregion
 
