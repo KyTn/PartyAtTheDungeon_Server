@@ -1399,9 +1399,6 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 	*/
 	controller->UpdateRotationCharacterToEnemy(CharWhoReceiveTheAttacks->GetCharacterBP()->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
 
-	if (CheckInRangeFromPositionToCharacter(CharWhoAttacks->GetCurrentLogicalPosition(), CharWhoReceiveTheAttacks, 10))
-	{
-
 		//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 		//animacion de casteo de habilidad
@@ -1419,13 +1416,8 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 
 		CharWhoReceiveTheAttacks->GetCharacterState()->alteredCharacterState.Empty();
 
-	}
-	else {
-		//No acierta
-		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
-	}
-
 }
+
 void PD_GM_LogicCharacter::Skill_Magic_ShotMana(PD_GM_LogicCharacter* CharWhoAttacks)
 {
 	/*

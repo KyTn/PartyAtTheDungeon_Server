@@ -536,9 +536,7 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
-		{
-			if (!playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
-			{
+		{		
 				for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract.Num(); index_actions++)
 				{
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnInteractablePhase -  players -- adding interaction %d"), index_actions);
@@ -547,15 +545,12 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 					int id_interc = playersManager->GetDataStructPlayer(index_players)->turnOrders->interactuablesToInteract[index_actions];
 					individualActionInteractablesOnTurns.Add(id_player, id_interc);
 				}
-			}
 		}
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {
 
 		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
 		{
-			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
-			{
 				if (enemyManager->GetTurnOrders(index_enemies))
 				{
 					for (int index_actions = 0; index_actions < enemyManager->GetTurnOrders(index_enemies)->interactuablesToInteract.Num(); index_actions++)
@@ -567,7 +562,6 @@ void PD_GM_GameManager::LogicTurnInteractablePhase()
 						individualActionInteractablesOnTurns.Add(id_enemy, id_interc);
 					}
 				}
-			}
 		}
 	}
 
@@ -602,8 +596,6 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
 		for (int index_players = 0; index_players < playersManager->GetNumPlayers(); index_players++)
 		{
-			if (!playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
-			{
 				for (int index_actions = 0; index_actions < playersManager->GetDataStructPlayer(index_players)->turnOrders->actions.Num(); index_actions++)
 				{
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::LogicTurnAttackPhase -  players -- adding action %d"), index_actions);
@@ -611,14 +603,11 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 					FString id_player = playersManager->GetDataStructPlayer(index_players)->logic_Character->GetIDCharacter();
 					individualActionOnTurns.Add(id_player, index_actions);
 				}
-			}
 		}
 	}
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) {	
 		for (int index_enemies = 0; index_enemies < enemyManager->GetEnemies().Num(); index_enemies++)
 		{
-			if (!enemyManager->GetEnemies()[index_enemies]->GetIsStoppingByCollision()) //si esto es true, el character esta stuneado y no podria realizar nada
-			{
 				if (enemyManager->getListTurnOrders().Num() > 0) // hay ordenes
 				{
 					if (enemyManager->GetTurnOrders(index_enemies))
@@ -632,7 +621,6 @@ void PD_GM_GameManager::LogicTurnAttackPhase() {
 						}
 					}
 				}
-			}
 		}
 	}
 
@@ -1643,6 +1631,15 @@ void PD_GM_GameManager::OnBeginPhase()
 	}
 	else if (structGamePhase->enumGamePhase == EServerPhase::InteractionIni)
 	{
+		//liberar a cualquier character de su collision
+		for (int index_player = 0; index_player < playersManager->GetNumPlayers(); index_player++)
+		{
+			playersManager->GetDataStructPlayer(index_player)->logic_Character->SetIsStoppingByCollision(false);
+		}
+		for (int index_enemy = 0; index_enemy < enemyManager->GetEnemies().Num(); index_enemy++)
+		{
+			enemyManager->GetEnemies()[index_enemy]->SetIsStoppingByCollision(false);
+		}
 
 		individualActionInteractablesOnTurns.Empty(); //limpiar siempre el Tmap(), por lo que pueda pasr
 
