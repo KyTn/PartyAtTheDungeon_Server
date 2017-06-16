@@ -128,11 +128,16 @@ void APD_E_WallActor::ChangeMaterialProperties_MapSkin(PD_MG_LogicPosition lp) {
 	FOutputDeviceDebug debug;
 	Super::ActualLogicPosition = lp;
 	Super::SGI = Cast<UPD_ServerGameInstance>(GetWorld()->GetGameInstance());
-	TArray<PD_MG_LogicPosition> adj_reales = Super::SGI->mapManager->Get_LogicPosition_Adyacents_To(Super::ActualLogicPosition);
+	TArray<PD_MG_LogicPosition> adj_reales = Super::SGI->mapManager->Get_LogicPosition_Diagonals_And_Adyacents_To(Super::ActualLogicPosition);
 	PD_MG_LogicPosition N = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() - 1, Super::ActualLogicPosition.GetY());
 	PD_MG_LogicPosition S = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() + 1, Super::ActualLogicPosition.GetY());
 	PD_MG_LogicPosition E = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX(), Super::ActualLogicPosition.GetY() + 1);
 	PD_MG_LogicPosition W = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX(), Super::ActualLogicPosition.GetY() - 1);
+
+	PD_MG_LogicPosition NE = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() - 1, Super::ActualLogicPosition.GetY() + 1);
+	PD_MG_LogicPosition SE = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() + 1, Super::ActualLogicPosition.GetY() + 1);
+	PD_MG_LogicPosition NW = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() - 1, Super::ActualLogicPosition.GetY() - 1);
+	PD_MG_LogicPosition SW = PD_MG_LogicPosition(Super::ActualLogicPosition.GetX() + 1, Super::ActualLogicPosition.GetY() - 1);
 
 
 	UE_LOG(LogTemp, Log, TEXT("APD_E_WallActor::ChangeMaterialProperties_MapSkin - adj_reales %d isTile %d isProp %d && "), adj_reales.Contains(N), Super::SGI->mapManager->IsLogicPositionATile(N), Super::SGI->mapManager->IsLogicPositionAProp(N));
@@ -202,6 +207,57 @@ void APD_E_WallActor::ChangeMaterialProperties_MapSkin(PD_MG_LogicPosition lp) {
 			//this->CallFunctionByNameWithArguments(TEXT("BP_W_NotVisible"), debug, this, true);
 		}
 	}
+
+
+
+	if (adj_reales.Contains(NE)) {
+		if (Super::SGI->mapManager->IsLogicPositionATile(NE) || Super::SGI->mapManager->IsLogicPositionAProp(NE)) {
+			mapSkin_NE = APD_E_ElementActor::SGI->mapManager->MapInfo->roomByLogPos[NE]->mapSkin;
+		}
+		else
+		{
+			//this->CallFunctionByNameWithArguments(TEXT("BP_N_NotVisible"), debug, this, true);
+		}
+	}
+
+
+	// Tienes una tile en el sur?
+	if (adj_reales.Contains(SE)) {
+		if (Super::SGI->mapManager->IsLogicPositionATile(SE) || Super::SGI->mapManager->IsLogicPositionAProp(SE)) {
+			mapSkin_SE = APD_E_ElementActor::SGI->mapManager->MapInfo->roomByLogPos[SE]->mapSkin;
+		}
+		else
+		{
+			//this->CallFunctionByNameWithArguments(TEXT("BP_S_NotVisible"), debug, this, true);
+		}
+	}
+
+	// Tienes una tile en el este?
+	if (adj_reales.Contains(SW)) {
+		if (Super::SGI->mapManager->IsLogicPositionATile(SW) || Super::SGI->mapManager->IsLogicPositionAProp(SW)) {
+			mapSkin_SW = APD_E_ElementActor::SGI->mapManager->MapInfo->roomByLogPos[SW]->mapSkin;
+		}
+		else
+		{
+			//this->CallFunctionByNameWithArguments(TEXT("BP_E_NotVisible"), debug, this, true);
+		}
+	}
+
+
+	// Tienes una tile en el oeste?
+	if (adj_reales.Contains(NW)) {
+		if (Super::SGI->mapManager->IsLogicPositionATile(NW) || Super::SGI->mapManager->IsLogicPositionAProp(NW)) {
+			mapSkin_NW = APD_E_ElementActor::SGI->mapManager->MapInfo->roomByLogPos[NW]->mapSkin;
+		}
+		else
+		{
+			//this->CallFunctionByNameWithArguments(TEXT("BP_W_NotVisible"), debug, this, true);
+		}
+	}
+
+
+
+
 
 
 	// aplicar los skins a los elementos visibles

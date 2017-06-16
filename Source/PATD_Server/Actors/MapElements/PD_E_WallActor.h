@@ -37,6 +37,14 @@ public:
 		MapSkinType mapSkin_E;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
 		MapSkinType mapSkin_W;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
+		MapSkinType mapSkin_NE;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
+		MapSkinType mapSkin_SE;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
+		MapSkinType mapSkin_SW;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Type")
+		MapSkinType mapSkin_NW;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotated")
 		bool rotated = false;
