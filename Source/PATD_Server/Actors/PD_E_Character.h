@@ -158,10 +158,21 @@ public:
 	int  GetBaseHP() { return baseHP; };
 
 
-	//Funciones para mantener la barra de vida actualizada.
+	//Funciones para mantener la interfaz,  la barra de vida actualizada.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InGameStats")
-	float percentHP=1.0;
-
+		float percentHP = 1.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InGameStats")
+		FString stringHP = "0";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InGameStats")
+		FString stateActionOnChar = " ";
+	UFUNCTION(BlueprintCallable, Category = "InGameStats")
+		bool  GetIsConnected();
+	UFUNCTION(BlueprintCallable, Category = "InGameStats")
+		bool  GetAreOrdersSended();
+	UFUNCTION(BlueprintCallable, Category = "InGameStats")
+		void UpdateStringHP();
+	UFUNCTION(BlueprintCallable, Category = "InGameStats")
+		void UpdateStateActionOnChar();
 
 	//PARA MUSICA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound Base")
@@ -185,4 +196,8 @@ public:
 		USoundBase* sound_GiveFire;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music Sound SKILLS")
 		USoundBase* sound_IceBorder;
+
+
+
+
 };

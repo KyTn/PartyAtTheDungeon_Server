@@ -209,9 +209,18 @@ void UPD_ServerGameInstance::HandleEvent_IDClient(FStructGeneric* inDataStruct, 
 	{
 		networkManager->GetSocketManager()->ReconnectSockets(aux_theClient->ID_PLAYER, inPlayer);
 
+		if (playersManager->GetDataPlayers()[aux_theClient->ID_PLAYER]->isConnected)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("El Jugador con Numero: %d, se ha conectado - pero connected a true"), aux_theClient->ID_PLAYER));
+
+		}
+		else 
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Conectado - pero connected a false"), aux_theClient->ID_PLAYER));
+
+		}
 		playersManager->GetDataPlayers()[aux_theClient->ID_PLAYER]->isConnected = true; //Seteamos la variable connected a true para el jugador reconectado
 		playersManager->GetDataPlayers()[aux_theClient->ID_PLAYER]->pingPong = 2; //se pone a 2 para indicar que esta conectado (luego volvera a 1 cuando se vuelva a lanzar el broadcast de ping
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("El Jugador con Numero: %d, se ha Conectado"), aux_theClient->ID_PLAYER));
 
 		if (structServerState->enumServerState == EServerState::WaitingGameConfiguration) //Menu Principal
 		{

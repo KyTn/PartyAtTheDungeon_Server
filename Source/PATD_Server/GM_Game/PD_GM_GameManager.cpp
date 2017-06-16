@@ -251,6 +251,15 @@ void PD_GM_GameManager::OnBeginState() {
 		Cast<AServerCamera>(SGI->CameraServer)->LookAtPoint(target);
 		Cast<AServerCamera>(SGI->CameraServer)->SetCameraOnView();
 
+		//setar la vida en el widget de los jugadores
+		for (int index_player = 0; index_player < playersManager->GetNumPlayers(); index_player++)
+		{
+			Cast<APD_E_Character>(playersManager->GetDataStructPlayer(index_player)->logic_Character->GetCharacterBP())->UpdateStringHP();
+		}
+		for (int index_enemy = 0; index_enemy < enemyManager->GetEnemies().Num(); index_enemy++)
+		{
+			Cast<APD_E_Character>(enemyManager->GetEnemies()[index_enemy]->GetCharacterBP())->UpdateStringHP();
+		}
 		UpdateState();
 
 	}else if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) {
@@ -287,6 +296,15 @@ void PD_GM_GameManager::OnBeginState() {
 		
 		enemyManager->newTurn();
 		CreateEnemyOrders();
+		//update life for widget
+		for (int index_player = 0; index_player < playersManager->GetNumPlayers(); index_player++)
+		{
+			Cast<APD_E_Character>(playersManager->GetDataStructPlayer(index_player)->logic_Character->GetCharacterBP())->UpdateStringHP();
+		}
+		for (int index_enemy = 0; index_enemy < enemyManager->GetEnemies().Num(); index_enemy++)
+		{
+			Cast<APD_E_Character>(enemyManager->GetEnemies()[index_enemy]->GetCharacterBP())->UpdateStringHP();
+		}
 		UpdateState();
 
 	}
@@ -1313,12 +1331,15 @@ void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 {
 	for (int character = 0; character < characterWhoPlayDefenseAnim.Num(); character++)
 	{
+		Cast<APD_E_Character>(characterWhoPlayDefenseAnim[character]->GetCharacterBP())->UpdateStateActionOnChar();
 
 		characterWhoPlayDefenseAnim[character]->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
 	}
 	
 	for (int character = 0; character < characterWhoPlayGetHurtAnim.Num(); character++)
 	{
+		Cast<APD_E_Character>(characterWhoPlayGetHurtAnim[character]->GetCharacterBP())->UpdateStringHP();
+		Cast<APD_E_Character>(characterWhoPlayGetHurtAnim[character]->GetCharacterBP())->UpdateStateActionOnChar();
 		if (characterWhoPlayGetHurtAnim[character]->GetTotalStats()->HPCurrent <= 0.0f)
 			characterWhoPlayGetHurtAnim[character]->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
 		else
@@ -1327,6 +1348,8 @@ void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 
 	for (int character = 0; character < characterWhoPlayHealAnim.Num(); character++)
 	{
+		Cast<APD_E_Character>(characterWhoPlayHealAnim[character]->GetCharacterBP())->UpdateStringHP();
+		Cast<APD_E_Character>(characterWhoPlayHealAnim[character]->GetCharacterBP())->UpdateStateActionOnChar();
 		characterWhoPlayHealAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::WhoHeal);
 	}
 }

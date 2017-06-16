@@ -5,11 +5,12 @@
 
 #include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
 #include "GM_Game/PD_GM_EnemyManager.h"
+#include "WidgetComponent.h"
 #include "PD_ServerGameInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "PD_GenericController.h"
 #include "PD_SplineActors.h"
-
+#include "UserWidget.h"
 
 /*
 // Sets default values
@@ -47,6 +48,7 @@ void APD_E_Character::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 
 	
 }
@@ -57,9 +59,8 @@ void APD_E_Character::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 	percentHP =  (float)logic_character->totalStats->HPCurrent / (float)logic_character->totalStats->HPTotal;
 
-
 //	Update del widget para que apunte a la camara
-	AActor* targetView= UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetViewTarget();
+	/*AActor* targetView= UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetViewTarget();
 	ACameraActor* camera = Cast<ACameraActor>(targetView);
 	APD_E_Character* PDCharacter = Cast<APD_E_Character>(targetView);
 	UCameraComponent* cameraRotateTo = nullptr;
@@ -75,7 +76,7 @@ void APD_E_Character::Tick( float DeltaTime )
 	FRotator widgetRot = UKismetMathLibrary::FindLookAtRotation(Widget->ComponentToWorld.GetLocation(), viewInfo.Location);
 	widgetRot.Roll = 0;
 	Widget->SetWorldRotation(widgetRot);
-	
+	*/
 
 }
 
@@ -210,6 +211,13 @@ bool APD_E_Character::SetCharacterCameraOnView()
 
 void APD_E_Character::UpdateCharLife(float damage)
 {
+	UpdateStringHP();
+
+	FString actionString = " - ";
+	actionString.Append(FString::FromInt(damage));
+	stateActionOnChar = actionString;
+	UpdateStateActionOnChar();
+
 	logic_character->UpdateHPCurrent(damage);
 	if (logic_character->GetTotalStats()->HPCurrent <= 0)
 	{
@@ -286,14 +294,15 @@ bool APD_E_Character::IscharacterStoppingByCollision()
 
 void APD_E_Character::GetCharacterID(FString &ID_Char)
 {
-	FString positionLogic = "PoX: ";
-	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetX()));
-	positionLogic.Append(" PosY: ");
-	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetY()));
 
 	ID_Char = logic_character->GetIDCharacter();
 
-	switch (logic_character->GetIAPersonality())
+	/*FString positionLogic = "PoX: ";
+	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetX()));
+	positionLogic.Append(" PosY: ");
+	positionLogic.Append(FString::FromInt(logic_character->GetCurrentLogicalPosition().GetY()));
+	*/
+	/*switch (logic_character->GetIAPersonality())
 	{
 		case EIAPersonality::Coward:{
 			ID_Char.Append("::Coward");
@@ -314,6 +323,7 @@ void APD_E_Character::GetCharacterID(FString &ID_Char)
 	default:
 		break;
 	}
+	*/
 	//ID_Char.Append(positionLogic);
 }
 
@@ -397,5 +407,48 @@ void APD_E_Character::GetInfoCharcaterForWidget(FString &ID_Char, FString &TypeC
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge - name %s "), *ID_Char);
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge - type  %s "), *TypeChar);
 	//UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::GetInfoCharcaterForWidge number player - %d "), numberPlayer);
+
+}
+
+bool APD_E_Character::GetIsConnected() {
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(this->GetGameInstance())->gameManager->playersManager;
+	StructPlayer *structPlayer = playersManager->GetStructPlayerByIDCharacter(logic_character->GetIDCharacter());
+
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %d"), structPlayer->ID_PLAYER);
+
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %s"),* structPlayer->ID_Client);
+
+
+	return structPlayer->isConnected;
+
+
+}
+
+bool  APD_E_Character::GetAreOrdersSended() {
+	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(this->GetGameInstance())->gameManager->playersManager;
+	StructPlayer *structPlayer = playersManager->GetStructPlayerByIDCharacter(logic_character->GetIDCharacter());
+	return structPlayer->playerSendOrder;
+
+}
+
+void APD_E_Character::UpdateStringHP()
+{
+	stringHP = FString::FromInt(logic_character->totalStats->HPCurrent).Append(FString("/").Append(FString::FromInt((float)logic_character->totalStats->HPTotal)));
+
+}
+
+void APD_E_Character::UpdateStateActionOnChar()
+{
+	FOutputDeviceNull ar;
+
+	const FString command = FString::Printf(TEXT("ShowStateActionOnChar"));
+
+	if (Widget->GetUserWidgetObject()->CallFunctionByNameWithArguments(*command, ar, NULL, true))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::UpdateStateActionOnChar -- EXITO EN LLAMAR A LA FUNCION"));
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("APD_E_Character::UpdateStateActionOnChar - EEROR EN LLAMATR A LA FUNCION"));
+	}
 
 }

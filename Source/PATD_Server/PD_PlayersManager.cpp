@@ -112,33 +112,33 @@ int PD_PlayersManager::GetIndexClientMaster() {
 
 StructPlayer* PD_PlayersManager::GetStructPlayerByIDClient(FString ID_ClientToSearch)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : buscando a %s"), *ID_ClientToSearch);
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : buscando a %s"), *ID_ClientToSearch);
 
 	for (int i = 0; i < dataPlayers.Num(); i++) {
-		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->ID_Client);
+	//	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : probando con %s"), *dataPlayers[i]->ID_Client);
 
 		if (dataPlayers[i]->ID_Client == ID_ClientToSearch) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : acertando con %s"), *dataPlayers[i]->ID_Client);
+		//	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient : acertando con %s"), *dataPlayers[i]->ID_Client);
 			return dataPlayers[i];
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient ERROR: No se ha encontrado cliente con id %s"), *ID_ClientToSearch);
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDClient ERROR: No se ha encontrado cliente con id %s"), *ID_ClientToSearch);
 	return nullptr;
 }
 
 StructPlayer* PD_PlayersManager::GetStructPlayerByIDCharacter(FString ID_CharacterToSearch)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : buscando a %s"), *ID_CharacterToSearch);
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : buscando a %s"), *ID_CharacterToSearch);
 
 	for (int i = 0; i < dataPlayers.Num(); i++) {
-		UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : probando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
+		//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : probando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
 
 		if (dataPlayers[i]->logic_Character->GetIDCharacter() == ID_CharacterToSearch) {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : acertando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
+			//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter : acertando con %s"), *dataPlayers[i]->logic_Character->GetIDCharacter());
 			return dataPlayers[i];
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter ERROR: No se ha encontrado character de player con id %s"), *ID_CharacterToSearch);
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerManager:: GetStructPlayerByIDCharacter ERROR: No se ha encontrado character de player con id %s"), *ID_CharacterToSearch);
 	return nullptr;
 }
 
