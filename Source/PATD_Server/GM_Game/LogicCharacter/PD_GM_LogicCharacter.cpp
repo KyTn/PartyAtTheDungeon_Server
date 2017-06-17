@@ -412,6 +412,10 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 		//lanzar animacion de pain
 		if (_GameManager)
 		{
+			
+			FString actionString = FString::SanitizeFloat(updateLifeIn);
+			Cast<APD_E_Character>(this->GetCharacterBP())->stateActionOnChar = actionString;
+
 			//this->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 			_GameManager->characterWhoPlayGetHurtAnim.Add(this);
 		}
@@ -419,6 +423,9 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 	else {
 		if (_GameManager)
 		{
+			FString actionString = " + ";
+			actionString.Append(FString::SanitizeFloat(updateLifeIn));
+			Cast<APD_E_Character>(this->GetCharacterBP())->stateActionOnChar = actionString;
 			//FX de la curacion sobre el afectado
 			//Cast<APD_E_Character>(this->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
 			_GameManager->characterWhoPlayHealAnim.Add(this);
@@ -950,14 +957,18 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 					totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
 					totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter:: atq update: %d"), totalDamage);
+
 					CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
 
 				}
 				else  //Fallo del Ataque
 				{
 					CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::BasicAttack);
 
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FALLO DE ATAQUE DEL CHARACTER !");
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FALLO DE ATAQUE DEL CHARACTER !");
+					FString actionString = "MISS !";
+					Cast<APD_E_Character>(CharWhoReceiveTheAttacks->GetCharacterBP())->stateActionOnChar = actionString;
 
 					//lanzar animacion de defensa por parte del atacado
 					//CharWhoReceiveTheAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
@@ -977,6 +988,10 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 		else 
 		{
 			//No acierta
+			FString actionString = "NOT IN RANGE!";
+			Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->stateActionOnChar = actionString;
+			Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->UpdateStateActionOnChar();
+
 			CharWhoAttacks->GetController()->OnAnimationEnd();
 			CharWhoReceiveTheAttacks->GetController()->OnAnimationEnd();
 		}
@@ -999,6 +1014,12 @@ void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
 	*/
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
+	
+	//No acierta
+	FString actionString = "YOU DEFEND!";
+	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->stateActionOnChar = actionString;
+	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->UpdateStateActionOnChar();
+
 	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::Defense, 1);
 
 	CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
@@ -1016,6 +1037,9 @@ void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* Cha
 	*/
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
+	FString actionString = "ATK UP, FUA!";
+	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->stateActionOnChar = actionString;
+	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->UpdateStateActionOnChar();
 
 	CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::WhenFua);
 

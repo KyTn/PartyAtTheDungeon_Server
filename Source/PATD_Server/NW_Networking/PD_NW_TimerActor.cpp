@@ -39,7 +39,7 @@ void APD_NW_TimerActor::InitTimerActor()
 
 	//Mandar un ping cada 10 s (tiempo configurable) 
 	FTimerHandle handleForPing;
-	GetWorldTimerManager().SetTimer(handleForPing, this, &APD_NW_TimerActor::PingFunctionCallbyNetworkManager, 60.00f, true);
+	GetWorldTimerManager().SetTimer(handleForPing, this, &APD_NW_TimerActor::PingFunctionCallbyNetworkManager, 20.00f, true);
 
 
 }
