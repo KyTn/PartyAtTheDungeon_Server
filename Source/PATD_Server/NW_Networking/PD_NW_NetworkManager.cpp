@@ -341,7 +341,7 @@ bool PD_NW_NetworkManager::CheckForPongAllClients() //comprueba que todos los cl
 				allClientsConnected = false;
 				FStructLostConnection lostConnection;
 				lostConnection.indexPlayer = i;
-				eventManager->GenerateEvent(&lostConnection, i);
+			//	eventManager->GenerateEvent(&lostConnection, i);
 
 			}
 

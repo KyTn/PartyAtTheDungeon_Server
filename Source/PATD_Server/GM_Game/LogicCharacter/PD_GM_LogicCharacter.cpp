@@ -413,7 +413,7 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 		if (_GameManager)
 		{
 			
-			FString actionString = FString::SanitizeFloat(updateLifeIn);
+			FString actionString = FString::FromInt(updateLife);
 			Cast<APD_E_Character>(this->GetCharacterBP())->stateActionOnChar = actionString;
 
 			//this->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
@@ -424,7 +424,7 @@ void PD_GM_LogicCharacter::UpdateHPCurrent(float updateLifeIn)
 		if (_GameManager)
 		{
 			FString actionString = " + ";
-			actionString.Append(FString::SanitizeFloat(updateLifeIn));
+			actionString.Append(FString::FromInt(updateLife));
 			Cast<APD_E_Character>(this->GetCharacterBP())->stateActionOnChar = actionString;
 			//FX de la curacion sobre el afectado
 			//Cast<APD_E_Character>(this->GetCharacterBP())->PlayAnimationSkill((int)ActiveSkills::WhoHeal);
@@ -1016,7 +1016,7 @@ void PD_GM_LogicCharacter::Skill_Defense(PD_GM_LogicCharacter* CharWhoAttacks)
 
 	
 	//No acierta
-	FString actionString = "YOU DEFEND!";
+	FString actionString = "DEFENSE!";
 	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->stateActionOnChar = actionString;
 	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->UpdateStateActionOnChar();
 

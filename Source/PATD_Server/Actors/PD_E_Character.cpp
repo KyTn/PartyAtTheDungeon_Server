@@ -213,10 +213,10 @@ void APD_E_Character::UpdateCharLife(float damage)
 {
 	UpdateStringHP();
 
-	FString actionString = " - ";
-	actionString.Append(FString::FromInt(damage));
-	stateActionOnChar = actionString;
-	UpdateStateActionOnChar();
+	//FString actionString = " - ";
+	//actionString.Append(FString::FromInt(damage));
+	//stateActionOnChar = actionString;
+	//UpdateStateActionOnChar();
 
 	logic_character->UpdateHPCurrent(damage);
 	if (logic_character->GetTotalStats()->HPCurrent <= 0)
@@ -414,9 +414,9 @@ bool APD_E_Character::GetIsConnected() {
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(this->GetGameInstance())->gameManager->playersManager;
 	StructPlayer *structPlayer = playersManager->GetStructPlayerByIDCharacter(logic_character->GetIDCharacter());
 
-	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %d"), structPlayer->ID_PLAYER);
+	//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %d"), structPlayer->ID_PLAYER);
 
-	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %s"),* structPlayer->ID_Client);
+	//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %s"),* structPlayer->ID_Client);
 
 
 	return structPlayer->isConnected;
