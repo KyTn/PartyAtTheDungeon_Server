@@ -1329,13 +1329,24 @@ void PD_GM_GameManager::OnAnimationEnd() {
 
 void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 {
-	for (int character = 0; character < characterWhoPlayDefenseAnim.Num(); character++)
+	UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal: Entrando"));
+
+	/*for (int character = 0; character < characterWhoPlayDefenseAnim.Num(); character++)
 	{
 		Cast<APD_E_Character>(characterWhoPlayDefenseAnim[character]->GetCharacterBP())->UpdateStateActionOnChar();
 
 		characterWhoPlayDefenseAnim[character]->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
+	}*/
+	while (characterWhoPlayDefenseAnim.Num() > 0) {
+		Cast<APD_E_Character>(characterWhoPlayDefenseAnim[0]->GetCharacterBP())->UpdateStateActionOnChar();
+
+		characterWhoPlayDefenseAnim[0]->GetController()->Animation_DefenseChar((int)ActiveSkills::Defense);
+
+		characterWhoPlayDefenseAnim.RemoveAt(0);
+		//characterWhoPlayDefenseAnim.Pop
+
 	}
-	
+	/*
 	for (int character = 0; character < characterWhoPlayGetHurtAnim.Num(); character++)
 	{
 		Cast<APD_E_Character>(characterWhoPlayGetHurtAnim[character]->GetCharacterBP())->UpdateStringHP();
@@ -1344,13 +1355,29 @@ void PD_GM_GameManager::PlayAnimationOnCharacters_HurtDefenseHeal()
 			characterWhoPlayGetHurtAnim[character]->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
 		else
 			characterWhoPlayGetHurtAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
-	}
+	}*/
+	while (characterWhoPlayGetHurtAnim.Num() > 0) {
+		Cast<APD_E_Character>(characterWhoPlayGetHurtAnim[0]->GetCharacterBP())->UpdateStringHP();
+		Cast<APD_E_Character>(characterWhoPlayGetHurtAnim[0]->GetCharacterBP())->UpdateStateActionOnChar();
+		if (characterWhoPlayGetHurtAnim[0]->GetTotalStats()->HPCurrent <= 0.0f)
+			characterWhoPlayGetHurtAnim[0]->GetController()->Animation_DeathChar((int)ActiveSkills::GetHurt);
+		else
+			characterWhoPlayGetHurtAnim[0]->GetController()->Animation_GetHurt((int)ActiveSkills::GetHurt);
 
+		characterWhoPlayGetHurtAnim.RemoveAt(0);
+	}
 	for (int character = 0; character < characterWhoPlayHealAnim.Num(); character++)
-	{
+	/*{
 		Cast<APD_E_Character>(characterWhoPlayHealAnim[character]->GetCharacterBP())->UpdateStringHP();
 		Cast<APD_E_Character>(characterWhoPlayHealAnim[character]->GetCharacterBP())->UpdateStateActionOnChar();
 		characterWhoPlayHealAnim[character]->GetController()->Animation_GetHurt((int)ActiveSkills::WhoHeal);
+	}*/
+	while (characterWhoPlayHealAnim.Num() > 0) {
+		Cast<APD_E_Character>(characterWhoPlayHealAnim[0]->GetCharacterBP())->UpdateStringHP();
+		Cast<APD_E_Character>(characterWhoPlayHealAnim[0]->GetCharacterBP())->UpdateStateActionOnChar();
+		characterWhoPlayHealAnim[0]->GetController()->Animation_GetHurt((int)ActiveSkills::WhoHeal);
+
+		characterWhoPlayHealAnim.RemoveAt(0);
 	}
 }
 

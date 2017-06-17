@@ -213,10 +213,10 @@ void APD_E_Character::UpdateCharLife(float damage)
 {
 	UpdateStringHP();
 
-	FString actionString = " - ";
-	actionString.Append(FString::FromInt(damage));
-	stateActionOnChar = actionString;
-	UpdateStateActionOnChar();
+	//FString actionString = " - ";
+	//actionString.Append(FString::FromInt(damage));
+	//stateActionOnChar = actionString;
+	//UpdateStateActionOnChar();
 
 	logic_character->UpdateHPCurrent(damage);
 	if (logic_character->GetTotalStats()->HPCurrent <= 0)
