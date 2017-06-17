@@ -399,7 +399,9 @@ bool PD_MG_MapParser::Parsing_v_0_2(FStructMapData * NETMAPDATA, PD_MM_MapInfo *
 			MapInfoRef->interactuableInfoByID.Add(interactuableInfo->IDInteractuable, interactuableInfo);
 
 			if (MapInfoRef->roomByLogPos.Contains(pos)) {
+				UE_LOG(LogTemp, Error, TEXT("PD_MG_MapParser::Parsing_v_0_2 - adding interactuable con id %d logpos (%d,%d)"), interactuableInfo->IDInteractuable, pos.GetX(), pos.GetY());
 				MapInfoRef->roomByLogPos[pos]->InteractuableInfoInRoomByLogicPosition.Add(pos, interactuableInfo);
+				MapInfoRef->roomByLogPos[pos]->LogicInteractuablesPosInRoom.AddUnique(pos);
 			}
 			else {
 				UE_LOG(LogTemp, Error, TEXT("PD_MG_MapParser::Parsing_v_0_2 - Error al añadir interactuable con id %d: No hay room con logpos (%d,%d)"),

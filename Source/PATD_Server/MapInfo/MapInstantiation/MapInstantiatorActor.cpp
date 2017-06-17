@@ -287,6 +287,7 @@ APD_E_Door* AMapInstantiatorActor::InstantiateDoor(PD_MG_LogicPosition logpos)
 
 APD_E_Interactuable * AMapInstantiatorActor::InstantiateLargeChest(PD_MG_LogicPosition logpos)
 {
+	UE_LOG(LogTemp, Log, TEXT("AMapInstantiatorActor::InstantiateLargeChest : adding chest at (%d,%d)"), logpos.GetX(), logpos.GetY());
 	return GetWorld()->SpawnActor<APD_E_Interactuable>(Default_Interactuable_LargeChest_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 

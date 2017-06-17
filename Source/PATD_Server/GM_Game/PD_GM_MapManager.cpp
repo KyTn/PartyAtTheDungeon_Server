@@ -247,6 +247,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 
 		for (int j = 0; j < room->LogicInteractuablesPosInRoom.Num(); j++)///Instanciamos las puertas de una habitacion.
 		{
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables "));
 			room->AddInteractuable(
 				room->LogicInteractuablesPosInRoom[j],
 				InstantiateInteractuable(
@@ -300,6 +301,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 
 			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicInteractuablesPosInRoom.Num(); j++)///Instanciamos las puertas de una habitacion.
 			{
+				UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables "));
 				MapInfo->rooms[adj[i]]->AddInteractuable(
 					MapInfo->rooms[adj[i]]->LogicInteractuablesPosInRoom[j],
 					InstantiateInteractuable(
@@ -714,7 +716,7 @@ void PD_GM_MapManager::InstantiateDoor(PD_MG_LogicPosition lp, PD_MM_DoorInfo* d
 
 
 APD_E_Interactuable* PD_GM_MapManager::InstantiateInteractuable(PD_MG_LogicPosition lp, PD_MM_InteractuableInfo* interInfo) {
-
+	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateInteractuable at (%d,%d)"), lp.GetX(), lp.GetY());
 	APD_E_Interactuable* ret = nullptr;
 
 	switch ((StaticMapElement)interInfo->IDInteractuable) {

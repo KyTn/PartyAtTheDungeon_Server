@@ -968,8 +968,10 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & M, PD_MatchConfigManager * MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables)
 {
 	int difficulty = DifficultyDungeon(MatchConfigMan->Get_Difficulty());
-	int totalTreasures = (numPlayers * difficulty/3.f * M.mapRooms.Num()) / 2.f + numPlayers/3.f;///Esto hay que ir balanceandolo
+	int totalTreasures = (difficulty * M.mapRooms.Num()) / 3.f + FPlatformMath::Ceil(numPlayers/3.f);///Esto hay que ir balanceandolo
 	
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::InteractuablesGeneration_v02 : num Treasures %d"), totalTreasures);
+
 	MATCHCONFIG_MISSIONTYPE matchConfig_MATCHCONFIG_MISSIONTYPE = MatchConfigMan->Get_MissionType();
 
 	for (int i = 0; i < totalTreasures; i++) {
@@ -989,6 +991,10 @@ bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & 
 			i--;
 		}
 		else {
+
+
+			UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::InteractuablesGeneration_v02 : adding chest at (%d,%d)"), lp.GetX(), lp.GetY());
+
 			LogicPositionAmplified lpAmp = LogicPositionAmplified(lp);
 			lpAmp.AddInfo(LInteractuables.Num()); // idInteractuable
 			lpAmp.AddInfo((int)StaticMapElement::LARGE_CHEST); // typeInteractuable
