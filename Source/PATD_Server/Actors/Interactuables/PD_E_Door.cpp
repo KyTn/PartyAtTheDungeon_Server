@@ -134,6 +134,7 @@ void APD_E_Door::ChangeRotationToReal(PD_MG_LogicPosition lp) {
 bool APD_E_Door::OpenTheDoor()
 {
 	FOutputDeviceNull ar;
+	IsDoorOpen = true;
 
 	const FString command = FString::Printf(TEXT("OpenDoor_Mesh"));
 
@@ -153,6 +154,7 @@ bool APD_E_Door::CloseTheDoor() {
 
 	FOutputDeviceNull ar;
 
+	IsDoorOpen = false;
 	const FString command = FString::Printf(TEXT("CloseDoor_Mesh"));
 
 	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))

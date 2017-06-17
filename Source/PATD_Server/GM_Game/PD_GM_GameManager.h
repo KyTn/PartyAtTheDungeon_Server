@@ -145,6 +145,7 @@ public:
 	//Tmap<Id_Char, index action>
 	TMultiMap<FString, int> individualActionInteractablesOnTurns = TMultiMap<FString, int>();
 	TArray<uint32> doorsOpened = TArray<uint32>();
+	TArray<uint32> interactuablesActivated = TArray<uint32>();
 	TArray<uint32> listOfRoomsInstiantate = TArray<uint32>();	
 	int index_individualActionInteractablesOnTurns = 0;
 

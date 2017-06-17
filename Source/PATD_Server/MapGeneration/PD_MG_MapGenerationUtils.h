@@ -598,7 +598,7 @@ public:
 
 	bool EnemiesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers);
 
-	bool InteractuablesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables);
+	bool InteractuablesGeneration_v02(MapProceduralInfo &M, PD_MatchConfigManager* MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> &LInteractuables);
 
 #pragma endregion
 

@@ -244,7 +244,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 			InstantiateMapElementBySkin(room->mapSkin, room->PropsAndTilesInRoomByLogicPosition[lp[j]], lp[j]);
 		}
 
-
+		UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables num %d"), room->LogicInteractuablesPosInRoom.Num());
 		for (int j = 0; j < room->LogicInteractuablesPosInRoom.Num(); j++)///Instanciamos las puertas de una habitacion.
 		{
 			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables "));
@@ -299,6 +299,7 @@ void PD_GM_MapManager::InstantiateRoomAndAdj(uint8 id) {
 			}
 
 
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables num %d"), MapInfo->rooms[adj[i]]->LogicInteractuablesPosInRoom.Num());
 			for (int j = 0; j < MapInfo->rooms[adj[i]]->LogicInteractuablesPosInRoom.Num(); j++)///Instanciamos las puertas de una habitacion.
 			{
 				UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiating interactuables "));
@@ -719,9 +720,16 @@ APD_E_Interactuable* PD_GM_MapManager::InstantiateInteractuable(PD_MG_LogicPosit
 	UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::InstantiateInteractuable at (%d,%d)"), lp.GetX(), lp.GetY());
 	APD_E_Interactuable* ret = nullptr;
 
-	switch ((StaticMapElement)interInfo->IDInteractuable) {
+	switch (interInfo->type) {
 		case StaticMapElement::LARGE_CHEST: {
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiate chest at (%d,%d)"), lp.GetX(), lp.GetY());
 			ret = instantiator->InstantiateLargeChest(lp);
+
+			TArray<APD_E_Interactuable*> interact;
+			MapInfo->interactuableActorByID.GenerateValueArray(interact);
+			ret->Set_InteractuableInfo(interact, interInfo);
+
+			MapInfo->AddInteractuable(lp, ret);
 		}
 	}
 

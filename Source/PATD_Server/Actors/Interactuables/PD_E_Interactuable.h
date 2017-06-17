@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ID Interactuable")
 		int ID_Interactuable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "type Interactuable")
+		StaticMapElement type;
+
 
 	PD_MM_InteractuableInfo* interactuableInfo;
 

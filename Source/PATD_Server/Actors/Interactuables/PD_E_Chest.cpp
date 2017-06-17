@@ -8,6 +8,9 @@
 #include "GM_Game/PD_GM_MapManager.h"
 #include "MapInfo/PD_MM_MapInfo.h"
 
+#include "Actors/PD_E_Character.h"
+#include "GM_Game/LogicCharacter/PD_GM_LogicCharacter.h"
+#include "Structs/PD_NetStructs.h"
 #include "Actors/Interactuables/PD_E_Interactuable.h"
 
 
@@ -136,8 +139,12 @@ void APD_E_Chest::InteractToActivate(AActor * interactor, bool overwriteState)
 
 	// sacar del interactor lo que haga falta para aumentar el score del logicCharacter que lo activó
 
+	APD_E_Character* character = (APD_E_Character*)(interactor);
 
-	isChestOpened = true;
+	if (character) {
+		character->GetLogicCharacter()->totalStats->PointsCurrent += 50;
+	}
+	
 
 	for (APD_E_Interactuable* reactives : ActivateThisReactorsWhenActive) {
 		if (reactives->IsCurrentlyActivated) {
@@ -174,7 +181,7 @@ void APD_E_Chest::InteractToDeactivate(AActor* interactor, bool overwriteState) 
 bool APD_E_Chest::OpenChest() {
 
 	FOutputDeviceNull ar;
-
+	isChestOpened = true;
 	const FString command = FString::Printf(TEXT("BP_OPEN_CHEST"));
 
 	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))
@@ -190,7 +197,7 @@ bool APD_E_Chest::OpenChest() {
 bool APD_E_Chest::CloseChest() {
 
 	FOutputDeviceNull ar;
-
+	isChestOpened = false;
 	const FString command = FString::Printf(TEXT("BP_CLOSE_CHEST"));
 
 	if (this->CallFunctionByNameWithArguments(*command, ar, NULL, true))

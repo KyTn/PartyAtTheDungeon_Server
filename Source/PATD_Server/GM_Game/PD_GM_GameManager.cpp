@@ -14,6 +14,7 @@
 #include "MapInfo/PD_MM_MapInfo.h"
 #include "Actors/Interactuables/PD_E_Interactuable.h"
 #include "Actors/Interactuables/PD_E_Door.h"
+#include "Actors/Interactuables/PD_E_Chest.h"
 
 
 //Includes of forward declaration
@@ -1117,8 +1118,6 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 
 			switch (StaticMapElement(typeInteract))
 			{
-			case StaticMapElement::PROP_CHEST:
-				break;
 			case StaticMapElement::DOOR:
 			{
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una puerta"));
@@ -1143,11 +1142,11 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 				doorOpend = mapManager->MapInfo->doorActorByID[id_interact];
 				if (doorOpend)
 				{
-					doorOpend->IsDoorOpen = true;
+					//doorOpend->IsDoorOpen = true;
 					doorsOpened.Add(doorOpend->ID_Interactuable);
 					doorOpend->Interact(nullptr);
 					//doorOpend->SetActorHiddenInGame(true);
-					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del enemigo al que va a atacar
+					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 					logic_char->UseInteractable();
 
 				}
@@ -1158,7 +1157,28 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 			case StaticMapElement::PRESURE_PLATE:
 				break;
 			case StaticMapElement::LARGE_CHEST:
+			{
+				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una Large_Chest %d"), id_interact);
+
+				if (mapManager->MapInfo->interactuableActorByID.Contains(id_interact)) {
+
+					APD_E_Chest* chest = nullptr;
+					chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
+					if (chest)
+					{
+						//chest->isChestOpened = true;
+
+						interactuablesActivated.Add(chest->ID_Interactuable);
+						chest->Interact(nullptr);
+						//doorOpend->SetActorHiddenInGame(true);
+						logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
+						logic_char->UseInteractable();
+
+					}
+
+				}
 				break;
+			}
 			case StaticMapElement::SMALL_CHEST:
 				break;
 			default:

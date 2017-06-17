@@ -19,6 +19,9 @@ UCLASS()
 class PATD_SERVER_API APD_E_Chest : public APD_E_Interactuable
 {
 	GENERATED_BODY()
+
+public:
+
 		APD_E_Chest();
 
 	bool isChestOpened = false;

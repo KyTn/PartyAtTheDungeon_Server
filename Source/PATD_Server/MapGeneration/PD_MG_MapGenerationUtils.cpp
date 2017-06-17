@@ -861,6 +861,7 @@ bool PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02(MapProceduralInfo &M,
 	InteractuablesGeneration_v02(M, MatchConfigMan, numPlayers, LInteractuables);
 
 
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::GenerateRandomStaticMap_v02  LInteractuables num %d"), LInteractuables.Num());
 
 #pragma endregion 
 
@@ -965,10 +966,10 @@ bool PD_MG_MapGenerationUtils::EnemiesGeneration_v02(MapProceduralInfo &M, PD_Ma
 	}
 }
 
-bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & M, PD_MatchConfigManager * MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> LInteractuables)
+bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & M, PD_MatchConfigManager * MatchConfigMan, int numPlayers, TArray<LogicPositionAmplified> &LInteractuables)
 {
 	int difficulty = DifficultyDungeon(MatchConfigMan->Get_Difficulty());
-	int totalTreasures = (difficulty * M.mapRooms.Num()) / 3.f + FPlatformMath::Ceil(numPlayers/3.f);///Esto hay que ir balanceandolo
+	int totalTreasures = (difficulty * M.mapRooms.Num()) / 3.f + FPlatformMath::CeilToInt(numPlayers/3.f);///Esto hay que ir balanceandolo
 	
 	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::InteractuablesGeneration_v02 : num Treasures %d"), totalTreasures);
 
@@ -976,8 +977,8 @@ bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & 
 
 	for (int i = 0; i < totalTreasures; i++) {
 		int index_room = FMath::RandRange(0, M.mapRooms.Num() - 1);
-		PD_MG_LogicPosition lp = M.mapRooms[index_room].NORMAL_TILES[FMath::RandRange(0, M.mapRooms[index_room].NORMAL_TILES.Num() - 1)];
-
+		PD_MG_LogicPosition lp = M.mapRooms[index_room].NORMAL_TILES[FMath::RandRange(0, M.mapRooms[index_room].NORMAL_TILES.Num() - 1)] + M.mapRooms[index_room].BOUNDING_BOX_TOP_LEFT;
+		
 		bool found_ = false;
 
 		for (int j = 0; j < LInteractuables.Num(); j++) {
@@ -996,12 +997,15 @@ bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & 
 			UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::InteractuablesGeneration_v02 : adding chest at (%d,%d)"), lp.GetX(), lp.GetY());
 
 			LogicPositionAmplified lpAmp = LogicPositionAmplified(lp);
-			lpAmp.AddInfo(LInteractuables.Num()); // idInteractuable
+			lpAmp.AddInfo(LInteractuables.Num()+1); // idInteractuable
 			lpAmp.AddInfo((int)StaticMapElement::LARGE_CHEST); // typeInteractuable
 
 			LInteractuables.Add(lpAmp);
 		}
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::InteractuablesGeneration_v02 : num interactuables %d"), LInteractuables.Num());
+
 	return false;
 }
 
@@ -1429,11 +1433,13 @@ void PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from(MapProceduralInfo &M, TArray
 		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from doorComposition value add %d"), M.NETMAPDATA->doorComposition[M.NETMAPDATA->doorComposition.Num() - 1]);
 	}
 
+	UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from interactuablesId num %d"), interactuablesId.Num());
+
 	// guardamos el interactuableId
 	for (int i = 0; i < interactuablesId.Num(); i++) {
 		M.NETMAPDATA->interactuableId.Add(	InteractuableIDOf(interactuablesId[i].logicPosition - M.BOUNDING_BOX_TOP_LEFT, interactuablesId[i].info[0], interactuablesId[i].info[1]));
 											// log pos																		// idInteract				// typeInteract
-		//UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from interactuablesId value add %d"), M.NETMAPDATA->interactuableId[M.NETMAPDATA->interactuableId.Num() - 1]);
+		UE_LOG(LogTemp, Log, TEXT("PD_MG_MapGenerationUtils::Fill_NETMAPDATA_from interactuablesId value add %d"), M.NETMAPDATA->interactuableId[M.NETMAPDATA->interactuableId.Num() - 1]);
 		if (interactuablesId[i].info.Num() > 2) {
 			for (int j = 2; j < interactuablesId[i].info.Num(); j++) {
 				M.NETMAPDATA->interactuableComposition.Add(InteractuableComposition(interactuablesId[i].info[0], interactuablesId[i].info[j]));
