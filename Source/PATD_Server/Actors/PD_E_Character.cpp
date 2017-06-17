@@ -414,9 +414,9 @@ bool APD_E_Character::GetIsConnected() {
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(this->GetGameInstance())->gameManager->playersManager;
 	StructPlayer *structPlayer = playersManager->GetStructPlayerByIDCharacter(logic_character->GetIDCharacter());
 
-	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %d"), structPlayer->ID_PLAYER);
+	//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %d"), structPlayer->ID_PLAYER);
 
-	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %s"),* structPlayer->ID_Client);
+	//UE_LOG(LogTemp, Warning, TEXT("MyCharacter's id_player is %s"),* structPlayer->ID_Client);
 
 
 	return structPlayer->isConnected;
