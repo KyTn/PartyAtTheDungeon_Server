@@ -1059,8 +1059,8 @@ for (int i = 0; i < players; i++) {
 		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
-		
-		positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
+		if (!logicCharacter->GetIsPlayer())
+			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
 		
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)
 		{
@@ -1214,7 +1214,7 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 		{
 			int index_enemy = enemyManager->GetIndexByID(id_char);
 
-			if (enemyManager->GetTurnOrders(index_enemy)->actions.Num() > 0)
+			if (enemyManager->GetTurnOrders(index_enemy)->actions.Num() > 0 && !enemyManager->GetCharacterByID(id_char)->GetIsDead())
 			{
 				Cast<APD_E_Character>(enemyManager->GetCharacterByID(id_char)->GetCharacterBP())->SetCharacterCameraOnView();
 
