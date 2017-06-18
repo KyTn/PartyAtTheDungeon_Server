@@ -40,5 +40,6 @@ EBTNodeResult::Type UPD_IA_TaskOpenRoom::ExecuteTask(UBehaviorTreeComponent& Own
 	AIController->turnTargetCharacter = nullptr;
 	AIController->turnNumAttacks = 0;
 	AIController->EndAITurnCalculation();
+	AIController->activateThisTurn = false;
 	return EBTNodeResult::Failed;
 }

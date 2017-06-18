@@ -13,6 +13,7 @@ EBTNodeResult::Type UPD_IA_TaskClear::ExecuteTask(UBehaviorTreeComponent & Owner
 	AIController->turnsForGoal--;
 	AIController->turnTargetCharacter=nullptr;
 	AIController->turnNumAttacks = 0;
+	AIController->activateThisTurn = false;
 //	AIController->turnTargetPosition = PD_MG_LogicPosition(0,0,0);
 
 	AIController->EndAITurnCalculation();

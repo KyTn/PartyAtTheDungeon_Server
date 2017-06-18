@@ -1097,13 +1097,35 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 	*/
 
 	StaticMapElement typeInteract;
+	APD_E_Interactuable* interactableActor = nullptr;
+	if (mapManager->MapInfo->interactuableActorByID.Contains(id_interact)) {
+		interactableActor = mapManager->MapInfo->interactuableActorByID[id_interact];
+	}
 
+	PD_GM_LogicCharacter* logic_char;
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn)
 	{
-		PD_GM_LogicCharacter* logic_char = playersManager->GetCharacterByID(id_char);
+		logic_char = playersManager->GetCharacterByID(id_char);
+	}
+	else {
+		logic_char = enemyManager->GetCharacterByID(id_char);
+	}
 
-		if (mapManager->MapInfo->interactuableInfoInMap.Num() > 0 )
-		{
+	
+
+
+
+	if (!(mapManager->MapInfo->interactuableInfoInMap.Num() > 0 && interactableActor)) {
+		logic_char->GetController()->OnAnimationEnd();
+		return;//El interactuable no esta realmente en rango del character
+	}else {
+
+		TArray<PD_MG_LogicPosition> interactableAdy = mapManager->Get_LogicPosition_Adyacents_To(interactableActor->ActualLogicPosition);
+		if (!interactableAdy.Contains(logic_char->GetCurrentLogicalPosition())) {
+			logic_char->GetController()->OnAnimationEnd();
+			return;//El interactuable no esta realmente en rango del character
+		}else {
+
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Hay info interactublaInfoMap"));
 
 			for (int i = 0; i < mapManager->MapInfo->interactuableInfoInMap.Num(); i++)
@@ -1113,6 +1135,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Ha encontrado el interactuable"));
 
 					typeInteract = mapManager->MapInfo->interactuableInfoInMap[i]->type;
+
 				}
 			}
 
@@ -1131,7 +1154,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 
 				mapManager->InstantiateRoomAndAdj(idRoomA);
 				mapManager->InstantiateRoomAndAdj(idRoomB);
-				
+
 				//metemos en la lista de habitaciones instanciadas las que se van a instanciar
 				listOfRoomsInstiantate.Add(idRoomA);
 				listOfRoomsInstiantate.Add(idRoomB);
@@ -1179,9 +1202,9 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 						//chest->isChestOpened = true;
 
 						//interactuablesActivated.Add(chest->ID_Interactuable);
-						
 
-						
+
+
 						chest->Interact(nullptr);
 						//doorOpend->SetActorHiddenInGame(true);
 						logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
@@ -1208,10 +1231,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 		}
 	}
 
-	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn)
-	{
 
-	}
 }
 
 
@@ -1329,20 +1349,20 @@ void PD_GM_GameManager::OnAnimationEnd() {
 			{
 				index_individualActionInteractablesOnTurns++;
 
-				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: index - %d"), index_IndividualActionsOnTurns);
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: index - %d"), index_individualActionInteractablesOnTurns);
 
-				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: totalindex - %d"), individualActionOnTurns.Num());
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: totalindex - %d"), individualActionInteractablesOnTurns.Num());
 
 				if (index_individualActionInteractablesOnTurns < individualActionInteractablesOnTurns.Num())
 				{
 					TArray<FString> id_charactersOnArray;
-					individualActionOnTurns.GenerateKeyArray(id_charactersOnArray);
+					individualActionInteractablesOnTurns.GenerateKeyArray(id_charactersOnArray);
 
 					TArray<int> index_totalActions;
-					individualActionOnTurns.GenerateValueArray(index_totalActions);
+					individualActionInteractablesOnTurns.GenerateValueArray(index_totalActions);
 
-					FString id_char = id_charactersOnArray[index_IndividualActionsOnTurns];
-					int id_interact = index_totalActions[index_IndividualActionsOnTurns];
+					FString id_char = id_charactersOnArray[index_individualActionInteractablesOnTurns];
+					int id_interact = index_totalActions[index_individualActionInteractablesOnTurns];
 
 					UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::OnAnimationEnd: lanzando interactuable de caract :%s , id  - %d"), *id_char, id_interact);
 
