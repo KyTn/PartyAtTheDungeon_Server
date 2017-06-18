@@ -1037,11 +1037,14 @@ void PD_GM_LogicCharacter::Skill_Melee_Daggers_WhenFua(PD_GM_LogicCharacter* Cha
 	*/
 
 	//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
-	FString actionString = "ATK UP, FUA!";
+	FString actionString = "+ ATK, FUA!";
 	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->stateActionOnChar = actionString;
 	Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->UpdateStateActionOnChar();
 
-	CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::WhenFua);
+	if (CharWhoAttacks->GetIsPlayer())
+		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhenFua);
+	else
+		CharWhoAttacks->GetController()->Animation_DefenseChar((int)ActiveSkills::WhenFua);
 
 	CharWhoAttacks->GetCharacterState()->activeEffectsOnCharacter.Add((int)ActiveSkills::WhenFua, 1);
 
@@ -1426,7 +1429,7 @@ void PD_GM_LogicCharacter::Skill_Magic_WhoHeal(PD_GM_LogicCharacter* CharWhoAtta
 		//Cast<APD_E_Character>(CharWhoAttacks->GetCharacterBP())->SetCharacterCameraOnView();
 
 		//animacion de casteo de habilidad
-		CharWhoAttacks->GetController()->Animation_CastSkill((int)ActiveSkills::WhoHeal);
+		CharWhoAttacks->GetController()->Animation_BasicAttack((int)ActiveSkills::WhoHeal);
 
 		int totalHeal = 20;
 		//comprobacion de que tiene pasivas que puedan incrementar el efecto del hechizo
