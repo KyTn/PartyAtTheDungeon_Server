@@ -722,7 +722,7 @@ APD_E_Interactuable* PD_GM_MapManager::InstantiateInteractuable(PD_MG_LogicPosit
 
 	switch (interInfo->type) {
 		case StaticMapElement::LARGE_CHEST: {
-			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiate chest at (%d,%d)"), lp.GetX(), lp.GetY());
+			UE_LOG(LogTemp, Error, TEXT("PD_GM_MapManager::Instantiate chest at (%d,%d) id %d"), lp.GetX(), lp.GetY(), interInfo->IDInteractuable);
 			ret = instantiator->InstantiateLargeChest(lp);
 
 			TArray<APD_E_Interactuable*> interact;

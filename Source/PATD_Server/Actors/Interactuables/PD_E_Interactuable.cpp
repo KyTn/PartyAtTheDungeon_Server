@@ -41,7 +41,9 @@ void APD_E_Interactuable::Set_InteractuableInfo(TArray<APD_E_Interactuable*> oth
 		}
 	}
 
-	 type = interInfo->type;
+	type = interInfo->type;
+
+	ID_Interactuable = interInfo->IDInteractuable;
 
 	InteractFromThisLogicPositions = this->interactuableInfo->logpos.GenerateAdjacents();
 

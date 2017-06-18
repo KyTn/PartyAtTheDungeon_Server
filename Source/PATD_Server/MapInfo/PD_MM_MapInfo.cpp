@@ -265,7 +265,7 @@ bool PD_MM_MapInfo::AddInteractuable(PD_MG_LogicPosition logpos, APD_E_Interactu
 		interactuableActorByID[interactuable->ID_Interactuable]->ActualLogicPosition.GetX(), 
 		interactuableActorByID[interactuable->ID_Interactuable]->ActualLogicPosition.GetY(), 
 		interactuable->ID_Interactuable);
-
+	
 	if (roomByLogPos.Contains(logpos)) {
 		roomByLogPos[logpos]->AddInteractuable(logpos, interactuable);
 	}

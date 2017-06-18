@@ -1145,11 +1145,6 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					//doorOpend->IsDoorOpen = true;
 					//doorsOpened.Add(doorOpend->ID_Interactuable);
 
-					FStructInteractableUpdate st = FStructInteractableUpdate();
-					st.ID_Interactable = doorOpend->ID_Interactuable;
-					st.isActive = doorOpend->isActive;
-
-					interactuablesActivated.Add(st);
 
 
 					doorOpend->Interact(nullptr);
@@ -1157,6 +1152,11 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 					logic_char->UseInteractable();
 
+					FStructInteractableUpdate st = FStructInteractableUpdate();
+					st.ID_Interactable = doorOpend->ID_Interactuable;
+					st.isActive = doorOpend->IsCurrentlyActivated;
+
+					interactuablesActivated.Add(st);
 				}
 				break;
 			}
@@ -1181,17 +1181,19 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 						//interactuablesActivated.Add(chest->ID_Interactuable);
 						
 
-						FStructInteractableUpdate st = FStructInteractableUpdate();
-						st.ID_Interactable = chest->ID_Interactuable;
-						st.isActive = chest->isActive;
-
-						interactuablesActivated.Add(st);
 						
 						chest->Interact(nullptr);
 						//doorOpend->SetActorHiddenInGame(true);
 						logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 						logic_char->UseInteractable();
 
+
+
+						FStructInteractableUpdate st = FStructInteractableUpdate();
+						st.ID_Interactable = chest->ID_Interactuable;
+						st.isActive = chest->IsCurrentlyActivated;
+
+						interactuablesActivated.Add(st);
 					}
 
 				}
