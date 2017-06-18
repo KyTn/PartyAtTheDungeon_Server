@@ -431,7 +431,7 @@ FStructUpdateTurn PD_GM_GameManager::GenerateStructUpdateTurn() {
 
 	structUpdateTurn.listOfRoomsInstiantate = listOfRoomsInstiantate;
 
-	structUpdateTurn.listOfDoorOpend = doorsOpened;
+	structUpdateTurn.listOfInteractuablesActive = interactuablesActivated;
 
 	return structUpdateTurn;
 }
@@ -1143,7 +1143,15 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 				if (doorOpend)
 				{
 					//doorOpend->IsDoorOpen = true;
-					doorsOpened.Add(doorOpend->ID_Interactuable);
+					//doorsOpened.Add(doorOpend->ID_Interactuable);
+
+					FStructInteractableUpdate st = FStructInteractableUpdate();
+					st.ID_Interactable = doorOpend->ID_Interactuable;
+					st.isActive = doorOpend->isActive;
+
+					interactuablesActivated.Add(st);
+
+
 					doorOpend->Interact(nullptr);
 					//doorOpend->SetActorHiddenInGame(true);
 					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
@@ -1161,14 +1169,24 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una Large_Chest %d"), id_interact);
 
 				if (mapManager->MapInfo->interactuableActorByID.Contains(id_interact)) {
-
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- contains %d"), id_interact);
 					APD_E_Chest* chest = nullptr;
 					chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
 					if (chest)
 					{
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- is a chest %d"), id_interact);
+
 						//chest->isChestOpened = true;
 
-						interactuablesActivated.Add(chest->ID_Interactuable);
+						//interactuablesActivated.Add(chest->ID_Interactuable);
+						
+
+						FStructInteractableUpdate st = FStructInteractableUpdate();
+						st.ID_Interactable = chest->ID_Interactuable;
+						st.isActive = chest->isActive;
+
+						interactuablesActivated.Add(st);
+						
 						chest->Interact(nullptr);
 						//doorOpend->SetActorHiddenInGame(true);
 						logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
@@ -1177,6 +1195,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					}
 
 				}
+
 				break;
 			}
 			case StaticMapElement::SMALL_CHEST:
