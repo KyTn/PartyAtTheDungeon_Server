@@ -186,6 +186,45 @@ PD_MG_LogicPosition APD_AIController::GetClosestDoorPosition() {
 	return GetClosestPosition(listPositions);
 }
 
+APD_E_Interactuable* APD_AIController::GetClosestDoor() {
+	TArray<APD_E_Door*> listActorDoors;
+	mapMng->MapInfo->doorActorByLogPos.GenerateValueArray(listActorDoors);
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::GetClosestDoor: Puertas Totales:%d "), listActorDoors.Num());
+	TArray<PD_MG_LogicPosition> listPositions;
+
+	for (APD_E_Door* door : listActorDoors) {
+		listPositions.Add(door->ActualLogicPosition);
+	}
+	PD_MG_LogicPosition doorPos = GetClosestPosition(listPositions);
+	if (mapMng->MapInfo->doorActorByLogPos.Contains(doorPos)) {
+		return mapMng->MapInfo->doorActorByLogPos[doorPos];
+	}
+
+	return nullptr;
+}
+
+
+PD_MG_LogicPosition APD_AIController::GetActivationPosition(APD_E_Interactuable* interactuable) {
+	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
+
+	APD_E_Door* door = Cast<APD_E_Door>(interactuable);
+
+	PD_MM_Room* room = nullptr;
+	room = mapMng->MapInfo->roomByLogPos[logicCharacter->GetCurrentLogicalPosition()];
+
+	if (door) {
+		if (door->doorInfo->room_ConnA == room) {
+			return door->doorInfo->connA;
+		}
+		else if (door->doorInfo->room_ConnB == room) {
+			return door->doorInfo->connB;
+
+		}
+	}
+	return PD_MG_LogicPosition();
+}
+
+
 PD_MG_LogicPosition APD_AIController::GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition) {
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)this->GetPawn())->logic_character;
 	float minDistance = 10000; //Un maxint
@@ -298,4 +337,19 @@ void APD_AIController::SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalC
 	goalPosition = inGoalPosition;
 	useCharacter = true;
 	usePosition = true;
+}
+
+APD_E_Interactuable* APD_AIController::GetAdyacentDoor(PD_MG_LogicPosition position) {
+	TArray<PD_MG_LogicPosition> listAdyacents = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(position);
+	TArray<PD_MG_LogicPosition> listResult;
+	for (PD_MG_LogicPosition logicPosition : listAdyacents) {
+		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d"), logicPosition.GetX(), logicPosition.GetY(), mapMng->IsLogicPositionAWall(logicPosition), mapMng->IsLogicPositionAProp(logicPosition), (mapMng->IsLogicPositionADoor(logicPosition) && !mapMng->MapInfo->doorActorByLogPos[logicPosition]->IsDoorOpen));
+		mapMng->getInteractuableAt(logicPosition);
+	//	&& !(mapMng->MapInfo->doorActorByLogPos[logicPosition]->IsDoorOpen)
+		if (mapMng->IsLogicPositionADoor(logicPosition)) {
+			return nullptr;
+		}
+
+	}
+	return nullptr;
 }

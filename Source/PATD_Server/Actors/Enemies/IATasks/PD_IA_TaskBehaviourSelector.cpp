@@ -12,11 +12,17 @@ EBTNodeResult::Type UPD_IA_TaskBehaviourSelector::ExecuteTask(UBehaviorTreeCompo
 	APD_AIController* AIController = (APD_AIController*)OwnerComp.GetAIOwner();
 	PD_GM_LogicCharacter* logicCharacter = ((APD_E_Character*)AIController->GetPawn())->logic_character;
 
+	if (logicCharacter) {
+		UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: Id:%s  PeronalityCode:%d  EnemyType:%d"), *logicCharacter->GetIDCharacter(), (int)logicCharacter->GetIAPersonality(), (int)logicCharacter->GetTypeCharacter());
+		SelectBehaviour(OwnerComp);
+		SelectGoals(OwnerComp);
+		return EBTNodeResult::Succeeded;
 
-	UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: Id:%s  PeronalityCode:%d  EnemyType:%d"), *logicCharacter->GetIDCharacter(), (int)logicCharacter->GetIAPersonality(), (int)logicCharacter->GetTypeCharacter());
-	SelectBehaviour(OwnerComp);
-	SelectGoals(OwnerComp);
-	
+	}
+	else {
+		return EBTNodeResult::Failed;
+
+	}
 /*
 	switch (logicCharacter->GetIAPersonality())
 	{
@@ -25,7 +31,6 @@ EBTNodeResult::Type UPD_IA_TaskBehaviourSelector::ExecuteTask(UBehaviorTreeCompo
 		break;
 	}*/
 
-	return EBTNodeResult::Succeeded;
 
 }
 
@@ -246,12 +251,13 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 			//PD_MG_LogicPosition positionToFlee = AIController->GetClosestDoorPosition();
 			PD_MG_LogicPosition clostestDoorPos = AIController->GetClosestDoorPosition();
 			if (clostestDoorPos == PD_MG_LogicPosition(0, 0)) {
-				if (AIController->GetMostHPEnemy()->GetIDCharacter() != logicCharacter->GetIDCharacter()) {
+				PD_GM_LogicCharacter* mostHPEnemy = AIController->GetMostHPEnemy();
+				if (mostHPEnemy&& (mostHPEnemy->GetIDCharacter() != logicCharacter->GetIDCharacter())) {
 					AIController->SetGoalCharacter(AIController->GetMostHPEnemy());
 						
 				}
 				else {
-					AIController->selectedBehaviour = EIABehaviour::Defense;
+					AIController->selectedBehaviour = EIABehaviour::Defense; //si no hace defensa
 					SelectGoals(OwnerComp);
 				}
 			}
@@ -273,7 +279,8 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 
 			if (logicCharacter->GetIAPersonality() == EIAPersonality::Smart) {
 				//Falta que puedan elegir otras posiciones, como el inteligente. o aleatoria el cobarde
-				if (AIController->GetMostHPEnemy()->GetIDCharacter() != logicCharacter->GetIDCharacter()) {
+				PD_GM_LogicCharacter* mostHPEnemy = AIController->GetMostHPEnemy();
+				if (mostHPEnemy&&(mostHPEnemy->GetIDCharacter() != logicCharacter->GetIDCharacter())) {
 					AIController->SetGoalCharacter(AIController->GetMostHPEnemy());
 
 				}
@@ -309,6 +316,14 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 				//AIController->turnsForGoal = 2; //Este comportamiento tiene 2 fases, una en la que ataca y otra en el que huye
 			}
 			break;
+		}
+		case EIABehaviour::Swindler:
+		{
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Swindler"));
+			AIController->turnsForGoal = 3;
+
+			AIController->goalInteractuable = AIController->GetClosestDoor();
+
 		}
 		default:
 			break;

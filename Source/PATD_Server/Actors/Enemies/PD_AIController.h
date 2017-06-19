@@ -13,7 +13,7 @@
 
 class APD_E_Character;
 class PD_GM_LogicCharacter;
-
+class APD_E_Interactuable;
 class PD_GM_MapManager;
 class PD_GM_Pathfinder;
 /**
@@ -58,9 +58,11 @@ public:
 	PD_GM_LogicCharacter* GetLeastHPPlayer();
 	PD_GM_LogicCharacter* GetMostHPEnemy();
 	PD_MG_LogicPosition GetClosestDoorPosition();
+	APD_E_Interactuable* GetClosestDoor();
 	PD_MG_LogicPosition GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition);
+	APD_E_Interactuable* GetAdyacentDoor(PD_MG_LogicPosition position);
 
-
+	PD_MG_LogicPosition GetActivationPosition(APD_E_Interactuable* interactuable);
 	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character,int range);
 	/*
 	virtual bool MoveTo(float x, float y) override;
@@ -83,6 +85,8 @@ public:
 	PD_MG_LogicPosition goalPosition;
 	//Usado por Attack, Defense, Berserker 
 	PD_GM_LogicCharacter* goalCharacter;
+
+	APD_E_Interactuable* goalInteractuable;
 //Definen que goals han sido seteados.
 	bool usePosition;
 	bool useCharacter;
@@ -102,6 +106,8 @@ public:
 	//Indica cuantos ataques va a hacer este turno. 0 si no hace ninguno. 
 	int turnNumAttacks;
 
+	//Indica si este turno activa el interactuable.
+	bool activateThisTurn;
 
 
 };

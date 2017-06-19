@@ -15,6 +15,7 @@ class PATD_SERVER_API UPD_IA_TaskFleeCreateOrder : public UBTTaskNode
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+public:
 	void CreateMoveOrders(UBehaviorTreeComponent& OwnerComp);
 	
 	
