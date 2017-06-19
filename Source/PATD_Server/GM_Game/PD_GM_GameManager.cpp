@@ -1051,7 +1051,7 @@ for (int i = 0; i < players; i++) {
 		logicCharacter = enemyManager->GetEnemies()[i];
 	}
 
-	if (logicCharacter->GetMovingLogicalPosition().Num() > 0) //Si hay posiciones en este array, quiere decir que se tiene que mover
+	if (logicCharacter->GetMovingLogicalPosition().Num() > 0 && !logicCharacter->GetIsDead()) //Si hay posiciones en este array, quiere decir que se tiene que mover
 	{
 		//Set un spline para dicho character
 		if (!logicCharacter->GetController()->GetSpline())
@@ -1112,19 +1112,16 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 	}
 
 	
-
-
-
 	if (!(mapManager->MapInfo->interactuableInfoInMap.Num() > 0 && interactableActor)) {
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- No hay interactbleINFOMAP ni hay actor interactbale "));
+
 		logic_char->GetController()->OnAnimationEnd();
-		return;//El interactuable no esta realmente en rango del character
+		//return;//El interactuable no esta realmente en rango del character
 	}else {
 
-		TArray<PD_MG_LogicPosition> interactableAdy = mapManager->Get_LogicPosition_Adyacents_To(interactableActor->ActualLogicPosition);
-		if (!interactableAdy.Contains(logic_char->GetCurrentLogicalPosition())) {
-			logic_char->GetController()->OnAnimationEnd();
-			return;//El interactuable no esta realmente en rango del character
-		}else {
+
+		TArray<PD_MG_LogicPosition> interactableAdy = TArray<PD_MG_LogicPosition>();
 
 			UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Hay info interactublaInfoMap"));
 
@@ -1135,99 +1132,104 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Ha encontrado el interactuable"));
 
 					typeInteract = mapManager->MapInfo->interactuableInfoInMap[i]->type;
-
+					interactableAdy = mapManager->Get_LogicPosition_Adyacents_To(mapManager->MapInfo->interactuableInfoInMap[i]->logpos);
 				}
 			}
 
-			switch (StaticMapElement(typeInteract))
-			{
-			case StaticMapElement::DOOR:
-			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una puerta"));
 
-				int idRoomA = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnA->IDRoom;
-				int idRoomB = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnB->IDRoom;
+			if (!interactableAdy.Contains(logic_char->GetCurrentLogicalPosition())) {
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- No en rango "));
 
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room A es: %d"), idRoomA);
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room B es: %d"), idRoomB);
+				logic_char->GetController()->OnAnimationEnd();
+				//return;//El interactuable no esta realmente en rango del character
+			}
+			else {
 
-
-				mapManager->InstantiateRoomAndAdj(idRoomA);
-				mapManager->InstantiateRoomAndAdj(idRoomB);
-
-				//metemos en la lista de habitaciones instanciadas las que se van a instanciar
-				listOfRoomsInstiantate.Add(idRoomA);
-				listOfRoomsInstiantate.Add(idRoomB);
-
-				mapManager->InstantiateEnemies();
-
-				APD_E_Door* doorOpend = nullptr;
-				doorOpend = mapManager->MapInfo->doorActorByID[id_interact];
-				if (doorOpend)
+				switch (StaticMapElement(typeInteract))
 				{
-					//doorOpend->IsDoorOpen = true;
-					//doorsOpened.Add(doorOpend->ID_Interactuable);
+				case StaticMapElement::DOOR:
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una puerta"));
+
+					int idRoomA = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnA->IDRoom;
+					int idRoomB = mapManager->MapInfo->doorInfoByID[id_interact]->room_ConnB->IDRoom;
+
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room A es: %d"), idRoomA);
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- room B es: %d"), idRoomB);
 
 
+					mapManager->InstantiateRoomAndAdj(idRoomA);
+					mapManager->InstantiateRoomAndAdj(idRoomB);
 
-					doorOpend->Interact(nullptr);
-					//doorOpend->SetActorHiddenInGame(true);
-					logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
-					logic_char->UseInteractable();
+					//metemos en la lista de habitaciones instanciadas las que se van a instanciar
+					listOfRoomsInstiantate.Add(idRoomA);
+					listOfRoomsInstiantate.Add(idRoomB);
 
-					FStructInteractableUpdate st = FStructInteractableUpdate();
-					st.ID_Interactable = doorOpend->ID_Interactuable;
-					st.isActive = doorOpend->IsCurrentlyActivated;
+					mapManager->InstantiateEnemies();
 
-					interactuablesActivated.Add(st);
-				}
-				break;
-			}
-			case StaticMapElement::LEVEL:
-				break;
-			case StaticMapElement::PRESURE_PLATE:
-				break;
-			case StaticMapElement::LARGE_CHEST:
-			{
-				UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una Large_Chest %d"), id_interact);
-
-				if (mapManager->MapInfo->interactuableActorByID.Contains(id_interact)) {
-					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- contains %d"), id_interact);
-					APD_E_Chest* chest = nullptr;
-					chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
-					if (chest)
+					APD_E_Door* doorOpend = nullptr;
+					doorOpend = mapManager->MapInfo->doorActorByID[id_interact];
+					if (doorOpend)
 					{
-						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- is a chest %d"), id_interact);
-
-						//chest->isChestOpened = true;
-
-						//interactuablesActivated.Add(chest->ID_Interactuable);
+						//doorOpend->IsDoorOpen = true;
+						//doorsOpened.Add(doorOpend->ID_Interactuable);
 
 
 
-						chest->Interact(nullptr);
+						doorOpend->Interact(nullptr);
 						//doorOpend->SetActorHiddenInGame(true);
-						logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
+						logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 						logic_char->UseInteractable();
 
-
-
 						FStructInteractableUpdate st = FStructInteractableUpdate();
-						st.ID_Interactable = chest->ID_Interactuable;
-						st.isActive = chest->IsCurrentlyActivated;
+						st.ID_Interactable = doorOpend->ID_Interactuable;
+						st.isActive = doorOpend->IsCurrentlyActivated;
 
 						interactuablesActivated.Add(st);
 					}
-
+					break;
 				}
+				case StaticMapElement::LEVEL:
+					break;
+				case StaticMapElement::PRESURE_PLATE:
+					break;
+				case StaticMapElement::LARGE_CHEST:
+				{
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- Es una Large_Chest %d"), id_interact);
 
-				break;
-			}
-			case StaticMapElement::SMALL_CHEST:
-				break;
-			default:
-				break;
-			}
+					if (mapManager->MapInfo->interactuableActorByID.Contains(id_interact)) {
+						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- contains %d"), id_interact);
+						APD_E_Chest* chest = nullptr;
+						chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
+						if (chest && !chest->isActive)
+						{
+							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- is a chest %d"), id_interact);
+
+							//chest->isChestOpened = true;
+							//interactuablesActivated.Add(chest->ID_Interactuable);
+
+							chest->Interact(nullptr);
+							//doorOpend->SetActorHiddenInGame(true);
+							logic_char->GetTotalStats()->PointsCurrent += 10;
+							logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
+							logic_char->UseInteractable();
+
+							FStructInteractableUpdate st = FStructInteractableUpdate();
+							st.ID_Interactable = chest->ID_Interactuable;
+							st.isActive = chest->IsCurrentlyActivated;
+
+							interactuablesActivated.Add(st);
+						}
+
+					}
+
+					break;
+				}
+				case StaticMapElement::SMALL_CHEST:
+					break;
+				default:
+					break;
+				}
 		}
 	}
 
@@ -1261,7 +1263,13 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 					FStructTargetToAction action = playersManager->GetStructPlayerByIDCharacter(id_char)->turnOrders->actions[index_action];
 					logic_char->ActionTo(action);
 				}
-			}			
+				else {
+					playersManager->GetStructPlayerByIDCharacter(id_char)->logic_Character->GetController()->OnAnimationEnd();
+				}
+			}
+			else {
+				playersManager->GetStructPlayerByIDCharacter(id_char)->logic_Character->GetController()->OnAnimationEnd();
+			}
 		}
 
 	}
@@ -1282,6 +1290,12 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 				enemyManager->GetCharacterByID(id_char)->ActionTo(
 					enemyManager->GetTurnOrders(index_enemy)->actions[index_action]);
 			}
+			else {
+				enemyManager->GetCharacterByID(id_char)->GetController()->OnAnimationEnd();
+			}
+		}
+		else {
+			enemyManager->GetCharacterByID(id_char)->GetController()->OnAnimationEnd();
 		}
 	}
 

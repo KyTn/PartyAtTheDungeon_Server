@@ -320,7 +320,8 @@ void UPD_IA_TaskBehaviourSelector::SelectGoals(UBehaviorTreeComponent & OwnerCom
 		case EIABehaviour::Swindler:
 		{
 			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskBehaviourSelector:: SelectGoals: Swindler"));
-	
+			AIController->turnsForGoal = 3;
+
 			AIController->goalInteractuable = AIController->GetClosestDoor();
 
 		}
