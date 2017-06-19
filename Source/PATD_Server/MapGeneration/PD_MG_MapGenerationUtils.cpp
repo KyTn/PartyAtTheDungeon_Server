@@ -1218,11 +1218,28 @@ StaticMapElement PD_MG_MapGenerationUtils::GetStaticMapElementFrom(MapSkinType m
 	if (melem == StaticMapElementInRoomTemplate::WALL_PROP_1)
 		return StaticMapElement::WALL_PROP_1;
 
+	if (melem == StaticMapElementInRoomTemplate::WALL_PROP_2)
+		return StaticMapElement::WALL_PROP_2;
+
+	if (melem == StaticMapElementInRoomTemplate::PROP_1)
+		return StaticMapElement::PROP_1;
+
+	if (melem == StaticMapElementInRoomTemplate::PROP_2)
+		return StaticMapElement::PROP_2;
+
 	if (melem == StaticMapElementInRoomTemplate::PROP_CHEST)
 		return StaticMapElement::PROP_CHEST;
 
-	if (melem == StaticMapElementInRoomTemplate::OBSTRUCTION)
-		return StaticMapElement::OBSTRUCTION_00;
+	if (melem == StaticMapElementInRoomTemplate::OBSTRUCTION) {
+		TArray<StaticMapElement> posibles = TArray<StaticMapElement>();
+		posibles.Add(StaticMapElement::OBSTRUCTION_00);
+		posibles.Add(StaticMapElement::OBSTRUCTION_01);
+		posibles.Add(StaticMapElement::OBSTRUCTION_02);
+		posibles.Add(StaticMapElement::OBSTRUCTION_03);
+		posibles.Add(StaticMapElement::OBSTRUCTION_04);
+
+		return posibles[FMath::RandRange(0, posibles.Num() - 1)];
+	}
 
 
 

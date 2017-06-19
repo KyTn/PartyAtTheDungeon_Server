@@ -148,6 +148,18 @@ struct RoomTemplateInfo {
 		case 'l':
 			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_PROP_TORCH);
 			break;
+		case 'e':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::WALL_PROP_2);
+			break;
+		case 'h':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_1);
+			break;
+		case 'j':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::PROP_2);
+			break;
+		case 'b':
+			MAP_DATA.Add(p, StaticMapElementInRoomTemplate::OBSTRUCTION);
+			break;
 		default:
 			break;
 		}

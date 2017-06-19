@@ -53,11 +53,14 @@ public:
 	TSubclassOf<class APD_E_Door> DoorClass;
 
 	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_01_Class;
-	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_1_Class;
-	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_2_Class;
-	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_03_Class;
-	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_1_Class;
-	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_2_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_02_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_02_03_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_03_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_03_02_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_02_Class;
+	TSubclassOf<class APD_E_ElementActor> Default_Prop_Column_04_03_Class;
 
 	TSubclassOf<class APD_E_ElementActor> Default_Prop_Obstruction_02_Class;
 	TSubclassOf<class APD_E_ElementActor> Default_Prop_Obstruction_03_Class;
@@ -76,50 +79,75 @@ public:
 	
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Dungeon_Prop_Treasure_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Dungeon_Prop_Bush_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Dungeon_Prop_Tomb_01_Class;
 
 	//Wall prop
 	TSubclassOf<class APD_E_WallProp> Dungeon_WallProp_grille_torch_01_Class;
 	TSubclassOf<class APD_E_WallProp> Dungeon_WallProp_grille_window_01_Class;
+	TSubclassOf<class APD_E_WallProp> Dungeon_WallProp_shield_01_Class;
 
 #pragma endregion 
 
 
 #pragma region MAPSKIN GARDEN
 
+	TSubclassOf<class APD_E_ElementActor> Garden_SpecialTile_Class;
+
+	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Tree_01_Class;
 
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Treasure_01_Class;
-	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Tree_01_Class;
 	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Bush_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Garden_Prop_Tomb_01_Class;
 
 	//WallProp
 	TSubclassOf<class APD_E_WallProp> Garden_WallProp_Lamp_01_Class;
 	TSubclassOf<class APD_E_WallProp> Garden_WallProp_Font_01_Class;
+	TSubclassOf<class APD_E_WallProp> Garden_WallProp_Window_01_Class;
 #pragma endregion
 
 #pragma region MAPSKIN LIBRARY
+
+	TSubclassOf<class APD_E_ElementActor> Library_SpecialTile_Class;
+
 	TSubclassOf<class APD_E_ElementActor> Library_Prop_Treasure_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Library_Prop_Shelves_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Library_Prop_Table_01_Class;
 
 	//WallProp
 	TSubclassOf<class APD_E_WallProp> Library_WallProp_Torch_01_Class;
 	TSubclassOf<class APD_E_WallProp> Library_WallProp_Stairs_01_Class;
+	TSubclassOf<class APD_E_WallProp> Library_WallProp_Window_01_Class;
 #pragma endregion
 
 #pragma region MAPSKIN SACRIFICE
 
+	TSubclassOf<class APD_E_ElementActor> Sacrifice_SpecialTile_Class;
 
 	//Props
 	TSubclassOf<class APD_E_ElementActor> Sacrifice_Prop_Treasure_01_Class;
 	TSubclassOf<class APD_E_ElementActor> Sacrifice_Prop_Jail_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Sacrifice_Prop_Altar_01_Class;
 
 	//WallProp
 	TSubclassOf<class APD_E_WallProp> Sacrifice_WallProp_grille_window_01_Class;
+	TSubclassOf<class APD_E_WallProp> Sacrifice_WallProp_chains_01_Class;
+	TSubclassOf<class APD_E_WallProp> Sacrifice_WallProp_window_01_Class;
 
 #pragma endregion
 #pragma region MAPSKIN BOSS
 
+	TSubclassOf<class APD_E_ElementActor> Boss_SpecialTile_Class;
+
+	//props
+	TSubclassOf<class APD_E_ElementActor> Boss_Prop_Fullpot_01_Class;
+	TSubclassOf<class APD_E_ElementActor> Boss_Prop_Tomb_01_Class;
+
 	//WallProp
 	TSubclassOf<class APD_E_WallProp> Boss_WallProp_Fence_01_Class;
+	TSubclassOf<class APD_E_WallProp> Boss_WallProp_chain_torch_01_Class;
+	TSubclassOf<class APD_E_WallProp> Boss_WallProp_chain_01_Class;
 
 #pragma endregion
 
@@ -141,6 +169,13 @@ public:
 #pragma endregion 
 
 
+
+
+
+
+
+
+
 	///////////////////
 	//   FUNCTIONS   //
 	///////////////////
@@ -153,60 +188,107 @@ public:
 
 	APD_E_Interactuable* InstantiateLargeChest(PD_MG_LogicPosition logpos);
 
+
+
+
+	APD_E_ElementActor* Instantiate_Column_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_02_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_02_02(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_02_03(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_03_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_03_02(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_04_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_04_02(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Column_04_03(PD_MG_LogicPosition logpos);
+
+
+	APD_E_ElementActor* Instantiate_Obstruction_00(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Obstruction_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Obstruction_02(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Obstruction_03(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Obstruction_04(PD_MG_LogicPosition logpos);
+
+
 #pragma region Instantiate Dungeon MapElements 
 
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Dungeon_SpecialTile(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_01(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_02_1(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_03(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Column_04_1(PD_MG_LogicPosition logpos);
 
-	APD_E_ElementActor* Instantiate_Dungeon_Prop_Obstruction_02(PD_MG_LogicPosition logpos);
+	//prop
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_Treasure_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_bush_1(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Dungeon_Prop_tomb_1(PD_MG_LogicPosition logpos);
 
 
 	// Wallprops 
 	APD_E_WallProp* Instantiate_Dungeon_WallProp_grille_torch_01(PD_MG_LogicPosition logpos);
 	APD_E_WallProp* Instantiate_Dungeon_WallProp_grille_window_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Dungeon_WallProp_shield_01(PD_MG_LogicPosition logpos);
 
 #pragma endregion 
 
 #pragma region Instantiate Garden MapElements 
-	APD_E_ElementActor* Instantiate_Garden_Prop_Treasure_01(PD_MG_LogicPosition logpos);
+
+	APD_E_ElementActor* Instantiate_Garden_SpecialTile(PD_MG_LogicPosition logpos);
+
+	// columns
 	APD_E_ElementActor* Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos);
+
+	//props
+	APD_E_ElementActor* Instantiate_Garden_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Garden_Prop_Bush_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Garden_Prop_tomb_01(PD_MG_LogicPosition logpos);
 
 	// Wallprops 
 	APD_E_WallProp* Instantiate_Garden_WallProp_Lamp_01(PD_MG_LogicPosition logpos);
 	APD_E_WallProp* Instantiate_Garden_WallProp_Font_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Garden_WallProp_Window_01(PD_MG_LogicPosition logpos);
 
 #pragma endregion
 
 #pragma region Instantiate Library MapElements 
+
+	APD_E_ElementActor* Instantiate_Library_SpecialTile(PD_MG_LogicPosition logpos);
+
+	//props
 	APD_E_ElementActor* Instantiate_Library_Prop_Treasure_01(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor * Instantiate_Library_Prop_Column_04_2(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Library_Prop_Obstruction_12_1(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Library_Prop_shelves_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Library_Prop_table_01(PD_MG_LogicPosition logpos);
 
 
 	// Wallprops 
 	APD_E_WallProp* Instantiate_Library_WallProp_Torch_01(PD_MG_LogicPosition logpos);
 	APD_E_WallProp* Instantiate_Library_WallProp_Stairs_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Library_WallProp_Window_01(PD_MG_LogicPosition logpos);
 
 #pragma endregion
 
-#pragma region Instantiate Sacrifice MapElements 
+#pragma region Instantiate Sacrifice MapElements
+
+	APD_E_ElementActor* Instantiate_Sacrifice_SpecialTile(PD_MG_LogicPosition logpos);
+
+	//props
 	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Treasure_01(PD_MG_LogicPosition logpos);
 	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Jail_01(PD_MG_LogicPosition logpos);
-	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Obstruction_12_2(PD_MG_LogicPosition logpos);
-
+	APD_E_ElementActor* Instantiate_Sacrifice_Prop_Altar_01(PD_MG_LogicPosition logpos);
 
 	// Wallprops 
 	APD_E_WallProp* Instantiate_Sacrifice_WallProp_grille_window_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Sacrifice_WallProp_window_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Sacrifice_WallProp_chains_torch_01(PD_MG_LogicPosition logpos);
 
 #pragma region Instantiate Boss MapElements 
 
+	APD_E_ElementActor* Instantiate_Boss_SpecialTile(PD_MG_LogicPosition logpos);
+
+	//props
+	APD_E_ElementActor* Instantiate_Boss_Prop_fullpot_01(PD_MG_LogicPosition logpos);
+	APD_E_ElementActor* Instantiate_Boss_Prop_tomb_01(PD_MG_LogicPosition logpos);
+
 	// Wallprops 
 	APD_E_WallProp* Instantiate_Boss_WallProp_Fence_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Boss_WallProp_Chains_01(PD_MG_LogicPosition logpos);
+	APD_E_WallProp* Instantiate_Boss_WallProp_ChainsAndTorch_01(PD_MG_LogicPosition logpos);
+
 
 #pragma endregion
 

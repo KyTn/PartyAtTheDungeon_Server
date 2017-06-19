@@ -349,28 +349,58 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Column_01(lp);
+					actorElement = instantiator->Instantiate_Column_01(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Column_02_1(lp);
+					actorElement = instantiator->Instantiate_Column_02_01(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Column_03(lp);
+					actorElement = instantiator->Instantiate_Column_03_01(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
-					
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Obstruction_02(lp);
+
+					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_01: {
+
+					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_02: {
+
+					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_03: {
+
+					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_04: {
+
+					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::WALL_PROP_1: {
-					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_grille_torch_01(lp);
+					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_grille_window_01(lp);
+					wp->ActualLogicPosition = lp;
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_2: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_shield_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
 					break;
@@ -379,6 +409,18 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					APD_E_WallProp* wp = instantiator->Instantiate_Dungeon_WallProp_grille_window_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::PROP_1: {
+
+					actorElement = instantiator->Instantiate_Dungeon_Prop_bush_1(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::PROP_2: {
+
+					actorElement = instantiator->Instantiate_Dungeon_Prop_tomb_1(lp);
+					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 			}
@@ -394,7 +436,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement = instantiator->Instantiate_Garden_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
 					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
@@ -422,7 +464,32 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
-					actorElement = instantiator->Instantiate_Garden_Prop_Bush_01(lp);
+
+					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_01: {
+
+					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_02: {
+
+					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_03: {
+
+					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_04: {
+
+					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -432,10 +499,26 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					wp->SearchWallAndFix(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_2: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Garden_WallProp_Window_01(lp);
+					wp->ActualLogicPosition = lp;
+					wp->SearchWallAndFix(lp);
+					break;
+				}
 				case StaticMapElement::WALL_PROP_TORCH: {
 					APD_E_WallProp* wp = instantiator->Instantiate_Garden_WallProp_Lamp_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::PROP_1: {
+					actorElement = instantiator->Instantiate_Dungeon_Prop_bush_1(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::PROP_2: {
+					actorElement = instantiator->Instantiate_Dungeon_Prop_tomb_1(lp);
+					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 
@@ -452,7 +535,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement = instantiator->Instantiate_Sacrifice_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
 					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
@@ -461,7 +544,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::PROP_CHEST: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Treasure_01(lp);
+					actorElement = instantiator->Instantiate_Sacrifice_Prop_Treasure_01(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -469,7 +552,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-					actorElement = instantiator->Instantiate_Sacrifice_Prop_Jail_01(lp);
+					actorElement = instantiator->Instantiate_Column_04_03(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -480,7 +563,32 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
-					actorElement = instantiator->Instantiate_Sacrifice_Prop_Obstruction_12_2(lp);
+
+					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_01: {
+
+					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_02: {
+
+					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_03: {
+
+					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_04: {
+
+					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -490,10 +598,26 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					wp->SearchWallAndFix(lp);
 					break;
 				}
-				case StaticMapElement::WALL_PROP_TORCH: {
-					APD_E_WallProp* wp = instantiator->Instantiate_Sacrifice_WallProp_grille_window_01(lp);
+				case StaticMapElement::WALL_PROP_2: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Sacrifice_WallProp_window_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Sacrifice_WallProp_chains_torch_01(lp);
+					wp->ActualLogicPosition = lp;
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::PROP_1: {
+					actorElement = instantiator->Instantiate_Sacrifice_Prop_Jail_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::PROP_2: {
+					actorElement = instantiator->Instantiate_Sacrifice_Prop_Altar_01(lp);
+					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 
@@ -510,7 +634,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement = instantiator->Instantiate_Boss_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
 					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
@@ -527,7 +651,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Column_04_1(lp);
+					actorElement = instantiator->Instantiate_Column_04_01(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -538,7 +662,32 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
-					actorElement = instantiator->Instantiate_Dungeon_Prop_Obstruction_02(lp);
+
+					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_01: {
+
+					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_02: {
+
+					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_03: {
+
+					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_04: {
+
+					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -548,10 +697,26 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					wp->SearchWallAndFix(lp);
 					break;
 				}
-				case StaticMapElement::WALL_PROP_TORCH: {
-					APD_E_WallProp* wp = instantiator->Instantiate_Boss_WallProp_Fence_01(lp);
+				case StaticMapElement::WALL_PROP_2: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Boss_WallProp_Chains_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::WALL_PROP_TORCH: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Boss_WallProp_ChainsAndTorch_01(lp);
+					wp->ActualLogicPosition = lp;
+					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::PROP_1: {
+					actorElement = instantiator->Instantiate_Boss_Prop_fullpot_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::PROP_2: {
+					actorElement = instantiator->Instantiate_Boss_Prop_tomb_01(lp);
+					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 
@@ -568,7 +733,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
-					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
+					actorElement = instantiator->Instantiate_Library_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
 					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
@@ -585,7 +750,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
-					actorElement = instantiator->Instantiate_Library_Prop_Column_04_2(lp);
+					actorElement = instantiator->Instantiate_Column_04_02(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -596,7 +761,32 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
-					actorElement = instantiator->Instantiate_Library_Prop_Obstruction_12_1(lp);
+
+					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_01: {
+
+					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_02: {
+
+					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_03: {
+
+					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::OBSTRUCTION_04: {
+
+					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -606,10 +796,26 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 					wp->SearchWallAndFix(lp);
 					break;
 				}
+				case StaticMapElement::WALL_PROP_2: {
+					APD_E_WallProp* wp = instantiator->Instantiate_Library_WallProp_Window_01(lp);
+					wp->ActualLogicPosition = lp;
+					wp->SearchWallAndFix(lp);
+					break;
+				}
 				case StaticMapElement::WALL_PROP_TORCH: {
 					APD_E_WallProp* wp = instantiator->Instantiate_Library_WallProp_Torch_01(lp);
 					wp->ActualLogicPosition = lp;
 					wp->SearchWallAndFix(lp);
+					break;
+				}
+				case StaticMapElement::PROP_1: {
+					actorElement = instantiator->Instantiate_Library_Prop_shelves_01(lp);
+					actorElement->ActualLogicPosition = lp;
+					break;
+				}
+				case StaticMapElement::PROP_2: {
+					actorElement = instantiator->Instantiate_Library_Prop_table_01(lp);
+					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 

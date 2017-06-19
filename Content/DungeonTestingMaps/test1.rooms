@@ -1,40 +1,64 @@
 START_ROOM
 Name: simple_Cuadrada
 tags: 0, 10, 20, 30
-size_x: 8
-size_y: 8
-WWwwwwWW
-W......W
-w......w
-w..t...w
-w......w
-w......w
-W......W
-WWwwwwWW
+size_x: 10
+size_y: 10
+WWWwwwwWWW
+Wl......eW
+W........W
+w........w
+w........w
+w........w
+w........w
+w........W
+Wq......lW
+WWWwwwwWWW
 START_ROOM
-Name: Cuadrada_1
+Name: Almacen_1
 tags: 0, 10, 20, 30
-size_x: 8
-size_y: 9
-WWWWWWWW
-WqlWW..W
-w..WW..w
-w......w
-w......w
-w..t...w
-w......w
-W......W
-WWwwwwWW
+size_x: 9
+size_y: 13
+WWWWWWWWW
+WbqWlWebW
+WbbWbWbbW
+W...c...W
+W.......w
+W.......w
+W...c...w
+w.......w
+w.......w
+w...c...W
+w.......W
+W.......W
+WWwwwwwWW
+START_ROOM
+Name: Almacen_2
+tags: 0, 10, 20, 30
+size_x: 9
+size_y: 13
+WWwwwwwWW
+W.......W
+w.......W
+w...c...W
+w.......W
+w.......w
+W...c...w
+W.......w
+W.......w
+W...c...W
+WbqWbWebW
+WbbWlWbbW
+WWWWWWWWW
 START_ROOM
 Name: Cuadrada_2
 tags: 0, 10, 20, 30
 size_x: 9
 size_y: 9
 WWwwwwwWW
-Wq.....lW
-w...t...w
+W.......W
+w...,...w
 w.......w
-w.,...,.w
+w.,.c.,.w
 w.......w
 W...,...W
 W.......W
@@ -45,20 +69,20 @@ tags: 0, 10, 20, 30, 100
 size_X: 16
 size_Y: 16
 WWwwwwwwwwwwwwWW
-Wq............lW
+Wl............lW
+w..............w
+w..............w
+w...c......c...w
 w..............w
 w..............w
 w..............w
 w..............w
 w..............w
 w..............w
+w...c......c...w
 w..............w
 w..............w
-w..............w
-w..............w
-w..............w
-w..............w
-W..............W
+Wl............lW
 WWwwwwwwwwwwwwWW
 START_ROOM
 Name: Rectangular_1
@@ -66,13 +90,13 @@ tags: 0, 10, 20, 30
 size_X: 20
 size_Y: 10
 WWwwwwwwWWWWwwwwwwWW
-Wq......lWW........W
-w..................w
-w..c............c..w
-w..................w
-w..................w
-w..c............c..w
-w..................w
+W.......lWW........W
+Wq................eW
+W..c............c..W
+w........bb........w
+w........bb........w
+W..c............c..W
+Wq................eW
 W........WW........W
 WWwwwwwwWWWWwwwwwwWW
 START_ROOM
@@ -100,14 +124,14 @@ size_Y: 16
      W....W     
      W....W     
      W....W     
-     W....W     
-WWWWWW....WWWWWW
-W....q....l....W
+    WW....WW    
+WWWWWq....lWWWWW
+W..............W
 w..............w
 w..............w
 W..............W
-WWWWWW....WWWWWW
-     W....W     
+WWWWWe....qWWWWW
+    WW....WW    
      W....W     
      W....W     
      W....W     

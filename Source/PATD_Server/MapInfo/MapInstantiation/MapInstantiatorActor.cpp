@@ -47,25 +47,45 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	if (Default_Prop_Column_01_Blueprint.Object) {
 		Default_Prop_Column_01_Class = (UClass*)Default_Prop_Column_01_Blueprint.Object->GeneratedClass;
 	}
+
+
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_02_1_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_02_1.BP_Column_02_1'"));
 	if (Default_Prop_Column_02_1_Blueprint.Object) {
-		Default_Prop_Column_02_1_Class = (UClass*)Default_Prop_Column_02_1_Blueprint.Object->GeneratedClass;
+		Default_Prop_Column_02_01_Class = (UClass*)Default_Prop_Column_02_1_Blueprint.Object->GeneratedClass;
 	}
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_02_2_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_02_2.BP_Column_02_2'"));
 	if (Default_Prop_Column_02_2_Blueprint.Object) {
-		Default_Prop_Column_02_2_Class = (UClass*)Default_Prop_Column_02_2_Blueprint.Object->GeneratedClass;
+		Default_Prop_Column_02_02_Class = (UClass*)Default_Prop_Column_02_2_Blueprint.Object->GeneratedClass;
 	}
-	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_03_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_03_1.BP_Column_03_1'"));
-	if (Default_Prop_Column_03_Blueprint.Object) {
-		Default_Prop_Column_03_Class = (UClass*)Default_Prop_Column_03_Blueprint.Object->GeneratedClass;
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_02_3_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_02_3.BP_Column_02_3'"));
+	if (Default_Prop_Column_02_3_Blueprint.Object) {
+		Default_Prop_Column_02_03_Class = (UClass*)Default_Prop_Column_02_3_Blueprint.Object->GeneratedClass;
 	}
+
+
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_03_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_03_1.BP_Column_03_1'"));
+	if (Default_Prop_Column_03_01_Blueprint.Object) {
+		Default_Prop_Column_03_01_Class = (UClass*)Default_Prop_Column_03_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_03_02_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_03_2.BP_Column_03_2'"));
+	if (Default_Prop_Column_03_02_Blueprint.Object) {
+		Default_Prop_Column_03_02_Class = (UClass*)Default_Prop_Column_03_02_Blueprint.Object->GeneratedClass;
+	}
+
+
+
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_04_1_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_04_1.BP_Column_04_1'"));
 	if (Default_Prop_Column_04_1_Blueprint.Object) {
-		Default_Prop_Column_04_1_Class = (UClass*)Default_Prop_Column_04_1_Blueprint.Object->GeneratedClass;
+		Default_Prop_Column_04_01_Class = (UClass*)Default_Prop_Column_04_1_Blueprint.Object->GeneratedClass;
 	}
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_04_2_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_04_2.BP_Column_04_2'"));
 	if (Default_Prop_Column_04_2_Blueprint.Object) {
-		Default_Prop_Column_04_2_Class = (UClass*)Default_Prop_Column_04_2_Blueprint.Object->GeneratedClass;
+		Default_Prop_Column_04_02_Class = (UClass*)Default_Prop_Column_04_2_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Default_Prop_Column_04_3_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/DEFA_COMM/COLUMN/BP_Column_04_3.BP_Column_04_3'"));
+	if (Default_Prop_Column_04_3_Blueprint.Object) {
+		Default_Prop_Column_04_03_Class = (UClass*)Default_Prop_Column_04_3_Blueprint.Object->GeneratedClass;
 	}
 
 
@@ -110,6 +130,16 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	if (Dungeon_Prop_Treasure_01_Blueprint.Object) {
 		Dungeon_Prop_Treasure_01_Class = (UClass*)Dungeon_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_Prop_Bush_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_DUNG/BP_Dungeon_Prop_rocks_01.BP_Dungeon_Prop_rocks_01'"));
+	if (Dungeon_Prop_Bush_01_Blueprint.Object) {
+		Dungeon_Prop_Bush_01_Class = (UClass*)Dungeon_Prop_Bush_01_Blueprint.Object->GeneratedClass;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_Prop_Tomb_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_DUNG/BP_Dungeon_Prop_tomb_01.BP_Dungeon_Prop_tomb_01'"));
+	if (Dungeon_Prop_Tomb_01_Blueprint.Object) {
+		Dungeon_Prop_Tomb_01_Class = (UClass*)Dungeon_Prop_Tomb_01_Blueprint.Object->GeneratedClass;
+	}
 	
 	// Wall Props 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_WallProp_grille_torch_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_DUNG/wallprops/BP_Dungeon_WallProp_GAT_01.BP_Dungeon_WallProp_GAT_01'"));
@@ -122,28 +152,45 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 		Dungeon_WallProp_grille_window_01_Class = (UClass*)Dungeon_WallProp_grille_window_01_Blueprint.Object->GeneratedClass;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Dungeon_WallProp_shield_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_DUNG/wallprops/BP_Dungeon_WallProp_Shield_01.BP_Dungeon_WallProp_Shield_01'"));
+	if (Dungeon_WallProp_shield_01_Blueprint.Object) {
+		Dungeon_WallProp_shield_01_Class = (UClass*)Dungeon_WallProp_shield_01_Blueprint.Object->GeneratedClass;
+	}
 
+	
 	
 #pragma endregion 
 
 
 
-
 #pragma region MAPSKIN GARDEN
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Treasure_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_Prop_Treasure_01.BP_Garden_Prop_Treasure_01'"));
-	if (Garden_Prop_Treasure_01_Blueprint.Object) {
-		Garden_Prop_Treasure_01_Class = (UClass*)Garden_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_SpecialTile_01.BP_Garden_SpecialTile_01'"));
+	if (Garden_SpecialTile_Blueprint.Object) {
+		Garden_SpecialTile_Class = (UClass*)Garden_SpecialTile_Blueprint.Object->GeneratedClass;
 	}
+
+
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Tree_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_Tree_01.BP_Garden_Tree_01'"));
 	if (Garden_Prop_Tree_01_Blueprint.Object) {
 		Garden_Prop_Tree_01_Class = (UClass*)Garden_Prop_Tree_01_Blueprint.Object->GeneratedClass;
 	}
 
+
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Treasure_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_Prop_Treasure_01.BP_Garden_Prop_Treasure_01'"));
+	if (Garden_Prop_Treasure_01_Blueprint.Object) {
+		Garden_Prop_Treasure_01_Class = (UClass*)Garden_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Bush_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_bush_01.BP_Garden_Bush_01'"));
 	if (Garden_Prop_Bush_01_Blueprint.Object) {
 		Garden_Prop_Bush_01_Class = (UClass*)Garden_Prop_Bush_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_Prop_Tomb_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/BP_Garden_tomb_01.BP_Garden_tomb_01'"));
+	if (Garden_Prop_Tomb_01_Blueprint.Object) {
+		Garden_Prop_Tomb_01_Class = (UClass*)Garden_Prop_Tomb_01_Blueprint.Object->GeneratedClass;
 	}
 
 
@@ -157,13 +204,36 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	if (Garden_WallProp_Font_01_Blueprint.Object) {
 		Garden_WallProp_Font_01_Class = (UClass*)Garden_WallProp_Font_01_Blueprint.Object->GeneratedClass;
 	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Garden_WallProp_Window_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_GARD/wallprops/BP_Garden_WallProp_window_01.BP_Garden_WallProp_window_01'"));
+	if (Garden_WallProp_Window_01_Blueprint.Object) {
+		Garden_WallProp_Window_01_Class = (UClass*)Garden_WallProp_Window_01_Blueprint.Object->GeneratedClass;
+	}
 
 
 #pragma endregion 
+
+
+
 #pragma region MAPSKIN LIBRARY
+
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Library_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_LIBR/BP_Library_SpecialTile_01.BP_Library_SpecialTile_01'"));
+	if (Library_SpecialTile_Blueprint.Object) {
+		Library_SpecialTile_Class = (UClass*)Library_SpecialTile_Blueprint.Object->GeneratedClass;
+	}
+
+
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Library_Prop_Treasure_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_LIBR/BP_Library_Prop_Treasure_01.BP_Library_Prop_Treasure_01'"));
 	if (Library_Prop_Treasure_01_Blueprint.Object) {
 		Library_Prop_Treasure_01_Class = (UClass*)Library_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Library_Prop_Shelves_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_LIBR/BP_Library_Prop_shelves_01.BP_Library_Prop_shelves_01'"));
+	if (Library_Prop_Shelves_01_Blueprint.Object) {
+		Library_Prop_Shelves_01_Class = (UClass*)Library_Prop_Shelves_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Library_Prop_Table_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_LIBR/BP_Library_Prop_table_01.BP_Library_Prop_table_01'"));
+	if (Library_Prop_Table_01_Blueprint.Object) {
+		Library_Prop_Table_01_Class = (UClass*)Library_Prop_Table_01_Blueprint.Object->GeneratedClass;
 	}
 
 
@@ -177,17 +247,36 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	if (Library_WallProp_Torch_01_Blueprint.Object) {
 		Library_WallProp_Torch_01_Class = (UClass*)Library_WallProp_Torch_01_Blueprint.Object->GeneratedClass;
 	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Library_WallProp_Window_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_LIBR/wallprops/BP_Library_WallProp_window_01.BP_Library_WallProp_window_01'"));
+	if (Library_WallProp_Window_01_Blueprint.Object) {
+		Library_WallProp_Window_01_Class = (UClass*)Library_WallProp_Window_01_Blueprint.Object->GeneratedClass;
+	}
 
 #pragma endregion 
+
+
+
+
 #pragma region MAPSKIN SACRIFICE
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/BP_Sacrifice_SpecialTile_01.BP_Sacrifice_SpecialTile_01'"));
+	if (Sacrifice_SpecialTile_Blueprint.Object) {
+		Sacrifice_SpecialTile_Class = (UClass*)Sacrifice_SpecialTile_Blueprint.Object->GeneratedClass;
+	}
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_Prop_Treasure_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/BP_Sacrifice_Prop_Treasure_01.BP_Sacrifice_Prop_Treasure_01'"));
 	if (Sacrifice_Prop_Treasure_01_Blueprint.Object) {
 		Sacrifice_Prop_Treasure_01_Class = (UClass*)Sacrifice_Prop_Treasure_01_Blueprint.Object->GeneratedClass;
 	}
+
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_Prop_Jail_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/BP_Sacrifice_Prop_Jail_01.BP_Sacrifice_Prop_Jail_01'"));
 	if (Sacrifice_Prop_Jail_01_Blueprint.Object) {
 		Sacrifice_Prop_Jail_01_Class = (UClass*)Sacrifice_Prop_Jail_01_Blueprint.Object->GeneratedClass;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_Prop_Altar_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/BP_Sacrifice_Prop_Altar_01.BP_Sacrifice_Prop_Altar_01'"));
+	if (Sacrifice_Prop_Altar_01_Blueprint.Object) {
+		Sacrifice_Prop_Altar_01_Class = (UClass*)Sacrifice_Prop_Altar_01_Blueprint.Object->GeneratedClass;
 	}
 
 
@@ -196,6 +285,14 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_WallProp_grille_window_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/wallprops/BP_Sacrifice_WallProp_window_01.BP_Sacrifice_WallProp_window_01'"));
 	if (Sacrifice_WallProp_grille_window_01_Blueprint.Object) {
 		Sacrifice_WallProp_grille_window_01_Class = (UClass*)Sacrifice_WallProp_grille_window_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_WallProp_chains_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/wallprops/BP_Sacrifice_WallProp_CT_01.BP_Sacrifice_WallProp_CT_01'"));
+	if (Sacrifice_WallProp_chains_01_Blueprint.Object) {
+		Sacrifice_WallProp_chains_01_Class = (UClass*)Sacrifice_WallProp_chains_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Sacrifice_WallProp_window_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_SACR/wallprops/BP_Sacrifice_WallProp_CT_01.BP_Sacrifice_WallProp_CT_01'"));
+	if (Sacrifice_WallProp_window_01_Blueprint.Object) {
+		Sacrifice_WallProp_window_01_Class = (UClass*)Sacrifice_WallProp_window_01_Blueprint.Object->GeneratedClass;
 	}
 
 #pragma endregion 
@@ -206,12 +303,33 @@ AMapInstantiatorActor::AMapInstantiatorActor()
 
 #pragma region MAPSKIN BOSS
 
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_SpecialTile_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/BP_Boss_SpecialTile_01.BP_Boss_SpecialTile_01'"));
+	if (Boss_SpecialTile_Blueprint.Object) {
+		Boss_SpecialTile_Class = (UClass*)Boss_SpecialTile_Blueprint.Object->GeneratedClass;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_Prop_Fullpot_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/BP_Boss_Prop_fullpot_01.BP_Boss_Prop_fullpot_01'"));
+	if (Boss_Prop_Fullpot_01_Blueprint.Object) {
+		Boss_Prop_Fullpot_01_Class = (UClass*)Boss_Prop_Fullpot_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_Prop_Tomb_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/BP_Boss_Prop_tomb_01.BP_Boss_Prop_tomb_01'"));
+	if (Boss_Prop_Tomb_01_Blueprint.Object) {
+		Boss_Prop_Tomb_01_Class = (UClass*)Boss_Prop_Tomb_01_Blueprint.Object->GeneratedClass;
+	}
+
 	// Wall Props 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_WallProp_Fence_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/wallprops/BP_Boss_WallProp_Fence_01.BP_Boss_WallProp_Fence_01'"));
 	if (Boss_WallProp_Fence_01_Blueprint.Object) {
 		Boss_WallProp_Fence_01_Class = (UClass*)Boss_WallProp_Fence_01_Blueprint.Object->GeneratedClass;
 	}
-
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_WallProp_chain_torch_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/wallprops/BP_Boss_WallProp_CT_01.BP_Boss_WallProp_CT_01'"));
+	if (Boss_WallProp_chain_torch_01_Blueprint.Object) {
+		Boss_WallProp_chain_torch_01_Class = (UClass*)Boss_WallProp_chain_torch_01_Blueprint.Object->GeneratedClass;
+	}
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Boss_WallProp_chain_01_Blueprint(TEXT("Blueprint'/Game/BluePrints/PD_E/ESC/SK_BOSS/wallprops/BP_Boss_WallProp_chain_01.BP_Boss_WallProp_chain_01'"));
+	if (Boss_WallProp_chain_01_Blueprint.Object) {
+		Boss_WallProp_chain_01_Class = (UClass*)Boss_WallProp_chain_01_Blueprint.Object->GeneratedClass;
+	}
 
 #pragma endregion 
 
@@ -291,6 +409,73 @@ APD_E_Interactuable * AMapInstantiatorActor::InstantiateLargeChest(PD_MG_LogicPo
 	return GetWorld()->SpawnActor<APD_E_Interactuable>(Default_Interactuable_LargeChest_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 
+
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_02_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_02_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_02_02(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_02_02_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_02_03(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_02_03_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_03_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_03_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_03_02(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_03_02_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_04_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_04_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_04_02(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_04_02_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Column_04_03(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_04_03_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Obstruction_00(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_02_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Obstruction_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_03_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Obstruction_02(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_04_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Obstruction_03(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_12_1_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Obstruction_04(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_12_2_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
 #pragma endregion
 
 
@@ -304,35 +489,21 @@ APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Dungeon_Prop_Treasure_01(
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(Dungeon_Prop_Treasure_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_bush_1(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Dungeon_Prop_Bush_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_tomb_1(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Dungeon_Prop_Tomb_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
 APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Dungeon_SpecialTile(PD_MG_LogicPosition logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(Dungeon_SpecialTile_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 
-APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Dungeon_Prop_Column_01(PD_MG_LogicPosition logpos)
-{
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
-}
-
-APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_Column_02_1(PD_MG_LogicPosition logpos)
-{
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_02_1_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
-}
-APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_Column_03(PD_MG_LogicPosition logpos)
-{
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_03_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
-}
-
-APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Dungeon_Prop_Column_04_1(PD_MG_LogicPosition logpos)
-{
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_04_1_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
-}
-
-
-APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Dungeon_Prop_Obstruction_02(PD_MG_LogicPosition logpos) {
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_02_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
-
-}
 
 
 // Wallprops
@@ -344,13 +515,23 @@ APD_E_WallProp * AMapInstantiatorActor::Instantiate_Dungeon_WallProp_grille_wind
 {
 	return GetWorld()->SpawnActor<APD_E_WallProp>(Dungeon_WallProp_grille_window_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Dungeon_WallProp_shield_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Dungeon_WallProp_shield_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
 #pragma endregion 
 
 
 
 #pragma region MAPSKIN GARDEN
 
-APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos) 
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Garden_SpecialTile(PD_MG_LogicPosition logpos)
+{
+
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Garden_SpecialTile_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Garden_Prop_Tree_01(PD_MG_LogicPosition logpos)
 {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(Garden_Prop_Tree_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
@@ -363,6 +544,11 @@ APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Garden_Prop_Bush_01(PD_MG
 
 }
 
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Garden_Prop_tomb_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Garden_Prop_Tomb_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
 
 // Wallprops
 APD_E_WallProp* AMapInstantiatorActor::Instantiate_Garden_WallProp_Lamp_01(PD_MG_LogicPosition logpos) {
@@ -373,23 +559,35 @@ APD_E_WallProp* AMapInstantiatorActor::Instantiate_Garden_WallProp_Font_01(PD_MG
 
 	return GetWorld()->SpawnActor<APD_E_WallProp>(Garden_WallProp_Font_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Garden_WallProp_Window_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Garden_WallProp_Window_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
 #pragma endregion 
 
 #pragma region MAPSKIN LIBRARY
 
-APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Library_Prop_Column_04_2(PD_MG_LogicPosition logpos)
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Library_SpecialTile(PD_MG_LogicPosition logpos)
 {
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Column_04_2_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Library_SpecialTile_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Library_Prop_Treasure_01(PD_MG_LogicPosition logpos) {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(Library_Prop_Treasure_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 
 }
 
-APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Library_Prop_Obstruction_12_1(PD_MG_LogicPosition logpos) {
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_12_1_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Library_Prop_shelves_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Library_Prop_Shelves_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 
 }
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Library_Prop_table_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Library_Prop_Table_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+
+}
+
 
 // Wallprops 
 APD_E_WallProp* AMapInstantiatorActor::Instantiate_Library_WallProp_Torch_01(PD_MG_LogicPosition logpos) {
@@ -400,9 +598,18 @@ APD_E_WallProp* AMapInstantiatorActor::Instantiate_Library_WallProp_Stairs_01(PD
 
 	return GetWorld()->SpawnActor<APD_E_WallProp>(Library_WallProp_Stairs_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Library_WallProp_Window_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Library_WallProp_Window_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
 #pragma endregion 
 
 #pragma region MAPSKIN SACRIFICE
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Sacrifice_SpecialTile(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Sacrifice_SpecialTile_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
 
 APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Sacrifice_Prop_Treasure_01(PD_MG_LogicPosition logpos) {
 	return GetWorld()->SpawnActor<APD_E_ElementActor>(Sacrifice_Prop_Treasure_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
@@ -413,15 +620,25 @@ APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Sacrifice_Prop_Jail_01(PD
 
 }
 
-APD_E_ElementActor* AMapInstantiatorActor::Instantiate_Sacrifice_Prop_Obstruction_12_2(PD_MG_LogicPosition logpos) {
-	return GetWorld()->SpawnActor<APD_E_ElementActor>(Default_Prop_Obstruction_12_2_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Sacrifice_Prop_Altar_01(PD_MG_LogicPosition logpos)
+{
 
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Sacrifice_Prop_Altar_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
+
 
 // Wallprops 
 APD_E_WallProp* AMapInstantiatorActor::Instantiate_Sacrifice_WallProp_grille_window_01(PD_MG_LogicPosition logpos) {
 
 	return GetWorld()->SpawnActor<APD_E_WallProp>(Sacrifice_WallProp_grille_window_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Sacrifice_WallProp_window_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Sacrifice_WallProp_window_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Sacrifice_WallProp_chains_torch_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Sacrifice_WallProp_chains_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 #pragma endregion 
 
@@ -432,10 +649,35 @@ APD_E_WallProp* AMapInstantiatorActor::Instantiate_Sacrifice_WallProp_grille_win
 #pragma region MAPSKIN BOSS
 
 
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Boss_SpecialTile(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Boss_SpecialTile_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Boss_Prop_fullpot_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Boss_Prop_Fullpot_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_ElementActor * AMapInstantiatorActor::Instantiate_Boss_Prop_tomb_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_ElementActor>(Boss_Prop_Tomb_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
 // Wallprops 
 APD_E_WallProp* AMapInstantiatorActor::Instantiate_Boss_WallProp_Fence_01(PD_MG_LogicPosition logpos) {
 
 	return GetWorld()->SpawnActor<APD_E_WallProp>(Boss_WallProp_Fence_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Boss_WallProp_Chains_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Boss_WallProp_chain_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
+}
+
+APD_E_WallProp * AMapInstantiatorActor::Instantiate_Boss_WallProp_ChainsAndTorch_01(PD_MG_LogicPosition logpos)
+{
+	return GetWorld()->SpawnActor<APD_E_WallProp>(Boss_WallProp_chain_torch_01_Class, logpos.ToWorldPosition(), FRotator(0.0f, 0.f, 0.f));
 }
 
 #pragma endregion 
@@ -464,6 +706,4 @@ APD_E_Character* AMapInstantiatorActor::InstantiatePlayer(PD_MG_LogicPosition lo
 #pragma endregion
 
 #pragma endregion
-
-
 
