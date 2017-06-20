@@ -18,7 +18,8 @@ PD_GM_EnemyManager::~PD_GM_EnemyManager()
 
 
 void PD_GM_EnemyManager::AddEnemy(PD_GM_LogicCharacter* enemy) {
-	enemies.Add(enemy);
+	int index=enemies.Add(enemy);
+	listTurnOrders.Insert(nullptr, index);
 	
 }
 
