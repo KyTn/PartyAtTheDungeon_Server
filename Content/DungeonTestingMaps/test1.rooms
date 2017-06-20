@@ -4,14 +4,14 @@ tags: 0, 10, 20, 30
 size_x: 10
 size_y: 10
 WWWwwwwWWW
-Wl......eW
+We......eW
 W........W
 w........w
 w........w
 w........w
 w........w
 w........W
-Wq......lW
+Wq......qW
 WWWwwwwWWW
 START_ROOM
 Name: Almacen_1
@@ -87,18 +87,18 @@ WWwwwwwwwwwwwwWW
 START_ROOM
 Name: Rectangular_1
 tags: 0, 10, 20, 30
-size_X: 20
+size_X: 16
 size_Y: 10
-WWwwwwwwWWWWwwwwwwWW
-W.......lWW........W
-Wq................eW
-W..c............c..W
-w........bb........w
-w........bb........w
-W..c............c..W
-Wq................eW
-W........WW........W
-WWwwwwwwWWWWwwwwwwWW
+WWwwwwWWWWwwwwWW
+W......WW......W
+Wq............eW
+W..c........c..W
+w......bb......w
+w......bb......w
+W..c........c..W
+Wq............eW
+W......WW......W
+WWwwwwWWWWwwwwWW
 START_ROOM
 Name: forma_L_Cuadrada
 tags: 0, 10, 20, 30
@@ -136,3 +136,84 @@ WWWWWe....qWWWWW
      W....W     
      W....W     
      WWwwWW     
+START_ROOM
+Name: Rectangular_paredes_internas
+tags: 0, 10, 20, 30
+size_X: 16
+size_Y: 16
+WWwwwwWWWWwwwwWW
+Wq.....WW.....eW
+w..............w
+w..c........c..w
+w......WW......w
+w......WW......w
+W..............W
+WW..WW....WW..WW
+WW..WW....WW..WW
+W..............W
+w......WW......w
+w......WW......w
+w..c........c..w
+w..............w
+Wq.....WW.....eW
+WWwwwwWWWWwwwwWW
+START_ROOM
+Name: musical_corchea
+tags: 0, 10, 20, 30
+size_X: 14
+size_Y: 20
+       WWWWWWW
+      WW.....w
+      W......w
+      W...WWWW
+      W..W    
+      W..W    
+      W..W    
+      W..W    
+      W..W    
+      W..W    
+  WWWWW..W    
+ WW......W    
+WW.......W    
+W........W    
+w...bb...W    
+w...bb...W    
+W........W    
+WW......WW    
+ WW....WW     
+  WWwwWW      
+START_ROOM
+Name: cuadrado_paredes_internas
+tags: 0, 10, 20, 30
+size_X: 12
+size_Y: 12
+  WWWwwWWW  
+ WW......WW 
+WW........WW
+W...W..W...W
+W..WW..WW..W
+w..........W
+w..........w
+W..WW..WW..W
+W...W..W...W
+WW........WW
+ WW......WW 
+  WWWwwWWW  
+START_ROOM
+Name: H_larga
+tags: 0, 10, 20, 30
+size_X: 17
+size_Y: 13
+WWwWW       WWwWW
+W...W       W...W
+W...W       W...W
+W...W       W...W
+W...WWWWWWWWW...W
+W.....q...e.....W
+W...............W
+W.....q...e.....W
+W...WWWWWWWWW...W
+W...W       W...W
+W...W       W...W
+W...W       W...W
+WWwWW       WWwWW
