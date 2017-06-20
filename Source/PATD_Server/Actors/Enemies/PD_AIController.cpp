@@ -338,7 +338,7 @@ void APD_AIController::SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalC
 	useCharacter = true;
 	usePosition = true;
 }
-
+/*
 APD_E_Interactuable* APD_AIController::GetAdyacentDoor(PD_MG_LogicPosition position) {
 	TArray<PD_MG_LogicPosition> listAdyacents = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(position);
 	TArray<PD_MG_LogicPosition> listResult;
@@ -352,4 +352,10 @@ APD_E_Interactuable* APD_AIController::GetAdyacentDoor(PD_MG_LogicPosition posit
 
 	}
 	return nullptr;
+}*/
+
+bool APD_AIController::CanEndMoveAtPosition(PD_MG_LogicPosition position) {
+	return !mapMng->IsLogicPositionADoor(position);
+		//&& !mapMng->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen;
+
 }

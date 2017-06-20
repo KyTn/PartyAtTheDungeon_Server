@@ -36,6 +36,7 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 		
 		if (AIController->CheckInRangeFromPositionToCharacter(logicCharacter->GetCurrentLogicalPosition(), AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 			//En este caso no necesita moverse
+			UE_LOG(LogTemp, Log, TEXT("UPD_IA_TaskAttackTargetCalc:: No necesita moverse y ataca"));
 			AIController->turnTargetCharacter = AIController->goalCharacter;
 			AIController->turnNumAttacks = APMaxAttack;
 
@@ -62,8 +63,11 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 				indexPath++;
 				AP--;
 				//Coge la ultima a la que llege por el ap, pero si hay una en la que ya tenga rango, aunque le queden AP sale del bucle.
-				AIController->turnTargetPosition = pathPosition;
-				if (AIController->CheckInRangeFromPositionToCharacter(pathPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
+				if (AIController->CanEndMoveAtPosition(pathPosition)) {
+					AIController->turnTargetPosition = pathPosition;
+				}
+
+				if (AIController->CheckInRangeFromPositionToCharacter(AIController->turnTargetPosition, AIController->goalCharacter, logicCharacter->weapon->RangeWeapon)) {
 					break;
 				}
 
@@ -121,7 +125,9 @@ bool UPD_IA_TaskAttackTargetCalc::CalculateTurnTarget(UBehaviorTreeComponent& Ow
 				indexPath++;
 				AP--;
 				//Coge la ultima a la que llege por el ap, pero si llega a la ultima le puede sobrar ap y atacar
-				AIController->turnTargetPosition = pathPosition;
+				if (AIController->CanEndMoveAtPosition(pathPosition)) {
+					AIController->turnTargetPosition = pathPosition;
+				}
 			}
 
 			//Al salir del bucle nos pueden sobrar ap para atacar o no. Tambien podemos estar en rango o no.
