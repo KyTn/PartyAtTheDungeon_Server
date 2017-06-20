@@ -568,9 +568,11 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 		}
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
-
-
+			 //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
+			if ((mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) &&
+				(mapMng->IsLogicPositionATile(possibleNewPositionToMove[j])) &&
+				(!mapMng->MapInfo->interactuableActorByLogicPosition.Contains(possibleNewPositionToMove[j])))
+			{
 				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 				if (SGI)
 				{
@@ -634,8 +636,10 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
-
+			if ( (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) && 
+				(mapMng->IsLogicPositionATile(possibleNewPositionToMove[j])) && 
+				(!mapMng->MapInfo->interactuableActorByLogicPosition.Contains(possibleNewPositionToMove[j])) )
+			{ //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
 
 				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 				if (SGI)
@@ -651,6 +655,7 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 			}
 
 		}
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
 
 		if (newPositionsToMove.Num() > 0)
 		{
@@ -660,12 +665,6 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 			SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(newPositionsToMove.Last()));
 			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
 			MoveToPhysicalPosition(newPositionsToMove);
-
-			//GetCharacterBP()->SetActorLocation(newPositionsToMove.Last());
-			//if (GetCharacterBP()->TeleportTo(newPositionsToMove.Last(), GetCharacterBP()->GetActorRotation(), false, false))//return a boolean
-				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Se ha movido por collision")));
-			//else
-				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("NO Se ha movido por collision")));
 
 		}
 	

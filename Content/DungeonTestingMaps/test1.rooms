@@ -4,14 +4,14 @@ tags: 0, 10, 20, 30
 size_x: 10
 size_y: 10
 WWWwwwwWWW
-We......eW
+W........W
 W........W
 w........w
 w........w
 w........w
 w........w
 w........W
-Wq......qW
+W........W
 WWWwwwwWWW
 START_ROOM
 Name: Almacen_1
@@ -69,7 +69,7 @@ tags: 0, 10, 20, 30, 100
 size_X: 16
 size_Y: 16
 WWwwwwwwwwwwwwWW
-Wl............lW
+W..............W
 w..............w
 w..............w
 w...c......c...w
@@ -82,7 +82,7 @@ w..............w
 w...c......c...w
 w..............w
 w..............w
-Wl............lW
+W..............W
 WWwwwwwwwwwwwwWW
 START_ROOM
 Name: Rectangular_1
