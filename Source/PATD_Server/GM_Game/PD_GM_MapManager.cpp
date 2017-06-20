@@ -158,7 +158,7 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 
 		for (int j = 0; j < actualAdjacents.Num(); j++) {
 
-			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - TODAS LAS ADYACENTES %d"), actualAdjacents.Num());
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - X: %d  Y: %d"), actualAdjacents[j].GetX(), actualAdjacents[j].GetY());
 
 			if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
 			{

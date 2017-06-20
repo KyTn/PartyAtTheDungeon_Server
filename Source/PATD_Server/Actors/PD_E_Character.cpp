@@ -130,8 +130,6 @@ if (other != nullptr) //Los dos son characters
 
 void APD_E_Character::CollisionWithOtherCharacter(APD_E_Character* charWhoCrash)
 {
-	UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter Entrando: YO:%s EL:%s"), *logic_character->GetIDCharacter(), *charWhoCrash->logic_character->GetIDCharacter());
-
 	if (logic_character)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("APD_E_Character::CollisionWithOtherCharacter TIENE LOGIC_CHAR: %s"), *logic_character->GetIDCharacter());
