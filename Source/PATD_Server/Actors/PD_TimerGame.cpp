@@ -49,3 +49,32 @@ void APD_TimerGame::OnTimerEndPodiums() {
 	UE_LOG(LogTemp, Log, TEXT("APD_TimerGame::OnTimerEndPodiums - Tiempo se acabo en el podium "));
 	SGI->OnTimerPodiumEnds();
 }
+
+
+//To control the flow of the game and never stay in one phase--> allows to force to continue the flow, ou yeah!
+void APD_TimerGame::InitTimerAnimationsToEnd(float time)
+{
+	UE_LOG(LogTemp, Log, TEXT("APD_TimerGame::InitTimerAnimationsToEnd -"));
+
+	timerAnimationRunning = true;
+	GetWorld()->GetTimerManager().ClearTimer(timerForAnimations);
+	GetWorldTimerManager().SetTimer(timerForAnimations, this, &APD_TimerGame::OnTimerEndForAnimationsToEnd, time, false);
+}
+
+void APD_TimerGame::OnTimerEndForAnimationsToEnd()
+{
+
+	UE_LOG(LogTemp, Log, TEXT("APD_TimerGame::OnTimerEndForAnimationsToEnd - the timer of animations end... call to gamemanager"));
+
+	timerAnimationRunning = false;
+	//time to all animations end for anyone(players and enemies)
+	gameManager->OnTimerAnimationEnd();
+}
+
+void APD_TimerGame::CancelTimeAanimation()
+{
+	UE_LOG(LogTemp, Log, TEXT("APD_TimerGame::CancelTimeAanimation - stop the timer"));
+
+	timerAnimationRunning = false;
+	GetWorld()->GetTimerManager().ClearTimer(timerForAnimations);
+}

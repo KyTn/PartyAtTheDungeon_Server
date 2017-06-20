@@ -175,6 +175,8 @@ public:
 	void OnCameraEndMove();
 
 	void OnTimerEnd();
+	void OnTimerAnimationEnd(); //cuando se completa el timepo maximo de ejecucion de una animacion --> se fuerza a continuar la ejecucion
+
 	void VisualTickControl();
 	void VisualMoveTick();
 	void VisualAttackTick(FString id_char, int index_action);

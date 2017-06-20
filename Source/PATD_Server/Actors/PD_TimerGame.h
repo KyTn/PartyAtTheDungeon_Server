@@ -26,9 +26,13 @@ public:
 
 	FTimerHandle timer;
 
+	FTimerHandle timerForAnimations;
+
 	PD_GM_GameManager* gameManager;
 
 	bool timerRunning=false;
+	bool timerAnimationRunning = false;
+	bool isTimerAnimationRunning() { return timerAnimationRunning; };
 	bool isTimerRunning() { return timerRunning; };
 
 	void setGameManager(PD_GM_GameManager* inGameManager) { gameManager = inGameManager; };
@@ -38,4 +42,8 @@ public:
 
 	void InitTimerPodium(float time, UPD_ServerGameInstance* inSGI);
 	void OnTimerEndPodiums();
+
+	void InitTimerAnimationsToEnd(float time);
+	void OnTimerEndForAnimationsToEnd();
+	void CancelTimeAanimation();
 };

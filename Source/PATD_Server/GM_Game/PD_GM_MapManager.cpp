@@ -66,8 +66,18 @@ bool PD_GM_MapManager::IsLogicPositionATile(PD_MG_LogicPosition logpos)
 {
 	if (MapInfo->roomByLogPos.Contains(logpos)) {
 		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
-		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos) && r->tiles.Contains(logpos))
-			return true;
+		//if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos) && r->tiles.Contains(logpos))
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::IsLogicPositionATile() - TILES %d "), (int)r->PropsAndTilesInRoomByLogicPosition[logpos]);
+
+			if (((int)r->PropsAndTilesInRoomByLogicPosition[logpos] > 0) && ((int)r->PropsAndTilesInRoomByLogicPosition[logpos] < 20))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::IsLogicPositionATile() - ES UNA TILE"));
+				return true;
+			}
+		}
+			
 	}
 	return false;
 }
@@ -76,8 +86,11 @@ bool PD_GM_MapManager::IsLogicPositionAProp(PD_MG_LogicPosition logpos)
 {
 	if (MapInfo->roomByLogPos.Contains(logpos)) {
 		PD_MM_Room *r = MapInfo->roomByLogPos[logpos];
-		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos) && !r->tiles.Contains(logpos))
-			return true;
+		if (r->PropsAndTilesInRoomByLogicPosition.Contains(logpos))
+		{
+			if (((int)r->PropsAndTilesInRoomByLogicPosition[logpos] >= 20) && ((int)r->PropsAndTilesInRoomByLogicPosition[logpos] < 150))
+				return true;
+		}
 	}
 	return false;
 }
@@ -138,10 +151,19 @@ TArray<PD_MG_LogicPosition> PD_GM_MapManager::GetSpawnPoints() {
 	TArray<PD_MG_LogicPosition> ret = TArray<PD_MG_LogicPosition>();
 
 	for (int i = 0; i < MapInfo->SpawnRoom->LogicDoorPosInRoom.Num(); i++) {
+
+		UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - TODAS LAS PUERTAS"));
+
 		TArray<PD_MG_LogicPosition> actualAdjacents = MapInfo->SpawnRoom->LogicDoorPosInRoom[i].GetAllTilesInRange(5, MapInfo->SpawnRoom->LogicPosInRoom);
 
 		for (int j = 0; j < actualAdjacents.Num(); j++) {
-			ret.AddUnique(actualAdjacents[j]);
+
+			UE_LOG(LogTemp, Warning, TEXT("PD_GM_MapManager::GetSpawnPoints() - TODAS LAS ADYACENTES %d"), actualAdjacents.Num());
+
+			if (MapInfo->mapManager->IsLogicPositionATile(MapInfo->SpawnRoom->LogicPosInRoom[i]))
+			{
+				ret.AddUnique(actualAdjacents[j]);
+			}
 		}
 	}
 
