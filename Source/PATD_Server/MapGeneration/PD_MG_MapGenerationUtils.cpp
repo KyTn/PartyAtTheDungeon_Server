@@ -987,6 +987,14 @@ bool PD_MG_MapGenerationUtils::InteractuablesGeneration_v02(MapProceduralInfo & 
 				break;
 			}
 		}
+		TArray <PD_MG_LogicPosition> lpEnemies;
+		M.enemies.GenerateKeyArray(lpEnemies);
+		for (int j = 0; j < lpEnemies.Num(); j++){
+			if (lpEnemies[j] == lp) {
+				found_ = true;
+				break;
+			}
+		}
 
 		if (found_) {
 			i--;
