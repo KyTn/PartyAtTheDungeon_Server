@@ -6,7 +6,7 @@
 #include "MapGeneration/PD_MG_LogicPosition.h"
 #include "MapInfo/PD_MM_MapInfo.h"
 #include "Actors/Interactuables/PD_E_Door.h"
-
+#include "Actors/Interactuables/PD_E_Chest.h"
 PD_GM_Pathfinder::PD_GM_Pathfinder(PD_GM_MapManager* inMapManager)
 {
 	mapManager = inMapManager;
@@ -127,17 +127,25 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch, MapSe
 	for (PD_MG_LogicPosition adyacentLogicPosition : adyacentsList) {
 		//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d ==Wall:%d,Prop:%d,DoorClosed:%d, %d"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY(), mapManager->IsLogicPositionAWall(adyacentLogicPosition), mapManager->IsLogicPositionAProp(adyacentLogicPosition), (mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen), !(adyacentLogicPosition == parentLogicPosition));
 		
+		bool isWall = mapManager->IsLogicPositionAWall(adyacentLogicPosition);
+		bool isProp = mapManager->IsLogicPositionAProp(adyacentLogicPosition);
+		bool isDoorClosed = mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen;
+		bool isChestClosed = false;
+		if (mapManager->MapInfo->interactuableActorByLogicPosition.Contains(adyacentLogicPosition)) {
+			APD_E_Interactuable* inter=mapManager->MapInfo->interactuableActorByLogicPosition[adyacentLogicPosition];
+			APD_E_Chest* chest = Cast<APD_E_Chest>(inter);
+			isChestClosed = chest && !chest->isChestOpened;
+		}
+
 
 		if (//Condiciones de no pasar
-			!(mapManager->IsLogicPositionAWall(adyacentLogicPosition)
-			||mapManager->IsLogicPositionAProp(adyacentLogicPosition)
-			//||mapManager->IsLogicPositionAEnemy(adyacentLogicPosition) //Lo dejamos para que puedan haber choques.
-			||(mapManager->IsLogicPositionADoor(adyacentLogicPosition) && !mapManager->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen)
-			
-			)
+			!isWall &&
+			!isProp &&
+			!isDoorClosed &&
+			!isChestClosed &&
 
 			//condicion para que no repita
-			&& !(adyacentLogicPosition == parentLogicPosition)
+			!(adyacentLogicPosition == parentLogicPosition)
 			)
 		{
 			//UE_LOG(LogTemp, Log, TEXT("Pathfinding successors %d,%d TRUE"), adyacentLogicPosition.GetX(), adyacentLogicPosition.GetY());

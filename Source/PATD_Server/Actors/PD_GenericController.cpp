@@ -137,7 +137,7 @@ void APD_GenericController::MoveWithSpline(float deltaTime)
 
 		if (!lastPosition.Equals(currentPosition, 15.0)) //Compara con un offset de error, (Por pruebas se ha determinado que 15, pero pueden ser mas o menos)
 		{
-		//	IsCalculatingMovePath = true;
+			//IsCalculatingMovePath = true;
 			//Animacion de andar
 			UAnimInstance* AnimInst = GetCharacter()->GetMesh()->GetAnimInstance();
 			if (AnimInst) {

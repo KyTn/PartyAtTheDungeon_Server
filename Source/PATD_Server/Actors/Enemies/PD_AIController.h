@@ -60,7 +60,10 @@ public:
 	PD_MG_LogicPosition GetClosestDoorPosition();
 	APD_E_Interactuable* GetClosestDoor();
 	PD_MG_LogicPosition GetClosestPosition(TArray<PD_MG_LogicPosition> listPosition);
-	APD_E_Interactuable* GetAdyacentDoor(PD_MG_LogicPosition position);
+	//APD_E_Interactuable* GetAdyacentDoor(PD_MG_LogicPosition position);
+
+	//Pregunta si puede terminar el movimiento en esta casilla
+	bool CanEndMoveAtPosition(PD_MG_LogicPosition position);
 
 	PD_MG_LogicPosition GetActivationPosition(APD_E_Interactuable* interactuable);
 	bool CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition positionFrom, PD_GM_LogicCharacter* character,int range);

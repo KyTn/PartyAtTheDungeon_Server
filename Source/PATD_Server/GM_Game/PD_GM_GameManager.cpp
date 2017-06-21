@@ -1095,6 +1095,8 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 	 4. Hacer un Case
 		4.1 Si es una puerta: Acceder a las id de roomA y roomB, instanciarlas ambas, instanciar enemigos
 	*/
+	timer->CancelTimeAanimation(); //cancelamos si hubiera, el timer de animacion que estuviese en ejecucion
+	timer->InitTimerAnimationsToEnd(5.0f); //seteamos el timer en 10 s
 
 	StaticMapElement typeInteract;
 	APD_E_Interactuable* interactableActor = nullptr;
@@ -1174,8 +1176,6 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 						//doorOpend->IsDoorOpen = true;
 						//doorsOpened.Add(doorOpend->ID_Interactuable);
 
-
-
 						doorOpend->Interact(nullptr);
 						//doorOpend->SetActorHiddenInGame(true);
 						logic_char->GetController()->UpdateRotationCharacterToEnemy(doorOpend->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
@@ -1187,6 +1187,8 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 
 						interactuablesActivated.Add(st);
 					}
+					else
+						logic_char->GetController()->OnAnimationEnd();
 					break;
 				}
 				case StaticMapElement::LEVEL:
@@ -1201,7 +1203,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- contains %d"), id_interact);
 						APD_E_Chest* chest = nullptr;
 						chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
-						if (chest && !chest->IsCurrentlyActivated)
+						if (chest && !chest->isChestOpened)
 						{
 							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- is a chest %d"), id_interact);
 
@@ -1220,8 +1222,11 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 
 							interactuablesActivated.Add(st);
 						}
-
+						else
+							logic_char->GetController()->OnAnimationEnd();
 					}
+					else
+						logic_char->GetController()->OnAnimationEnd();
 
 					break;
 				}
@@ -1244,6 +1249,9 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 	characterWhoPlayDefenseAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de defensa
 	characterWhoPlayGetHurtAnim.Empty(); //limpiamos los characters que se tienen que tienen que lanzar animacion de herida
 	characterWhoPlayHealAnim.Empty();    //limpiamos los characters que se tienen que tienen que lanzar animacion de Curar
+
+	timer->CancelTimeAanimation(); //cancelamos si hubiera, el timer de animacion que estuviese en ejecucion
+	timer->InitTimerAnimationsToEnd(5.0f); //seteamos el timer en 10 s
 
 	if (structGameState->enumGameState == EGameState::ExecutingPlayersTurn) 
 	{
@@ -1271,7 +1279,9 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 				playersManager->GetStructPlayerByIDCharacter(id_char)->logic_Character->GetController()->OnAnimationEnd();
 			}
 		}
-
+		else
+			OnAnimationEnd();
+		
 	}
 
 	else if (structGameState->enumGameState == EGameState::ExecutingEnemiesTurn) 
@@ -1295,8 +1305,10 @@ void PD_GM_GameManager::VisualAttackTick(FString id_char, int index_action) {
 			}
 		}
 		else {
-			enemyManager->GetCharacterByID(id_char)->GetController()->OnAnimationEnd();
+			OnAnimationEnd();
 		}
+
+
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualAttackTick despues de players/enemigos"));
@@ -1464,6 +1476,20 @@ void PD_GM_GameManager::OnTimerEnd() {
 	UpdatePhase();
 }
 
+void PD_GM_GameManager::OnTimerAnimationEnd() //cuando se completa el timepo maximo de ejecucion de una animacion --> se fuerza a continuar la ejecucion
+{
+	//set de todos los players a animacion idle
+	for (int i = 0; i < playersManager->GetNumPlayers() ; i++)
+	{
+		playersManager->GetDataStructPlayer(i)->logic_Character->GetController()->Animation_Idle();
+	}
+	for (int i = 0; i < enemyManager->GetEnemies().Num(); i++)
+	{
+		enemyManager->GetEnemies()[i]->GetController()->Animation_Idle();
+	}
+
+	OnAnimationEnd();
+}
 
 
 #pragma region GM PHASE MACHINE 

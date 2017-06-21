@@ -568,9 +568,11 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 		}
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
-
-
+			 //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
+			if ((mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) &&
+				(mapMng->IsLogicPositionATile(possibleNewPositionToMove[j])) &&
+				(!mapMng->MapInfo->interactuableActorByLogicPosition.Contains(possibleNewPositionToMove[j])))
+			{
 				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 				if (SGI)
 				{
@@ -634,8 +636,10 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 
 		for (int j = 0; j < possibleNewPositionToMove.Num(); j++)
 		{
-			if (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) { //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
-
+			if ( (mapMng->MapInfo->roomByLogPos.Contains(possibleNewPositionToMove[j])) && 
+				(mapMng->IsLogicPositionATile(possibleNewPositionToMove[j])) && 
+				(!mapMng->MapInfo->interactuableActorByLogicPosition.Contains(possibleNewPositionToMove[j])) )
+			{ //Esto es una comprobacion de que esa tile es valida, de momento vale para los muros, pero se puede mejorar
 
 				UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance());
 				if (SGI)
@@ -651,6 +655,7 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 			}
 
 		}
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::MoveWhenCollisionLost %d"), newPositionsToMove.Num());
 
 		if (newPositionsToMove.Num() > 0)
 		{
@@ -660,12 +665,6 @@ void PD_GM_LogicCharacter::MoveWhenCollisionLost()
 			SetCurrentLogicalPosition(mapMng->WorldToLogicPosition(newPositionsToMove.Last()));
 			Cast<APD_AIController>(controller)->GetSpline()->SetPoints(newPositionsToMove);
 			MoveToPhysicalPosition(newPositionsToMove);
-
-			//GetCharacterBP()->SetActorLocation(newPositionsToMove.Last());
-			//if (GetCharacterBP()->TeleportTo(newPositionsToMove.Last(), GetCharacterBP()->GetActorRotation(), false, false))//return a boolean
-				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Se ha movido por collision")));
-			//else
-				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("NO Se ha movido por collision")));
 
 		}
 	
@@ -831,34 +830,41 @@ bool PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter(PD_MG_LogicPositi
 
 	TArray<PD_MG_LogicPosition> listInRange = mapMng->GetAllTilesInRange(range, positionFrom);
 
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  Rango: %d"), range);
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  Rango: %d"), range);
 
 
 	if (!listInRange.Contains(character->GetCurrentLogicalPosition())) {
-		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  NO ESTA EN RANGO"));
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  NO ESTA EN RANGO"));
 
 		return false;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  esta en rango a falta de raycast"));
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  esta en rango a falta de raycast"));
 
 	FHitResult hit;
 	FVector iniPos = mapMng->LogicToWorldPosition(positionFrom);
-	iniPos.Z = 50;
+	iniPos.Z = 80;
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
-	endPos.Z = 50;
+	endPos.Z = 80;
+
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: lanzando drawing"));
+
+
 
 	FCollisionQueryParams paramsRay = FCollisionQueryParams();
 	paramsRay.AddIgnoredActor(this->GetCharacterBP());
 	this->GetController()->GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Camera, paramsRay);
+	
+	//DrawDebugLine(GetWorld(),iniPos,hit.ImpactPoint,FColor(255, 0, 0),true, -1, 0,12.333);
+	//UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Actor impactado %s"), *hit.Actor->GetName());
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 
-		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
 
 		return false;
 	}
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
 	return true;
 
 }

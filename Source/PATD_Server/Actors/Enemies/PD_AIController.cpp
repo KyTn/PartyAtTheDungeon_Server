@@ -266,13 +266,17 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 
 	FHitResult hit;
 	FVector iniPos = mapMng->LogicToWorldPosition(positionFrom);
-	iniPos.Z = 50;
+	iniPos.Z = 80;
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
-	endPos.Z = 50;
+	endPos.Z = 80;
+
 
 	FCollisionQueryParams paramsRay = FCollisionQueryParams();
 	paramsRay.AddIgnoredActor(GetPawn());
 	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Camera, paramsRay);
+
+	//DrawDebugLine(GetWorld(),iniPos,hit.ImpactPoint,FColor(255, 0, 0),true, -1, 0,12.333);
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 		
@@ -338,7 +342,7 @@ void APD_AIController::SetGoalCharacterAndPosition(PD_GM_LogicCharacter* inGoalC
 	useCharacter = true;
 	usePosition = true;
 }
-
+/*
 APD_E_Interactuable* APD_AIController::GetAdyacentDoor(PD_MG_LogicPosition position) {
 	TArray<PD_MG_LogicPosition> listAdyacents = mapMng->Get_LogicPosition_Diagonals_And_Adyacents_To(position);
 	TArray<PD_MG_LogicPosition> listResult;
@@ -352,4 +356,10 @@ APD_E_Interactuable* APD_AIController::GetAdyacentDoor(PD_MG_LogicPosition posit
 
 	}
 	return nullptr;
+}*/
+
+bool APD_AIController::CanEndMoveAtPosition(PD_MG_LogicPosition position) {
+	return !mapMng->IsLogicPositionADoor(position);
+		//&& !mapMng->MapInfo->doorActorByLogPos[adyacentLogicPosition]->IsDoorOpen;
+
 }
