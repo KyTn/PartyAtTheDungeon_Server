@@ -347,7 +347,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::NORMAL_TILE: {
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
+					actorElement->SetMaterialSkin(mapSkin);
 					
 					MapInfo->AddTile(lp, actorElement);
 					break;
@@ -355,7 +355,6 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::SPECIAL_TILE: {
 					actorElement = instantiator->Instantiate_Dungeon_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -364,51 +363,60 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::PROP_CHEST: {
 					actorElement = instantiator->Instantiate_Dungeon_Prop_Treasure_01(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
 					actorElement = instantiator->Instantiate_Column_01(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_01: {
 					actorElement = instantiator->Instantiate_Column_02_01(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::TREE_OR_COLUMN_02: {
 					actorElement = instantiator->Instantiate_Column_03_01(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_00: {
 
 					actorElement = instantiator->Instantiate_Obstruction_00(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_01: {
 
 					actorElement = instantiator->Instantiate_Obstruction_01(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_02: {
 
 					actorElement = instantiator->Instantiate_Obstruction_02(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_03: {
 
 					actorElement = instantiator->Instantiate_Obstruction_03(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_04: {
 
 					actorElement = instantiator->Instantiate_Obstruction_04(lp);
 					actorElement->ActualLogicPosition = lp;
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::WALL_PROP_1: {
@@ -449,14 +457,13 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::NORMAL_TILE: {
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::GARDEN);
+					actorElement->SetMaterialSkin(mapSkin);
 					MapInfo->AddTile(lp, actorElement);
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
 					actorElement = instantiator->Instantiate_Garden_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -464,6 +471,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::PROP_CHEST: {
 					actorElement = instantiator->Instantiate_Garden_Prop_Treasure_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -472,6 +480,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
 					actorElement = instantiator->Instantiate_Garden_Prop_Tree_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -484,30 +493,35 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::OBSTRUCTION_00: {
 
 					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_01: {
 
 					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_02: {
 
 					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_03: {
 
 					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_04: {
 
 					actorElement = instantiator->Instantiate_Obstruction_04(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -548,14 +562,13 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::NORMAL_TILE: {
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::SACRIFICE);
+					actorElement->SetMaterialSkin(mapSkin);
 					MapInfo->AddTile(lp, actorElement);
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
 					actorElement = instantiator->Instantiate_Sacrifice_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -563,6 +576,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::PROP_CHEST: {
 					actorElement = instantiator->Instantiate_Sacrifice_Prop_Treasure_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -571,6 +585,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
 					actorElement = instantiator->Instantiate_Column_04_03(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -583,30 +598,35 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::OBSTRUCTION_00: {
 
 					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_01: {
 
 					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_02: {
 
 					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_03: {
 
 					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_04: {
 
 					actorElement = instantiator->Instantiate_Obstruction_04(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -647,14 +667,14 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::NORMAL_TILE: {
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::BOSS);
+					actorElement->SetMaterialSkin(mapSkin);
 					MapInfo->AddTile(lp, actorElement);
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
 					actorElement = instantiator->Instantiate_Boss_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -662,6 +682,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::PROP_CHEST: {
 					actorElement = instantiator->Instantiate_Dungeon_Prop_Treasure_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -670,6 +691,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
 					actorElement = instantiator->Instantiate_Column_04_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -682,30 +704,35 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::OBSTRUCTION_00: {
 
 					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_01: {
 
 					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_02: {
 
 					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_03: {
 
 					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_04: {
 
 					actorElement = instantiator->Instantiate_Obstruction_04(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -746,14 +773,14 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::NORMAL_TILE: {
 					actorElement = instantiator->InstantiateTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::LIBRARY);
+					actorElement->SetMaterialSkin(mapSkin);
 					MapInfo->AddTile(lp, actorElement);
 					break;
 				}
 				case StaticMapElement::SPECIAL_TILE: {
 					actorElement = instantiator->Instantiate_Library_SpecialTile(lp);
 					actorElement->ActualLogicPosition = lp;
-					actorElement->SetMaterialSkin(MapSkinType::DUNGEON_NORMAL);
+					actorElement->SetMaterialSkin(mapSkin);
 					break;
 				}
 				case StaticMapElement::EMPTY: {
@@ -761,6 +788,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::PROP_CHEST: {
 					actorElement = instantiator->Instantiate_Library_Prop_Treasure_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -769,6 +797,7 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				}
 				case StaticMapElement::TREE_OR_COLUMN_00: {
 					actorElement = instantiator->Instantiate_Column_04_02(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
@@ -781,30 +810,35 @@ void PD_GM_MapManager::InstantiateMapElementBySkin(MapSkinType mapSkin, StaticMa
 				case StaticMapElement::OBSTRUCTION_00: {
 
 					actorElement = instantiator->Instantiate_Obstruction_00(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_01: {
 
 					actorElement = instantiator->Instantiate_Obstruction_01(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_02: {
 
 					actorElement = instantiator->Instantiate_Obstruction_02(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_03: {
 
 					actorElement = instantiator->Instantiate_Obstruction_03(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
 				case StaticMapElement::OBSTRUCTION_04: {
 
 					actorElement = instantiator->Instantiate_Obstruction_04(lp);
+					actorElement->SetMaterialSkin(mapSkin);
 					actorElement->ActualLogicPosition = lp;
 					break;
 				}
