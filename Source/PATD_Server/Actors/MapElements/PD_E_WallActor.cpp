@@ -108,16 +108,16 @@ void APD_E_WallActor::ChangeRotationToReal(PD_MG_LogicPosition lp) {
 		adj_reales.Contains(N), Super::SGI->mapManager->IsLogicPositionATile(N), Super::SGI->mapManager->IsLogicPositionAProp(N));
 
 	// Tienes una tile en el norte o el sur?
-	if ((adj_reales.Contains(N) && (Super::SGI->mapManager->IsLogicPositionATile(N) || Super::SGI->mapManager->IsLogicPositionAProp(N)))
-		|| (adj_reales.Contains(S) && (Super::SGI->mapManager->IsLogicPositionATile(S) || Super::SGI->mapManager->IsLogicPositionAProp(S)))
+	if ((adj_reales.Contains(N) && (Super::SGI->mapManager->IsLogicPositionATile(N) || Super::SGI->mapManager->IsLogicPositionADoor(N)))
+		|| (adj_reales.Contains(S) && (Super::SGI->mapManager->IsLogicPositionATile(S) || Super::SGI->mapManager->IsLogicPositionADoor(S)))
 		) {
 		this->CallFunctionByNameWithArguments(TEXT("BP_Thin_NS_Visible"), debug, this, true);
 	}
 
 
 	// Tienes una tile en el este o el oeste?
-	else if ((adj_reales.Contains(E) && (Super::SGI->mapManager->IsLogicPositionATile(E) || Super::SGI->mapManager->IsLogicPositionAProp(E)))
-		|| (adj_reales.Contains(W) && (Super::SGI->mapManager->IsLogicPositionATile(W) || Super::SGI->mapManager->IsLogicPositionAProp(W)))
+	else if ((adj_reales.Contains(E) && (Super::SGI->mapManager->IsLogicPositionATile(E) || Super::SGI->mapManager->IsLogicPositionADoor(E)))
+		|| (adj_reales.Contains(W) && (Super::SGI->mapManager->IsLogicPositionATile(W) || Super::SGI->mapManager->IsLogicPositionADoor(W)))
 		) {
 		this->CallFunctionByNameWithArguments(TEXT("BP_Thin_WE_Visible"), debug, this, true);
 		rotated = true;

@@ -1201,7 +1201,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 						UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- contains %d"), id_interact);
 						APD_E_Chest* chest = nullptr;
 						chest = Cast<APD_E_Chest>(mapManager->MapInfo->interactuableActorByID[id_interact]);
-						if (chest && !chest->isActive)
+						if (chest && !chest->IsCurrentlyActivated)
 						{
 							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- is a chest %d"), id_interact);
 
