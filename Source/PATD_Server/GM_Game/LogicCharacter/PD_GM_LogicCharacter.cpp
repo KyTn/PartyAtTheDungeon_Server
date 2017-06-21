@@ -830,34 +830,41 @@ bool PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter(PD_MG_LogicPositi
 
 	TArray<PD_MG_LogicPosition> listInRange = mapMng->GetAllTilesInRange(range, positionFrom);
 
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  Rango: %d"), range);
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  Rango: %d"), range);
 
 
 	if (!listInRange.Contains(character->GetCurrentLogicalPosition())) {
-		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  NO ESTA EN RANGO"));
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  NO ESTA EN RANGO"));
 
 		return false;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter:  esta en rango a falta de raycast"));
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter:  esta en rango a falta de raycast"));
 
 	FHitResult hit;
 	FVector iniPos = mapMng->LogicToWorldPosition(positionFrom);
-	iniPos.Z = 50;
+	iniPos.Z = 80;
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
-	endPos.Z = 50;
+	endPos.Z = 80;
+
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: lanzando drawing"));
+
+
 
 	FCollisionQueryParams paramsRay = FCollisionQueryParams();
 	paramsRay.AddIgnoredActor(this->GetCharacterBP());
 	this->GetController()->GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Camera, paramsRay);
+	
+	//DrawDebugLine(GetWorld(),iniPos,hit.ImpactPoint,FColor(255, 0, 0),true, -1, 0,12.333);
+	//UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Actor impactado %s"), *hit.Actor->GetName());
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 
-		UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
+		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
 
 		return false;
 	}
-	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
+	UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CheckInRangeFromPositionToCharacter: Raycast Acertado"));
 	return true;
 
 }

@@ -266,13 +266,17 @@ bool APD_AIController::CheckInRangeFromPositionToCharacter(PD_MG_LogicPosition p
 
 	FHitResult hit;
 	FVector iniPos = mapMng->LogicToWorldPosition(positionFrom);
-	iniPos.Z = 50;
+	iniPos.Z = 80;
 	FVector endPos = mapMng->LogicToWorldPosition(character->GetCurrentLogicalPosition());
-	endPos.Z = 50;
+	endPos.Z = 80;
+
 
 	FCollisionQueryParams paramsRay = FCollisionQueryParams();
 	paramsRay.AddIgnoredActor(GetPawn());
 	GetWorld()->LineTraceSingleByChannel(hit, iniPos, endPos, ECollisionChannel::ECC_Camera, paramsRay);
+
+	//DrawDebugLine(GetWorld(),iniPos,hit.ImpactPoint,FColor(255, 0, 0),true, -1, 0,12.333);
+	UE_LOG(LogTemp, Log, TEXT("APD_AIController::CheckInRangeFromPositionToCharacter: Raycast Fallado"));
 
 	if (hit.GetActor() != character->GetCharacterBP()) {
 		
