@@ -1577,15 +1577,21 @@ void UPD_ServerGameInstance::GetInfoPlayerForPodium(TArray<FString> &NamePlayer,
 		}
 		else 
 		{
-			for (int i = 0; i < out_Scores.Num(); i++)
+			int numMaxPlayers = out_Scores.Num();
+			
+			for (int i = 0; i < out_Scores.Num() ; i++)
 			{
 				int ScoreMax_Winner = out_Scores_sorted.Pop();
 				int index_winner = 0;
 				if (out_Scores.Find(ScoreMax_Winner, index_winner))
 				{
+					UE_LOG(LogTemp, Log, TEXT("UPD_ServerGameInstance::GetInfoPlayerForPodium -  %d -- %s "), i, *playersManager->GetDataStructPlayer(index_winner)->logic_Character->GetIDCharacter());
+
 					NamePlayer.Add(playersManager->GetDataStructPlayer(index_winner)->logic_Character->GetIDCharacter());
 					Score.Add(ScoreMax_Winner);
 					id_Skin.Add(playersManager->GetDataStructPlayer(index_winner)->logic_Character->GetSkin()->ID_SkinHead);
+
+					out_Scores[index_winner] = -1; //se pone -1 asi se sabe que ya se ha cogido, no va a encontrar nunca -1 buscando puntuacion
 				}
 			}
 		}
