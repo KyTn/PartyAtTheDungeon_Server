@@ -987,6 +987,7 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 				if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
 				{
 					CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+					CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 					CharWhoReceiveTheAttacks->isDead = true;
 					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 				}
@@ -1113,6 +1114,7 @@ void PD_GM_LogicCharacter::Skill_Melee_LargeSword_JumpFatTigger(PD_GM_LogicChara
 						if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
 						{
 							CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+							CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 							enemyManager->GetEnemies()[j]->isDead = true;
 							UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 						}
@@ -1158,6 +1160,7 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 				if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
 				{
 					CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+					CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 					CharWhoReceiveTheAttacks->isDead = true;
 					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 				}
@@ -1214,6 +1217,7 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 					if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
 					{
 						CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+						CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 						CharWhoReceiveTheAttacks->isDead = true;
 						UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 					}
@@ -1266,6 +1270,7 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 			if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
 			{
 				CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+				CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 				CharWhoReceiveTheAttacks->isDead = true;
 				UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 			}
@@ -1408,6 +1413,7 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 						if (CharWhoAttacks->isPlayer && !enemyManager->GetEnemies()[j]->isDead && 	enemyManager->GetEnemies()[j]->GetTotalStats()->HPCurrent <= 0)
 						{
 							CharWhoAttacks->UpdatePointsCurrent(enemyManager->GetEnemies()[j]->GetTotalStats()->PointsCurrent);
+							CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
 							enemyManager->GetEnemies()[j]->isDead = true;
 							UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
 						}

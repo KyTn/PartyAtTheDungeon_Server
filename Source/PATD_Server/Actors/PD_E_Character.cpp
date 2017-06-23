@@ -239,9 +239,16 @@ bool APD_E_Character::IsDead()
 
 }
 
+//LLamados desde blueprint(como bola de fuego)
+
 void APD_E_Character::UpdatePoints(int inPoints)
 {
 	logic_character->UpdatePointsCurrent(inPoints);
+}
+
+void APD_E_Character::UpdateEnemiesDefeated()
+{
+	logic_character->GetTotalStats()->EnemiesDefeated++;
 }
 
 int APD_E_Character::GetPoints()
