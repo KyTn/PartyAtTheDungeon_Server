@@ -112,6 +112,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
 		void UpdatePoints (int inPoints);
+
+	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
+		void UpdateEnemiesDefeated();
+
 	UFUNCTION(BlueprintCallable, Category = "PD_GM_LogicCharacter")
 		int GetPoints();
 

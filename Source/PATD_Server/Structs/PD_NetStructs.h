@@ -274,6 +274,12 @@ struct FStructTotalStats
 	UPROPERTY()
 		int PointsCurrent;
 
+	UPROPERTY()
+		int EnemiesDefeated;
+
+	UPROPERTY()
+		int ChestsOpened;
+
 	//Constructor
 	FStructTotalStats()
 	{

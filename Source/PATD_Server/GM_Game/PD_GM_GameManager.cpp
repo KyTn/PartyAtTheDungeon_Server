@@ -1213,6 +1213,8 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 							chest->Interact(nullptr);
 							//doorOpend->SetActorHiddenInGame(true);
 							logic_char->GetTotalStats()->PointsCurrent += 10;
+							logic_char->GetTotalStats()->ChestsOpened++;
+							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- LARGE CHEST OPENED %i"), logic_char->GetTotalStats()->ChestsOpened++);
 							logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 							logic_char->UseInteractable();
 
@@ -1231,7 +1233,11 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 					break;
 				}
 				case StaticMapElement::SMALL_CHEST:
-					break;
+				{
+					logic_char->GetTotalStats()->ChestsOpened++;
+					UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- SMALL CHEST OPENED %i"), logic_char->GetTotalStats()->ChestsOpened++);
+					break; 
+				}
 				default:
 					break;
 				}
