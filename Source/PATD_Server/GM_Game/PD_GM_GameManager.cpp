@@ -1062,7 +1062,7 @@ for (int i = 0; i < players; i++) {
 		}
 
 		TArray<FVector> positionsToMove = TArray<FVector>();
-		if (!logicCharacter->GetIsPlayer())
+		//if (!logicCharacter->GetIsPlayer())
 			positionsToMove.Add(mapManager->LogicToWorldPosition(logicCharacter->GetCurrentLogicalPosition())); //Add the current poisition to start moving
 		
 		for (int j = 0; j < logicCharacter->GetMovingLogicalPosition().Num(); j++)

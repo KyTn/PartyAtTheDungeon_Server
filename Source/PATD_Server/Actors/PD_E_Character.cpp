@@ -42,6 +42,8 @@ APD_E_Character::APD_E_Character(const FObjectInitializer& ObjectInitializer)
 	Widget->SetupAttachment(RootComponent);
 	SpringArm->SetupAttachment(RootComponent);
 	Camera->SetupAttachment(SpringArm);
+	this->GetCharacterMovement()->GravityScale = 0;
+	//this->GetCharacterMovement()->planar
 }
 // Called when the game starts or when spawned
 void APD_E_Character::BeginPlay()
