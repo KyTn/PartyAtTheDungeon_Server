@@ -405,6 +405,8 @@ FStructUpdateTurn PD_GM_GameManager::GenerateStructUpdateTurn() {
 		logicPosition.positionY = logicCharacter->GetCurrentLogicalPosition().GetY();
 		structUpdateCharacter.HPCurrent = logicCharacter->GetTotalStats()->HPCurrent;
 		structUpdateCharacter.PointsCurrent = logicCharacter->GetTotalStats()->PointsCurrent;
+		structUpdateCharacter.EnemiesDefeated = logicCharacter->GetTotalStats()->EnemiesDefeated;
+		structUpdateCharacter.ChestsOpened = logicCharacter->GetTotalStats()->ChestsOpened;
 		structUpdateCharacter.currentCharacterPosition = logicPosition;
 		structUpdateCharacter.ID_character = logicCharacter->GetIDCharacter();
 		structUpdateTurn.listPlayerCharacters.Add(structUpdateCharacter);
@@ -1214,7 +1216,7 @@ void PD_GM_GameManager::VisualInteractbaleTick(FString id_char, int id_interact)
 							//doorOpend->SetActorHiddenInGame(true);
 							logic_char->GetTotalStats()->PointsCurrent += 10;
 							logic_char->GetTotalStats()->ChestsOpened++;
-							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- LARGE CHEST OPENED %i"), logic_char->GetTotalStats()->ChestsOpened++);
+							UE_LOG(LogTemp, Log, TEXT("PD_GM_GameManager::VisualInteractbaleTick -- LARGE CHEST OPENED %i"), logic_char->GetTotalStats()->ChestsOpened);
 							logic_char->GetController()->UpdateRotationCharacterToEnemy(chest->GetActorLocation()); //Pasarle la direccion del interactuable al que va a atacar
 							logic_char->UseInteractable();
 
