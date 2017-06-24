@@ -808,7 +808,7 @@ void UPD_ServerGameInstance::OnLoadedLevel() {
 
 		UE_LOG(LogTemp, Warning, TEXT("enumServerState == EServerState::Podium -"));
 
-		timerOnPodium->InitTimerPodium(5.0f, this);
+		timerOnPodium->InitTimerPodium(30.0f, this);
 		
 	}
 	else if (structServerState->enumServerState == EServerState::OnExit) {
