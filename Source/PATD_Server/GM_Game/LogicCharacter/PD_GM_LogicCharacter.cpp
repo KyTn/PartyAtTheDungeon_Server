@@ -773,7 +773,7 @@ int PD_GM_LogicCharacter::CalculateAPleftInPlayerActions(PD_GM_LogicCharacter* C
 	PD_GM_EnemyManager* enemyManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->enemyManager;
 	PD_PlayersManager* playersManager = Cast<UPD_ServerGameInstance>(GetCharacterBP()->GetGameInstance())->gameManager->playersManager;
 
-	int APleft = CharWhoAttacks->GetTotalStats()->AP; //AP totales del personaje
+	int APleft = CharWhoAttacks->GetTotalStats()->APTotal; //AP totales del personaje
 
 	if (CharWhoAttacks->isPlayer)
 	{
@@ -896,7 +896,7 @@ int PD_GM_LogicCharacter::CalculateIncreaseOfDamage(PD_GM_LogicCharacter* CharWh
 
 	if (CharWhoDeffense->GetCharacterState()->activeEffectsOnCharacter.Contains((int)ActiveSkills::WhenFua)) 
 	{
-		increaseDMG = 20;
+		increaseDMG = 35;
 		UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter::CalculateIncreaseOfDamage:: Se va a incrementar el ataque"));
 
 		//Si se da este power up, se lo tiene que quitar (solo dura 1 hostia) -> aunque se va hacer de modo generico - primero restando 1 al valor y luego viendo si es 0 para quitarlo.
@@ -960,8 +960,7 @@ void PD_GM_LogicCharacter::Skill_BasicAttack(PD_GM_LogicCharacter* CharWhoAttack
 
 					//quitarselo al charWhoRecieveTheAttacks
 					int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-					totalDamage = totalDamage - ((reductionOfDamage / 100)  * totalDamage);
-					totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
+					totalDamage = totalDamage - FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 					UE_LOG(LogTemp, Log, TEXT("PD_GM_LogicCharacter:: atq update: %d"), totalDamage);
 
 					CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
@@ -1149,10 +1148,15 @@ void PD_GM_LogicCharacter::Skill_Melee_Hostion(PD_GM_LogicCharacter* CharWhoAtta
 				totalDamage = totalDamage + FMath::TruncToInt((((double)increaseOfDMG / 100)  * totalDamage));
 
 				int APLeftBonus = CalculateAPleftInPlayerActions(CharWhoAttacks);
-				totalDamage = totalDamage + FMath::TruncToInt((((double)APLeftBonus / 100)  * totalDamage));
+				if (APLeftBonus >= 5)
+					totalDamage = 2*totalDamage;
+				else 
+					totalDamage = totalDamage + FMath::TruncToInt((0.5) * totalDamage);
+
+
 
 				int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-				totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
+				totalDamage = totalDamage - FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 				CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
 				CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::Hostion);
@@ -1204,27 +1208,26 @@ void PD_GM_LogicCharacter::Skill_Range_Guns_SomeHit(PD_GM_LogicCharacter* CharWh
 				for (int i = 0; i < 2; i++)
 				{
 
-					totalDamage = (CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
+					totalDamage = totalDamage +(CharWhoAttacks->GetWeapon()->DMWeapon + CharWhoAttacks->GetInitBaseStats()->DMGBase) * (1 + CharWhoAttacks->GetTotalStats()->PODBonus);
 					int increaseOfDMG = CalculateIncreaseOfDamage(CharWhoAttacks);
 					totalDamage = totalDamage + FMath::TruncToInt((((double)increaseOfDMG / 100)  * totalDamage));
 
 					//quitarselo al charWhoRecieveTheAttacks
 					int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-					totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
+					totalDamage = totalDamage - FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 
-					CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
-
-					if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
-					{
-						CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
-						CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
-						CharWhoReceiveTheAttacks->isDead = true;
-						UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
-					}
-
-					if (!CharWhoReceiveTheAttacks->isDead)
-						break;
 				}
+
+				CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
+
+				if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
+				{
+					CharWhoAttacks->UpdatePointsCurrent(CharWhoReceiveTheAttacks->GetTotalStats()->PointsCurrent);
+					CharWhoAttacks->GetTotalStats()->EnemiesDefeated++;
+					CharWhoReceiveTheAttacks->isDead = true;
+					UE_LOG(LogTemp, Log, TEXT("Logic_character::Soy %s y tengo %i puntos"), *CharWhoAttacks->GetIDCharacter(), CharWhoAttacks->GetTotalStats()->PointsCurrent);
+				}
+
 			}
 			else
 			{
@@ -1264,7 +1267,7 @@ void PD_GM_LogicCharacter::Skill_Range_RightInTheAsshole(PD_GM_LogicCharacter* C
 			CharWhoAttacks->GetController()->Animation_CriticalBasicAttack((int)ActiveSkills::BasicAttack);
 
 			int reductionOfDamage = CalculateReductionOfDamage(CharWhoReceiveTheAttacks);
-			totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
+			totalDamage = totalDamage - FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 			CharWhoReceiveTheAttacks->UpdateHPCurrent(-totalDamage);
 
 			if (CharWhoAttacks->isPlayer && !CharWhoReceiveTheAttacks->isDead && CharWhoReceiveTheAttacks->GetTotalStats()->HPCurrent <= 0)
@@ -1400,13 +1403,13 @@ void PD_GM_LogicCharacter::Skill_Magic_BeInCrossroads(PD_GM_LogicCharacter* Char
 						for (int index_SkillPas = 0; index_SkillPas < CharWhoAttacks->GetSkills()->listPasiveSkills.Num(); index_SkillPas++)
 						{
 							if (CharWhoAttacks->GetSkills()->listPasiveSkills[index_SkillPas].ID_Skill == (int)PasiveSkills::PowerfulStick)
-								totalDamage += 2; //valor que se incrementa el ataque
+								totalDamage += 20; //valor que se incrementa el ataque
 							if (CharWhoAttacks->GetSkills()->listPasiveSkills[index_SkillPas].ID_Skill == (int)PasiveSkills::Borderline)
-								totalDamage += 3; //valor que se incrementa el ataque		
+								totalDamage += 10; //valor que se incrementa el ataque		
 						}
 
 						int reductionOfDamage = CalculateReductionOfDamage(enemyManager->GetEnemies()[j]);
-						totalDamage = totalDamage + FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
+						totalDamage = totalDamage - FMath::TruncToInt((((double)reductionOfDamage / 100)  * totalDamage));
 
 						enemyManager->GetEnemies()[j]->UpdateHPCurrent(-totalDamage);
 
