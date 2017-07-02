@@ -45,7 +45,8 @@ public:
 
 
 
-//	APD_GenericController(FString type);
+		//	APD_GenericController(FString type);
+	void Possess(APawn* charac) override;
 
 	void SetSpline(APD_SplineActors* newSpline);
 	APD_SplineActors* GetSpline();

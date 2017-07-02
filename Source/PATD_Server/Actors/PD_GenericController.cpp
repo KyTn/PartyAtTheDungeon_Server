@@ -25,6 +25,12 @@
 APD_GenericController::APD_GenericController(FString type) {
 
 }*/
+void APD_GenericController::Possess(APawn* charac)
+{
+	Super::Possess(charac);
+	spline = nullptr;
+}
+
 
 void APD_GenericController::Tick(float DeltaTime)
 {
@@ -252,11 +258,11 @@ void APD_GenericController::UpdateRotationCharacterToEnemy(FVector target)
 
 APD_SplineActors* APD_GenericController::GetSpline()
 {
-	if (spline)
+	if (spline->IsValidLowLevelFast())
 	{
 		return spline;
 	}
-	else //Si no existe, pide uno al Spline Manager ->  devuelve ese
+	else //Si no existe, pide uno al Spline Manager ->  devuelve ese*/
 	{
 		UPD_ServerGameInstance* SGI = Cast<UPD_ServerGameInstance>(GetCharacter()->GetGameInstance());
 		if (SGI)
